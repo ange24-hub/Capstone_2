@@ -2,9 +2,29 @@
 
 @section('content')
     <section class="panel stack">
-        <div class="page-kicker">Barangay Records Desk</div>
-        <h1>Barangay Dashboard</h1>
-        <p>{{ auth()->user()->name }} is signed in as {{ auth()->user()->roleLabel() }}.</p>
+        <div class="dashboard-hero">
+            <div>
+                <div class="page-kicker">Barangay Operations Hub</div>
+                <h1>Barangay Dashboard</h1>
+                <p>Prepare RBI monthly updates, manage draft rows, and move directly into registry, mapping, and migration work.</p>
+
+                <div class="hero-actions">
+                    <a class="button" href="{{ route('registry.index') }}">Central Registry</a>
+                    <a class="button" href="{{ route('spatial.index') }}">Spatial Map</a>
+                    <a class="button" href="{{ route('migration.dashboard') }}">Migration Monitor</a>
+                </div>
+            </div>
+            <div class="hero-side">
+                <div class="hero-mini-card">
+                    <strong>{{ number_format($rbiUpdates->count()) }}</strong>
+                    <span>Total RBI updates</span>
+                </div>
+                <div class="hero-mini-card">
+                    <strong>{{ number_format($rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count()) }}</strong>
+                    <span>Submitted to municipal LGU</span>
+                </div>
+            </div>
+        </div>
 
         @if (session('status'))
             <div class="success">{{ session('status') }}</div>
@@ -20,18 +40,26 @@
             </div>
         @endif
 
-        <div class="meta-grid">
-            <div class="meta">
-                <strong>Access tier</strong>
-                Barangay
+        <div class="stat-grid">
+            <div class="stat-card">
+                <span class="stat-label">Access Tier</span>
+                <span class="stat-value">BRGY</span>
+                <span class="stat-note">Barangay-level workspace</span>
             </div>
-            <div class="meta">
-                <strong>Permissions</strong>
-                Barangay and resident areas
+            <div class="stat-card">
+                <span class="stat-label">Drafts</span>
+                <span class="stat-value">{{ number_format($rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count()) }}</span>
+                <span class="stat-note">Pending completion</span>
             </div>
-            <div class="meta">
-                <strong>Session</strong>
-                Authenticated
+            <div class="stat-card">
+                <span class="stat-label">Submitted</span>
+                <span class="stat-value">{{ number_format($rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count()) }}</span>
+                <span class="stat-note">Sent to municipal LGU</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Session</span>
+                <span class="stat-value">Live</span>
+                <span class="stat-note">{{ auth()->user()->name }}</span>
             </div>
         </div>
 
@@ -88,7 +116,7 @@
                     <div>
                         <span class="step-pill">Step 2</span>
                         <h2 class="section-title">Review and Submit RBI Update</h2>
-                        <p>Edit the table, certification names, and dates. Use “Save and Submit” to send the current entries to Municipal LGU in one action.</p>
+                        <p>Edit the table, certification names, and dates. Use "Save and Submit" to send the current entries to Municipal LGU in one action.</p>
                     </div>
                     <span class="badge">Draft</span>
                 </div>

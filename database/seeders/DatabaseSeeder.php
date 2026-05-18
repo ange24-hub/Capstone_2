@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Barangay;
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +15,37 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        $barangay = Barangay::firstOrCreate(
+            ['name' => 'San Isidro'],
+            ['municipality' => 'Lawgawan']
+        );
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::updateOrCreate(
+            ['email' => 'municipal@example.com'],
+            [
+                'name' => 'Municipal Admin',
+                'role' => User::ROLE_MUNICIPAL_LGU,
+                'password' => Hash::make('Password123!'),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'barangay@example.com'],
+            [
+                'name' => 'Barangay Staff',
+                'role' => User::ROLE_BARANGAY,
+                'barangay_id' => $barangay->id,
+                'password' => Hash::make('Password123!'),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'resident@example.com'],
+            [
+                'name' => 'Resident User',
+                'role' => User::ROLE_RESIDENT,
+                'password' => Hash::make('Password123!'),
+            ]
+        );
     }
 }

@@ -2,9 +2,23 @@
 
 @section('content')
     <section class="panel stack">
-        <div class="page-kicker">Resident Services</div>
-        <h1>Resident Dashboard</h1>
-        <p>{{ auth()->user()->name }} is signed in as {{ auth()->user()->roleLabel() }}.</p>
+        <div class="dashboard-hero">
+            <div>
+                <div class="page-kicker">Resident Service Portal</div>
+                <h1>Resident Dashboard</h1>
+                <p>Request barangay documents, track processing status, and keep your local service transactions in one clean workspace.</p>
+            </div>
+            <div class="hero-side">
+                <div class="hero-mini-card">
+                    <strong>{{ number_format($documentRequests->count()) }}</strong>
+                    <span>Total form requests</span>
+                </div>
+                <div class="hero-mini-card">
+                    <strong>{{ number_format($documentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count()) }}</strong>
+                    <span>Pending requests</span>
+                </div>
+            </div>
+        </div>
 
         @if (session('status'))
             <div class="success">{{ session('status') }}</div>
@@ -20,23 +34,31 @@
             </div>
         @endif
 
-        <div class="meta-grid">
-            <div class="meta">
-                <strong>Access tier</strong>
-                Resident
+        <div class="stat-grid">
+            <div class="stat-card">
+                <span class="stat-label">Access Tier</span>
+                <span class="stat-value">RES</span>
+                <span class="stat-note">Resident service area</span>
             </div>
-            <div class="meta">
-                <strong>Permissions</strong>
-                Resident area
+            <div class="stat-card">
+                <span class="stat-label">Requests</span>
+                <span class="stat-value">{{ number_format($documentRequests->count()) }}</span>
+                <span class="stat-note">All submitted forms</span>
             </div>
-            <div class="meta">
-                <strong>Session</strong>
-                Authenticated
+            <div class="stat-card">
+                <span class="stat-label">Pending</span>
+                <span class="stat-value">{{ number_format($documentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count()) }}</span>
+                <span class="stat-note">Awaiting review</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Session</span>
+                <span class="stat-value">Live</span>
+                <span class="stat-note">{{ auth()->user()->name }}</span>
             </div>
         </div>
 
         @if (auth()->user()->hasRole(App\Models\User::ROLE_RESIDENT))
-            <div>
+            <div class="workflow-card">
                 <h2 class="section-title">Request a Form</h2>
                 <p>Select the barangay form you need and submit your purpose for processing.</p>
 
@@ -63,7 +85,7 @@
             </div>
         @endif
 
-        <div>
+        <div class="workflow-card">
             <h2 class="section-title">My Form Requests</h2>
 
             @if ($documentRequests->isEmpty())

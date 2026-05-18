@@ -4,6 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangayRbiUpdateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentRequestController;
+use App\Http\Controllers\MigrationDashboardController;
+use App\Http\Controllers\RegistryController;
+use App\Http\Controllers\SpatialVisualizationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +69,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/resident', [DashboardController::class, 'resident'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY.','.User::ROLE_RESIDENT)
         ->name('dashboard.resident');
+
+    Route::get('/registry', [RegistryController::class, 'index'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('registry.index');
+
+    Route::post('/registry', [RegistryController::class, 'store'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('registry.store');
+
+    Route::get('/registry/{inhabitant}/edit', [RegistryController::class, 'edit'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('registry.edit');
+
+    Route::put('/registry/{inhabitant}', [RegistryController::class, 'update'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('registry.update');
+
+    Route::delete('/registry/{inhabitant}', [RegistryController::class, 'destroy'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('registry.destroy');
+
+    Route::get('/migration-monitoring', MigrationDashboardController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('migration.dashboard');
+
+    Route::get('/spatial-visualization', SpatialVisualizationController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('spatial.index');
 
     Route::post('/resident/document-requests', [DocumentRequestController::class, 'store'])
         ->middleware('role:'.User::ROLE_RESIDENT)

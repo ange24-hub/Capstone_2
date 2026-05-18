@@ -22,6 +22,7 @@ class DocumentRequest extends Model
      */
     protected $fillable = [
         'resident_id',
+        'inhabitant_id',
         'reference_number',
         'document_type',
         'purpose',

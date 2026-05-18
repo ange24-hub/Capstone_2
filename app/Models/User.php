@@ -26,6 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'role',
+        'barangay_id',
         'password',
     ];
 
@@ -82,5 +83,10 @@ class User extends Authenticatable
     public function documentRequests(): HasMany
     {
         return $this->hasMany(DocumentRequest::class, 'resident_id');
+    }
+
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class);
     }
 }
