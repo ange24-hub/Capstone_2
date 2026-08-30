@@ -12,12 +12,18 @@ class SpatialVisualizationController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $isBarangaySecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
+
+        if ($isBarangaySecretary) {
+            abort_unless($request->user()->barangay_id, 403, 'Your secretary account is not assigned to a barangay.');
+        }
+
         $households = Household::with(['barangay', 'inhabitants'])
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->when($request->user()->hasRole(User::ROLE_BARANGAY) && $request->user()->barangay_id, fn ($query) => $query
+            ->when($isBarangaySecretary, fn ($query) => $query
                 ->where('barangay_id', $request->user()->barangay_id))
-            ->when($request->filled('barangay_id'), fn ($query) => $query
+            ->when(! $isBarangaySecretary && $request->filled('barangay_id'), fn ($query) => $query
                 ->where('barangay_id', $request->integer('barangay_id')))
             ->orderBy('household_number')
             ->get();
@@ -38,7 +44,9 @@ class SpatialVisualizationController extends Controller
         ])->values();
 
         return view('spatial.index', [
-            'barangays' => Barangay::orderBy('name')->get(),
+            'barangays' => $isBarangaySecretary
+                ? Barangay::whereKey($request->user()->barangay_id)->get()
+                : Barangay::orderBy('name')->get(),
             'markers' => $markers,
             'householdCount' => $households->count(),
             'populationCount' => $households->sum(fn (Household $household): int => $household->inhabitants->count()),

@@ -15,10 +15,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $barangay = Barangay::firstOrCreate(
-            ['name' => 'San Isidro'],
-            ['municipality' => 'Lawgawan']
-        );
+        foreach (Barangay::TOMAS_OPPUS_BARANGAYS as $name) {
+            Barangay::updateOrCreate(
+                ['name' => $name],
+                ['municipality' => Barangay::MUNICIPALITY]
+            );
+        }
+
+        $barangay = Barangay::where('name', 'San Isidro')->firstOrFail();
 
         User::updateOrCreate(
             ['email' => 'municipal@example.com'],
@@ -33,6 +37,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'barangay@example.com'],
             [
                 'name' => 'Barangay Staff',
+                'staff_id' => 'TO-SI-001',
                 'role' => User::ROLE_BARANGAY,
                 'barangay_id' => $barangay->id,
                 'password' => Hash::make('Password123!'),

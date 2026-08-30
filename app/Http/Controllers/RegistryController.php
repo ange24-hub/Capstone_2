@@ -16,14 +16,20 @@ class RegistryController extends Controller
 {
     public function index(Request $request): View
     {
+        $isBarangaySecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
+
+        if ($isBarangaySecretary) {
+            abort_unless($request->user()->barangay_id, 403, 'Your secretary account is not assigned to a barangay.');
+        }
+
         $query = Inhabitant::with(['barangay', 'household', 'migrationRecords'])
             ->latest();
 
-        if ($request->user()->hasRole(User::ROLE_BARANGAY) && $request->user()->barangay_id) {
+        if ($isBarangaySecretary) {
             $query->where('barangay_id', $request->user()->barangay_id);
         }
 
-        if ($request->filled('barangay_id')) {
+        if (! $isBarangaySecretary && $request->filled('barangay_id')) {
             $query->where('barangay_id', $request->integer('barangay_id'));
         }
 
@@ -40,7 +46,9 @@ class RegistryController extends Controller
 
         return view('registry.index', [
             'inhabitants' => $query->paginate(15)->withQueryString(),
-            'barangays' => Barangay::orderBy('name')->get(),
+            'barangays' => $isBarangaySecretary
+                ? Barangay::whereKey($request->user()->barangay_id)->get()
+                : Barangay::orderBy('name')->get(),
             'statusLabels' => Inhabitant::statusLabels(),
             'migrationTypes' => MigrationRecord::typeLabels(),
         ]);
@@ -136,13 +144,8 @@ class RegistryController extends Controller
             );
 
         if ($request->user()->hasRole(User::ROLE_BARANGAY)) {
-            if ($request->user()->barangay_id && $request->user()->barangay_id !== $barangay->id) {
-                abort(403);
-            }
-
-            if (! $request->user()->barangay_id) {
-                $request->user()->update(['barangay_id' => $barangay->id]);
-            }
+            abort_unless($request->user()->barangay_id, 403, 'Your secretary account is not assigned to a barangay.');
+            abort_unless($request->user()->barangay_id === $barangay->id, 403);
         }
 
         return $barangay;

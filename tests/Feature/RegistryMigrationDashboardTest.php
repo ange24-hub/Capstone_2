@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Barangay;
 use App\Models\Inhabitant;
 use App\Models\MigrationRecord;
 use App\Models\User;
@@ -23,12 +24,15 @@ class RegistryMigrationDashboardTest extends TestCase
 
     public function test_staff_can_create_registry_record_with_house_coordinates_and_migration_event(): void
     {
-        $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $barangay = Barangay::where('name', 'San Isidro')->firstOrFail();
+        $secretary = User::factory()->create([
+            'role' => User::ROLE_BARANGAY,
+            'barangay_id' => $barangay->id,
+        ]);
 
-        $this->actingAs($municipal)
+        $this->actingAs($secretary)
             ->post(route('registry.store'), [
-                'barangay_name' => 'San Isidro',
-                'municipality' => 'Lawgawan',
+                'barangay_id' => $barangay->id,
                 'household_number' => 'HH-001',
                 'purok' => 'Purok 2',
                 'address' => 'Riverside Road',
@@ -61,6 +65,8 @@ class RegistryMigrationDashboardTest extends TestCase
             'origin' => 'Quezon City',
             'destination' => 'San Isidro',
         ]);
+
+        $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
 
         $this->actingAs($municipal)
             ->get(route('migration.dashboard'))

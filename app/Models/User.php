@@ -17,6 +17,10 @@ class User extends Authenticatable
     public const ROLE_BARANGAY = 'barangay';
     public const ROLE_MUNICIPAL_LGU = 'municipal_lgu';
 
+    public const APPROVAL_PENDING = 'pending';
+    public const APPROVAL_APPROVED = 'approved';
+    public const APPROVAL_REJECTED = 'rejected';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -25,8 +29,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'staff_id',
         'role',
         'barangay_id',
+        'approval_status',
+        'approved_at',
+        'approved_by',
         'password',
     ];
 
@@ -47,6 +55,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'approved_at' => 'datetime',
         'password' => 'hashed',
     ];
 
@@ -57,13 +66,17 @@ class User extends Authenticatable
     {
         return [
             self::ROLE_RESIDENT => 'Resident',
-            self::ROLE_BARANGAY => 'Barangay-level user',
+            self::ROLE_BARANGAY => 'Barangay Secretary',
             self::ROLE_MUNICIPAL_LGU => 'Municipal LGU-level user',
         ];
     }
 
     public function roleLabel(): string
     {
+        if ($this->role === self::ROLE_BARANGAY) {
+            return 'Barangay Secretary';
+        }
+
         return self::roleLabels()[$this->role] ?? 'Unknown';
     }
 
@@ -80,6 +93,20 @@ class User extends Authenticatable
         return in_array($this->role, $roles, true);
     }
 
+    public function isApproved(): bool
+    {
+        return $this->approval_status === self::APPROVAL_APPROVED;
+    }
+
+    public function approvalStatusLabel(): string
+    {
+        return match ($this->approval_status) {
+            self::APPROVAL_APPROVED => 'Approved',
+            self::APPROVAL_REJECTED => 'Rejected',
+            default => 'Pending approval',
+        };
+    }
+
     public function documentRequests(): HasMany
     {
         return $this->hasMany(DocumentRequest::class, 'resident_id');
@@ -88,5 +115,10 @@ class User extends Authenticatable
     public function barangay()
     {
         return $this->belongsTo(Barangay::class);
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(self::class, 'approved_by');
     }
 }

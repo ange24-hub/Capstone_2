@@ -1,5 +1,15 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
+## Running RBIM locally
+
+On the Laragon development machine, run `start-rbim.bat` (or `composer dev`)
+instead of running `php artisan serve` directly. The launcher checks MySQL,
+starts Laragon's MySQL instance when necessary, waits for it to accept
+connections, and then starts RBIM at <http://127.0.0.1:8000>.
+
+If Laragon is installed outside `C:\laragon`, set the `RBIM_LARAGON_ROOT`
+environment variable to its installation directory before using the launcher.
+
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
@@ -64,3 +74,18 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## GCash document payments
+
+Document fees and GCash collection are disabled by default. A Municipal LGU user configures each Barangay's official merchant name, account identifier, QR image, and enabled status in **Barangay Directory → GCash document payments**. The QR image is stored privately and can be viewed only by the Municipal LGU, that Barangay's staff, and residents assigned to that Barangay.
+
+Configure only the municipality-approved fee schedule in `.env`:
+
+```env
+DOCUMENT_FEE_INDIGENCY=0
+DOCUMENT_FEE_CLEARANCE=0
+DOCUMENT_FEE_RESIDENCY=0
+DOCUMENT_FEE_BUSINESS_CLEARANCE=0
+```
+
+Each request automatically uses the GCash profile of its receiving Barangay. Barangay staff must match the 13-digit GCash reference, amount, timestamp, and receipt against that Barangay's GCash for Business transaction history before verifying payment. The system prevents a merchant profile from being changed while it has unpaid or unverified requests. Receipt images are stored on the private local disk and are available only to the resident who submitted them and the assigned Barangay reviewer.

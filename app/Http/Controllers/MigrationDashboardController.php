@@ -13,10 +13,16 @@ class MigrationDashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $isBarangaySecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
+
+        if ($isBarangaySecretary) {
+            abort_unless($request->user()->barangay_id, 403, 'Your secretary account is not assigned to a barangay.');
+        }
+
         $records = MigrationRecord::with(['barangay', 'inhabitant.household'])
-            ->when($request->user()->hasRole(User::ROLE_BARANGAY) && $request->user()->barangay_id, fn ($query) => $query
+            ->when($isBarangaySecretary, fn ($query) => $query
                 ->where('barangay_id', $request->user()->barangay_id))
-            ->when($request->filled('barangay_id'), fn ($query) => $query
+            ->when(! $isBarangaySecretary && $request->filled('barangay_id'), fn ($query) => $query
                 ->where('barangay_id', $request->integer('barangay_id')))
             ->latest('movement_date')
             ->get();
@@ -49,11 +55,13 @@ class MigrationDashboardController extends Controller
             ->values();
 
         return view('dashboards.migration', [
-            'barangays' => Barangay::orderBy('name')->get(),
+            'barangays' => $isBarangaySecretary
+                ? Barangay::whereKey($request->user()->barangay_id)->get()
+                : Barangay::orderBy('name')->get(),
             'records' => $records->take(12),
             'barangayStats' => $barangayStats,
             'monthlyTrend' => $monthlyTrend,
-            'totalInhabitants' => Inhabitant::when($request->user()->hasRole(User::ROLE_BARANGAY) && $request->user()->barangay_id, fn ($query) => $query
+            'totalInhabitants' => Inhabitant::when($isBarangaySecretary, fn ($query) => $query
                 ->where('barangay_id', $request->user()->barangay_id))
                 ->count(),
             'totalIn' => $records->where('type', MigrationRecord::TYPE_IN)->count(),
