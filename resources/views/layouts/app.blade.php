@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/rbim.css') }}?v={{ filemtime(public_path('css/rbim.css')) }}">
     @stack('head')
 </head>
-<body @auth class="role-{{ str_replace('_', '-', auth()->user()->role) }}" @endauth>
+<body @auth class="role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'sidebar-collapsed focused-workspace' : '' }}" @endauth>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     @guest
         <div class="public-shell">
@@ -33,7 +33,7 @@
                     <nav class="public-nav" aria-label="Public navigation">
                         <a href="{{ route('home') }}">Home</a>
                         <a href="{{ route('home') }}#about">About</a>
-                        <a href="{{ route('home') }}#services">Services</a>
+                        <a href="{{ route('services') }}">Services</a>
                         <a class="public-login-link" href="{{ route('login') }}">Login</a>
                         <a class="public-register-link" href="{{ route('register') }}">Register</a>
                     </nav>
@@ -84,17 +84,28 @@
                 <nav class="side-nav" aria-label="Primary navigation">
                     @if (auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
                         <a class="@if(request()->routeIs('dashboard.municipal')) active @endif" href="{{ route('dashboard.municipal') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
+                        <a class="@if(request()->routeIs('municipal.approvals.*')) active @endif" href="{{ route('municipal.approvals.index') }}"><span class="nav-mark"><x-app-icon name="check" /></span><span>Account Approvals</span></a>
                         <a class="@if(request()->routeIs('municipal.barangays.*')) active @endif" href="{{ route('municipal.barangays.index') }}"><span class="nav-mark"><x-app-icon name="directory" /></span><span>Barangay Directory</span></a>
                         <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Trends</span></a>
                         <a class="@if(request()->routeIs('spatial.index')) active @endif" href="{{ route('spatial.index') }}"><span class="nav-mark"><x-app-icon name="map" /></span><span>Movement Map</span></a>
                     @elseif (auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
                         <a class="@if(request()->routeIs('dashboard.barangay')) active @endif" href="{{ route('dashboard.barangay') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
-                        <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
-                        <a class="@if(request()->routeIs('registry.*')) active @endif" href="{{ route('registry.index') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>Resident Registry</span></a>
+                        <a class="@if(request()->routeIs('barangay.resident-approvals.*')) active @endif" href="{{ route('barangay.resident-approvals.index') }}"><span class="nav-mark"><x-app-icon name="check" /></span><span>Resident Approvals</span></a>
+                        <a class="@if(request()->routeIs('barangay.document-requests.*')) active @endif" href="{{ route('barangay.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Document Requests</span></a>
+                        @php($navWorkbook = in_array(auth()->user()->barangay?->name, ['Canlupao', 'Biasong', 'Cabascan'], true) ? strtoupper(auth()->user()->barangay->name).'.xlsx' : null)
+                        @if ($navWorkbook)
+                            <a class="@if(request()->routeIs('barangay.registry.new-inhabitants')) active @endif" href="{{ route('barangay.registry.new-inhabitants') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>New Inhabitants</span></a>
+                            <a class="@if(request()->routeIs('barangay.registry.deceased')) active @endif" href="{{ route('barangay.registry.deceased') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Deceased Records</span></a>
+                        @else
+                            <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
+                        @endif
+                        <a class="@if(request()->routeIs('barangay.registry.active') || request()->routeIs('registry.*') && !in_array(request('sheet'), ['new-inhabitants', 'deceased'], true)) active @endif" href="{{ route('barangay.registry.active') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>Resident Registry</span></a>
                         <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Records</span></a>
                         <a class="@if(request()->routeIs('spatial.index')) active @endif" href="{{ route('spatial.index') }}"><span class="nav-mark"><x-app-icon name="map" /></span><span>Household Map</span></a>
                     @else
-                        <a class="@if(request()->routeIs('dashboard.resident')) active @endif" href="{{ route('dashboard.resident') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>My Dashboard</span></a>
+                        <a class="@if(request()->routeIs('dashboard.resident')) active @endif" href="{{ route('dashboard.resident') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
+                        <a class="@if(request()->routeIs('resident.document-requests.create')) active @endif" href="{{ route('resident.document-requests.create') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>Request a Document</span></a>
+                        <a class="@if(request()->routeIs('resident.document-requests.index')) active @endif" href="{{ route('resident.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>My Requests</span></a>
                     @endif
                 </nav>
 
@@ -122,6 +133,9 @@
             <div class="app-main">
                 <header class="app-header">
                     <div class="app-header-primary">
+                        <button class="desktop-sidebar-button" type="button" aria-label="Collapse navigation" aria-controls="app-sidebar" aria-expanded="true" data-sidebar-collapse>
+                            <x-app-icon name="menu" />
+                        </button>
                         <button class="mobile-menu-button" type="button" aria-label="Open navigation" aria-controls="app-sidebar" aria-expanded="false" data-sidebar-toggle>
                             <x-app-icon name="menu" />
                         </button>
@@ -158,12 +172,18 @@
                 const body = document.body;
                 const toggle = document.querySelector('[data-sidebar-toggle]');
                 const close = document.querySelector('[data-sidebar-close]');
+                const collapse = document.querySelector('[data-sidebar-collapse]');
                 const setOpen = (open) => {
                     body.classList.toggle('sidebar-is-open', open);
                     toggle?.setAttribute('aria-expanded', String(open));
                 };
 
                 toggle?.addEventListener('click', () => setOpen(!body.classList.contains('sidebar-is-open')));
+                collapse?.addEventListener('click', () => {
+                    const isCollapsed = body.classList.toggle('sidebar-collapsed');
+                    collapse.setAttribute('aria-expanded', String(!isCollapsed));
+                    collapse.setAttribute('aria-label', isCollapsed ? 'Expand navigation' : 'Collapse navigation');
+                });
                 close?.addEventListener('click', () => setOpen(false));
                 document.addEventListener('keydown', (event) => event.key === 'Escape' && setOpen(false));
                 window.addEventListener('resize', () => window.innerWidth > 960 && setOpen(false));

@@ -22,11 +22,18 @@
 
 <form method="POST" action="{{ $isEdit ? route('registry.update', $inhabitant) : route('registry.store') }}">
     @csrf
+    @if (request('source'))
+        <input type="hidden" name="source" value="{{ request('source') }}">
+    @endif
     @if ($isEdit)
         @method('PUT')
     @endif
 
     <div class="form-grid">
+        <div>
+            <label for="registry_sequence">RBI row / HH sequence</label>
+            <input id="registry_sequence" name="registry_sequence" type="text" value="{{ old('registry_sequence', $inhabitant->registry_sequence ?? '') }}">
+        </div>
         <div>
             <label for="barangay_id">Barangay</label>
             <select id="barangay_id" name="barangay_id">
@@ -105,6 +112,10 @@
             <input id="birth_date" name="birth_date" type="date" value="{{ old('birth_date', optional($inhabitant->birth_date ?? null)->format('Y-m-d')) }}">
         </div>
         <div>
+            <label for="recorded_age">Age recorded in RBI</label>
+            <input id="recorded_age" name="recorded_age" type="number" min="0" max="150" value="{{ old('recorded_age', $inhabitant->recorded_age ?? '') }}">
+        </div>
+        <div>
             <label for="birth_place">Birth place</label>
             <input id="birth_place" name="birth_place" type="text" value="{{ old('birth_place', $inhabitant->birth_place ?? '') }}">
         </div>
@@ -129,6 +140,10 @@
             <input id="contact_number" name="contact_number" type="text" value="{{ old('contact_number', $inhabitant->contact_number ?? '') }}">
         </div>
         <div>
+            <label for="ethnicity">Ethnicity</label>
+            <input id="ethnicity" name="ethnicity" type="text" value="{{ old('ethnicity', $inhabitant->ethnicity ?? '') }}">
+        </div>
+        <div>
             <label for="status">Record status</label>
             <select id="status" name="status" required>
                 @foreach ($statusLabels as $value => $label)
@@ -137,6 +152,9 @@
             </select>
         </div>
     </div>
+
+    <label for="remarks">RBI remarks / other information</label>
+    <textarea id="remarks" name="remarks">{{ old('remarks', $inhabitant->remarks ?? '') }}</textarea>
 
     <div class="form-grid">
         <div>

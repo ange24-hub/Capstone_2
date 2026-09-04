@@ -5,19 +5,22 @@
         $pendingDocuments = $barangayDocumentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count();
         $submittedRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count();
         $draftRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count();
+        $sourceWorkbook = in_array($barangay?->name, ['Canlupao', 'Biasong', 'Cabascan'], true) ? strtoupper($barangay->name).'.xlsx' : null;
+        $newInhabitantsUrl = $sourceWorkbook
+            ? route('barangay.registry.new-inhabitants')
+            : route('barangay.rbi-updates.index');
     @endphp
 
-    <section class="barangay-dashboard" aria-labelledby="barangay-dashboard-title">
+    <section class="barangay-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="barangay-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions">
             <div class="dashboard-title-group">
-                <span class="dashboard-eyebrow">Barangay Administration</span>
-                <h1 id="barangay-dashboard-title">Barangay {{ $barangay?->name ?? 'Dashboard' }}</h1>
-                <p>Process resident services, maintain community records, and prepare monthly RBI reports.</p>
+                <span class="dashboard-eyebrow">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident Verification' : (($workspacePage ?? 'overview') === 'documents' ? 'Barangay E-Services' : 'Barangay Administration') }}</span>
+                <h1 id="barangay-dashboard-title">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident approvals' : (($workspacePage ?? 'overview') === 'documents' ? 'Document requests' : 'Barangay '.($barangay?->name ?? 'Dashboard')) }}</h1>
+                <p>{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Review and verify resident accounts assigned to your barangay.' : (($workspacePage ?? 'overview') === 'documents' ? 'Process resident requests, payments, and release updates in one focused workspace.' : 'Process resident services, maintain community records, and prepare monthly RBI reports.') }}</p>
             </div>
             @if ($barangay)
                 <div class="dashboard-header-actions">
-                    <a class="button" href="{{ route('barangay.rbi-updates.index') }}"><x-app-icon name="form" /> New RBI report</a>
-                    <a class="button secondary-button" href="{{ route('registry.index') }}"><x-app-icon name="users" /> Resident registry</a>
+                    <a class="button" href="{{ route('barangay.registry.active') }}"><x-app-icon name="users" /> Resident registry</a>
                 </div>
             @endif
         </header>
@@ -36,10 +39,10 @@
                     <h2>Good day, {{ str(auth()->user()->name)->before(' ') }}.</h2>
                     <p>You have {{ $residentApprovalRequests->count() }} resident {{ \Illuminate\Support\Str::plural('registration', $residentApprovalRequests->count()) }} and {{ $pendingDocuments }} document {{ \Illuminate\Support\Str::plural('request', $pendingDocuments) }} awaiting review.</p>
                     <div class="barangay-primary-actions">
-                        <a class="button government-primary-button" href="#resident-approvals-title">
+                        <a class="button government-primary-button" href="{{ route('barangay.resident-approvals.index') }}">
                             <span class="action-icon"><x-app-icon name="users" /></span><span><strong>Review resident registrations</strong><small>{{ $residentApprovalRequests->count() }} awaiting verification</small></span>
                         </a>
-                        <a class="button government-outline-button" href="#document-requests-title">
+                        <a class="button government-outline-button" href="{{ route('barangay.document-requests.index') }}">
                             <span class="action-icon"><x-app-icon name="document" /></span><span><strong>Process document requests</strong><small>{{ $pendingDocuments }} awaiting action</small></span>
                         </a>
                     </div>
@@ -70,7 +73,7 @@
 
             <div class="barangay-dashboard-columns">
                 <main class="barangay-dashboard-main">
-                    <section class="government-content-card" aria-labelledby="resident-approvals-title">
+                    <section class="government-content-card workspace-approvals-panel" aria-labelledby="resident-approvals-title">
                         <header class="government-card-header">
                             <div><span class="government-eyebrow">Resident Verification</span><h2 id="resident-approvals-title">Pending Resident Registrations</h2><p>Verify residency before granting access to barangay online services.</p></div>
                             <span class="government-count-badge {{ $residentApprovalRequests->isEmpty() ? 'is-clear' : 'is-pending' }}">{{ $residentApprovalRequests->count() }} pending</span>
@@ -93,7 +96,7 @@
                         @endif
                     </section>
 
-                    <section class="government-content-card" aria-labelledby="document-requests-title">
+                    <section class="government-content-card workspace-documents-panel" aria-labelledby="document-requests-title">
                         <header class="government-card-header">
                             <div><span class="government-eyebrow">Barangay E-Services</span><h2 id="document-requests-title">Resident Document Requests</h2><p>Process requests submitted by approved Barangay {{ $barangay->name }} residents.</p></div>
                             <span class="government-count-badge {{ $pendingDocuments === 0 ? 'is-clear' : 'is-pending' }}">{{ $pendingDocuments }} pending</span>
@@ -150,16 +153,6 @@
                 </main>
 
                 <aside class="barangay-dashboard-aside" aria-label="Quick links and report status">
-                    <section class="government-side-card">
-                        <header><span class="government-eyebrow">Quick Access</span><h2>Barangay Tools</h2></header>
-                        <nav class="government-quick-links" aria-label="Barangay tools">
-                            <a href="{{ route('registry.index') }}"><span class="quick-link-icon">CR</span><span><strong>Central Registry</strong><small>Inhabitants and households</small></span><b>→</b></a>
-                            <a href="{{ route('barangay.rbi-updates.index') }}"><span class="quick-link-icon">RBI</span><span><strong>Monthly RBI Forms</strong><small>Create and download reports</small></span><b>→</b></a>
-                            <a href="{{ route('migration.dashboard') }}"><span class="quick-link-icon">MM</span><span><strong>Migration Monitor</strong><small>Population movement records</small></span><b>→</b></a>
-                            <a href="{{ route('spatial.index') }}"><span class="quick-link-icon">SM</span><span><strong>Spatial Map</strong><small>Household location overview</small></span><b>→</b></a>
-                        </nav>
-                    </section>
-
                     <section class="government-side-card rbi-status-card">
                         <header><span class="government-eyebrow">Reporting Status</span><h2>Monthly RBI Forms</h2></header>
                         <div class="rbi-status-summary"><div><strong>{{ $submittedRbi }}</strong><span>Submitted</span></div><div><strong>{{ $draftRbi }}</strong><span>Drafts</span></div></div>
@@ -169,7 +162,7 @@
                             @php($latestRbi = $rbiUpdates->first())
                             <div class="latest-report"><span>Latest report</span><strong>{{ optional($latestRbi->reporting_month)->format('F Y') ?: 'Month not set' }}</strong><small>{{ $latestRbi->statusLabel() }} · {{ count($latestRbi->rows ?? []) }} inhabitant entries</small></div>
                         @endif
-                        <a class="button government-outline-button primary-block" href="{{ route('barangay.rbi-updates.index') }}">Manage RBI Reports</a>
+                        <a class="button government-outline-button primary-block" href="{{ $newInhabitantsUrl }}">Manage Monthly Reports</a>
                     </section>
 
                     <section class="government-side-card security-card"><span class="security-mark">DPA</span><div><strong>Data Privacy Reminder</strong><p>Access resident information only for authorized barangay functions. Keep account credentials confidential.</p></div></section>
@@ -179,7 +172,7 @@
             <section class="government-content-card" aria-labelledby="rbi-history-title">
                 <header class="government-card-header">
                     <div><span class="government-eyebrow">Secretary Copies</span><h2 id="rbi-history-title">Monthly RBI Form History</h2><p>Review, update, and download the official copies retained by this barangay.</p></div>
-                    <a class="button government-outline-button" href="{{ route('barangay.rbi-updates.index') }}">Open RBI Forms</a>
+                    <a class="button government-outline-button" href="{{ $newInhabitantsUrl }}">Open Monthly Reports</a>
                 </header>
                 @if ($rbiUpdates->isEmpty())
                     <div class="government-empty-state"><span class="empty-state-mark">—</span><div><strong>No monthly RBI forms created yet</strong><span>Create the first monthly report through RBI Forms.</span></div></div>
@@ -190,7 +183,7 @@
                             <td><strong>{{ optional($update->reporting_month)->format('F Y') ?: 'Not set' }}</strong><small>Barangay {{ $update->barangay_name ?: $barangay->name }}</small></td>
                             <td>{{ collect($update->rows ?? [])->pluck('household_head')->filter()->unique()->count() }}</td><td>{{ count($update->rows ?? []) }}</td>
                             <td><span class="request-status request-status-{{ $update->status }}">{{ $update->statusLabel() }}</span></td><td>{{ optional($update->submitted_at)->format('M d, Y · h:i A') ?: 'Not submitted' }}</td>
-                            <td class="row-actions"><a href="{{ route('rbi-updates.show', $update) }}">View</a><a href="{{ route('barangay.rbi-updates.index', ['edit' => $update->id]) }}">{{ $update->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue Draft' : 'Update form' }}</a><a href="{{ route('rbi-updates.export-pdf', $update) }}">PDF</a><a href="{{ route('rbi-updates.export-word', $update) }}">Word</a>@if ($update->source_file_path)<a href="{{ route('rbi-updates.download', $update) }}">Original</a>@endif</td>
+                            <td class="row-actions"><a href="{{ route('rbi-updates.show', $update) }}">View</a>@if(!$sourceWorkbook)<a href="{{ route('barangay.rbi-updates.index', ['edit' => $update->id]) }}">{{ $update->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue Draft' : 'Update form' }}</a>@endif<a href="{{ route('rbi-updates.export-pdf', $update) }}">PDF</a><a href="{{ route('rbi-updates.export-word', $update) }}">Word</a>@if ($update->source_file_path)<a href="{{ route('rbi-updates.download', $update) }}">Original</a>@endif</td>
                         </tr>@endforeach</tbody>
                     </table></div>
                 @endif

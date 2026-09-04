@@ -36,6 +36,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login.store');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+    Route::get('/services', fn () => view('services'))->name('services');
 });
 
 Route::middleware('auth')->group(function () {
@@ -53,6 +54,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
         ->name('dashboard.municipal');
 
+    Route::get('/municipal/account-approvals', [DashboardController::class, 'municipalApprovals'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+        ->name('municipal.approvals.index');
+
     Route::get('/municipal/barangays', [DashboardController::class, 'municipalBarangays'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
         ->name('municipal.barangays.index');
@@ -68,6 +73,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/barangay', [DashboardController::class, 'barangay'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('dashboard.barangay');
+
+    Route::get('/barangay/resident-approvals', [DashboardController::class, 'barangay'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.resident-approvals.index');
+
+    Route::get('/barangay/document-requests', [DashboardController::class, 'barangay'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.document-requests.index');
 
     Route::get('/barangay/rbi-updates', [DashboardController::class, 'barangay'])
         ->middleware('role:'.User::ROLE_BARANGAY)
@@ -112,6 +125,16 @@ Route::middleware('auth')->group(function () {
         ->middleware('resident.approved')
         ->name('dashboard.resident');
 
+    Route::get('/resident/request-document', [DashboardController::class, 'resident'])
+        ->middleware('role:'.User::ROLE_RESIDENT)
+        ->middleware('resident.approved')
+        ->name('resident.document-requests.create');
+
+    Route::get('/resident/my-requests', [DashboardController::class, 'resident'])
+        ->middleware('role:'.User::ROLE_RESIDENT)
+        ->middleware('resident.approved')
+        ->name('resident.document-requests.index');
+
     Route::post('/barangay/residents/{resident}/approve', [ResidentApprovalController::class, 'approve'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.residents.approve');
@@ -136,9 +159,58 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('registry.index');
 
+    Route::get('/barangay/resident-registry', [RegistryController::class, 'activeRegistry'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.registry.active');
+
+    Route::get('/barangay/new-inhabitants', [RegistryController::class, 'newInhabitants'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.registry.new-inhabitants');
+
+    Route::get('/barangay/deceased-records', [RegistryController::class, 'deceasedRecords'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.registry.deceased');
+
     Route::post('/registry', [RegistryController::class, 'store'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('registry.store');
+
+    Route::put('/registry/deceased/{deceasedInhabitant}', [RegistryController::class, 'updateDeceased'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.deceased.update');
+
+    Route::put('/registry/new-inhabitants/{newInhabitant}', [RegistryController::class, 'updateNewInhabitant'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.new-inhabitants.update');
+
+    Route::post('/registry/new-inhabitants', [RegistryController::class, 'storeNewInhabitant'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.new-inhabitants.store');
+
+    Route::post('/registry/new-inhabitant-families', [RegistryController::class, 'storeNewInhabitantFamily'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.new-inhabitant-families.store');
+
+    Route::post('/registry/new-inhabitant-monthly-reports', [RegistryController::class, 'storeNewInhabitantMonthlyReport'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.new-inhabitant-monthly-reports.store');
+
+    Route::delete('/registry/new-inhabitants/{newInhabitant}', [RegistryController::class, 'destroyNewInhabitant'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitants.destroy');
+    Route::get('/registry/new-inhabitants/{newInhabitant}/edit', [RegistryController::class, 'editNewInhabitant'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitants.edit');
+    Route::get('/registry/new-inhabitant-monthly-reports/{month}/pdf', [RegistryController::class, 'downloadNewMonthlyReportPdf'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitant-monthly-reports.pdf');
+    Route::post('/registry/new-inhabitant-monthly-reports/{month}/submit', [RegistryController::class, 'submitNewMonthlyReport'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitant-monthly-reports.submit');
+
+    Route::post('/registry/new-inhabitant-families/add-to-active', [RegistryController::class, 'addNewFamilyToActive'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.new-inhabitant-families.add-to-active');
+
+    Route::delete('/registry/new-inhabitant-families/remove-from-active', [RegistryController::class, 'removeNewFamilyFromActive'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('registry.new-inhabitant-families.remove-from-active');
 
     Route::get('/registry/{inhabitant}/edit', [RegistryController::class, 'edit'])
         ->middleware('role:'.User::ROLE_BARANGAY)

@@ -8,7 +8,7 @@
                 <h1>Edit {{ $inhabitant->fullName() }}</h1>
                 <p>{{ $inhabitant->barangay->name }} household {{ $inhabitant->household->household_number }}</p>
             </div>
-            <a class="button secondary-button" href="{{ route('registry.index') }}">Back to Registry</a>
+            <a class="button secondary-button" href="{{ route('registry.index', request('source') ? ['source' => request('source')] : []) }}">Back to {{ request('source') ?: 'Registry' }}</a>
         </div>
 
         <div class="workflow-card">

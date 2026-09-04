@@ -140,6 +140,13 @@ class DashboardController extends Controller
         return view('municipal.barangays.index', $dashboard->getData());
     }
 
+    public function municipalApprovals(): View
+    {
+        $dashboard = $this->municipal();
+
+        return view('municipal.approvals.index', $dashboard->getData());
+    }
+
     public function barangay(Request $request): View
     {
         $barangay = auth()->user()->barangay;
@@ -205,14 +212,24 @@ class DashboardController extends Controller
             'rbiRowFields' => BarangayRbiUpdate::rowFields(),
             'rbiDeceasedRowFields' => BarangayRbiUpdate::deceasedRowFields(),
             'rbiHouseholds' => $rbiHouseholds,
+            'workspacePage' => match (true) {
+                $request->routeIs('barangay.resident-approvals.index') => 'approvals',
+                $request->routeIs('barangay.document-requests.index') => 'documents',
+                default => 'overview',
+            },
         ]);
     }
 
-    public function resident(): View
+    public function resident(Request $request): View
     {
         return view('dashboards.resident', [
             'documentTypes' => DocumentRequest::typeLabels(),
             'documentRequests' => auth()->user()->documentRequests()->with('barangay')->latest()->get(),
+            'workspacePage' => match (true) {
+                $request->routeIs('resident.document-requests.create') => 'create',
+                $request->routeIs('resident.document-requests.index') => 'history',
+                default => 'overview',
+            },
         ]);
     }
 }

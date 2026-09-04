@@ -19,6 +19,9 @@ class Inhabitant extends Model
         'barangay_id',
         'household_id',
         'resident_user_id',
+        'registry_sequence',
+        'family_number',
+        'individual_number',
         'first_name',
         'middle_name',
         'last_name',
@@ -26,17 +29,21 @@ class Inhabitant extends Model
         'relationship_to_head',
         'sex',
         'birth_date',
+        'recorded_age',
         'birth_place',
         'civil_status',
         'religion',
         'occupation',
         'education_level',
         'contact_number',
+        'remarks',
+        'ethnicity',
         'status',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
+        'recorded_age' => 'integer',
     ];
 
     public static function statusLabels(): array

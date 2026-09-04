@@ -7,12 +7,12 @@
         $completedRequests = $documentRequests->where('status', App\Models\DocumentRequest::STATUS_COMPLETED)->count();
     @endphp
 
-    <section class="dashboard-page resident-dashboard" aria-labelledby="resident-dashboard-title">
+    <section class="dashboard-page resident-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="resident-dashboard-title">
         <header class="dashboard-page-header">
             <div class="dashboard-title-group">
-                <span class="dashboard-eyebrow">Resident Services</span>
-                <h1 id="resident-dashboard-title">Good day, {{ str(auth()->user()->name)->before(' ') }}.</h1>
-                <p>Request barangay documents and follow every update from one place.</p>
+                <span class="dashboard-eyebrow">{{ ($workspacePage ?? 'overview') === 'create' ? 'New Transaction' : (($workspacePage ?? 'overview') === 'history' ? 'Transaction History' : 'Resident Services') }}</span>
+                <h1 id="resident-dashboard-title">{{ ($workspacePage ?? 'overview') === 'create' ? 'Request a document' : (($workspacePage ?? 'overview') === 'history' ? 'My document requests' : 'Good day, '.str(auth()->user()->name)->before(' ').'.') }}</h1>
+                <p>{{ ($workspacePage ?? 'overview') === 'create' ? 'Choose a barangay document and submit its purpose.' : (($workspacePage ?? 'overview') === 'history' ? 'Track statuses, payment verification, and barangay remarks.' : 'Request barangay documents and follow every update from one place.') }}</p>
             </div>
             <div class="dashboard-context-card">
                 <span class="context-icon"><x-app-icon name="location" /></span>
@@ -31,6 +31,11 @@
             <article class="metric-card metric-info"><span class="metric-icon"><x-app-icon name="activity" /></span><div><span>In progress</span><strong>{{ number_format($activeRequests) }}</strong><small>Processing or ready to claim</small></div></article>
             <article class="metric-card metric-success"><span class="metric-icon"><x-app-icon name="check" /></span><div><span>Completed</span><strong>{{ number_format($completedRequests) }}</strong><small>Finished transactions</small></div></article>
         </section>
+
+        <nav class="workspace-launcher" aria-label="Resident service shortcuts">
+            <a href="{{ route('resident.document-requests.create') }}"><span class="workspace-launcher-icon"><x-app-icon name="form" /></span><span><small>Start a transaction</small><strong>Request a document</strong><em>Submit a new barangay document request</em></span><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('resident.document-requests.index') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><small>Track transactions</small><strong>View my requests</strong><em>Check status, payment, and remarks</em></span><x-app-icon name="arrow-right" /></a>
+        </nav>
 
         @if (auth()->user()->hasRole(App\Models\User::ROLE_RESIDENT))
             <div class="resident-action-layout">
