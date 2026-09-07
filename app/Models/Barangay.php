@@ -78,6 +78,11 @@ class Barangay extends Model
             && filled($this->gcash_qr_path);
     }
 
+    public function usesResidenceRegistry(): bool
+    {
+        return strcasecmp(trim($this->name), 'Biasong') !== 0;
+    }
+
     public function households(): HasMany
     {
         return $this->hasMany(Household::class);

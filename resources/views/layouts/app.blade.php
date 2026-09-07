@@ -52,11 +52,11 @@
                     </div>
                     <div class="public-footer-meta">
                         <strong>Registry of Barangay Inhabitants Management</strong>
-                        <span>Authorized public service portal · Data Privacy Act compliant operations</span>
+                        <span>Authorized public service portal Ã‚Â· Data Privacy Act compliant operations</span>
                     </div>
                 </div>
                 <div class="public-footer-bottom">
-                    <span>© {{ now()->year }} Municipality of Tomas Oppus. All rights reserved.</span>
+                    <span>Ã‚Â© {{ now()->year }} Municipality of Tomas Oppus. All rights reserved.</span>
                     <span>Southern Leyte, Philippines</span>
                 </div>
             </footer>
@@ -92,14 +92,13 @@
                         <a class="@if(request()->routeIs('dashboard.barangay')) active @endif" href="{{ route('dashboard.barangay') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
                         <a class="@if(request()->routeIs('barangay.resident-approvals.*')) active @endif" href="{{ route('barangay.resident-approvals.index') }}"><span class="nav-mark"><x-app-icon name="check" /></span><span>Resident Approvals</span></a>
                         <a class="@if(request()->routeIs('barangay.document-requests.*')) active @endif" href="{{ route('barangay.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Document Requests</span></a>
-                        @php($navWorkbook = in_array(auth()->user()->barangay?->name, ['Canlupao', 'Biasong', 'Cabascan'], true) ? strtoupper(auth()->user()->barangay->name).'.xlsx' : null)
-                        @if ($navWorkbook)
-                            <a class="@if(request()->routeIs('barangay.registry.new-inhabitants')) active @endif" href="{{ route('barangay.registry.new-inhabitants') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>New Inhabitants</span></a>
-                            <a class="@if(request()->routeIs('barangay.registry.deceased')) active @endif" href="{{ route('barangay.registry.deceased') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Deceased Records</span></a>
-                        @else
-                            <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
-                        @endif
-                        <a class="@if(request()->routeIs('barangay.registry.active') || request()->routeIs('registry.*') && !in_array(request('sheet'), ['new-inhabitants', 'deceased'], true)) active @endif" href="{{ route('barangay.registry.active') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>Resident Registry</span></a>
+                        <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
+                        <a class="@if(request()->routeIs('barangay.registry.deceased')) active @endif" href="{{ route('barangay.registry.deceased') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Deceased Records</span></a>
+                        <a class="@if(request()->routeIs('barangay.registry.active') || request()->routeIs('registry.*') && !in_array(request('sheet'), ['new-inhabitants', 'deceased'], true)) active @endif" href="{{ route('barangay.registry.active') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>{{ auth()->user()->barangay?->usesResidenceRegistry() ? 'Consolidated / All Registered' : 'Resident Registry' }}</span></a>
+@if(auth()->user()->barangay?->usesResidenceRegistry())
+                        <a class="{{ request()->routeIs('barangay.residence.*') ? 'active' : '' }}" href="{{ route('barangay.residence.index') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Living in Barangay</span></a>
+@endif
+                        <a class="@if(request()->routeIs('barangay.registry.moved-out*')) active @endif" href="{{ route('barangay.registry.moved-out') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Moved Out</span></a>
                         <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Records</span></a>
                         <a class="@if(request()->routeIs('spatial.index')) active @endif" href="{{ route('spatial.index') }}"><span class="nav-mark"><x-app-icon name="map" /></span><span>Household Map</span></a>
                     @else
@@ -140,14 +139,18 @@
                             <x-app-icon name="menu" />
                         </button>
                         <div>
-                        <span class="app-header-kicker">Republic of the Philippines · Local Government Unit</span>
+                        <span class="app-header-kicker">Republic of the Philippines DILG</span>
                             <strong>Registry of Barangay Inhabitants Management</strong>
                         </div>
                     </div>
                     <div class="app-header-meta">
                         <span class="system-status"><i></i> System Online</span>
                         <span class="header-date">{{ now()->format('F d, Y') }}</span>
-                        <span class="header-user">{{ auth()->user()->name }}</span>
+                        @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
+                            <a class="header-user" href="{{ route('profile.edit') }}" title="My Profile" aria-label="My Profile: {{ auth()->user()->name }}">{{ auth()->user()->name }}</a>
+                        @else
+                            <span class="header-user">{{ auth()->user()->name }}</span>
+                        @endif
                     </div>
                 </header>
 
@@ -156,8 +159,8 @@
                 </main>
 
                 <footer class="app-footer">
-                    <span>© {{ now()->year }} Municipal Government of Tomas Oppus</span>
-                    <span>RBIM · Official LGU Information System</span>
+                    <span>Ã‚Â© {{ now()->year }} Municipal Government of Tomas Oppus</span>
+                    <span>RBIM Ã‚Â· Official LGU Information System</span>
                 </footer>
             </div>
         </div>

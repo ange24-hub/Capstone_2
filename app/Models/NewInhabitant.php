@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NewInhabitant extends Model
 {
+    use \App\Models\Concerns\PreservesRegistryRemarks;
+
     protected $fillable = [
         'barangay_id', 'reporting_month', 'household_number', 'last_name', 'first_name', 'middle_name', 'suffix',
         'relationship_to_head', 'purok', 'complete_address', 'birth_place', 'birth_date', 'recorded_age',

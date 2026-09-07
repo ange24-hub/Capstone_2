@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BarangayRbiFamily extends Model
 {
-    protected $fillable = ['barangay_rbi_update_id', 'household_id', 'household_head', 'position'];
+    protected $fillable = ['barangay_rbi_update_id', 'household_id', 'household_head', 'household_number', 'position'];
 
     public function report(): BelongsTo
     {

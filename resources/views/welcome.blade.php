@@ -4,7 +4,7 @@
     <section class="public-hero">
         <div class="public-hero-copy">
             <span class="public-eyebrow">Official Digital Services Portal</span>
-            <h1>Serbisyong barangay, mas malapit sa mamamayan.</h1>
+            <h1>Sabay sa pagbabago, tungo sa mas magandang bukas.</h1>
             <p>Access barangay services, submit document requests, and securely manage resident information across the 29 barangays of Tomas Oppus.</p>
             <div class="public-trust-row">
                 <span><strong>29</strong> Barangays</span>

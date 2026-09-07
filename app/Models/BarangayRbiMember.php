@@ -9,10 +9,10 @@ class BarangayRbiMember extends Model
 {
     protected $fillable = [
         'barangay_rbi_family_id', 'inhabitant_id', 'inhabitant_name', 'sex', 'birth_date',
-        'birth_place', 'civil_status', 'occupation', 'relationship', 'position',
+        'birth_place', 'civil_status', 'occupation', 'relationship', 'position', 'details',
     ];
 
-    protected $casts = ['birth_date' => 'date'];
+    protected $casts = ['birth_date' => 'date', 'details' => 'array'];
 
     public function family(): BelongsTo
     {

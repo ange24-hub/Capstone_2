@@ -40,6 +40,11 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->group(function () {
+        Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/assistant/chat', AssistantController::class)
         ->middleware('throttle:30,1')
@@ -98,6 +103,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.submit');
 
+    Route::post('/barangay/rbi-updates/{rbiUpdate}/add-to-registry', [BarangayRbiUpdateController::class, 'addToRegistry'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.rbi-updates.add-to-registry');
+
     Route::get('/rbi-updates/{rbiUpdate}/download', [BarangayRbiUpdateController::class, 'download'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('rbi-updates.download');
@@ -108,7 +117,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/rbi-updates/{rbiUpdate}/signatures/{type}/{family?}', [BarangayRbiUpdateController::class, 'signature'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
-        ->whereIn('type', ['secretary', 'captain'])
+        ->whereIn('type', ['secretary', 'captain', 'certified'])
         ->whereNumber('family')
         ->name('rbi-updates.signature');
 
@@ -163,6 +172,13 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.registry.active');
 
+    Route::get('/barangay/living-in-barangay', [\App\Http\Controllers\ResidenceRegistryController::class, 'index'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.residence.index');
+    Route::get('/barangay/residence-file', [\App\Http\Controllers\ResidenceRegistryController::class, 'download'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.residence.download');
+    Route::put('/barangay/residence/{inhabitant}', [\App\Http\Controllers\ResidenceRegistryController::class, 'update'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.residence.update');
+
     Route::get('/barangay/new-inhabitants', [RegistryController::class, 'newInhabitants'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.registry.new-inhabitants');
@@ -170,6 +186,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/barangay/deceased-records', [RegistryController::class, 'deceasedRecords'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.registry.deceased');
+
+    Route::get('/barangay/moved-out', [RegistryController::class, 'movedOut'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.registry.moved-out');
+    Route::post('/barangay/moved-out', [RegistryController::class, 'storeMovedOut'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.registry.moved-out.store');
 
     Route::post('/registry', [RegistryController::class, 'store'])
         ->middleware('role:'.User::ROLE_BARANGAY)
@@ -203,6 +224,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitant-monthly-reports.pdf');
     Route::post('/registry/new-inhabitant-monthly-reports/{month}/submit', [RegistryController::class, 'submitNewMonthlyReport'])
         ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitant-monthly-reports.submit');
+
+    Route::post('/registry/new-inhabitants/{newInhabitant}/add-to-active', [RegistryController::class, 'addNewMemberToActive'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitants.add-to-active');
 
     Route::post('/registry/new-inhabitant-families/add-to-active', [RegistryController::class, 'addNewFamilyToActive'])
         ->middleware('role:'.User::ROLE_BARANGAY)

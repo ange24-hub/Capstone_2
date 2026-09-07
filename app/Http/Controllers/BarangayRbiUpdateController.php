@@ -20,6 +20,21 @@ use ZipArchive;
 
 class BarangayRbiUpdateController extends Controller
 {
+    public function addToRegistry(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
+    {
+        $this->authorizeBarangayReportOwner($request, $rbiUpdate);
+        $name = $this->assignedBarangayName($request);
+        abort_unless($rbiUpdate->barangay_name === $name, 403);
+        $result = DB::transaction(function () use ($request, $rbiUpdate): array {
+            $barangay = \App\Models\Barangay::whereKey($request->user()->barangay_id)->lockForUpdate()->firstOrFail();
+            $report = BarangayRbiUpdate::whereKey($rbiUpdate->id)->lockForUpdate()->firstOrFail();
+            $result = \App\Support\RbiReportRegistry::add($barangay, $report);
+            $this->syncRelationalRecords($report, $this->cleanRows($result['rows']), $this->cleanDeceasedRows($report->deceased_rows ?? []));
+            return $result;
+        });
+        return back()->with('status', $result['created'].' resident(s) added to Consolidated RBI; '.$result['linked'].' already registered. Household links saved.');
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $barangayName = $this->assignedBarangayName($request);
@@ -64,6 +79,8 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => $validated['as_of_date'] ?? null,
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
+            'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $preparedBy),
+            'certified_signature_path' => $this->storeDrawnSignature($request, 'certified_signature_data', $rbiUpdate->certified_signature_path ?? null),
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
             'status' => $submitted ? BarangayRbiUpdate::STATUS_SUBMITTED : BarangayRbiUpdate::STATUS_DRAFT,
@@ -132,6 +149,8 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => $validated['as_of_date'] ?? null,
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
+            'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $preparedBy),
+            'certified_signature_path' => $this->storeDrawnSignature($request, 'certified_signature_data', $rbiUpdate->certified_signature_path ?? null),
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
             'families' => null,
@@ -191,6 +210,8 @@ class BarangayRbiUpdateController extends Controller
 
         return view('rbi-updates.show', [
             'rbiUpdate' => $rbiUpdate->load('barangayUser'),
+            'wordPages' => $this->pdfPages($rbiUpdate),
+            'logoDataUri' => $this->absoluteImageDataUri(public_path('images/tomas-oppus-seal.png')),
             'rbiRowFields' => BarangayRbiUpdate::rowFields(),
             'rbiDeceasedRowFields' => BarangayRbiUpdate::deceasedRowFields(),
         ]);
@@ -203,6 +224,7 @@ class BarangayRbiUpdateController extends Controller
         $path = match ($type) {
             'secretary' => $rbiUpdate->prepared_signature_path,
             'captain' => $rbiUpdate->attested_signature_path,
+            'certified' => $rbiUpdate->certified_signature_path,
             default => null,
         };
 
@@ -237,8 +259,8 @@ class BarangayRbiUpdateController extends Controller
 
         $barangay = $rbiUpdate->barangayUser?->barangay;
         $barangayName = $barangay?->name ?: $rbiUpdate->barangay_name ?: 'Barangay';
-        $secretaryName = $barangay?->secretary_name ?: $rbiUpdate->prepared_by ?: $rbiUpdate->barangayUser?->name;
-        $punongBarangayName = $barangay?->punong_barangay_name ?: $rbiUpdate->attested_by;
+        $secretaryName = $rbiUpdate->prepared_by ?: $barangay?->secretary_name ?: $rbiUpdate->barangayUser?->name;
+        $punongBarangayName = $rbiUpdate->attested_by ?: $barangay?->punong_barangay_name;
         $pages = $this->pdfPages($rbiUpdate);
         $month = optional($rbiUpdate->reporting_month)->format('F_Y') ?: 'Undated';
         $filenameBarangay = trim((string) preg_replace('/[^A-Za-z0-9]+/', '_', Str::ascii($barangayName)), '_') ?: 'Barangay';
@@ -251,6 +273,7 @@ class BarangayRbiUpdateController extends Controller
             'secretaryName' => $secretaryName,
             'punongBarangayName' => $punongBarangayName,
             'logoDataUri' => $this->barangayLogoDataUri($barangay?->logo_path),
+            'certifiedSignatureDataUri' => $this->storageImageDataUri($rbiUpdate->certified_signature_path),
             'preparedSignatureDataUri' => $this->storageImageDataUri($rbiUpdate->prepared_signature_path),
             'attestedSignatureDataUri' => $this->storageImageDataUri($rbiUpdate->attested_signature_path),
         ])->setPaper('a4', 'landscape')->download($filename);
@@ -265,6 +288,18 @@ class BarangayRbiUpdateController extends Controller
             'attested_by' => ['nullable', 'string', 'max:255'],
             'prepared_signature_data' => ['nullable', 'string', 'max:3000000'],
             'attested_signature_data' => ['nullable', 'string', 'max:3000000'],
+            'rows.*.household_number' => ['nullable', 'string', 'max:100'],
+            'rows.*.last_name' => ['nullable', 'string', 'max:255'],
+            'rows.*.first_name' => ['nullable', 'string', 'max:255'],
+            'rows.*.middle_name' => ['nullable', 'string', 'max:255'],
+            'rows.*.suffix' => ['nullable', 'string', 'max:30'],
+            'rows.*.complete_address' => ['nullable', 'string', 'max:255'],
+            'rows.*.recorded_age' => ['nullable', 'integer', 'min:0', 'max:150'],
+            'rows.*.education_level' => ['nullable', 'string', 'max:255'],
+            'rows.*.religion' => ['nullable', 'string', 'max:255'],
+            'rows.*.remarks' => ['nullable', 'string', 'max:2000'],
+            'certified_by' => ['nullable', 'string', 'max:255'],
+            'certified_signature_data' => ['nullable', 'string', 'max:3000000'],
             'rows' => ['nullable', 'array'],
             'rows.*.household_head' => ['nullable', 'string', 'max:255'],
             'rows.*.household_id' => ['nullable', 'integer', Rule::exists('households', 'id')->where('barangay_id', request()->user()?->barangay_id)],
@@ -643,6 +678,7 @@ class BarangayRbiUpdateController extends Controller
     {
         $signatures = [
             'secretary' => [$rbiUpdate->prepared_signature_path, 'rId2', 'secretary-signature'],
+            'certified' => [$rbiUpdate->certified_signature_path, 'rId5', 'certified-signature'],
             'captain' => [$rbiUpdate->attested_signature_path, 'rId3', 'captain-signature'],
         ];
 
@@ -685,44 +721,36 @@ class BarangayRbiUpdateController extends Controller
 
     private function wordDocumentXml(BarangayRbiUpdate $rbiUpdate, array $signatureMedia): string
     {
-        $mainWidths = [2057, 3462, 598, 1457, 1869, 1028, 1401, 1683];
+        $mainWidths = array_map(fn($width) => $width * 135, \App\Support\HouseholdRbi::widths());
         $month = strtoupper(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'NOT SET');
         $barangay = $rbiUpdate->barangay_name ?: '____________';
-        $rows = $rbiUpdate->rows ?? [];
-        $families = collect($rows)
-            ->groupBy(fn (array $row, int $index): string => trim((string) ($row['household_head'] ?? '')) ?: '__unnamed_'.$index)
-            ->values();
+        $pages = collect($this->pdfPages($rbiUpdate));
 
-        if ($families->isEmpty()) {
-            $families = collect([collect([[]])]);
-        }
-
-        $familyPages = $families
-            ->map(function ($familyRows, int $familyIndex) use ($barangay, $families, $mainWidths, $month, $rbiUpdate, $signatureMedia): string {
+        $familyPages = $pages
+            ->map(function (array $page, int $pageIndex) use ($barangay, $pages, $mainWidths, $month, $rbiUpdate, $signatureMedia): string {
+                $familyRows = collect($page['members'])->pad(1, []);
                 $mainTableRows = [[
-                    'cells' => array_values(BarangayRbiUpdate::rowFields()),
+                    'cells' => array_values(\App\Support\HouseholdRbi::fields()),
                     'center' => true,
-                    'size' => 21,
-                    'height' => 1060,
+                    'size' => 14,
+                    'height' => 850,
                 ]];
 
                 foreach ($familyRows->values() as $memberIndex => $row) {
                     $mainTableRows[] = [
-                        'cells' => collect(array_keys(BarangayRbiUpdate::rowFields()))
+                        'cells' => collect(array_keys(\App\Support\HouseholdRbi::fields()))
                             ->map(fn (string $field): string => match ($field) {
-                                'household_head' => $memberIndex === 0 ? (string) ($row[$field] ?? '') : '',
+                                'household_head' => $memberIndex === 0 ? $page['household_head'] : '',
                                 'birth_date' => $this->formatFormDate((string) ($row[$field] ?? '')),
                                 default => (string) ($row[$field] ?? ''),
                             })
                             ->all(),
-                        'size' => 18,
-                        'height' => max(620, (int) floor(4000 / max($familyRows->count(), 1))),
+                        'size' => 14,
+                        'height' => 420,
                     ];
                 }
 
-                $deceasedRows = $familyIndex === $families->count() - 1
-                    ? ($rbiUpdate->deceased_rows ?? [])
-                    : [];
+                $deceasedRows = $page['deceased'];
 
                 if ($deceasedRows === []) {
                     $deceasedRows[] = [];
@@ -731,8 +759,8 @@ class BarangayRbiUpdateController extends Controller
                 $deceasedTableRows = [[
                     'cells' => array_values(BarangayRbiUpdate::deceasedRowFields()),
                     'center' => true,
-                    'size' => 21,
-                    'height' => 615,
+                    'size' => 14,
+                    'height' => 400,
                 ]];
 
                 foreach ($deceasedRows as $row) {
@@ -741,28 +769,30 @@ class BarangayRbiUpdateController extends Controller
                             (string) ($row['deceased_name'] ?? ''),
                             $this->formatFormDate((string) ($row['death_date'] ?? '')),
                         ],
-                        'size' => 18,
-                        'height' => max(700, (int) floor(2200 / max(count($deceasedRows), 1))),
+                        'size' => 14,
+                        'height' => 360,
                     ];
                 }
 
-                $documentIdOffset = $familyIndex * 3;
-                $pageBreak = $familyIndex < $families->count() - 1
+                $documentIdOffset = $pageIndex * 4;
+                $pageBreak = $pageIndex < $pages->count() - 1
                     ? '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
                     : '';
 
                 return $this->wordHeaderTable($month, $barangay, $signatureMedia['seal'] ?? null, $documentIdOffset + 3)
-                    .$this->wordParagraph('', false, false, 4)
+                    . $this->wordParagraph('A. REGION: VIII    B. PROVINCE: SOUTHERN LEYTE    C. CITY/MUNICIPALITY: TOMAS OPPUS', false, false, 14)
+                    . $this->wordParagraph('D. BARANGAY: '.$barangay.'    E. HOUSEHOLD NO.: '.(($page['household_number'] ?? '') ?: 'Not assigned').'    Household head: '.$page['household_head'], false, false, 14)
                     .$this->wordTable($mainTableRows, $mainWidths)
                     .$this->wordParagraph('', false, false, 4)
                     .$this->wordTable($deceasedTableRows, [5679, 4900])
                     .$this->wordParagraph('', false, false, 4)
-                    .$this->wordSignatureTable(
+                    .($page['show_signatures'] ? $this->wordSignatureTable(
                         $rbiUpdate->prepared_by ?: ($rbiUpdate->barangayUser->name ?? ''),
                         $rbiUpdate->attested_by ?: '',
                         $signatureMedia,
-                        $documentIdOffset
-                    )
+                        $documentIdOffset,
+                        $rbiUpdate->certified_by ?: $rbiUpdate->prepared_by ?: ''
+                    ) : '')
                     .$pageBreak;
             })
             ->implode('');
@@ -779,23 +809,14 @@ class BarangayRbiUpdateController extends Controller
 </w:document>';
     }
 
-    private function wordSignatureTable(string $preparedBy, string $notedBy, array $signatureMedia, int $documentIdOffset = 0): string
+    private function wordSignatureTable(string $preparedBy, string $notedBy, array $signatureMedia, int $documentIdOffset = 0, string $certifiedBy = ''): string
     {
-        $secretaryImage = isset($signatureMedia['secretary'])
-            ? $this->wordImageDrawing($signatureMedia['secretary']['relationship'], 'Barangay Secretary Signature', $documentIdOffset + 1)
-            : $this->wordParagraph('', false, true, 16);
-        $captainImage = isset($signatureMedia['captain'])
-            ? $this->wordImageDrawing($signatureMedia['captain']['relationship'], 'Barangay Captain Signature', $documentIdOffset + 2)
-            : $this->wordParagraph('', false, true, 16);
-
-        return '<w:tbl>
-            <w:tblPr><w:tblW w:w="8640" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders></w:tblPr>
-            <w:tblGrid><w:gridCol w:w="4320"/><w:gridCol w:w="4320"/></w:tblGrid>
-            <w:tr>
-                <w:tc><w:tcPr><w:tcW w:w="4320" w:type="dxa"/></w:tcPr>'.$this->wordParagraph('Prepared by:', false, false, 21).$secretaryImage.$this->wordParagraph($preparedBy, true, true, 21).$this->wordParagraph('Brgy. Secretary', false, true, 21).'</w:tc>
-                <w:tc><w:tcPr><w:tcW w:w="4320" w:type="dxa"/></w:tcPr>'.$this->wordParagraph('Noted by:', false, false, 21).$captainImage.$this->wordParagraph($notedBy, true, true, 21).$this->wordParagraph('Punong Barangay', false, true, 21).'</w:tc>
-            </w:tr>
-        </w:tbl>';
+        $cells = '';
+        foreach ([['Prepared by:', $preparedBy, 'BHW / Encoder', 'secretary', 1], ['Certified Correct:', $certifiedBy, 'Barangay Secretary', 'certified', 4], ['Verified by:', $notedBy, 'Punong Barangay', 'captain', 2]] as [$label, $name, $title, $media, $offset]) {
+            $image = isset($signatureMedia[$media]) ? $this->wordImageDrawing($signatureMedia[$media]['relationship'], $label, $documentIdOffset + $offset) : $this->wordParagraph('', false, true, 14);
+            $cells .= '<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/></w:tcPr>'.$this->wordParagraph($label, false, false, 16).$image.$this->wordParagraph($name, true, true, 16).$this->wordParagraph($title, false, true, 16).'</w:tc>';
+        }
+        return '<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid><w:tr><w:trPr><w:cantSplit/></w:trPr>'.$cells.'</w:tr></w:tbl>';
     }
 
     private function wordHeaderTable(string $month, string $barangay, ?array $sealMedia, int $documentPropertyId = 3): string
@@ -810,7 +831,7 @@ class BarangayRbiUpdateController extends Controller
             <w:tr>
                 <w:tc><w:tcPr><w:tcW w:w="1123" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>'.$seal.'</w:tc>
                 <w:tc><w:tcPr><w:tcW w:w="6437" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>'
-                    .$this->wordParagraph('Updates of Barangay Registry of Barangay Inhabitants', false, true, 17)
+                    .$this->wordParagraph('HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', false, true, 17)
                     .$this->wordParagraph('For the month of '.$month, true, true, 17)
                     .$this->wordParagraph('Barangay '.$barangay, false, true, 17)
                 .'</w:tc>
@@ -828,7 +849,7 @@ class BarangayRbiUpdateController extends Controller
     {
         $safeName = $this->xlsxEscape($name);
 
-        return '<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">
+        return '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">
             <wp:extent cx="'.$width.'" cy="'.$height.'"/><wp:docPr id="'.$documentPropertyId.'" name="'.$safeName.'"/>
             <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic>
                 <pic:nvPicPr><pic:cNvPr id="0" name="'.$safeName.'"/><pic:cNvPicPr/></pic:nvPicPr>
@@ -861,7 +882,7 @@ class BarangayRbiUpdateController extends Controller
                     ->implode('');
 
                 $height = isset($row['height'])
-                    ? '<w:trPr><w:trHeight w:val="'.(int) $row['height'].'" w:hRule="atLeast"/></w:trPr>'
+                    ? '<w:trPr><w:cantSplit/><w:trHeight w:val="'.(int) $row['height'].'" w:hRule="atLeast"/></w:trPr>'
                     : '';
 
                 return '<w:tr>'.$height.$cells.'</w:tr>';
@@ -1044,14 +1065,19 @@ class BarangayRbiUpdateController extends Controller
 
     private function cleanRows(array $rows): array
     {
-        $fields = array_merge(['household_id', 'inhabitant_id'], array_keys(BarangayRbiUpdate::rowFields()));
+        $fields = array_merge(['household_id', 'household_number', 'inhabitant_id', 'inhabitant_name'], array_keys(BarangayRbiUpdate::rowFields()));
 
         return collect($rows)
+            ->map(fn (array $row): array => \App\Support\HouseholdRbi::normalize($row))
+            ->map(function (array $row): array {
+                if (! empty($row['household_id'])) $row['household_number'] = \App\Models\Household::whereKey($row['household_id'])->value('household_number') ?? '';
+                return $row;
+            })
             ->map(fn (array $row): array => collect($fields)
                 ->mapWithKeys(fn (string $field): array => [$field => trim((string) ($row[$field] ?? ''))])
                 ->all())
             ->filter(fn (array $row): bool => collect($row)
-                ->except(['household_id', 'inhabitant_id', 'household_head'])
+                ->except(['household_id', 'household_number', 'inhabitant_id', 'household_head'])
                 ->contains(fn (string $value): bool => $value !== ''))
             ->values()
             ->all();
@@ -1161,6 +1187,7 @@ class BarangayRbiUpdateController extends Controller
                 $family = $report->rbiFamilies()->create([
                     'household_id' => $first['household_id'] ?: null,
                     'household_head' => $first['household_head'],
+                    'household_number' => $first['household_number'] ?: null,
                     'position' => $familyPosition,
                 ]);
                 $familyMap[$this->familyKey($first)] = $family;
@@ -1169,6 +1196,7 @@ class BarangayRbiUpdateController extends Controller
                     $family->members()->create([
                         'inhabitant_id' => $member['inhabitant_id'] ?: null,
                         'inhabitant_name' => $member['inhabitant_name'],
+                        'details' => collect($member)->only(array_keys(\App\Support\HouseholdRbi::fields()))->all(),
                         'sex' => $member['sex'] ?: null,
                         'birth_date' => $member['birth_date'] ?: null,
                         'birth_place' => $member['birth_place'] ?: null,
@@ -1216,7 +1244,8 @@ class BarangayRbiUpdateController extends Controller
         $families = $report->rbiFamilies->map(function (BarangayRbiFamily $family): array {
             return [
                 'household_head' => $family->household_head,
-                'members' => $family->members->map(fn ($member): array => [
+                'household_number' => $family->household?->household_number ?: $family->household_number,
+                'members' => $family->members->map(fn ($member): array => \App\Support\HouseholdRbi::normalize(($member->details ?? []) + [
                     'inhabitant_name' => $member->inhabitant_name,
                     'sex' => $member->sex,
                     'birth_date' => optional($member->birth_date)->format('Y-m-d'),
@@ -1224,7 +1253,7 @@ class BarangayRbiUpdateController extends Controller
                     'civil_status' => $member->civil_status,
                     'occupation' => $member->occupation,
                     'relationship' => $member->relationship,
-                ])->all(),
+                ]))->all(),
                 'deceased' => $family->deceasedRecords->map(fn ($record): array => [
                     'deceased_name' => $record->deceased_name,
                     'death_date' => optional($record->death_date)->format('Y-m-d'),
@@ -1237,7 +1266,8 @@ class BarangayRbiUpdateController extends Controller
                 ->groupBy(fn (array $row, int $index): string => trim((string) ($row['household_head'] ?? '')) ?: '__unnamed_'.$index)
                 ->map(fn ($members): array => [
                     'household_head' => (string) ($members->first()['household_head'] ?? ''),
-                    'members' => $members->values()->all(),
+                    'household_number' => $members->first()['household_number'] ?? (\App\Models\Household::find($members->first()['household_id'] ?? null)?->household_number ?? ''),
+                    'members' => $members->map(fn($row) => \App\Support\HouseholdRbi::normalize($row))->values()->all(),
                     'deceased' => [],
                 ])->values()->all();
         }
@@ -1276,6 +1306,7 @@ class BarangayRbiUpdateController extends Controller
             for ($pageIndex = 0; $pageIndex < $pageCount; $pageIndex++) {
                 $pages[] = [
                     'household_head' => $family['household_head'],
+                    'household_number' => $family['household_number'] ?? '',
                     'members' => $memberChunks[$pageIndex] ?? [],
                     'deceased' => $pageIndex >= $deathStart ? ($deathChunks[$pageIndex - $deathStart] ?? []) : [],
                     'continued' => $pageIndex > 0,

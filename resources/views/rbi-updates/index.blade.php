@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
+@push('head')<link rel="stylesheet" href="{{ asset('css/rbi-workspace.css') }}?v={{ filemtime(public_path('css/rbi-workspace.css')) }}">@endpush
+
 @section('content')
     @php
         $editingReport = $draftRbiUpdate;
-        $formRows = old('rows', $editingReport?->rows ?: [['household_head' => '']]);
+        $formRows = array_map([\App\Support\HouseholdRbi::class, 'normalize'], old('rows', $editingReport?->rows ?: [['household_head' => '']]));
         $memberFields = collect($rbiRowFields)->except('household_head')->all();
         $formFamilies = [];
 
@@ -11,13 +13,13 @@
             $householdHead = trim((string) ($row['household_head'] ?? ''));
             $householdId = (string) ($row['household_id'] ?? '');
             $familyKey = $householdId !== '' ? 'household:'.$householdId : ($householdHead !== '' ? mb_strtolower($householdHead) : '__blank_family__');
-            $formFamilies[$familyKey] ??= ['household_id' => $householdId, 'household_head' => $householdHead, 'members' => []];
+            $formFamilies[$familyKey] ??= ['household_id' => $householdId, 'household_head' => $householdHead, 'household_number' => $row['household_number'] ?? '', 'members' => []];
             unset($row['household_head'], $row['household_id']);
             $formFamilies[$familyKey]['members'][] = $row;
         }
 
         if ($formFamilies === []) {
-            $formFamilies = [['household_id' => '', 'household_head' => '', 'members' => [[]]]];
+            $formFamilies = [['household_id' => '', 'household_head' => '', 'household_number' => '', 'members' => [[]]]];
         }
 
         $rowInputIndex = 0;
@@ -30,14 +32,14 @@
             : (optional($editingReport?->reporting_month)->format('Y-m') ?: now()->format('Y-m'));
     @endphp
 
-    <section class="panel stack">
+    <section class="panel stack rbi-forms-workspace">
         <div class="dashboard-hero">
             <div>
                 <div class="page-kicker">RBI Monthly Reporting</div>
-                <h1>{{ $barangay ? 'Barangay '.$barangay->name.' RBI Update Form' : 'RBI Update Form' }}</h1>
-                <p>Add one family at a time using a simple family section. The system creates one consolidated official RBI PDF with a fresh form for every household.</p>
+                <h1>RBI Forms</h1>
+                <p>{{ $barangay?->name }} &middot; Manage household updates, prepare monthly reports, and submit to Municipal LGU.</p>
                 <div class="hero-actions">
-                    <a class="button" href="{{ route('dashboard.barangay') }}">Back to Secretary Dashboard</a>
+                    <a class="button" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @if ($editingReport)
                         <a class="button secondary-button" href="{{ route('barangay.rbi-updates.index', ['new' => 1]) }}">Start Another Month</a>
                     @endif
@@ -49,6 +51,12 @@
             </div>
         </div>
 
+        <nav class="rbi-section-nav" aria-label="RBI form sections">
+            <a href="#monthly-report"><span>01</span> Monthly report</a>
+            <a href="#family-section"><span>02</span> Family members</a>
+            <a href="#certification-section"><span>03</span> Certification</a>
+            <a href="#report-history"><span>04</span> Report history</a>
+        </nav>
         @if (session('status'))
             <div class="status-message">{{ session('status') }}</div>
         @endif
@@ -79,12 +87,12 @@
         @if (! $barangay)
             <div class="errors">This secretary account is not assigned to a barangay.</div>
         @else
-            <div class="workflow-card highlight-card">
+            <div class="workflow-card report-editor" id="monthly-report">
                 <div class="workflow-head">
                     <div>
                         <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
-                        <h2 class="section-title">Updates of Barangay Registry of Barangay Inhabitants</h2>
-                        <p>Enter the household head once, add that family's members, then use “Add Another Family Form” for the next household.</p>
+                        <h2 class="section-title">Monthly report</h2>
+                        <p>Choose a month, add the families, and complete the certification before saving.</p>
                     </div>
                     @if ($editingReport)<span class="badge">{{ $editingReport->statusLabel() }}</span>@endif
                 </div>
@@ -104,7 +112,7 @@
                         </div>
                     </div>
 
-                    <h3 class="section-title">A. Family Forms</h3>
+                    <h3 class="section-title" id="family-section">Family members</h3>
                     <div id="family-forms" class="stack">
                         @foreach ($formFamilies as $family)
                             <article class="workflow-card family-entry-card" data-family-card>
@@ -118,9 +126,9 @@
 
                                 <div class="form-grid">
                                     <div>
-                                        <label>Name of Household Head — Select/Search Existing Inhabitant or Enter a Name</label>
+                                        <label>Household head</label>
                                         <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head required autocomplete="off">
-                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id>
+                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household">
                                         <small class="field-help">Choose a registry match when available. A typed name is allowed for a newly registered household.</small>
                                     </div>
                                 </div>
@@ -135,7 +143,7 @@
                                                 <button class="secondary-button" type="button" data-remove-member @disabled(count($family['members']) === 1)>Remove Member</button>
                                             </div>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_head]" value="{{ $family['household_head'] }}" data-household-head-hidden>
-                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
+                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][household_number]" value="{{ $family['household_number'] ?? '' }}" data-household-number-hidden><input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
                                             <div class="form-grid">
                                                 @foreach ($memberFields as $field => $label)
@@ -148,7 +156,7 @@
                                                                 <option value="Female" @selected(($member[$field] ?? '') === 'Female')>Female</option>
                                                             </select>
                                                         @else
-                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : 'text' }}" value="{{ $member[$field] ?? '' }}">
+                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" value="{{ $member[$field] ?? '' }}">
                                                         @endif
                                                     </div>
                                                 @endforeach
@@ -165,7 +173,7 @@
                         <button type="button" id="add-family-form">Add Another Family Form</button>
                     </div>
 
-                    <h3 class="section-title">B. Deceased Registered Barangay Inhabitants</h3>
+                    <h3 class="section-title">Deceased inhabitants</h3>
                     <div class="table-wrap form-table-wrap">
                         <table id="rbi-deceased-rows-table">
                             <thead><tr><th>Household / Family</th>@foreach ($rbiDeceasedRowFields as $label)<th>{{ $label }}</th>@endforeach</tr></thead>
@@ -181,18 +189,19 @@
                     </div>
                     <div class="form-actions"><button type="button" class="secondary-button" id="add-rbi-deceased-row">Add Deceased Inhabitant</button></div>
 
-                    <h3 class="section-title">Monthly Form Certification</h3>
+                    <h3 class="section-title" id="certification-section">Monthly Form Certification</h3>
                     <p>The following names and signatures are repeated on every family form in the consolidated PDF.</p>
                     <div class="form-grid">
+                        <div><label for="certified_by">Certified Correct (Barangay Secretary)</label><input id="certified_by" name="certified_by" value="{{ old('certified_by', $editingReport?->certified_by ?: $barangay->secretary_name ?: auth()->user()->name) }}"></div>
                         <div>
-                            <label for="prepared_by">Prepared by (Barangay Secretary)</label>
+                            <label for="prepared_by">Prepared by (BHW / Encoder)</label>
                             <input id="prepared_by" name="prepared_by" type="text" value="{{ old('prepared_by', $editingReport?->prepared_by ?: $barangay->secretary_name ?: auth()->user()->name) }}">
                         </div>
                         <div>
-                            <label for="attested_by">Noted by (Punong Barangay)</label>
+                            <label for="attested_by">Verified by (Punong Barangay)</label>
                             <input id="attested_by" name="attested_by" type="text" value="{{ old('attested_by', $editingReport?->attested_by ?: $barangay->punong_barangay_name) }}" placeholder="Punong Barangay name">
                         </div>
-                        @foreach ([['prepared_signature_data', 'prepared_signature_path', 'Barangay Secretary', 'secretary'], ['attested_signature_data', 'attested_signature_path', 'Punong Barangay', 'captain']] as [$field, $pathField, $label, $type])
+                        @foreach ([['prepared_signature_data', 'prepared_signature_path', 'Prepared by', 'secretary'], ['certified_signature_data', 'certified_signature_path', 'Certified Correct', 'certified'], ['attested_signature_data', 'attested_signature_path', 'Punong Barangay', 'captain']] as [$field, $pathField, $label, $type])
                             <div class="signature-pad-field">
                                 <label>{{ $label }} signature</label>
                                 @if ($editingReport?->{$pathField})
@@ -209,22 +218,24 @@
                     </div>
 
                     <div class="form-actions split-actions">
-                        <span>All families remain together in one monthly record and one consolidated PDF.</span>
+                        <span>Save your changes first, then submit the saved report from Monthly RBI Form History below.</span>
                         <div class="toolbar compact-toolbar">
                             <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Form' : 'Save Monthly Draft' }}</button>
-                            <button type="submit" name="submit_to_municipal" value="1">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Municipal Copy' : 'Submit Complete Monthly Form' }}</button>
                         </div>
                     </div>
                 </form>
             </div>
         @endif
 
-        <div class="workflow-card">
-            <h2 class="section-title">Monthly RBI Form History</h2>
-            @if ($rbiUpdates->isEmpty())
+        <div class="workflow-card report-history" id="report-history">
+            <div class="history-heading"><div class="page-kicker">Saved reports</div><h2 class="section-title">Monthly RBI Form History</h2></div>
+            <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
+            @include('rbi-updates._saved-inhabitants')
+            @if ($rbiUpdates->isEmpty() && $newInhabitantRecords->isEmpty())
                 <p>No monthly RBI forms created yet.</p>
-            @else
-                <div class="table-wrap">
+            @endif
+            @if ($rbiUpdates->isNotEmpty())
+                <div class="table-wrap official-report-history">
                     <table>
                         <thead><tr><th>Month</th><th>Families</th><th>Inhabitants</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
                         <tbody>
@@ -236,12 +247,14 @@
                                     <td>{{ count($report->rows ?? []) }}</td>
                                     <td><span class="badge">{{ $report->statusLabel() }}</span></td>
                                     <td>{{ optional($report->submitted_at)->format('M d, Y h:i A') ?: 'Not submitted' }}</td>
-                                    <td class="row-actions">
+                                    <td><div class="rbi-history-actions">
                                         <a href="{{ route('rbi-updates.show', $report) }}">View form</a>
                                         <a href="{{ route('barangay.rbi-updates.index', ['edit' => $report->id]) }}">{{ $report->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue draft' : 'Update form' }}</a>
                                         <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
                                         <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
-                                    </td>
+                                        @include('rbi-updates._registry-action', ['report' => $report])
+                                        @include('rbi-updates._submit-action', ['report' => $report])
+                                    </div></td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -253,7 +266,7 @@
 
     <datalist id="rbi-household-heads">
         @foreach ($rbiHouseholds as $household)
-            <option value="{{ $household['label'] }}">Household {{ $household['household_number'] }}</option>
+            <option value="{{ $household['label'] }} [Household {{ $household['household_number'] }}]">Household {{ $household['household_number'] }}</option>
         @endforeach
     </datalist>
 
@@ -264,7 +277,7 @@
                 <button class="secondary-button" type="button" data-remove-member>Remove Member</button>
             </div>
             <input type="hidden" data-row-field="household_head" data-household-head-hidden>
-            <input type="hidden" data-row-field="household_id" data-household-id-hidden>
+            <input type="hidden" data-row-field="household_number" data-household-number-hidden><input type="hidden" data-row-field="household_id" data-household-id-hidden>
             <input type="hidden" data-row-field="inhabitant_id">
             <div class="form-grid">
                 @foreach ($memberFields as $field => $label)
@@ -273,7 +286,7 @@
                         @if ($field === 'sex')
                             <select data-row-field="{{ $field }}"><option value=""></option><option value="Male">Male</option><option value="Female">Female</option></select>
                         @else
-                            <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : 'text' }}">
+                            <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}">
                         @endif
                     </div>
                 @endforeach
@@ -287,7 +300,7 @@
                 <div><span class="step-pill" data-family-number></span><h4 class="section-title">Household Information</h4></div>
                 <button class="secondary-button" type="button" data-remove-family>Remove Family</button>
             </div>
-            <div class="form-grid"><div><label>Name of Household Head — Select/Search Existing Inhabitant or Enter a Name</label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><small class="field-help">Choose a registry match when available.</small></div></div>
+            <div class="form-grid"><div><label>Household head</label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small></div></div>
             <h5 class="section-title">Newly Registered Family Members</h5>
             <div class="stack" data-family-members></div>
             <div class="form-actions"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
@@ -303,9 +316,24 @@
             let nextRowIndex = {{ $rowInputIndex }};
 
             const syncHouseholdHead = (familyCard) => {
-                const householdHead = familyCard.querySelector('[data-family-head]').value;
-                const matchedHousehold = existingHouseholds.find((household) => household.label.toLocaleLowerCase() === householdHead.trim().toLocaleLowerCase());
+                const headInput = familyCard.querySelector('[data-family-head]');
+                const enteredHead = headInput.value.trim();
+                const currentId = familyCard.querySelector('[data-family-household-id]').value;
+                const matches = existingHouseholds.filter((household) =>
+                    household.label.toLocaleLowerCase() === enteredHead.toLocaleLowerCase()
+                    || `${household.label} [Household ${household.household_number}]`.toLocaleLowerCase() === enteredHead.toLocaleLowerCase());
+                const selectedHousehold = matches.length === 1 ? matches[0] : matches.find((household) => String(household.id) === currentId);
+                const originalId = familyCard.querySelector('[data-family-household-id]').defaultValue;
+                const retainedHousehold = enteredHead === headInput.defaultValue.trim()
+                    ? existingHouseholds.find((household) => String(household.id) === originalId) : null;
+                const matchedHousehold = selectedHousehold || retainedHousehold;
+                const householdHead = selectedHousehold ? selectedHousehold.label : enteredHead;
+                if (selectedHousehold) headInput.value = `${selectedHousehold.label} [Household ${selectedHousehold.household_number}]`;
                 const householdId = matchedHousehold ? matchedHousehold.id : '';
+                const numberInput = familyCard.querySelector('[data-family-household-number]');
+                if (matchedHousehold) numberInput.value = matchedHousehold.household_number;
+                numberInput.readOnly = Boolean(matchedHousehold);
+                familyCard.querySelectorAll('[data-household-number-hidden]').forEach(input => input.value = numberInput.value.trim());
                 familyCard.querySelector('[data-family-household-id]').value = householdId;
                 familyCard.querySelectorAll('[data-household-head-hidden]').forEach((input) => input.value = householdHead);
                 familyCard.querySelectorAll('[data-household-id-hidden]').forEach((input) => input.value = householdId);
@@ -313,7 +341,7 @@
             };
 
             const refreshDeceasedFamilyOptions = () => {
-                const heads = [...familyForms.querySelectorAll('[data-family-head]')].map((input) => input.value.trim()).filter(Boolean);
+                const heads = [...familyForms.querySelectorAll('[data-family-card]')].map((card) => card.querySelector('[data-household-head-hidden]')?.value.trim()).filter(Boolean);
                 document.querySelectorAll('[data-deceased-family]').forEach((select) => {
                     const selected = select.value || select.dataset.selected || '';
                     select.innerHTML = '<option value="">Select family</option>' + heads.map((head) => {
@@ -365,7 +393,7 @@
             });
 
             familyForms?.addEventListener('input', (event) => {
-                if (event.target.matches('[data-family-head]')) syncHouseholdHead(event.target.closest('[data-family-card]'));
+                if (event.target.matches('[data-family-head], [data-family-household-number]')) syncHouseholdHead(event.target.closest('[data-family-card]'));
             });
 
             familyForms?.addEventListener('click', (event) => {
@@ -390,6 +418,7 @@
             });
 
             refreshFamilyNumbers();
+            familyForms?.querySelectorAll('[data-family-card]').forEach(syncHouseholdHead);
 
             document.getElementById('add-rbi-deceased-row')?.addEventListener('click', () => {
                 const body = document.querySelector('#rbi-deceased-rows-table tbody');

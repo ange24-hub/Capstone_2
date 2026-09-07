@@ -19,15 +19,15 @@
         .continuation { margin-top: 1mm !important; font-size: 8pt !important; font-weight: 700; }
         table.form { width: 100%; border-collapse: collapse; table-layout: fixed; }
         table.form th, table.form td { border: .6pt solid #000; padding: .7mm .8mm; vertical-align: middle; overflow-wrap: anywhere; }
-        table.form th { height: 14mm; text-align: center; font-size: 7.2pt; line-height: 1.15; font-weight: 700; }
-        table.form td { height: 7.5mm; font-size: 7.5pt; line-height: 1.1; }
+        table.form th { height: 14mm; text-align: center; font-size: 6pt; line-height: 1.15; font-weight: 700; }
+        table.form td { height: 7.5mm; font-size: 6.5pt; line-height: 1.1; }
         .head-name, .resident-name { text-transform: uppercase; font-weight: 700; }
         .center { text-align: center; }
         .section-b { margin-top: 1.5mm; }
         .section-b th { height: 6.5mm !important; font-size: 8pt !important; }
         .section-b td { height: 6mm !important; }
         .signatures { width: 82%; margin: 2mm auto 0; border-collapse: collapse; table-layout: fixed; page-break-inside: avoid; }
-        .signatures td { width: 50%; border: 0; padding: 0 14mm; vertical-align: top; }
+        .signatures td { width: 33.33%; border: 0; padding: 0 5mm; vertical-align: top; }
         .signature-label { margin-bottom: 0; }
         .signature-block { height: 13mm; text-align: center; position: relative; }
         .signature-image { display: block; height: 8mm; max-width: 43mm; margin: 0 auto -1.5mm; object-fit: contain; }
@@ -49,7 +49,7 @@
                     @if ($logoDataUri)<img class="logo" src="{{ $logoDataUri }}" alt="Barangay seal">@endif
                 </td>
                 <td class="heading">
-                    <h1>Updates of Barangay Registry of Barangay Inhabitants</h1>
+                    <h1>HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</h1>
                     <p>For the month of <strong>{{ strtoupper(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'NOT SET') }}</strong></p>
                     <p>Barangay {{ $barangayName }}</p>
                     @if ($page['continued'])<p class="continuation">{{ strtoupper($page['household_head']) }} HOUSEHOLD — CONTINUED</p>@endif
@@ -58,33 +58,8 @@
             </tr>
         </table>
 
-        <table class="form">
-            <colgroup>
-                <col style="width: 13%"><col style="width: 22%"><col style="width: 5%"><col style="width: 10%">
-                <col style="width: 13%"><col style="width: 9%"><col style="width: 13%"><col style="width: 15%">
-            </colgroup>
-            <thead>
-            <tr>
-                @foreach (App\Models\BarangayRbiUpdate::rowFields() as $label)<th>{{ $label }}</th>@endforeach
-            </tr>
-            </thead>
-            <tbody>
-            @foreach ($memberRows as $member)
-                <tr>
-                    @if ($loop->first)
-                        <td class="head-name center" rowspan="7">{{ $page['household_head'] }}</td>
-                    @endif
-                    <td class="resident-name">{{ $member['inhabitant_name'] ?? '' }}</td>
-                    <td class="center">{{ $member['sex'] ?? '' }}</td>
-                    <td class="center">{{ ! empty($member['birth_date']) ? date('m/d/y', strtotime($member['birth_date'])) : '' }}</td>
-                    <td>{{ $member['birth_place'] ?? '' }}</td>
-                    <td class="center">{{ $member['civil_status'] ?? '' }}</td>
-                    <td>{{ $member['occupation'] ?? '' }}</td>
-                    <td>{{ $member['relationship'] ?? '' }}</td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
+        @include('rbi-updates._household-meta')
+        @include('rbi-updates._household-table')
 
         <table class="form section-b">
             <colgroup><col style="width: 75%"><col style="width: 25%"></colgroup>
@@ -109,8 +84,9 @@
                         <span class="official-title">Brgy. Secretary</span>
                     </div>
                 </td>
+                <td><p class="signature-label">Certified Correct:</p><div class="signature-block">@if($certifiedSignatureDataUri)<img class="signature-image" src="{{ $certifiedSignatureDataUri }}" alt="Certified Correct signature">@endif<span class="official-name">{{ $rbiUpdate->certified_by ?: $secretaryName }}</span><span class="official-title">Barangay Secretary</span></div></td>
                 <td>
-                    <p class="signature-label">Noted by:</p>
+                    <p class="signature-label">Verified by:</p>
                     <div class="signature-block">
                         @if ($attestedSignatureDataUri)<img class="signature-image" src="{{ $attestedSignatureDataUri }}" alt="Punong Barangay signature">@endif
                         <span class="official-name">{{ $punongBarangayName }}</span>

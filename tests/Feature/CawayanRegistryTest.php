@@ -1,0 +1,66 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Barangay;
+use App\Models\DeceasedInhabitant;
+use App\Models\Household;
+use App\Models\Inhabitant;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class CawayanRegistryTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_cawayan_has_workbook_pages_and_can_save_monthly_families(): void
+    {
+        $barangay = Barangay::where('name', 'Cawayan')->firstOrFail();
+        $barangay->update(['secretary_name' => 'Cawayan Secretary', 'punong_barangay_name' => 'Cawayan Chair']);
+        $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
+        $household = Household::create(['barangay_id' => $barangay->id, 'household_number' => '1']);
+        Inhabitant::create([
+            'barangay_id' => $barangay->id, 'household_id' => $household->id,
+            'last_name' => 'Example', 'first_name' => 'CawayanResident',
+            'sex' => '', 'status' => Inhabitant::STATUS_ACTIVE,
+        ]);
+        DeceasedInhabitant::create([
+            'barangay_id' => $barangay->id, 'household_number' => '2',
+            'last_name' => 'Example', 'first_name' => 'HistoricalResident',
+        ]);
+
+        $this->actingAs($secretary)->get(route('dashboard.barangay'))
+            ->assertOk()
+            ->assertSee(route('barangay.registry.new-inhabitants'))
+            ->assertSee(route('barangay.registry.deceased'));
+        $this->get(route('barangay.registry.active'))->assertOk()
+            ->assertSee('CAWAYAN')->assertSee('CawayanResident')->assertSee('Not provided');
+        $this->get(route('barangay.registry.deceased'))->assertOk()
+            ->assertSee('HistoricalResident');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()
+            ->assertSee('CAWAYAN')->assertSee('Save Monthly Report')
+            ->assertSee('Cawayan Secretary')->assertSee('Cawayan Chair')
+            ->assertDontSee('NENA E. GONZAGA')->assertDontSee('MARY GRACE M. POLISTICO')->assertDontSee('MARCOS L. MAQUILANG');
+
+        $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
+            'reporting_month' => '2026-09',
+            'families' => [[
+                'household_number' => '3',
+                'members' => [['last_name' => 'Example', 'first_name' => 'NewResident', 'sex' => 'Male']],
+            ]],
+        ])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertDatabaseHas('new_inhabitants', [
+            'barangay_id' => $barangay->id, 'household_number' => '3', 'first_name' => 'NewResident',
+        ]);
+
+        $otherSecretary = User::factory()->create([
+            'role' => User::ROLE_BARANGAY,
+            'barangay_id' => Barangay::where('name', 'Cabascan')->firstOrFail()->id,
+        ]);
+        $this->actingAs($otherSecretary)->get(route('barangay.registry.active'))
+            ->assertOk()->assertDontSee('CawayanResident');
+        $this->get(route('barangay.registry.deceased'))->assertOk()->assertDontSee('HistoricalResident');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()->assertDontSee('NewResident');
+    }
+}

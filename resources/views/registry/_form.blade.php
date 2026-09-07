@@ -151,10 +151,22 @@
                 @endforeach
             </select>
         </div>
+        @if(($inhabitant->barangay ?? auth()->user()->barangay)?->usesResidenceRegistry())
+        <div>
+            <label for="residence_status">Current residence</label>
+            <select id="residence_status" name="residence_status">
+                <option value="transferred" @selected(old('residence_status') === 'transferred')>Transferred to...</option>
+                @foreach(App\Models\Inhabitant::residenceLabels() as $value=>$label)
+                    <option value="{{ $value }}" @selected(old('residence_status', $inhabitant->residence_status ?? 'unconfirmed') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        @endif
     </div>
 
+    <label for="complete_address">Complete address</label><input id="complete_address" name="complete_address" value="{{ old('complete_address', $inhabitant->complete_address ?? '') }}">
     <label for="remarks">RBI remarks / other information</label>
-    <textarea id="remarks" name="remarks">{{ old('remarks', $inhabitant->remarks ?? '') }}</textarea>
+    <textarea id="remarks" name="remarks">{{ old('remarks', \App\Support\RegistryRemarks::display($inhabitant->remarks ?? null)) }}</textarea>
 
     <div class="form-grid">
         <div>

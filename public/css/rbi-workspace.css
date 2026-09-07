@@ -1,0 +1,90 @@
+
+.rbi-forms-workspace { --rbi-navy: #123b5a; --rbi-line: #d9e4ed; display: grid; gap: 24px; max-width: 1320px; margin: 0 auto; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.rbi-forms-workspace .dashboard-hero { display: flex; justify-content: space-between; align-items: center; gap: 28px; padding: 30px; border: 1px solid var(--rbi-line); border-top: 4px solid var(--rbi-navy); border-radius: 16px; background: #fff; color: var(--rbi-navy); box-shadow: 0 4px 18px #163c5906; }
+.rbi-forms-workspace .dashboard-hero h1 { margin: 6px 0 10px; color: var(--rbi-navy); font-size: clamp(28px, 3vw, 38px); letter-spacing: -.04em; }
+.rbi-forms-workspace .dashboard-hero p { max-width: 600px; color: #63788b; font-size: 14px; line-height: 1.7; }
+.rbi-forms-workspace .page-kicker { color: #42759d; font-size: 11px; letter-spacing: .13em; }
+.rbi-forms-workspace .hero-side { display: flex; gap: 12px; min-width: 0; }
+.rbi-forms-workspace .hero-mini-card { display: grid; gap: 5px; min-width: 125px; padding: 18px; border: 1px solid var(--rbi-line); border-radius: 12px; background: #f7fafc; }
+.rbi-forms-workspace .hero-mini-card strong { color: var(--rbi-navy); font-size: 30px; }
+.rbi-forms-workspace .hero-mini-card span { max-width: 110px; font-size: 12px; color: #63788b; }
+.rbi-forms-workspace .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.rbi-section-nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid var(--rbi-line); border-radius: 12px; background: #fff; }
+.rbi-section-nav a { display: flex; align-items: center; gap: 9px; flex: 1; padding: 10px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--rbi-navy); white-space: nowrap; }
+.rbi-section-nav a:hover { background: #edf4fa; text-decoration: none; }
+.rbi-section-nav a span { color: #7a95aa; font-size: 11px; }
+.rbi-forms-workspace [id] { scroll-margin-top: 100px; }
+.rbi-forms-workspace .workflow-card { padding: 26px; border: 1px solid var(--rbi-line); border-radius: 14px; background: #fff; box-shadow: 0 4px 16px #173d5804; }
+.rbi-forms-workspace .workflow-head { gap: 16px; align-items: center; margin-bottom: 20px; }
+.rbi-forms-workspace .section-title { color: var(--rbi-navy); font-size: 20px; line-height: 1.4; }
+.rbi-forms-workspace .workflow-head p, .rbi-forms-workspace .report-history > p { color: #667d90; font-size: 14px; line-height: 1.65; }
+.rbi-forms-workspace .step-pill { display: inline-block; padding: 5px 10px; background: #eaf2f8; color: #315f81; border: 0; border-radius: 6px; font-size: 11px; }
+.rbi-forms-workspace #rbi-monthly-form > h3 { margin: 30px 0 16px; padding-top: 22px; border-top: 1px solid #e5edf3; }
+.rbi-forms-workspace .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; }
+.rbi-forms-workspace label { display: block; margin-bottom: 7px; font-size: 12px; line-height: 1.4; letter-spacing: 0; color: #435f76; text-transform: none; font-weight: 600; }
+.rbi-forms-workspace input:not([type=hidden]), .rbi-forms-workspace select { min-height: 42px; width: 100%; min-width: 0; border: 1px solid #cbdbe7; border-radius: 7px; padding: 9px 11px; color: #173d58; background: #fff; font-size: 14px; }
+.rbi-forms-workspace input[readonly] { background: #f4f7fa; }
+.rbi-forms-workspace .field-help { display: block; margin-top: 7px; color: #708597; font-size: 12px; line-height: 1.5; }
+.rbi-forms-workspace .family-entry-card { margin: 0; padding: 20px; background: #f7fafc; border-left: 3px solid #7fa4bf; box-shadow: none; }
+.rbi-forms-workspace .family-entry-card h4 { font-size: 17px; margin: 5px 0 0; }
+.rbi-forms-workspace .family-entry-card h5 { margin: 20px 0 12px; font-size: 14px; }
+.rbi-forms-workspace .member-entry-card { padding: 18px; border: 1px solid #dce6ed; border-radius: 10px; background: #fff; }
+.rbi-forms-workspace .member-entry-card .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rbi-forms-workspace .member-entry-card .workflow-head { margin-bottom: 16px; }
+.rbi-forms-workspace .signature-pad { border: 1px dashed #a9bfd0; border-radius: 10px; overflow: hidden; background: #fff; }
+.rbi-forms-workspace .signature-pad-actions { background: #f7fafc; padding: 10px 12px; font-size: 12px; }
+.rbi-forms-workspace .form-actions { margin-top: 18px; gap: 12px; }
+.rbi-forms-workspace #rbi-monthly-form > .form-actions:last-child { padding: 18px; background: #f0f5f9; border: 1px solid var(--rbi-line); border-radius: 10px; font-size: 13px; color: #5c7487; }
+.rbi-forms-workspace button, .rbi-forms-workspace .button { min-height: 36px; padding: 8px 12px; border: 1px solid #b9cedd; border-radius: 7px; background: #fff; color: var(--rbi-navy); font-size: 13px; line-height: 1.4; font-weight: 600; text-decoration: none; white-space: normal; }
+.rbi-forms-workspace button:disabled { opacity: .4; cursor: not-allowed; }
+.rbi-forms-workspace button:hover:not(:disabled), .rbi-forms-workspace .button:hover { border-color: #315e7f; background: #edf4fa; color: var(--rbi-navy); }
+.rbi-forms-workspace button:focus-visible, .rbi-forms-workspace a:focus-visible, .rbi-forms-workspace summary:focus-visible { outline: 3px solid #8eb8d8; outline-offset: 3px; }
+.saved-report-list { display: grid; gap: 14px; margin: 22px 0; }
+.saved-report { border: 1px solid var(--rbi-line); border-radius: 12px; overflow: hidden; background: #fff; }
+.saved-report summary { display: flex; align-items: center; gap: 18px; padding: 18px 20px; cursor: pointer; background: #f7fafc; list-style: none; }
+.saved-report summary::-webkit-details-marker { display: none; }
+.report-month { display: flex; align-items: center; gap: 12px; flex: 1; }
+.report-month strong, .report-month small { display: block; }
+.report-month strong { color: var(--rbi-navy); font-size: 15px; }
+.report-month small { margin-top: 4px; font-size: 12px; color: #73899b; }
+.report-month-icon { display: grid; place-items: center; width: 38px; height: 42px; border: 1px solid #d5e3ed; border-radius: 9px; background: #fff; color: #426e8e; }
+.report-counts { font-size: 12px; color: #627c91; }
+.report-counts span { margin: 0 7px; }
+.report-expand { font-size: 22px; color: #577992; transition: transform .15s; }
+.saved-report[open] .report-expand { transform: rotate(180deg); }
+.saved-report-content { padding: 0 20px 20px; border-top: 1px solid var(--rbi-line); }
+.saved-report-toolbar, .saved-report-toolbar > div { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.saved-report-toolbar { justify-content: space-between; padding: 16px 0; color: #6e8495; font-size: 12px; }
+.saved-report form { margin: 0; }
+.saved-household { border: 1px solid #e0e9f0; border-radius: 9px; overflow: hidden; margin-top: 12px; }
+.saved-household-heading { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f5f8fb; }
+.saved-household-heading h3 { margin: 0; font-size: 14px; color: #31566f; }
+.saved-household-heading > span { font-size: 12px; color: #72899b; }
+.saved-member { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-top: 1px solid #edf1f5; }
+.saved-member-name { display: flex; align-items: center; gap: 10px; }
+.saved-member-name strong { font-size: 13px; font-weight: 600; color: #254963; }
+.member-initial { display: grid; place-items: center; width: 30px; height: 30px; background: #edf3f8; color: #537a98; border-radius: 50%; font-size: 12px; }
+.saved-member-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.saved-member-actions .member-edit { color: #315f82; padding: 7px; font-size: 13px; }
+.rbi-forms-workspace .member-delete { color: #984c53; border-color: #e6d3d6; background: #fff; }
+.saved-household-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid #e5edf3; background: #fbfcfe; }
+.saved-household-footer > span:not(.badge) { font-size: 12px; color: #748a9c; }
+.official-report-history { margin-top: 22px; border: 1px solid var(--rbi-line); border-radius: 10px; }
+.official-report-history table { min-width: 850px; }
+.official-report-history th { padding: 14px; font-size: 10px; background: #eff5f9; }
+.official-report-history td { padding: 16px 14px; font-size: 13px; vertical-align: middle; }
+.rbi-history-actions { min-width: 300px; max-width: 500px; }
+@media(max-width: 1000px) { .rbi-forms-workspace .member-entry-card .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .rbi-forms-workspace .dashboard-hero { align-items: flex-start; } .rbi-forms-workspace .hero-side { flex-direction: column; } }
+@media(max-width: 640px) { .rbi-forms-workspace { gap: 16px; } .rbi-forms-workspace .dashboard-hero { flex-direction: column; padding: 20px; } .rbi-forms-workspace .hero-side { flex-direction: row; width: 100%; } .rbi-forms-workspace .hero-mini-card { flex: 1; } .rbi-section-nav { display: grid; grid-template-columns: 1fr 1fr; } .rbi-section-nav a { font-size: 12px; padding: 9px; } .rbi-forms-workspace .workflow-card { padding: 16px; } .rbi-forms-workspace .form-grid, .rbi-forms-workspace .member-entry-card .form-grid { grid-template-columns: 1fr; } .rbi-forms-workspace .workflow-head { flex-wrap: wrap; } .saved-report summary { flex-wrap: wrap; gap: 8px; padding: 14px; } .report-month { flex-basis: 80%; } .report-counts { order: 3; padding-left: 50px; } .saved-report-content { padding: 0 12px 12px; } .saved-member { padding: 12px; } .saved-member-actions { width: 100%; } .saved-household-footer { align-items: flex-start; } }
+
+.rbi-forms-workspace { width: 100%; min-width: 0; }
+.rbi-forms-workspace :where(div, section, article, form, nav) { min-width: 0; }
+.rbi-forms-workspace .table-wrap { width: 100%; max-width: 100%; overflow-x: auto; }
+.rbi-forms-workspace .dashboard-hero > div:first-child { min-width: 0; }
+@media(max-width:640px) {
+ .rbi-forms-workspace .dashboard-hero { width: 100%; }
+ .rbi-forms-workspace .hero-mini-card { min-width: 0; }
+ .rbi-forms-workspace .split-actions { flex-direction: column; align-items: stretch; }
+ .rbi-forms-workspace .signature-pad-actions { flex-wrap: wrap; gap: 8px; }
+ .rbi-forms-workspace .saved-member-actions button { max-width: 100%; }
+}

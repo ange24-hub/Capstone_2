@@ -2,21 +2,21 @@
 
 @section('content')
     @php($isBiasong = $registryBarangay?->name === 'Biasong')
-    @php($usesFamilyNewInhabitants = in_array($registryBarangay?->name, ['Biasong', 'Cabascan'], true))
+    @php($usesFamilyNewInhabitants = $registryBarangay !== null)
     @php($isDedicatedRegistryPage = request()->routeIs('barangay.registry.*'))
     @php($registryFilterRoute = request()->routeIs('barangay.registry.new-inhabitants') ? 'barangay.registry.new-inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'barangay.registry.deceased' : (request()->routeIs('barangay.registry.active') ? 'barangay.registry.active' : 'registry.index')))
     <section class="panel stack registry-workspace {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
         <div class="page-kicker">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
         <div class="page-head">
             <div>
-                <h1>{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'New Inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'Deceased Records' : (request()->routeIs('barangay.registry.active') ? 'Resident Registry' : ($registryBarangay ? 'Barangay '.$registryBarangay->name.' RBI Data' : 'Multi-Barangay Registry'))) }}</h1>
+                <h1>{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'New Inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'Deceased Records' : (request()->routeIs('barangay.registry.active') ? ($isBiasong ? 'Resident Registry' : 'Consolidated / All Registered') : ($registryBarangay ? 'Barangay '.$registryBarangay->name.' RBI Data' : 'Multi-Barangay Registry'))) }}</h1>
                 <p>
                     @if (request()->routeIs('barangay.registry.new-inhabitants'))
                         Create and manage monthly family reports for Barangay {{ $registryBarangay->name }}.
                     @elseif (request()->routeIs('barangay.registry.deceased'))
                         Maintain the official deceased resident records for Barangay {{ $registryBarangay->name }}.
                     @elseif (request()->routeIs('barangay.registry.active'))
-                        View and update active household and resident records for Barangay {{ $registryBarangay->name }}.
+                        @if($isBiasong) Maintain the resident registry for Barangay Biasong. @else All registered residents of Barangay {{ $registryBarangay->name }}, including those living elsewhere. Moved-out and deceased records are separate. @endif
                     @elseif (request('source'))
                         Editable records imported from {{ request('source') }}. The information is separated per person and household.
                     @else
@@ -30,6 +30,16 @@
             <div class="success">{{ session('status') }}</div>
         @endif
 
+        @if(request()->routeIs('barangay.registry.active') && ! $isBiasong)
+            <div class="toolbar">
+                <a class="button" href="{{ route('barangay.residence.index') }}">Living in Barangay</a>
+                <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'living_elsewhere']) }}">Registered, Living Elsewhere</a>
+                <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'unconfirmed']) }}">Residence Needs Confirmation</a>
+                <a class="button secondary-button" href="{{ route('barangay.residence.download', ['scope'=>'registered']) }}">Download All Registered CSV</a>
+            </div>
+            <p>Green rows are registered residents living elsewhere. The Living in Barangay file excludes them.</p>
+        @endif
+
         @unless(request('source'))
         <div class="workflow-card">
             <h2 class="section-title">Create Inhabitant or Migrant Record</h2>
@@ -40,8 +50,8 @@
         <div class="workflow-card">
             <div class="workflow-head">
                 <div>
-                    <h2 class="section-title">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Active household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
-                    <p>@if ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit the spreadsheet cells, then click <strong>Save row</strong>. @endif</p>
+                    <h2 class="section-title">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
+                    <p>@if ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
                     @if (request('source') && ! $isDedicatedRegistryPage)
                         <div class="rbi-sheet-tabs">
                             <a class="button {{ request('sheet') !== 'deceased' ? '' : 'secondary-button' }}" href="{{ route('registry.index', ['source' => request('source')]) }}">Active Household</a>
@@ -68,7 +78,10 @@
                 <p>No records found.</p>
             @else
                 <div class="table-wrap {{ request('source') ? 'rbi-source-table' : '' }}">
-                    <table>
+                    <table @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong) class="rbi-compact-household-columns" @endif>
+                        @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong)
+                            <colgroup><col style="width: 56px"><col style="width: 56px"><col span="17"></colgroup>
+                        @endif
                         @if (request('source'))
                         @if (request('sheet') === 'deceased')
                         @if ($isBiasong)
@@ -99,7 +112,7 @@
                                     <td><input form="{{ $rowForm }}" name="education_level" value="{{ $record->education_level }}" aria-label="Education"></td>
                                     <td><input form="{{ $rowForm }}" name="religion" value="{{ $record->religion }}" aria-label="Religion"></td>
                                     <td><input form="{{ $rowForm }}" name="occupation" value="{{ $record->occupation }}" aria-label="Occupation"></td>
-                                    <td><input form="{{ $rowForm }}" name="remarks" value="{{ $record->remarks }}" aria-label="Remarks"></td>
+                                    <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($record->remarks) }}" aria-label="Remarks"></td>
                                     <td><input form="{{ $rowForm }}" name="death_date" type="date" value="{{ optional($record->death_date)->format('Y-m-d') }}" aria-label="Date of death"></td>
                                     <td class="rbi-row-save"><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.deceased.update', $record) }}">@csrf @method('PUT')<button type="submit">Save row</button></form></td>
                                 </tr>
@@ -134,7 +147,7 @@
                                     <td><input form="{{ $rowForm }}" name="education_level" value="{{ $record->education_level }}" aria-label="Education"></td>
                                     <td><input form="{{ $rowForm }}" name="religion" value="{{ $record->religion }}" aria-label="Religion"></td>
                                     <td><input form="{{ $rowForm }}" name="month_submitted" value="{{ $record->month_submitted }}" aria-label="Month submitted"></td>
-                                    <td class="rbi-row-save"><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.new-inhabitants.update', $record) }}">@csrf @method('PUT')<button type="submit">Save row</button></form></td>
+                                    <td class="rbi-row-save"><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.new-inhabitants.update', $record) }}">@csrf @method('PUT')</form></td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -147,17 +160,18 @@
                             <tr class="rbi-title-row"><th colspan="19">CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</th></tr>
                             <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
                             <tr class="rbi-meta-row">
-                                <th colspan="2">A. REGION:</th><th colspan="4">VIII</th><th colspan="3"></th><th colspan="2">D. BARANGAY:</th><th colspan="8">{{ strtoupper($registryBarangay?->name ?? '') }}</th>
+                                <th colspan="2">A. REGION:</th><th colspan="4">VIII</th><th colspan="3"></th><th colspan="2">D. BARANGAY:</th><th colspan="9">{{ strtoupper($registryBarangay?->name ?? '') }}</th>
                             </tr>
                             <tr class="rbi-meta-row">
-                                <th colspan="2">B. PROVINCE:</th><th colspan="4">SOUTHERN LEYTE</th><th colspan="3"></th><th colspan="2">E. HOUSEHOLD:</th><th colspan="8">{{ number_format($registryHouseholdCount) }} HOUSEHOLDS</th>
+                                <th colspan="2">B. PROVINCE:</th><th colspan="4">SOUTHERN LEYTE</th><th colspan="3"></th><th colspan="2">E. HOUSEHOLD:</th><th colspan="9">{{ number_format($registryHouseholdCount) }} HOUSEHOLDS</th>
                             </tr>
                             <tr class="rbi-meta-row">
                                 <th colspan="2">C. MUNICIPALITY:</th><th colspan="4">TOMAS OPPUS</th><th colspan="13"></th>
                             </tr>
                             <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
+                            <tr class="rbi-meta-row"><th colspan="19">Residents: {{ number_format($inhabitants->total()) }}</th></tr>
                             <tr class="rbi-group-row">
-                                <th rowspan="2">HH<br>No.</th><th rowspan="2">HH</th><th colspan="4">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2">ETHNICITY</th><th rowspan="2">ACTION</th>
+                                <th rowspan="2">HH<br>No.</th><th rowspan="2">HH</th><th colspan="4">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2">ETHNICITY</th><th rowspan="2" scope="col">Resident No.</th>
                             </tr>
                             <tr>
                                 <th>Last Name</th>
@@ -171,10 +185,14 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php($previousHousehold = null)
                             @foreach ($inhabitants as $inhabitant)
                                 @php($rowForm = 'rbi-row-'.$inhabitant->id)
-                                <tr class="{{ filled($inhabitant->registry_sequence) ? 'rbi-household-start' : '' }}">
-                                    <td><input form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}" aria-label="HH number sequence"></td>
+                                @php($householdNumber = $inhabitant->household->household_number)
+                                @php($householdStart = $householdNumber !== 'Not recorded' && $householdNumber !== $previousHousehold)
+                                @php($previousHousehold = $householdNumber)
+                                <tr class="{{ $householdStart ? 'rbi-household-start' : '' }} {{ $householdStart ? 'punong-household-start' : '' }} {{ $inhabitant->residence_status === 'living_elsewhere' ? 'residence-elsewhere' : '' }}">
+                                    <td><input value="{{ $inhabitant->household->household_number === 'Not recorded' ? '' : $inhabitant->household->household_number }}" readonly aria-label="Household number"><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
                                     <td><input form="{{ $rowForm }}" name="household_number" value="{{ $inhabitant->household->household_number }}" required aria-label="Household number"></td>
                                     <td><input form="{{ $rowForm }}" name="last_name" value="{{ $inhabitant->last_name }}" required aria-label="Last name"></td>
                                     <td><input form="{{ $rowForm }}" name="first_name" value="{{ $inhabitant->first_name }}" required aria-label="First name"></td>
@@ -185,14 +203,15 @@
                                     <td><input form="{{ $rowForm }}" name="birth_place" value="{{ $inhabitant->birth_place }}" aria-label="Place of birth"></td>
                                     <td><input form="{{ $rowForm }}" name="birth_date" type="date" value="{{ optional($inhabitant->birth_date)->format('Y-m-d') }}" aria-label="Date of birth"></td>
                                     <td><input form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" value="{{ $inhabitant->recorded_age }}" aria-label="Age"></td>
-                                    <td><select form="{{ $rowForm }}" name="sex" required aria-label="Sex"><option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select></td>
+                                    <td><select form="{{ $rowForm }}" name="sex" required aria-label="Sex">@if(blank($inhabitant->sex))<option value="" selected>Not provided</option>@endif<option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select></td>
                                     <td><input form="{{ $rowForm }}" name="civil_status" value="{{ $inhabitant->civil_status }}" aria-label="Civil status"></td>
                                     <td><input form="{{ $rowForm }}" name="education_level" value="{{ $inhabitant->education_level }}" aria-label="School level completed"></td>
                                     <td><input form="{{ $rowForm }}" name="religion" value="{{ $inhabitant->religion }}" aria-label="Religion"></td>
                                     <td><input form="{{ $rowForm }}" name="occupation" value="{{ $inhabitant->occupation }}" aria-label="Occupation"></td>
-                                    <td><input form="{{ $rowForm }}" name="remarks" value="{{ $inhabitant->remarks }}" aria-label="Remarks"></td>
+                                    <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($inhabitant->remarks) }}" aria-label="Remarks"></td>
                                     <td><input form="{{ $rowForm }}" name="ethnicity" value="{{ $inhabitant->ethnicity }}" aria-label="Ethnicity"></td>
-                                    <td class="rbi-row-save">
+                                    <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
+                                    <td class="rbi-row-save" hidden>
                                         <form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">
                                             @csrf
                                             @method('PUT')
@@ -203,7 +222,7 @@
                                             <input type="hidden" name="longitude" value="{{ $inhabitant->household->longitude }}">
                                             <input type="hidden" name="contact_number" value="{{ $inhabitant->contact_number }}">
                                             <input type="hidden" name="status" value="{{ $inhabitant->status }}">
-                                            <button type="submit">Save row</button>
+                                            
                                         </form>
                                     </td>
                                 </tr>
@@ -213,11 +232,12 @@
                         @endif
                         @else
                         <thead>
-                            <tr><th>Name</th><th>Barangay</th><th>Household</th><th>Coordinates</th><th>Status</th><th>Migration Events</th><th>Actions</th></tr>
+                            <tr><th scope="col">Resident No.</th><th>Name</th><th>Barangay</th><th>Household</th><th>Coordinates</th><th>Status</th><th>Migration Events</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             @foreach ($inhabitants as $inhabitant)
                                 <tr>
+                                    <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
                                     <td><strong>{{ $inhabitant->fullName() }}</strong><br>{{ $inhabitant->sex }} {{ optional($inhabitant->birth_date)->format('M d, Y') }}</td>
                                     <td>{{ $inhabitant->barangay->name }}</td>
                                     <td>{{ $inhabitant->household->household_number }}<br>{{ $inhabitant->household->address ?: 'No address' }}</td>
@@ -236,4 +256,5 @@
             @endif
         </div>
     </section>
+@push('scripts')<script src="{{ asset('js/registry-confirm.js') }}?v={{ filemtime(public_path('js/registry-confirm.js')) }}" defer></script>@endpush
 @endsection

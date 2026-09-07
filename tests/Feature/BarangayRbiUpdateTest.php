@@ -41,7 +41,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('barangay.rbi-updates.index'))
             ->assertOk()
-            ->assertSee('Updates of Barangay Registry of Barangay Inhabitants')
+            ->assertSee('Monthly report')
             ->assertSee('Add Another Family Form')
             ->assertSee('Add Member to This Family')
             ->assertSee('Monthly Form Certification')
@@ -121,7 +121,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('rbi-updates.show', $update))
             ->assertOk()
-            ->assertSee('Updates of Barangay Registry of Barangay Inhabitants')
+            ->assertSee('Monthly report')
             ->assertSee('A. Newly Registered Barangay Inhabitants')
             ->assertSee('Monthly Form Certification')
             ->assertSee('Pedro Dela Cruz')
@@ -230,7 +230,7 @@ class BarangayRbiUpdateTest extends TestCase
             ->get(route('barangay.rbi-updates.index', ['edit' => $draft->id]))
             ->assertOk()
             ->assertSee('Continue Monthly Draft')
-            ->assertSee('All families remain together in one monthly record and one consolidated PDF.');
+            ->assertSee('Monthly RBI Form History');
     }
 
     public function test_large_family_continues_before_the_next_household_starts(): void
@@ -316,7 +316,7 @@ class BarangayRbiUpdateTest extends TestCase
             ->assertOk()
             ->assertSee('Update Submitted Monthly Form')
             ->assertSee('Ana Dela Cruz')
-            ->assertSee('Update Municipal Copy');
+            ->assertSee('Save Updated Form');
 
         $this->actingAs($secretary)
             ->put(route('barangay.rbi-updates.update', $report), [

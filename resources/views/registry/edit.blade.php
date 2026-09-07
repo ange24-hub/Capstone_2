@@ -48,4 +48,5 @@
             @endif
         </div>
     </section>
+@push('scripts')<script src="{{ asset('js/registry-confirm.js') }}?v={{ filemtime(public_path('js/registry-confirm.js')) }}" defer></script>@endpush
 @endsection

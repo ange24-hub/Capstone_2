@@ -170,7 +170,8 @@ class RegistryMigrationDashboardTest extends TestCase
             ->assertSee('NEW INHABITANT')
             ->assertSee('Andrew')
             ->assertSee('MONTH')
-            ->assertSee('Save row');
+            ->assertSee('Save Monthly Report')
+            ->assertSee(route('registry.new-inhabitants.edit', $record));
 
         $this->actingAs($secretary)
             ->put(route('registry.new-inhabitants.update', $record), [
@@ -353,7 +354,7 @@ class RegistryMigrationDashboardTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('dashboard.barangay'))
             ->assertOk()
-            ->assertSee('Open CABASCAN.xlsx Data')
+            ->assertSee('Resident registry')
             ->assertSee('New Inhabitants');
 
         $this->actingAs($secretary)

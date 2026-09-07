@@ -185,6 +185,8 @@ DB::transaction(function () use ($barangay, $activeRows, $deceasedRows, $newRows
     }
 });
 
+\App\Support\SourceResidenceSync::apply($barangay, $source);
+
 echo json_encode([
     'barangay' => $barangay->name,
     'households' => Household::where('barangay_id', $barangay->id)->count(),

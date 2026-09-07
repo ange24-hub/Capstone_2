@@ -23,6 +23,8 @@ class BarangayRbiUpdate extends Model
         'as_of_date',
         'prepared_by',
         'prepared_signature_path',
+        'certified_by',
+        'certified_signature_path',
         'attested_by',
         'attested_signature_path',
         'status',
@@ -45,16 +47,7 @@ class BarangayRbiUpdate extends Model
 
     public static function rowFields(): array
     {
-        return [
-            'household_head' => 'Name of Household Head',
-            'inhabitant_name' => 'A. Name of Newly Registered Barangay Inhabitant (Family Name, First Name, Middle Name)',
-            'sex' => 'Sex',
-            'birth_date' => 'Date of Birth (mm/dd/yy)',
-            'birth_place' => 'Place of Birth',
-            'civil_status' => 'Civil Status',
-            'occupation' => 'Occupation',
-            'relationship' => 'Relationship to Household Head',
-        ];
+        return ['household_head' => 'Name of Household Head'] + \App\Support\HouseholdRbi::fields();
     }
 
     public static function deceasedRowFields(): array

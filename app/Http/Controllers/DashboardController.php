@@ -47,7 +47,7 @@ class DashboardController extends Controller
             ->get();
         $barangayOrder = array_flip(Barangay::TOMAS_OPPUS_BARANGAYS);
         $barangays = Barangay::where('municipality', Barangay::MUNICIPALITY)
-            ->withCount(['inhabitants', 'households', 'migrationRecords', 'secretaries'])
+            ->withCount(['inhabitants' => fn ($query) => $query->where(fn ($q) => $q->where('status', \App\Models\Inhabitant::STATUS_ACTIVE)->orWhereHas('barangay', fn ($b) => $b->where('name', 'Biasong'))), 'households' => fn ($query) => $query->where('household_number', '!=', 'Not recorded'), 'migrationRecords', 'secretaries'])
             ->get()
             ->sortBy(fn (Barangay $barangay): int => $barangayOrder[$barangay->name] ?? PHP_INT_MAX)
             ->values()
@@ -152,7 +152,9 @@ class DashboardController extends Controller
         $barangay = auth()->user()->barangay;
 
         if ($barangay) {
-            $barangay->loadCount(['inhabitants', 'households', 'migrationRecords']);
+            $barangay->loadCount(['inhabitants' => fn ($query) => $query->when($barangay->usesResidenceRegistry(), fn ($q) => $q->where('status', \App\Models\Inhabitant::STATUS_ACTIVE)),
+                'inhabitants as local_residents_count' => fn ($query) => $query->livingHere(),
+                'households' => fn ($query) => $query->where('household_number', '!=', 'Not recorded'), 'migrationRecords']);
         }
 
         $residentApprovalRequests = $barangay
@@ -203,6 +205,10 @@ class DashboardController extends Controller
             : collect();
 
         return view($request->routeIs('barangay.rbi-updates.index') ? 'rbi-updates.index' : 'dashboards.barangay', [
+            'newInhabitantRecords' => $barangay && $request->routeIs('barangay.rbi-updates.index')
+                ? \App\Models\NewInhabitant::where('barangay_id', $barangay->id)->orderByDesc('reporting_month')->orderBy('source_position')->orderBy('id')->get()
+                : collect(),
+            'registryActivities' => $barangay ? \App\Models\RegistryActivity::with('user')->where('barangay_id', $barangay->id)->latest('id')->paginate(15, ['*'], 'activity_page') : collect(),
             'rbiUpdates' => $rbiUpdates,
             'barangay' => $barangay,
             'residentApprovalRequests' => $residentApprovalRequests,

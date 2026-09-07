@@ -20,6 +20,52 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RegistryController extends Controller
 {
+    public function movedOut(Request $request): View
+    {
+        $barangay = $request->user()->barangay;
+        abort_unless($barangay, 403);
+        $search = trim((string) $request->input('search', ''));
+
+        return view('registry.moved-out', [
+            'barangay' => $barangay,
+            'residents' => Inhabitant::with(['household', 'migrationRecords' => fn ($query) => $query
+                ->where('type', MigrationRecord::TYPE_OUT)->orderByDesc('movement_date')->orderByDesc('id')])
+                ->where('barangay_id', $barangay->id)->where('status', Inhabitant::STATUS_MIGRATED_OUT)
+                ->when($search !== '', fn ($query) => $query->where(fn ($names) => $names
+                    ->where('first_name', 'like', '%'.$search.'%')->orWhere('last_name', 'like', '%'.$search.'%')))
+                ->orderBy('last_name')->orderBy('first_name')->orderBy('id')->paginate(25)->withQueryString(),
+            'activeResidents' => Inhabitant::with('household')->where('barangay_id', $barangay->id)
+                ->where('status', Inhabitant::STATUS_ACTIVE)->orderBy('last_name')->orderBy('first_name')->get(),
+        ]);
+    }
+
+    public function storeMovedOut(Request $request): RedirectResponse
+    {
+        abort_unless($request->user()->barangay_id, 403);
+        $validated = $request->validate([
+            'inhabitant_id' => ['required', 'integer'],
+            'movement_date' => ['required', 'date'],
+            'destination' => ['nullable', 'string', 'max:255'],
+            'reason' => ['nullable', 'string', 'max:1000'],
+        ]);
+        DB::transaction(function () use ($request, $validated): void {
+            $resident = Inhabitant::where('barangay_id', $request->user()->barangay_id)
+                ->whereKey($validated['inhabitant_id'])->lockForUpdate()->firstOrFail();
+            if ($resident->status !== Inhabitant::STATUS_ACTIVE) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['inhabitant_id' => 'Select an active resident.']);
+            }
+            $resident->migrationRecords()->create([
+                'barangay_id' => $resident->barangay_id, 'type' => MigrationRecord::TYPE_OUT,
+                'movement_date' => $validated['movement_date'], 'origin' => $request->user()->barangay->name,
+                'destination' => $validated['destination'] ?? null, 'reason' => $validated['reason'] ?? null,
+                'recorded_by' => $request->user()->id,
+            ]);
+            $resident->update(['status' => Inhabitant::STATUS_MIGRATED_OUT]);
+        });
+
+        return redirect()->route('barangay.registry.moved-out')->with('status', 'Resident moved to Moved Out records.');
+    }
+
     public function activeRegistry(Request $request): View
     {
         abort_unless($request->user()->barangay, 403, 'Your secretary account is not assigned to a barangay.');
@@ -32,16 +78,10 @@ class RegistryController extends Controller
         return $this->index($request);
     }
 
-    public function newInhabitants(Request $request): View
+    public function newInhabitants(Request $request): RedirectResponse
     {
-        abort_unless($request->user()->barangay, 403, 'Your secretary account is not assigned to a barangay.');
-
-        $request->merge([
-            'source' => strtoupper($request->user()->barangay->name).'.xlsx',
-            'sheet' => 'new-inhabitants',
-        ]);
-
-        return $this->index($request);
+        abort_unless($request->user()->barangay, 403);
+        return redirect()->route('barangay.rbi-updates.index');
     }
 
     public function deceasedRecords(Request $request): View
@@ -56,9 +96,12 @@ class RegistryController extends Controller
         return $this->index($request);
     }
 
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         $isBarangaySecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
+        if ($isBarangaySecretary && $request->input('sheet') === 'new-inhabitants') {
+            return redirect()->route('barangay.rbi-updates.index');
+        }
 
         if ($isBarangaySecretary) {
             abort_unless($request->user()->barangay_id, 403, 'Your secretary account is not assigned to a barangay.');
@@ -67,6 +110,12 @@ class RegistryController extends Controller
         $query = Inhabitant::with(['barangay', 'household', 'migrationRecords'])
             ->orderBy('household_id')
             ->orderBy('id');
+
+        $isActiveHousehold = $request->filled('source')
+            && ! in_array($request->input('sheet'), ['deceased', 'new-inhabitants'], true);
+        if ($isActiveHousehold) {
+            $query->where('status', Inhabitant::STATUS_ACTIVE);
+        }
 
         if ($isBarangaySecretary) {
             $query->where('barangay_id', $request->user()->barangay_id);
@@ -122,7 +171,12 @@ class RegistryController extends Controller
                         'head' => $head ? $head->last_name.', '.$head->first_name.' '.$head->middle_name : 'Household '.$household->household_number,
                     ];
                 }),
-            'registryHouseholdCount' => Household::where('barangay_id', $request->user()->barangay_id)->count(),
+            'registryHouseholdCount' => Household::where('barangay_id', $request->user()->barangay_id)
+                ->where('household_number', '!=', 'Not recorded')
+                ->when($isActiveHousehold, fn ($query) => $query->where(fn ($households) => $households
+                    ->doesntHave('inhabitants')
+                    ->orWhereHas('inhabitants', fn ($people) => $people->where('status', Inhabitant::STATUS_ACTIVE))))
+                ->count(),
         ]);
     }
 
@@ -217,6 +271,10 @@ class RegistryController extends Controller
             $headName = collect([$head->first_name, $head->middle_name, $head->last_name, $head->suffix])->filter()->implode(' ');
             return $members->map(fn (NewInhabitant $member): array => [
                 'household_head' => $headName,
+                'household_number' => $member->household_number,
+                'last_name' => $member->last_name, 'first_name' => $member->first_name, 'middle_name' => $member->middle_name, 'suffix' => $member->suffix,
+                'complete_address' => $member->complete_address, 'recorded_age' => $member->recorded_age,
+                'education_level' => $member->education_level, 'religion' => $member->religion, 'remarks' => \App\Support\RegistryRemarks::display($member->remarks),
                 'inhabitant_name' => collect([$member->last_name, $member->first_name, $member->middle_name, $member->suffix])->filter()->implode(', '),
                 'sex' => $member->sex,
                 'birth_date' => optional($member->birth_date)->format('Y-m-d') ?: '',
@@ -245,9 +303,9 @@ class RegistryController extends Controller
             foreach ($records->groupBy('household_number')->values() as $position => $members) {
                 $headMember = $members->first(fn (NewInhabitant $member): bool => mb_strtolower(trim((string) $member->relationship_to_head)) === 'head') ?: $members->first();
                 $headName = collect([$headMember->first_name, $headMember->middle_name, $headMember->last_name, $headMember->suffix])->filter()->implode(' ');
-                $family = $report->rbiFamilies()->create(['household_head' => $headName, 'position' => $position]);
+                $family = $report->rbiFamilies()->create(['household_head' => $headName, 'household_number' => $members->first()->household_number, 'position' => $position]);
                 foreach ($members->values() as $memberPosition => $member) {
-                    $family->members()->create(['inhabitant_name' => collect([$member->last_name,$member->first_name,$member->middle_name,$member->suffix])->filter()->implode(', '), 'sex'=>$member->sex, 'birth_date'=>$member->birth_date, 'birth_place'=>$member->birth_place, 'civil_status'=>$member->civil_status, 'occupation'=>$member->occupation, 'relationship'=>$member->relationship_to_head, 'position'=>$memberPosition]);
+                    $family->members()->create(['details' => $member->only(['last_name','first_name','middle_name','suffix','complete_address','recorded_age','education_level','religion','remarks']), 'inhabitant_name' => collect([$member->last_name,$member->first_name,$member->middle_name,$member->suffix])->filter()->implode(', '), 'sex'=>$member->sex, 'birth_date'=>$member->birth_date, 'birth_place'=>$member->birth_place, 'civil_status'=>$member->civil_status, 'occupation'=>$member->occupation, 'relationship'=>$member->relationship_to_head, 'position'=>$memberPosition]);
                 }
             }
             NewInhabitant::whereKey($records->modelKeys())->update(['submitted_rbi_update_id' => $report->id]);
@@ -399,6 +457,46 @@ class RegistryController extends Controller
             'sheet' => 'new-inhabitants',
             'reporting_month' => $validated['reporting_month'],
         ])->with('status', $families->count().' family forms saved as one consolidated monthly report.');
+    }
+
+    public function addNewMemberToActive(Request $request, NewInhabitant $newInhabitant): RedirectResponse
+    {
+        abort_unless($request->user()->barangay_id && $request->user()->barangay_id === $newInhabitant->barangay_id, 403);
+        DB::transaction(function () use ($request, $newInhabitant) {
+            Barangay::whereKey($newInhabitant->barangay_id)->lockForUpdate()->firstOrFail();
+            $record = NewInhabitant::whereKey($newInhabitant->id)->lockForUpdate()->firstOrFail();
+            if ($record->active_inhabitant_id) return;
+            $fail = fn ($message) => throw \Illuminate\Validation\ValidationException::withMessages(['member' => $message]);
+            if (blank($record->household_number) || $record->household_number === 'Not recorded') $fail('Edit this member and set the household number first.');
+            if (! in_array($record->sex, ['Male', 'Female'], true)) $fail('Edit this member and set the sex first.');
+            $identity = function ($query) use ($record) {
+                $query->where('barangay_id', $record->barangay_id)->where('first_name', $record->first_name)->where('last_name', $record->last_name);
+                foreach (['middle_name', 'suffix'] as $field) {
+                    if (filled($record->$field)) $query->where($field, $record->$field);
+                    else $query->where(fn ($q) => $q->whereNull($field)->orWhere($field, ''));
+                }
+                return $query;
+            };
+            if ($identity(DeceasedInhabitant::query())->exists()) $fail('A matching deceased record exists. Review the identity before adding this member.');
+            $matches = $identity(Inhabitant::with('household'))->get();
+            if ($matches->count() > 1) $fail('Multiple matching residents exist. Review the records first.');
+            $active = $matches->first();
+            if ($active && ($active->status !== Inhabitant::STATUS_ACTIVE || $active->household->household_number !== $record->household_number
+                || $active->birth_date?->format('Y-m-d') !== $record->birth_date?->format('Y-m-d'))) $fail('A matching resident has different household, birth date, or status. Review the record first.');
+            if (! $active) {
+                $household = Household::firstOrCreate(['barangay_id' => $record->barangay_id, 'household_number' => $record->household_number],
+                    ['purok' => $record->purok, 'address' => $record->complete_address]);
+                $data = $record->only(['first_name', 'last_name', 'middle_name', 'suffix', 'relationship_to_head', 'birth_place', 'birth_date',
+                    'recorded_age', 'sex', 'civil_status', 'education_level', 'religion', 'occupation', 'remarks']);
+                $active = Inhabitant::create($data + ['barangay_id' => $record->barangay_id, 'household_id' => $household->id,
+                    'family_number' => $record->household_number, 'status' => Inhabitant::STATUS_ACTIVE,
+                    'residence_status' => Inhabitant::RESIDENCE_UNCONFIRMED, 'residence_source' => 'Added from saved new-inhabitant record; residence needs confirmation']);
+            }
+            $record->update(['active_inhabitant_id' => $active->id, 'added_to_active_at' => now()]);
+            \App\Models\RegistryActivity::create(['barangay_id' => $record->barangay_id, 'user_id' => $request->user()->id,
+                'inhabitant_id' => $active->id, 'description' => 'Added saved member to Consolidated RBI: '.$active->fullName()]);
+        });
+        return redirect()->route('barangay.rbi-updates.index')->with('status', 'Member added to Consolidated / All Registered.');
     }
 
     public function addNewFamilyToActive(Request $request): RedirectResponse
@@ -554,13 +652,45 @@ class RegistryController extends Controller
     {
         $this->authorizeInhabitant($request, $inhabitant);
 
+        $transfer = $request->input('residence_status') === 'transferred';
+        $remark = (string) $request->input('remarks', '');
+        if (! preg_match('/\b(?:NOT|NO|NEVER)\s+TRANSFER/i', $remark)
+            && preg_match('/\bTRANSFER(?:RED|ED)\s+TO\s+([^\[\r\n]+)/i', $remark, $match)) {
+            $transfer = true;
+            if (! $request->filled('transfer_destination')) $request->merge(['transfer_destination' => trim($match[1])]);
+        }
+        if ($transfer) {
+            $request->validate(['transfer_confirmed' => ['required', 'accepted'], 'transfer_destination' => ['required', 'string', 'max:255']]);
+            $request->merge(['residence_status' => Inhabitant::RESIDENCE_ELSEWHERE, 'status' => Inhabitant::STATUS_MIGRATED_OUT,
+                'migration_type' => MigrationRecord::TYPE_OUT, 'movement_date' => now()->toDateString(),
+                'destination' => $request->input('transfer_destination')]);
+        }
         $validated = $this->validatePayload($request);
-        $barangay = $this->resolveBarangay($request, $validated);
-        $household = $this->resolveHousehold($barangay, $validated);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $inhabitant, $validated, $transfer) {
+            $inhabitant = Inhabitant::whereKey($inhabitant->id)->lockForUpdate()->firstOrFail();
+            $before = $inhabitant->getAttributes();
+            $oldHousehold = $inhabitant->household->getAttributes();
+            $barangay = $this->resolveBarangay($request, $validated);
+            $household = $this->resolveHousehold($barangay, $validated);
+            $alreadyMoved = $inhabitant->status === Inhabitant::STATUS_MIGRATED_OUT;
+            $inhabitant->fill($this->inhabitantAttributes($validated, $barangay, $household));
+            $changes = [];
+            foreach ($inhabitant->getDirty() as $field => $value) $changes[$field] = ['before' => $before[$field] ?? null, 'after' => $value];
+            foreach (['household_number', 'purok', 'address', 'latitude', 'longitude'] as $field) {
+                if (($oldHousehold[$field] ?? null) != $household->$field) $changes['household.'.$field] = ['before' => $oldHousehold[$field] ?? null, 'after' => $household->$field];
+            }
+            $inhabitant->save();
+            if (! $transfer || ! $alreadyMoved) $this->recordMigrationIfPresent($request, $inhabitant, $validated);
+            if ($changes) \App\Models\RegistryActivity::create([
+                'barangay_id' => $barangay->id, 'user_id' => $request->user()->id, 'inhabitant_id' => $inhabitant->id,
+                'description' => ($transfer ? 'Transferred resident to '.$validated['destination'].': ' : 'Updated resident: ').$inhabitant->fullName(),
+                'changes' => $changes,
+            ]);
+        });
 
-        $inhabitant->update($this->inhabitantAttributes($validated, $barangay, $household));
-        $this->recordMigrationIfPresent($request, $inhabitant, $validated);
-
+        if ($transfer && $request->user()->hasRole(User::ROLE_BARANGAY)) {
+            return redirect()->route('barangay.registry.active')->with('status', 'Resident transferred to Moved Out. The change is recorded in Registry Activity History.');
+        }
         return redirect()->route('registry.index', $request->filled('source') ? ['source' => $request->string('source')->toString()] : [])
             ->with('status', 'Inhabitant record updated.');
     }
@@ -598,6 +728,7 @@ class RegistryController extends Controller
             'birth_date' => ['nullable', 'date'],
             'recorded_age' => ['nullable', 'integer', 'between:0,150'],
             'birth_place' => ['nullable', 'string', 'max:255'],
+            'complete_address' => ['nullable', 'string', 'max:255'],
             'civil_status' => ['nullable', 'string', 'max:60'],
             'religion' => ['nullable', 'string', 'max:255'],
             'occupation' => ['nullable', 'string', 'max:255'],
@@ -606,6 +737,7 @@ class RegistryController extends Controller
             'remarks' => ['nullable', 'string', 'max:2000'],
             'ethnicity' => ['nullable', 'string', 'max:255'],
             'status' => ['required', Rule::in(array_keys(Inhabitant::statusLabels()))],
+            'residence_status' => ['sometimes', 'required', Rule::in(array_keys(Inhabitant::residenceLabels()))],
             'migration_type' => ['nullable', Rule::in(array_keys(MigrationRecord::typeLabels()))],
             'movement_date' => ['nullable', 'required_with:migration_type', 'date'],
             'origin' => ['nullable', 'string', 'max:255'],
@@ -649,6 +781,7 @@ class RegistryController extends Controller
 
     private function inhabitantAttributes(array $validated, Barangay $barangay, Household $household): array
     {
+        if (! $barangay->usesResidenceRegistry()) unset($validated['residence_status']);
         return collect($validated)
             ->only([
                 'resident_user_id',
@@ -664,6 +797,7 @@ class RegistryController extends Controller
                 'birth_date',
                 'recorded_age',
                 'birth_place',
+                'complete_address',
                 'civil_status',
                 'religion',
                 'occupation',
@@ -672,11 +806,13 @@ class RegistryController extends Controller
                 'remarks',
                 'ethnicity',
                 'status',
+                'residence_status',
             ])
             ->merge([
                 'barangay_id' => $barangay->id,
                 'household_id' => $household->id,
             ])
+            ->when(array_key_exists('residence_status', $validated), fn ($attributes) => $attributes->put('residence_source', 'Confirmed by barangay staff'))
             ->all();
     }
 

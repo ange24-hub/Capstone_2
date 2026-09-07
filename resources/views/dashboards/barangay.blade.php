@@ -5,10 +5,7 @@
         $pendingDocuments = $barangayDocumentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count();
         $submittedRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count();
         $draftRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count();
-        $sourceWorkbook = in_array($barangay?->name, ['Canlupao', 'Biasong', 'Cabascan'], true) ? strtoupper($barangay->name).'.xlsx' : null;
-        $newInhabitantsUrl = $sourceWorkbook
-            ? route('barangay.registry.new-inhabitants')
-            : route('barangay.rbi-updates.index');
+        $newInhabitantsUrl = route('barangay.rbi-updates.index');
     @endphp
 
     <section class="barangay-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="barangay-dashboard-title">
@@ -21,6 +18,9 @@
             @if ($barangay)
                 <div class="dashboard-header-actions">
                     <a class="button" href="{{ route('barangay.registry.active') }}"><x-app-icon name="users" /> Resident registry</a>
+@if($barangay->usesResidenceRegistry())
+                    <a class="button secondary-button" href="{{ route('barangay.residence.index') }}"><x-app-icon name="home" /> Living in Barangay</a>
+@endif
                 </div>
             @endif
         </header>
@@ -35,7 +35,7 @@
         @else
             <div class="barangay-welcome-panel barangay-focus-panel">
                 <div class="barangay-welcome-copy">
-                    <span class="government-eyebrow">Today’s focus</span>
+                    <span class="government-eyebrow">Todayâ€™s focus</span>
                     <h2>Good day, {{ str(auth()->user()->name)->before(' ') }}.</h2>
                     <p>You have {{ $residentApprovalRequests->count() }} resident {{ \Illuminate\Support\Str::plural('registration', $residentApprovalRequests->count()) }} and {{ $pendingDocuments }} document {{ \Illuminate\Support\Str::plural('request', $pendingDocuments) }} awaiting review.</p>
                     <div class="barangay-primary-actions">
@@ -66,6 +66,9 @@
                 <div class="dashboard-metrics">
                     <article class="metric-card {{ $residentApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon"><x-app-icon name="users" /></span><div><span>Resident approvals</span><strong>{{ number_format($residentApprovalRequests->count()) }}</strong><small>Registrations requiring review</small></div></article>
                     <article class="metric-card metric-primary"><span class="metric-icon"><x-app-icon name="users" /></span><div><span>Registered inhabitants</span><strong>{{ number_format($barangay->inhabitants_count) }}</strong><small>Individual registry records</small></div></article>
+@if($barangay->usesResidenceRegistry())
+                    <article class="metric-card metric-success"><span class="metric-icon"><x-app-icon name="home" /></span><div><span>Living in barangay</span><strong>{{ number_format($barangay->local_residents_count) }}</strong><small>Registered residents living here</small></div></article>
+@endif
                     <article class="metric-card metric-success"><span class="metric-icon"><x-app-icon name="home" /></span><div><span>Households</span><strong>{{ number_format($barangay->households_count) }}</strong><small>Household profiles on record</small></div></article>
                     <article class="metric-card metric-info"><span class="metric-icon"><x-app-icon name="trend" /></span><div><span>Migration events</span><strong>{{ number_format($barangay->migration_records_count) }}</strong><small>Recorded arrivals and departures</small></div></article>
                 </div>
@@ -79,13 +82,13 @@
                             <span class="government-count-badge {{ $residentApprovalRequests->isEmpty() ? 'is-clear' : 'is-pending' }}">{{ $residentApprovalRequests->count() }} pending</span>
                         </header>
                         @if ($residentApprovalRequests->isEmpty())
-                            <div class="government-empty-state"><span class="empty-state-mark">✓</span><div><strong>Verification queue is clear</strong><span>New resident registrations will appear here automatically.</span></div></div>
+                            <div class="government-empty-state"><span class="empty-state-mark">âœ“</span><div><strong>Verification queue is clear</strong><span>New resident registrations will appear here automatically.</span></div></div>
                         @else
                             <div class="government-record-list">
                                 @foreach ($residentApprovalRequests as $resident)
                                     <article class="government-record-row">
                                         <span class="record-avatar">{{ str($resident->name)->substr(0, 1)->upper() }}</span>
-                                        <div class="record-identity"><strong>{{ $resident->name }}</strong><span>{{ $resident->email }}</span><small>Registered {{ $resident->created_at->format('M d, Y · h:i A') }}</small></div>
+                                        <div class="record-identity"><strong>{{ $resident->name }}</strong><span>{{ $resident->email }}</span><small>Registered {{ $resident->created_at->format('M d, Y Â· h:i A') }}</small></div>
                                         <div class="approval-actions record-actions">
                                             <form method="POST" action="{{ route('barangay.residents.approve', $resident) }}">@csrf<button type="submit">Approve Resident</button></form>
                                             <form method="POST" action="{{ route('barangay.residents.reject', $resident) }}" onsubmit="return confirm('Reject this resident registration?')">@csrf<button type="submit" class="danger-button">Reject</button></form>
@@ -102,7 +105,7 @@
                             <span class="government-count-badge {{ $pendingDocuments === 0 ? 'is-clear' : 'is-pending' }}">{{ $pendingDocuments }} pending</span>
                         </header>
                         @if ($barangayDocumentRequests->isEmpty())
-                            <div class="government-empty-state"><span class="empty-state-mark">✓</span><div><strong>No document requests received</strong><span>Resident requests assigned to this barangay will appear here.</span></div></div>
+                            <div class="government-empty-state"><span class="empty-state-mark">âœ“</span><div><strong>No document requests received</strong><span>Resident requests assigned to this barangay will appear here.</span></div></div>
                         @else
                             <div class="table-wrap government-table-wrap">
                                 <table class="government-data-table">
@@ -114,10 +117,10 @@
                                             <td><strong>{{ $documentRequest->typeLabel() }}</strong><small>{{ $documentRequest->purpose }}</small></td>
                                             <td class="document-payment-cell">
                                                 @if ($documentRequest->requiresPayment())
-                                                    <strong>₱{{ number_format((float) $documentRequest->amount_due, 2) }}</strong>
+                                                    <strong>â‚±{{ number_format((float) $documentRequest->amount_due, 2) }}</strong>
                                                     <span class="payment-status payment-status-{{ $documentRequest->payment_status }}">{{ $documentRequest->paymentStatusLabel() }}</span>
                                                     @if ($documentRequest->payment_reference)
-                                                        <small>Ref: {{ $documentRequest->payment_reference }}<br>Paid: {{ optional($documentRequest->payment_transaction_at)->format('M d, Y h:i A') }}<br>{{ $documentRequest->payer_name }} · {{ $documentRequest->payer_mobile }}</small>
+                                                        <small>Ref: {{ $documentRequest->payment_reference }}<br>Paid: {{ optional($documentRequest->payment_transaction_at)->format('M d, Y h:i A') }}<br>{{ $documentRequest->payer_name }} Â· {{ $documentRequest->payer_mobile }}</small>
                                                     @endif
                                                     @if ($documentRequest->payment_proof_path)
                                                         <a href="{{ route('document-payments.proof', $documentRequest) }}">Open receipt proof</a>
@@ -160,7 +163,7 @@
                             <p>No RBI monthly report has been created.</p>
                         @else
                             @php($latestRbi = $rbiUpdates->first())
-                            <div class="latest-report"><span>Latest report</span><strong>{{ optional($latestRbi->reporting_month)->format('F Y') ?: 'Month not set' }}</strong><small>{{ $latestRbi->statusLabel() }} · {{ count($latestRbi->rows ?? []) }} inhabitant entries</small></div>
+                            <div class="latest-report"><span>Latest report</span><strong>{{ optional($latestRbi->reporting_month)->format('F Y') ?: 'Month not set' }}</strong><small>{{ $latestRbi->statusLabel() }} Â· {{ count($latestRbi->rows ?? []) }} inhabitant entries</small></div>
                         @endif
                         <a class="button government-outline-button primary-block" href="{{ $newInhabitantsUrl }}">Manage Monthly Reports</a>
                     </section>
@@ -172,22 +175,32 @@
             <section class="government-content-card" aria-labelledby="rbi-history-title">
                 <header class="government-card-header">
                     <div><span class="government-eyebrow">Secretary Copies</span><h2 id="rbi-history-title">Monthly RBI Form History</h2><p>Review, update, and download the official copies retained by this barangay.</p></div>
-                    <a class="button government-outline-button" href="{{ $newInhabitantsUrl }}">Open Monthly Reports</a>
+                    <div class="row-actions"><a class="button government-outline-button" href="{{ route('barangay.rbi-updates.index') }}">Open RBI Forms</a></div>
                 </header>
                 @if ($rbiUpdates->isEmpty())
-                    <div class="government-empty-state"><span class="empty-state-mark">—</span><div><strong>No monthly RBI forms created yet</strong><span>Create the first monthly report through RBI Forms.</span></div></div>
+                    <div class="government-empty-state"><span class="empty-state-mark">â€”</span><div><strong>No monthly RBI forms created yet</strong><span>Create the first monthly report through RBI Forms.</span></div></div>
                 @else
                     <div class="table-wrap government-table-wrap"><table class="government-data-table">
                         <thead><tr><th>Reporting Month</th><th>Families</th><th>Entries</th><th>Status</th><th>Submitted</th><th>Available Actions</th></tr></thead>
                         <tbody>@foreach ($rbiUpdates as $update)<tr>
                             <td><strong>{{ optional($update->reporting_month)->format('F Y') ?: 'Not set' }}</strong><small>Barangay {{ $update->barangay_name ?: $barangay->name }}</small></td>
                             <td>{{ collect($update->rows ?? [])->pluck('household_head')->filter()->unique()->count() }}</td><td>{{ count($update->rows ?? []) }}</td>
-                            <td><span class="request-status request-status-{{ $update->status }}">{{ $update->statusLabel() }}</span></td><td>{{ optional($update->submitted_at)->format('M d, Y · h:i A') ?: 'Not submitted' }}</td>
-                            <td class="row-actions"><a href="{{ route('rbi-updates.show', $update) }}">View</a>@if(!$sourceWorkbook)<a href="{{ route('barangay.rbi-updates.index', ['edit' => $update->id]) }}">{{ $update->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue Draft' : 'Update form' }}</a>@endif<a href="{{ route('rbi-updates.export-pdf', $update) }}">PDF</a><a href="{{ route('rbi-updates.export-word', $update) }}">Word</a>@if ($update->source_file_path)<a href="{{ route('rbi-updates.download', $update) }}">Original</a>@endif</td>
+                            <td><span class="request-status request-status-{{ $update->status }}">{{ $update->statusLabel() }}</span></td><td>{{ optional($update->submitted_at)->format('M d, Y Â· h:i A') ?: 'Not submitted' }}</td>
+                            <td class="row-actions"><a href="{{ route('rbi-updates.show', $update) }}">View</a><a href="{{ route('barangay.rbi-updates.index', ['edit' => $update->id]) }}">{{ $update->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue Draft' : 'Update form' }}</a><a href="{{ route('rbi-updates.export-pdf', $update) }}">PDF</a><a href="{{ route('rbi-updates.export-word', $update) }}">Word</a>@if ($update->source_file_path)<a href="{{ route('rbi-updates.download', $update) }}">Original</a>@endif @include('rbi-updates._registry-action', ['report' => $update])</td>
                         </tr>@endforeach</tbody>
                     </table></div>
                 @endif
             </section>
         @endif
     </section>
+@if($barangay)
+<section class="panel stack"><h2>Registry Activity History</h2>
+<p>Registry edits and transfers recorded from now on.</p>
+@forelse($registryActivities as $activity)
+<article><strong>{{ $activity->description }}</strong><p>{{ $activity->user?->name ?? 'Staff' }} ? {{ $activity->created_at->format('M d, Y h:i A') }}</p>
+<details><summary>View changes</summary>@foreach($activity->changes ?? [] as $field => $change)<p>{{ str_replace('_', ' ', $field) }}: {{ $change['before'] ?? '?' }} ? {{ $change['after'] ?? '?' }}</p>@endforeach</details></article>
+@empty<p>No registry activity recorded yet.</p>@endforelse
+{{ $registryActivities->links() }}
+</section>
+@endif
 @endsection
