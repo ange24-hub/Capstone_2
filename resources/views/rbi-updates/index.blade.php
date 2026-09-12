@@ -32,13 +32,13 @@
             : (optional($editingReport?->reporting_month)->format('Y-m') ?: now()->format('Y-m'));
     @endphp
 
-    <section class="panel stack rbi-forms-workspace">
-        <div class="dashboard-hero">
+    <section class="panel  rbi-forms-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
+        <div class="dashboard-hero rounded-xl border border-slate-200 bg-white bg-none shadow-sm border-l-4 border-l-blue-600 p-5 sm:p-6">
             <div>
-                <div class="page-kicker">RBI Monthly Reporting</div>
+                <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">RBI Monthly Reporting</div>
                 <h1>RBI Forms</h1>
                 <p>{{ $barangay?->name }} &middot; Manage household updates, prepare monthly reports, and submit to Municipal LGU.</p>
-                <div class="hero-actions">
+                <div class="hero-actions flex flex-wrap gap-3">
                     <a class="button" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @if ($editingReport)
                         <a class="button secondary-button" href="{{ route('barangay.rbi-updates.index', ['new' => 1]) }}">Start Another Month</a>
@@ -46,8 +46,8 @@
                 </div>
             </div>
             <div class="hero-side">
-                <div class="hero-mini-card"><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count() }}</strong><span>Submitted monthly forms</span></div>
-                <div class="hero-mini-card"><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong><span>Draft monthly forms</span></div>
+                <div class="hero-mini-card rounded-xl border border-blue-100 bg-blue-50 p-4 text-blue-900"><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count() }}</strong><span>Submitted monthly forms</span></div>
+                <div class="hero-mini-card rounded-xl border border-blue-100 bg-blue-50 p-4 text-blue-900"><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong><span>Draft monthly forms</span></div>
             </div>
         </div>
 
@@ -61,16 +61,16 @@
             <div class="status-message">{{ session('status') }}</div>
         @endif
         @if ($submittedReport)
-            <div class="workflow-card highlight-card" id="submitted-report">
-                <div class="workflow-head">
+            <div class="workflow-card highlight-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="submitted-report">
+                <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <span class="step-pill">Submission Complete</span>
-                        <h2 class="section-title">{{ optional($submittedReport->reporting_month)->format('F Y') }} RBI form is now displayed in the records</h2>
+                        <h2 class="section-title text-lg font-semibold text-slate-900">{{ optional($submittedReport->reporting_month)->format('F Y') }} RBI form is now displayed in the records</h2>
                         <p>Municipal LGU has received this form. A copy also remains in the secretary's Monthly RBI Form History below.</p>
                     </div>
-                    <span class="badge">{{ $submittedReport->statusLabel() }}</span>
+                    <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $submittedReport->statusLabel() }}</span>
                 </div>
-                <div class="toolbar">
+                <div class="toolbar flex flex-wrap items-end gap-3">
                     <a class="button" href="{{ route('rbi-updates.show', $submittedReport) }}">View Submitted Form</a>
                     <a class="button secondary-button" href="{{ route('rbi-updates.export-pdf', $submittedReport) }}">Download Consolidated PDF</a>
                     <a class="button secondary-button" href="{{ route('rbi-updates.export-word', $submittedReport) }}">Download Word Copy</a>
@@ -78,30 +78,30 @@
             </div>
         @endif
         @if ($errors->any())
-            <div class="errors">
+            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
                 <strong>Please check the monthly form:</strong>
                 <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
             </div>
         @endif
 
         @if (! $barangay)
-            <div class="errors">This secretary account is not assigned to a barangay.</div>
+            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">This secretary account is not assigned to a barangay.</div>
         @else
-            <div class="workflow-card report-editor" id="monthly-report">
-                <div class="workflow-head">
+            <div class="workflow-card report-editor rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="monthly-report">
+                <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
-                        <h2 class="section-title">Monthly report</h2>
+                        <h2 class="section-title text-lg font-semibold text-slate-900">Monthly report</h2>
                         <p>Choose a month, add the families, and complete the certification before saving.</p>
                     </div>
-                    @if ($editingReport)<span class="badge">{{ $editingReport->statusLabel() }}</span>@endif
+                    @if ($editingReport)<span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $editingReport->statusLabel() }}</span>@endif
                 </div>
 
                 <form method="POST" action="{{ $editingReport ? route('barangay.rbi-updates.update', $editingReport) : route('barangay.rbi-updates.store') }}" id="rbi-monthly-form">
                     @csrf
                     @if ($editingReport) @method('PUT') @endif
 
-                    <div class="form-grid">
+                    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                         <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
                         <div>
                             <label for="reporting_month">For the month of</label>
@@ -112,19 +112,19 @@
                         </div>
                     </div>
 
-                    <h3 class="section-title" id="family-section">Family members</h3>
-                    <div id="family-forms" class="stack">
+                    <h3 class="section-title text-lg font-semibold text-slate-900" id="family-section">Family members</h3>
+                    <div id="family-forms" class=" grid gap-6">
                         @foreach ($formFamilies as $family)
-                            <article class="workflow-card family-entry-card" data-family-card>
-                                <div class="workflow-head">
+                            <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card>
+                                <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                                     <div>
                                         <span class="step-pill" data-family-number>Family {{ $loop->iteration }}</span>
-                                        <h4 class="section-title">Household Information</h4>
+                                        <h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4>
                                     </div>
                                     <button class="secondary-button" type="button" data-remove-family @disabled(count($formFamilies) === 1)>Remove Family</button>
                                 </div>
 
-                                <div class="form-grid">
+                                <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                     <div>
                                         <label>Household head</label>
                                         <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head required autocomplete="off">
@@ -133,19 +133,19 @@
                                     </div>
                                 </div>
 
-                                <h5 class="section-title">Newly Registered Family Members</h5>
-                                <div class="stack" data-family-members>
+                                <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
+                                <div class=" grid gap-6" data-family-members>
                                     @foreach (($family['members'] ?: [[]]) as $member)
                                         @php($currentRowIndex = $rowInputIndex++)
                                         <article class="member-entry-card" data-member-card>
-                                            <div class="workflow-head">
+                                            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                                                 <strong data-member-number>Member {{ $loop->iteration }}</strong>
                                                 <button class="secondary-button" type="button" data-remove-member @disabled(count($family['members']) === 1)>Remove Member</button>
                                             </div>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_head]" value="{{ $family['household_head'] }}" data-household-head-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_number]" value="{{ $family['household_number'] ?? '' }}" data-household-number-hidden><input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
-                                            <div class="form-grid">
+                                            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                                 @foreach ($memberFields as $field => $label)
                                                     <div>
                                                         <label>{{ $label }}</label>
@@ -164,17 +164,17 @@
                                         </article>
                                     @endforeach
                                 </div>
-                                <div class="form-actions"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
+                                <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
                             </article>
                         @endforeach
                     </div>
-                    <div class="form-actions split-actions">
+                    <div class="form-actions split-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
                         <small class="field-help">Each family becomes a complete RBI form/page inside one monthly PDF.</small>
                         <button type="button" id="add-family-form">Add Another Family Form</button>
                     </div>
 
-                    <h3 class="section-title">Deceased inhabitants</h3>
-                    <div class="table-wrap form-table-wrap">
+                    <h3 class="section-title text-lg font-semibold text-slate-900">Deceased inhabitants</h3>
+                    <div class="table-wrap form-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
                         <table id="rbi-deceased-rows-table">
                             <thead><tr><th>Household / Family</th>@foreach ($rbiDeceasedRowFields as $label)<th>{{ $label }}</th>@endforeach</tr></thead>
                             <tbody>
@@ -187,11 +187,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="form-actions"><button type="button" class="secondary-button" id="add-rbi-deceased-row">Add Deceased Inhabitant</button></div>
+                    <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button type="button" class="secondary-button" id="add-rbi-deceased-row">Add Deceased Inhabitant</button></div>
 
-                    <h3 class="section-title" id="certification-section">Monthly Form Certification</h3>
+                    <h3 class="section-title text-lg font-semibold text-slate-900" id="certification-section">Monthly Form Certification</h3>
                     <p>The following names and signatures are repeated on every family form in the consolidated PDF.</p>
-                    <div class="form-grid">
+                    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                         <div><label for="certified_by">Certified Correct (Barangay Secretary)</label><input id="certified_by" name="certified_by" value="{{ old('certified_by', $editingReport?->certified_by ?: $barangay->secretary_name ?: auth()->user()->name) }}"></div>
                         <div>
                             <label for="prepared_by">Prepared by (BHW / Encoder)</label>
@@ -217,9 +217,9 @@
                         @endforeach
                     </div>
 
-                    <div class="form-actions split-actions">
+                    <div class="form-actions split-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
                         <span>Save your changes first, then submit the saved report from Monthly RBI Form History below.</span>
-                        <div class="toolbar compact-toolbar">
+                        <div class="toolbar compact-toolbar flex flex-wrap items-end gap-3">
                             <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Form' : 'Save Monthly Draft' }}</button>
                         </div>
                     </div>
@@ -227,15 +227,15 @@
             </div>
         @endif
 
-        <div class="workflow-card report-history" id="report-history">
-            <div class="history-heading"><div class="page-kicker">Saved reports</div><h2 class="section-title">Monthly RBI Form History</h2></div>
+        <div class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history">
+            <div class="history-heading"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Saved reports</div><h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2></div>
             <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
             @include('rbi-updates._saved-inhabitants')
             @if ($rbiUpdates->isEmpty() && $newInhabitantRecords->isEmpty())
                 <p>No monthly RBI forms created yet.</p>
             @endif
             @if ($rbiUpdates->isNotEmpty())
-                <div class="table-wrap official-report-history">
+                <div class="table-wrap official-report-history w-full overflow-x-auto rounded-xl border border-slate-200">
                     <table>
                         <thead><tr><th>Month</th><th>Families</th><th>Inhabitants</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
                         <tbody>
@@ -245,7 +245,7 @@
                                     <td>{{ optional($report->reporting_month)->format('F Y') ?: 'Not set' }}</td>
                                     <td>{{ $familyCount }}</td>
                                     <td>{{ count($report->rows ?? []) }}</td>
-                                    <td><span class="badge">{{ $report->statusLabel() }}</span></td>
+                                    <td><span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $report->statusLabel() }}</span></td>
                                     <td>{{ optional($report->submitted_at)->format('M d, Y h:i A') ?: 'Not submitted' }}</td>
                                     <td><div class="rbi-history-actions">
                                         <a href="{{ route('rbi-updates.show', $report) }}">View form</a>
@@ -272,14 +272,14 @@
 
     <template id="member-entry-template">
         <article class="member-entry-card" data-member-card>
-            <div class="workflow-head">
+            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <strong data-member-number>Member</strong>
                 <button class="secondary-button" type="button" data-remove-member>Remove Member</button>
             </div>
             <input type="hidden" data-row-field="household_head" data-household-head-hidden>
             <input type="hidden" data-row-field="household_number" data-household-number-hidden><input type="hidden" data-row-field="household_id" data-household-id-hidden>
             <input type="hidden" data-row-field="inhabitant_id">
-            <div class="form-grid">
+            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                 @foreach ($memberFields as $field => $label)
                     <div>
                         <label>{{ $label }}</label>
@@ -295,15 +295,15 @@
     </template>
 
     <template id="family-form-template">
-        <article class="workflow-card family-entry-card" data-family-card>
-            <div class="workflow-head">
-                <div><span class="step-pill" data-family-number></span><h4 class="section-title">Household Information</h4></div>
+        <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card>
+            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
+                <div><span class="step-pill" data-family-number></span><h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4></div>
                 <button class="secondary-button" type="button" data-remove-family>Remove Family</button>
             </div>
-            <div class="form-grid"><div><label>Household head</label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small></div></div>
-            <h5 class="section-title">Newly Registered Family Members</h5>
-            <div class="stack" data-family-members></div>
-            <div class="form-actions"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
+            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label>Household head</label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small></div></div>
+            <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
+            <div class=" grid gap-6" data-family-members></div>
+            <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
         </article>
     </template>
 

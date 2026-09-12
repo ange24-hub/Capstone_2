@@ -21,7 +21,7 @@ class AssistantChatTest extends TestCase
 
     public function test_resident_sees_only_their_own_document_requests(): void
     {
-        $barangay = Barangay::create(['name' => 'Banday', 'municipality' => Barangay::MUNICIPALITY]);
+        $barangay = Barangay::where('name', 'Banday')->firstOrFail();
         $resident = User::factory()->create(['barangay_id' => $barangay->id]);
         $otherResident = User::factory()->create(['barangay_id' => $barangay->id]);
 
@@ -52,8 +52,8 @@ class AssistantChatTest extends TestCase
 
     public function test_barangay_approval_summary_is_limited_to_the_assigned_barangay(): void
     {
-        $banday = Barangay::create(['name' => 'Banday', 'municipality' => Barangay::MUNICIPALITY]);
-        $bogo = Barangay::create(['name' => 'Bogo', 'municipality' => Barangay::MUNICIPALITY]);
+        $banday = Barangay::where('name', 'Banday')->firstOrFail();
+        $bogo = Barangay::where('name', 'Bogo')->firstOrFail();
         $secretary = User::factory()->create([
             'role' => User::ROLE_BARANGAY,
             'barangay_id' => $banday->id,

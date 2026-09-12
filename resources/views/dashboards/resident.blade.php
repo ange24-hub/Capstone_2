@@ -8,28 +8,28 @@
     @endphp
 
     <section class="dashboard-page resident-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="resident-dashboard-title">
-        <header class="dashboard-page-header">
+        <header class="dashboard-page-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
             <div class="dashboard-title-group">
-                <span class="dashboard-eyebrow">{{ ($workspacePage ?? 'overview') === 'create' ? 'New Transaction' : (($workspacePage ?? 'overview') === 'history' ? 'Transaction History' : 'Resident Services') }}</span>
+                <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">{{ ($workspacePage ?? 'overview') === 'create' ? 'New Transaction' : (($workspacePage ?? 'overview') === 'history' ? 'Transaction History' : 'Resident Services') }}</span>
                 <h1 id="resident-dashboard-title">{{ ($workspacePage ?? 'overview') === 'create' ? 'Request a document' : (($workspacePage ?? 'overview') === 'history' ? 'My document requests' : 'Good day, '.str(auth()->user()->name)->before(' ').'.') }}</h1>
                 <p>{{ ($workspacePage ?? 'overview') === 'create' ? 'Choose a barangay document and submit its purpose.' : (($workspacePage ?? 'overview') === 'history' ? 'Track statuses, payment verification, and barangay remarks.' : 'Request barangay documents and follow every update from one place.') }}</p>
             </div>
-            <div class="dashboard-context-card">
+            <div class="dashboard-context-card rounded-xl border border-slate-200 bg-white p-4 text-slate-700 ">
                 <span class="context-icon"><x-app-icon name="location" /></span>
                 <div><small>Your assigned barangay</small><strong>Barangay {{ auth()->user()->barangay?->name ?? 'Not assigned' }}</strong><span>Approved resident account</span></div>
             </div>
         </header>
 
-        @if (session('status'))<div class="success" role="status">{{ session('status') }}</div>@endif
+        @if (session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif
         @if ($errors->any())
-            <div class="errors" role="alert"><strong>Please check the following:</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert"><strong>Please check the following:</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
         @endif
 
-        <section class="dashboard-metrics" aria-label="Request summary">
-            <article class="metric-card metric-primary"><span class="metric-icon"><x-app-icon name="document" /></span><div><span>All requests</span><strong>{{ number_format($documentRequests->count()) }}</strong><small>Your complete request history</small></div></article>
-            <article class="metric-card metric-warning"><span class="metric-icon"><x-app-icon name="clock" /></span><div><span>Awaiting review</span><strong>{{ number_format($pendingRequests) }}</strong><small>Submitted to your barangay</small></div></article>
-            <article class="metric-card metric-info"><span class="metric-icon"><x-app-icon name="activity" /></span><div><span>In progress</span><strong>{{ number_format($activeRequests) }}</strong><small>Processing or ready to claim</small></div></article>
-            <article class="metric-card metric-success"><span class="metric-icon"><x-app-icon name="check" /></span><div><span>Completed</span><strong>{{ number_format($completedRequests) }}</strong><small>Finished transactions</small></div></article>
+        <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Request summary">
+            <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="document" /></span><div><span>All requests</span><strong>{{ number_format($documentRequests->count()) }}</strong><small>Your complete request history</small></div></article>
+            <article class="metric-card metric-warning rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="clock" /></span><div><span>Awaiting review</span><strong>{{ number_format($pendingRequests) }}</strong><small>Submitted to your barangay</small></div></article>
+            <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span><div><span>In progress</span><strong>{{ number_format($activeRequests) }}</strong><small>Processing or ready to claim</small></div></article>
+            <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="check" /></span><div><span>Completed</span><strong>{{ number_format($completedRequests) }}</strong><small>Finished transactions</small></div></article>
         </section>
 
         <nav class="workspace-launcher" aria-label="Resident service shortcuts">
@@ -39,14 +39,14 @@
 
         @if (auth()->user()->hasRole(App\Models\User::ROLE_RESIDENT))
             <div class="resident-action-layout">
-                <section class="dashboard-card request-form-card" aria-labelledby="request-form-title">
-                    <header class="dashboard-card-header">
-                        <div><span class="dashboard-eyebrow">Start a transaction</span><h2 id="request-form-title">Request a document</h2><p>Choose a form and tell the barangay how you will use it.</p></div>
+                <section class="dashboard-card request-form-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-form-title">
+                    <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
+                        <div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Start a transaction</span><h2 id="request-form-title">Request a document</h2><p>Choose a form and tell the barangay how you will use it.</p></div>
                         <span class="section-number">01</span>
                     </header>
 
                     @if (! auth()->user()->barangay?->gcashIsReady())
-                        <div class="payment-notice">Online payment is not yet active for your barangay. Documents with a fee will become available after the official GCash profile is approved.</div>
+                        <div class="payment-notice rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 ">Online payment is not yet active for your barangay. Documents with a fee will become available after the official GCash profile is approved.</div>
                     @endif
 
                     <form method="POST" action="{{ route('resident.document-requests.store') }}" class="clean-form">
@@ -65,12 +65,12 @@
                             <textarea id="purpose" name="purpose" maxlength="255" placeholder="Example: Employment requirement" required>{{ old('purpose') }}</textarea>
                             <small class="field-help">Keep the purpose brief and specific.</small>
                         </div>
-                        <div class="form-actions"><button type="submit">Submit request <x-app-icon name="arrow-right" /></button></div>
+                        <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button type="submit">Submit request <x-app-icon name="arrow-right" /></button></div>
                     </form>
                 </section>
 
-                <aside class="dashboard-card process-guide-card" aria-labelledby="request-process-title">
-                    <header class="dashboard-card-header"><div><span class="dashboard-eyebrow">What happens next</span><h2 id="request-process-title">Request process</h2></div></header>
+                <aside class="dashboard-card process-guide-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-process-title">
+                    <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">What happens next</span><h2 id="request-process-title">Request process</h2></div></header>
                     <ol class="process-list">
                         <li><span>1</span><div><strong>Submit your request</strong><small>Your barangay receives it immediately.</small></div></li>
                         <li><span>2</span><div><strong>Complete payment, if required</strong><small>Use only the official GCash details shown here.</small></div></li>
@@ -82,14 +82,14 @@
             </div>
         @endif
 
-        <section class="dashboard-card" aria-labelledby="request-history-title">
-            <header class="dashboard-card-header">
-                <div><span class="dashboard-eyebrow">Transaction history</span><h2 id="request-history-title">My document requests</h2><p>Latest requests appear first. Open payment details only when action is required.</p></div>
+        <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-history-title">
+            <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
+                <div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Transaction history</span><h2 id="request-history-title">My document requests</h2><p>Latest requests appear first. Open payment details only when action is required.</p></div>
                 <span class="count-chip">{{ $documentRequests->count() }} total</span>
             </header>
 
             @if ($documentRequests->isEmpty())
-                <div class="dashboard-empty-state"><span class="empty-icon"><x-app-icon name="inbox" /></span><strong>No requests yet</strong><span>Your first document request will appear here.</span></div>
+                <div class="dashboard-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"><span class="empty-icon"><x-app-icon name="inbox" /></span><strong>No requests yet</strong><span>Your first document request will appear here.</span></div>
             @else
                 <div class="request-card-list">
                     @foreach ($documentRequests as $request)

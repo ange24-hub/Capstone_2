@@ -14,6 +14,32 @@ class MovedOutRegistryTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_delete_removes_only_the_selected_resident_and_linked_movements(): void
+    {
+        $barangay = Barangay::where('name', 'Looc')->firstOrFail();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
+        $house = Household::create(['barangay_id' => $barangay->id, 'household_number' => '1']);
+        $resident = Inhabitant::create(['barangay_id' => $barangay->id, 'household_id' => $house->id,
+            'first_name' => 'Incorrect', 'last_name' => 'Example', 'sex' => 'Female', 'status' => Inhabitant::STATUS_MIGRATED_OUT]);
+        $keep = Inhabitant::create(['barangay_id' => $barangay->id, 'household_id' => $house->id,
+            'first_name' => 'Retained', 'last_name' => 'Example', 'sex' => 'Male', 'status' => Inhabitant::STATUS_ACTIVE]);
+        $movement = $resident->migrationRecords()->create(['barangay_id' => $barangay->id,
+            'type' => MigrationRecord::TYPE_OUT, 'movement_date' => '2026-09-01']);
+        $other = User::factory()->create(['role' => User::ROLE_BARANGAY,
+            'barangay_id' => Barangay::where('name', 'Higosoan')->firstOrFail()->id]);
+        $this->actingAs($other)->delete(route('registry.destroy', $resident), ['return_to' => 'moved-out'])->assertForbidden();
+        $this->assertDatabaseHas('inhabitants', ['id' => $resident->id]);
+        $this->actingAs($staff)->get(route('barangay.registry.moved-out'))->assertOk()
+            ->assertSee('Delete resident')->assertSee('This cannot be undone.')->assertSee('window.confirm', false);
+        $this->delete(route('registry.destroy', $resident), ['return_to' => 'moved-out'])
+            ->assertRedirect(route('barangay.registry.moved-out'))->assertSessionHas('status', 'Resident and linked migration records deleted.');
+        $this->assertDatabaseMissing('inhabitants', ['id' => $resident->id]);
+        $this->assertDatabaseMissing('migration_records', ['id' => $movement->id]);
+        $this->assertDatabaseHas('inhabitants', ['id' => $keep->id]);
+        $this->assertDatabaseHas('households', ['id' => $house->id]);
+        $this->get(route('barangay.registry.moved-out'))->assertOk()->assertSee('No moved-out residents found.');
+    }
+
     public function test_imported_transfer_destination_is_shown_without_inventing_a_date(): void
     {
         $barangay = Barangay::where('name', 'Looc')->firstOrFail();

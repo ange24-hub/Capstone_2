@@ -17,6 +17,9 @@ class RbimAssistant
      */
     public function respond(User $user, string $message): array
     {
+        $report = app(AssistantReportSummary::class)->respond($user, $message);
+        if ($report !== null) return $report;
+
         $message = mb_strtolower($message);
 
         if ($this->matches($message, ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'])) {
@@ -45,7 +48,7 @@ class RbimAssistant
             return $this->documents($user, $message);
         }
 
-        if ($this->matches($message, ['approval', 'approve', 'pending registration', 'pending account', 'verification'])) {
+        if ($this->matches($message, ['approval', 'approvals', 'approve', 'pending registration', 'pending account', 'verification'])) {
             return $this->approvals($user);
         }
 

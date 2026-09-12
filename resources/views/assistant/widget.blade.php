@@ -5,7 +5,7 @@
         <span class="assistant-online-dot" aria-hidden="true"></span>
     </button>
 
-    <section class="assistant-panel" id="rbim-assistant-panel" data-assistant-panel aria-label="RBIM Assistant" hidden>
+    <section class="assistant-panel overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl " id="rbim-assistant-panel" data-assistant-panel aria-label="RBIM Assistant" hidden>
         <header class="assistant-header">
             <div class="assistant-avatar" aria-hidden="true">AI</div>
             <div>
@@ -23,8 +23,8 @@
 
         <div class="assistant-suggestions" data-assistant-suggestions>
             @foreach (match(auth()->user()->role) {
-                App\Models\User::ROLE_MUNICIPAL_LGU => ['Summarize submitted RBI forms', 'Show migration totals'],
-                App\Models\User::ROLE_BARANGAY => ['Show pending resident approvals', 'Summarize our registry'],
+                App\Models\User::ROLE_MUNICIPAL_LGU => ['Show population summary', 'Show migration totals', 'Summarize submitted RBI forms'],
+                App\Models\User::ROLE_BARANGAY => ['Pila ka families sa among barangay?', 'Show migration totals', 'Show pending resident approvals'],
                 default => ['Show my document requests', 'What is my account status?'],
             } as $suggestion)
                 <button type="button" data-assistant-suggestion>{{ $suggestion }}</button>
@@ -62,12 +62,20 @@
         if (open) setTimeout(() => input.focus(), 50);
     };
 
-    const addMessage = (text, kind, actions = []) => {
+    const addMessage = (text, kind, actions = [], mode = null) => {
         const row = document.createElement('div');
         row.className = `assistant-message assistant-message-${kind}`;
         const bubble = document.createElement('div');
         bubble.className = 'assistant-bubble';
         bubble.textContent = text;
+        if (kind === 'bot' && mode) {
+            const source = document.createElement('div');
+            source.className = 'mb-2 text-xs font-semibold text-slate-600';
+            source.textContent = mode === 'local_ai'
+                ? 'Database summary with local AI explanation'
+                : 'Database summary';
+            bubble.prepend(source);
+        }
         row.appendChild(bubble);
 
         if (actions.length) {
@@ -125,7 +133,7 @@
             if (!response.ok) throw new Error('Request failed');
             const data = await response.json();
             typing.remove();
-            addMessage(data.reply, 'bot', data.actions || []);
+            addMessage(data.reply, 'bot', data.actions || [], data.facts ? data.mode : null);
             showSuggestions(data.suggestions || []);
         } catch (error) {
             typing.remove();

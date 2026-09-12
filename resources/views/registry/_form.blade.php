@@ -11,7 +11,7 @@
 @endonce
 
 @if ($errors->any())
-    <div class="errors">
+    <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
         <ul>
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
@@ -29,7 +29,7 @@
         @method('PUT')
     @endif
 
-    <div class="form-grid">
+    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
         <div>
             <label for="registry_sequence">RBI row / HH sequence</label>
             <input id="registry_sequence" name="registry_sequence" type="text" value="{{ old('registry_sequence', $inhabitant->registry_sequence ?? '') }}">
@@ -78,7 +78,7 @@
         <div id="coordinate-picker-map" class="picker-map" aria-label="Interactive map for recording household coordinates"></div>
     </div>
 
-    <div class="form-grid">
+    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
         <div>
             <label for="first_name">First name</label>
             <input id="first_name" name="first_name" type="text" value="{{ old('first_name', $inhabitant->first_name ?? '') }}" required>
@@ -168,7 +168,7 @@
     <label for="remarks">RBI remarks / other information</label>
     <textarea id="remarks" name="remarks">{{ old('remarks', \App\Support\RegistryRemarks::display($inhabitant->remarks ?? null)) }}</textarea>
 
-    <div class="form-grid">
+    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
         <div>
             <label for="migration_type">Migration event</label>
             <select id="migration_type" name="migration_type">
@@ -195,7 +195,7 @@
     <label for="reason">Migration reason / notes</label>
     <textarea id="reason" name="reason">{{ old('reason') }}</textarea>
 
-    <div class="form-actions">
+    <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
         <button type="submit">{{ $isEdit ? 'Save Changes' : 'Create Record' }}</button>
     </div>
 </form>

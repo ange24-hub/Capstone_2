@@ -17,6 +17,50 @@ class RegistryMigrationDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_monthly_migration_filters_year_and_barangay_and_includes_empty_months(): void
+    {
+        $barangay = Barangay::where('name', 'San Isidro')->firstOrFail();
+        $otherBarangay = Barangay::where('name', 'Canlupao')->firstOrFail();
+        $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
+        foreach ([$barangay, $otherBarangay] as $area) {
+            $household = Household::create(['barangay_id' => $area->id, 'household_number' => 'MONTHLY-1']);
+            $inhabitant = Inhabitant::create([
+                'barangay_id' => $area->id, 'household_id' => $household->id,
+                'first_name' => 'Monthly', 'last_name' => 'Resident',
+                'sex' => 'Female', 'status' => Inhabitant::STATUS_ACTIVE,
+            ]);
+            foreach (['2025-12-31', '2026-01-01', '2026-12-31', '2027-01-01'] as $date) {
+                MigrationRecord::create([
+                    'inhabitant_id' => $inhabitant->id, 'barangay_id' => $area->id,
+                    'type' => $date === '2026-12-31' ? MigrationRecord::TYPE_OUT : MigrationRecord::TYPE_IN,
+                    'movement_date' => $date, 'recorded_by' => $secretary->id,
+                ]);
+            }
+        }
+
+        $assertMonthly = function ($response): void {
+            $response->assertOk()->assertSee('Monthly migration in 2026')
+                ->assertViewHas('totalIn', 1)->assertViewHas('totalOut', 1)
+                ->assertViewHas('totalInhabitants', 1)
+                ->assertViewHas('monthlyTrend', fn ($months) => $months->count() === 12
+                    && $months[0]['in'] === 1 && $months[11]['out'] === 1
+                    && $months[1]['in'] === 0 && $months[1]['out'] === 0);
+        };
+        $assertMonthly($this->actingAs($secretary)->get(route('migration.dashboard', [
+            'year' => 2026, 'barangay_id' => $otherBarangay->id,
+        ])));
+        $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $assertMonthly($this->actingAs($municipal)->get(route('migration.dashboard', [
+            'year' => 2026, 'barangay_id' => $barangay->id,
+        ])));
+        $this->get(route('migration.dashboard', ['year' => 2024]))
+            ->assertOk()->assertSee('No migration events recorded for 2024.')
+            ->assertViewHas('monthlyTrend', fn ($months) => $months->count() === 12
+                && $months->sum('in') === 0 && $months->sum('out') === 0);
+        $this->getJson(route('migration.dashboard', ['year' => 'invalid']))
+            ->assertUnprocessable()->assertJsonValidationErrors('year');
+    }
+
     protected function setUp(): void
     {
         if (! extension_loaded('pdo_sqlite')) {

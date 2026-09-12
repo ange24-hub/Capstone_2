@@ -6,7 +6,7 @@
         $activeSecretaries = $barangays->sum('secretaries_count');
     @endphp
 
-    <section class="municipal-directory-page panel stack" aria-labelledby="municipal-directory-title">
+    <section class="municipal-directory-page panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6" aria-labelledby="municipal-directory-title">
         <div class="government-page-heading">
             <div>
                 <nav class="government-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('dashboard.municipal') }}">Municipal Dashboard</a><span>/</span><strong>Barangay Directory</strong></nav>
@@ -16,14 +16,14 @@
             <a class="button government-outline-button" href="{{ route('dashboard.municipal') }}">Back to Municipal Dashboard</a>
         </div>
 
-        <div class="municipal-directory-summary-grid">
+        <div class="municipal-directory-summary-grid grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 ">
             <article><span>Total Barangays</span><strong>{{ $barangays->count() }}</strong><small>Official barangays of Tomas Oppus</small></article>
             <article class="has-reports"><span>With RBI Reports</span><strong>{{ $barangaysWithReports }}</strong><small>Barangays with received submissions</small></article>
             <article class="needs-report"><span>Awaiting Reports</span><strong>{{ $barangays->count() - $barangaysWithReports }}</strong><small>No submitted RBI report on record</small></article>
             <article><span>Approved Secretaries</span><strong>{{ $activeSecretaries }}</strong><small>Authorized barangay accounts</small></article>
         </div>
 
-        <div class="municipal-directory-toolbar">
+        <div class="municipal-directory-toolbar flex flex-wrap items-end gap-4 rounded-xl border border-slate-200 bg-white p-5 ">
             <div class="directory-search-field">
                 <label for="barangay-directory-search">Search the barangay list</label>
                 <input id="barangay-directory-search" type="search" placeholder="Enter barangay or local name..." autocomplete="off">
@@ -36,14 +36,14 @@
             <span id="barangay-directory-count">Showing {{ $barangays->count() }} barangays</span>
         </div>
 
-        <div class="municipal-directory-grid" id="municipal-directory-grid">
+        <div class="municipal-directory-grid grid grid-cols-1 gap-5 xl:grid-cols-2 " id="municipal-directory-grid">
             @foreach ($barangays as $index => $barangay)
                 @php
                     $barangayReports = $rbiUpdates->where('barangay_name', $barangay->name);
                     $latestReport = $barangayReports->first();
                     $hasReports = $barangayReports->isNotEmpty();
                 @endphp
-                <article class="municipal-directory-card {{ $hasReports ? 'has-reports' : 'needs-report' }}" data-directory-card data-status="{{ $hasReports ? 'reported' : 'missing' }}" data-name="{{ str($barangay->name.' '.$barangay->localName())->lower() }}">
+                <article class="municipal-directory-card min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white bg-none shadow-sm {{ $hasReports ? 'has-reports' : 'needs-report' }}" data-directory-card data-status="{{ $hasReports ? 'reported' : 'missing' }}" data-name="{{ str($barangay->name.' '.$barangay->localName())->lower() }}">
                     <header>
                         <span class="barangay-number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                         <div><small>Barangay</small><h2>{{ $barangay->name }}</h2><p>{{ $barangay->localName() ?: 'Tomas Oppus, Southern Leyte' }}</p></div>

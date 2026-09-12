@@ -5,9 +5,9 @@
     @php($usesFamilyNewInhabitants = $registryBarangay !== null)
     @php($isDedicatedRegistryPage = request()->routeIs('barangay.registry.*'))
     @php($registryFilterRoute = request()->routeIs('barangay.registry.new-inhabitants') ? 'barangay.registry.new-inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'barangay.registry.deceased' : (request()->routeIs('barangay.registry.active') ? 'barangay.registry.active' : 'registry.index')))
-    <section class="panel stack registry-workspace {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
-        <div class="page-kicker">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
-        <div class="page-head">
+    <section class="panel  registry-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6 {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
+        <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
+        <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
                 <h1>{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'New Inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'Deceased Records' : (request()->routeIs('barangay.registry.active') ? ($isBiasong ? 'Resident Registry' : 'Consolidated / All Registered') : ($registryBarangay ? 'Barangay '.$registryBarangay->name.' RBI Data' : 'Multi-Barangay Registry'))) }}</h1>
                 <p>
@@ -27,11 +27,11 @@
         </div>
 
         @if (session('status'))
-            <div class="success">{{ session('status') }}</div>
+            <div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>
         @endif
 
         @if(request()->routeIs('barangay.registry.active') && ! $isBiasong)
-            <div class="toolbar">
+            <div class="toolbar flex flex-wrap items-end gap-3">
                 <a class="button" href="{{ route('barangay.residence.index') }}">Living in Barangay</a>
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'living_elsewhere']) }}">Registered, Living Elsewhere</a>
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'unconfirmed']) }}">Residence Needs Confirmation</a>
@@ -41,16 +41,16 @@
         @endif
 
         @unless(request('source'))
-        <div class="workflow-card">
-            <h2 class="section-title">Create Inhabitant or Migrant Record</h2>
+        <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
+            <h2 class="section-title text-lg font-semibold text-slate-900">Create Inhabitant or Migrant Record</h2>
             @include('registry._form')
         </div>
         @endunless
 
-        <div class="workflow-card">
-            <div class="workflow-head">
+        <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
+            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
-                    <h2 class="section-title">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
+                    <h2 class="section-title text-lg font-semibold text-slate-900">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
                     <p>@if ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
                     @if (request('source') && ! $isDedicatedRegistryPage)
                         <div class="rbi-sheet-tabs">
@@ -60,7 +60,7 @@
                         </div>
                     @endif
                 </div>
-                <form class="toolbar compact-toolbar" method="GET" action="{{ route($registryFilterRoute) }}">
+                <form class="toolbar compact-toolbar flex flex-wrap items-end gap-3" method="GET" action="{{ route($registryFilterRoute) }}">
                     @if (request('source') && ! $isDedicatedRegistryPage)<input type="hidden" name="source" value="{{ request('source') }}">@endif
                     @if (request('sheet') && ! $isDedicatedRegistryPage)<input type="hidden" name="sheet" value="{{ request('sheet') }}">@endif
                     @unless($isDedicatedRegistryPage)<select name="barangay_id" aria-label="Filter by barangay">
@@ -77,7 +77,7 @@
             @if ((request('sheet') === 'deceased' && $deceasedRecords->isEmpty()) || (request('sheet') === 'new-inhabitants' && !$usesFamilyNewInhabitants && $newInhabitantRecords->isEmpty()) || (!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && $inhabitants->isEmpty()))
                 <p>No records found.</p>
             @else
-                <div class="table-wrap {{ request('source') ? 'rbi-source-table' : '' }}">
+                <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200 {{ request('source') ? 'rbi-source-table' : '' }}">
                     <table @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong) class="rbi-compact-household-columns" @endif>
                         @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong)
                             <colgroup><col style="width: 56px"><col style="width: 56px"><col span="17"></colgroup>
@@ -242,7 +242,7 @@
                                     <td>{{ $inhabitant->barangay->name }}</td>
                                     <td>{{ $inhabitant->household->household_number }}<br>{{ $inhabitant->household->address ?: 'No address' }}</td>
                                     <td>{{ $inhabitant->household->coordinate() }}</td>
-                                    <td><span class="badge">{{ $inhabitant->statusLabel() }}</span></td>
+                                    <td><span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $inhabitant->statusLabel() }}</span></td>
                                     <td>{{ $inhabitant->migrationRecords->count() }}</td>
                                     <td class="row-actions"><a href="{{ route('registry.edit', $inhabitant) }}">Edit</a></td>
                                 </tr>

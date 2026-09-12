@@ -13,6 +13,8 @@ class MigrationDashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $request->validate(['year' => ['nullable', 'integer', 'between:1900,9999']]);
+        $selectedYear = $request->filled('year') ? $request->integer('year') : now()->year;
         $isBarangaySecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
 
         if ($isBarangaySecretary) {
@@ -20,6 +22,7 @@ class MigrationDashboardController extends Controller
         }
 
         $records = MigrationRecord::with(['barangay', 'inhabitant.household'])
+            ->whereYear('movement_date', $selectedYear)
             ->when($isBarangaySecretary, fn ($query) => $query
                 ->where('barangay_id', $request->user()->barangay_id))
             ->when(! $isBarangaySecretary && $request->filled('barangay_id'), fn ($query) => $query
@@ -44,17 +47,19 @@ class MigrationDashboardController extends Controller
             ->sortByDesc('total')
             ->values();
 
-        $monthlyTrend = $records
-            ->groupBy(fn (MigrationRecord $record): string => $record->movement_date->format('Y-m'))
-            ->map(fn ($items, string $month): array => [
-                'month' => $month,
+        $recordsByMonth = $records->groupBy(fn (MigrationRecord $record): int => $record->movement_date->month);
+        $monthlyTrend = collect(range(1, 12))->map(function (int $month) use ($recordsByMonth, $selectedYear): array {
+            $items = $recordsByMonth->get($month, collect());
+
+            return [
+                'month' => sprintf('%04d-%02d', $selectedYear, $month),
                 'in' => $items->where('type', MigrationRecord::TYPE_IN)->count(),
                 'out' => $items->where('type', MigrationRecord::TYPE_OUT)->count(),
-            ])
-            ->sortBy('month')
-            ->values();
+            ];
+        });
 
         return view('dashboards.migration', [
+            'selectedYear' => $selectedYear,
             'barangays' => $isBarangaySecretary
                 ? Barangay::whereKey($request->user()->barangay_id)->get()
                 : Barangay::orderBy('name')->get(),
@@ -63,6 +68,8 @@ class MigrationDashboardController extends Controller
             'monthlyTrend' => $monthlyTrend,
             'totalInhabitants' => Inhabitant::when($isBarangaySecretary, fn ($query) => $query
                 ->where('barangay_id', $request->user()->barangay_id))
+                ->when(! $isBarangaySecretary && $request->filled('barangay_id'), fn ($query) => $query
+                    ->where('barangay_id', $request->integer('barangay_id')))
                 ->count(),
             'totalIn' => $records->where('type', MigrationRecord::TYPE_IN)->count(),
             'totalOut' => $records->where('type', MigrationRecord::TYPE_OUT)->count(),

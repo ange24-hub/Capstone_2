@@ -5,7 +5,7 @@
 
     <section class="registration-page">
         <div class="registration-layout">
-            <aside class="registration-guide" aria-label="Registration information">
+            <aside class="registration-guide bg-blue-900 bg-none text-white" aria-label="Registration information">
                 <span class="registration-eyebrow">RBIM Account Enrollment</span>
                 <h1>Join your barangay’s digital registry.</h1>
                 <p>Create a secure account connected to the barangay where you live or serve.</p>
@@ -31,15 +31,15 @@
                 </div>
             </aside>
 
-            <div class="registration-card">
+            <div class="registration-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm p-5 sm:p-8">
                 <div class="registration-card-head">
-                    <div class="page-kicker">Create Account</div>
+                    <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Create Account</div>
                     <h2 id="registration-title">Resident registration</h2>
                     <p id="registration-description">Create a resident account and send it to your barangay secretary for verification.</p>
                 </div>
 
                 @if ($errors->any())
-                    <div class="errors" role="alert">
+                    <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">
                         <strong>Please review the highlighted information.</strong>
                         <ul>
                             @foreach ($errors->all() as $error)
@@ -74,20 +74,20 @@
                             <small>Use your complete and correct identity.</small>
                         </div>
 
-                        <div class="registration-fields">
+                        <div class="registration-fields grid grid-cols-1 gap-5 md:grid-cols-2">
                             <div class="field-group">
                                 <label for="name">Full name</label>
                                 <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" placeholder="e.g. Maria D. Santos" @error('name') aria-invalid="true" @enderror required autofocus>
-                                @error('name') <small class="field-error">{{ $message }}</small> @enderror
+                                @error('name') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
                             <div class="field-group">
                                 <label for="email">Email address</label>
                                 <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="name@example.com" @error('email') aria-invalid="true" @enderror required>
-                                @error('email') <small class="field-error">{{ $message }}</small> @enderror
+                                @error('email') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
-                            <div class="field-group registration-field-wide">
+                            <div class="field-group registration-field-wide md:col-span-2">
                                 <label for="barangay_id">Barangay</label>
                                 <select id="barangay_id" name="barangay_id" @error('barangay_id') aria-invalid="true" @enderror required>
                                     <option value="">Select your barangay</option>
@@ -97,7 +97,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('barangay_id') <small class="field-error">{{ $message }}</small> @enderror
+                                @error('barangay_id') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
                         </div>
                     </div>
@@ -108,19 +108,19 @@
                             <small>These details confirm your authorized barangay role.</small>
                         </div>
 
-                        <div class="registration-fields">
+                        <div class="registration-fields grid grid-cols-1 gap-5 md:grid-cols-2">
                             <div class="field-group">
                                 <label for="user_id">Secretary user ID</label>
                                 <input id="user_id" name="user_id" type="text" value="{{ old('user_id') }}" autocomplete="username" placeholder="e.g. TO-BANDAY-001" @error('user_id') aria-invalid="true" @enderror>
                                 <small class="field-help">Letters, numbers, dashes, and underscores only.</small>
-                                @error('user_id') <small class="field-error">{{ $message }}</small> @enderror
+                                @error('user_id') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
                             <div class="field-group">
                                 <label for="access_code">LGU access code</label>
                                 <input id="access_code" name="access_code" type="password" autocomplete="off" placeholder="Code issued by Municipal LGU" @error('access_code') aria-invalid="true" @enderror>
                                 <small class="field-help">Contact the Municipal LGU if you have not received a code.</small>
-                                @error('access_code') <small class="field-error">{{ $message }}</small> @enderror
+                                @error('access_code') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
                         </div>
                     </div>
@@ -131,11 +131,11 @@
                             <small>Use at least 8 characters.</small>
                         </div>
 
-                        <div class="registration-fields">
+                        <div class="registration-fields grid grid-cols-1 gap-5 md:grid-cols-2">
                             <div class="field-group">
                                 <label for="password">Password</label>
                                 <input id="password" name="password" type="password" autocomplete="new-password" @error('password') aria-invalid="true" @enderror required>
-                                @error('password') <small class="field-error">{{ $message }}</small> @enderror
+                                @error('password') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
                             <div class="field-group">

@@ -5,13 +5,16 @@
         $pendingDocuments = $barangayDocumentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count();
         $submittedRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count();
         $draftRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count();
-        $newInhabitantsUrl = route('barangay.rbi-updates.index');
+        $sourceWorkbook = in_array($barangay?->name, ['Canlupao', 'Biasong', 'Cabascan', 'Camansi', 'Carnaga', 'Cawayan', 'Higosoan', 'Hinagtikan', 'Hinapo', 'Hugpa', 'Iniguihan', 'Looc', 'Luan', 'Mag-ata', 'Maslog', 'Punong', 'Rizal', 'San Agustin'], true) ? strtoupper($barangay->name).'.xlsx' : null;
+        $newInhabitantsUrl = $sourceWorkbook
+            ? route('barangay.registry.new-inhabitants')
+            : route('barangay.rbi-updates.index');
     @endphp
 
     <section class="barangay-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="barangay-dashboard-title">
-        <header class="dashboard-page-header dashboard-page-header-with-actions">
+        <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
             <div class="dashboard-title-group">
-                <span class="dashboard-eyebrow">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident Verification' : (($workspacePage ?? 'overview') === 'documents' ? 'Barangay E-Services' : 'Barangay Administration') }}</span>
+                <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident Verification' : (($workspacePage ?? 'overview') === 'documents' ? 'Barangay E-Services' : 'Barangay Administration') }}</span>
                 <h1 id="barangay-dashboard-title">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident approvals' : (($workspacePage ?? 'overview') === 'documents' ? 'Document requests' : 'Barangay '.($barangay?->name ?? 'Dashboard')) }}</h1>
                 <p>{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Review and verify resident accounts assigned to your barangay.' : (($workspacePage ?? 'overview') === 'documents' ? 'Process resident requests, payments, and release updates in one focused workspace.' : 'Process resident services, maintain community records, and prepare monthly RBI reports.') }}</p>
             </div>
@@ -25,17 +28,16 @@
             @endif
         </header>
 
-        @if (session('status'))<div class="success" role="status">{{ session('status') }}</div>@endif
+        @if (session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif
         @if ($errors->any())
-            <div class="errors" role="alert"><strong>Please review the following:</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert"><strong>Please review the following:</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
         @endif
 
         @if (! $barangay)
-            <div class="errors" role="alert">This account is not assigned to a barangay. Ask the municipal administrator to complete the account assignment.</div>
+            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">This account is not assigned to a barangay. Ask the municipal administrator to complete the account assignment.</div>
         @else
-            <div class="barangay-welcome-panel barangay-focus-panel">
+            <div class="barangay-welcome-panel barangay-focus-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm border-l-4 border-l-blue-600 p-5 sm:p-6">
                 <div class="barangay-welcome-copy">
-                    <span class="government-eyebrow">Todayâ€™s focus</span>
                     <h2>Good day, {{ str(auth()->user()->name)->before(' ') }}.</h2>
                     <p>You have {{ $residentApprovalRequests->count() }} resident {{ \Illuminate\Support\Str::plural('registration', $residentApprovalRequests->count()) }} and {{ $pendingDocuments }} document {{ \Illuminate\Support\Str::plural('request', $pendingDocuments) }} awaiting review.</p>
                     <div class="barangay-primary-actions">
@@ -60,36 +62,36 @@
 
             <section aria-labelledby="community-summary-title">
                 <div class="dashboard-section-heading compact-heading">
-                    <div><span class="government-eyebrow">Community Overview</span><h2 id="community-summary-title">Current Barangay Records</h2></div>
+                    <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Community Overview</span><h2 id="community-summary-title">Current Barangay Records</h2></div>
                     <span class="data-freshness">Database totals as of today</span>
                 </div>
-                <div class="dashboard-metrics">
-                    <article class="metric-card {{ $residentApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon"><x-app-icon name="users" /></span><div><span>Resident approvals</span><strong>{{ number_format($residentApprovalRequests->count()) }}</strong><small>Registrations requiring review</small></div></article>
-                    <article class="metric-card metric-primary"><span class="metric-icon"><x-app-icon name="users" /></span><div><span>Registered inhabitants</span><strong>{{ number_format($barangay->inhabitants_count) }}</strong><small>Individual registry records</small></div></article>
+                <div class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $residentApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Resident approvals</span><strong>{{ number_format($residentApprovalRequests->count()) }}</strong><small>Registrations requiring review</small></div></article>
+                    <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Registered inhabitants</span><strong>{{ number_format($barangay->inhabitants_count) }}</strong><small>Individual registry records</small></div></article>
 @if($barangay->usesResidenceRegistry())
-                    <article class="metric-card metric-success"><span class="metric-icon"><x-app-icon name="home" /></span><div><span>Living in barangay</span><strong>{{ number_format($barangay->local_residents_count) }}</strong><small>Registered residents living here</small></div></article>
+                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Living in barangay</span><strong>{{ number_format($barangay->local_residents_count) }}</strong><small>Registered residents living here</small></div></article>
 @endif
-                    <article class="metric-card metric-success"><span class="metric-icon"><x-app-icon name="home" /></span><div><span>Households</span><strong>{{ number_format($barangay->households_count) }}</strong><small>Household profiles on record</small></div></article>
-                    <article class="metric-card metric-info"><span class="metric-icon"><x-app-icon name="trend" /></span><div><span>Migration events</span><strong>{{ number_format($barangay->migration_records_count) }}</strong><small>Recorded arrivals and departures</small></div></article>
+                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Households</span><strong>{{ number_format($barangay->households_count) }}</strong><small>Household profiles on record</small></div></article>
+                    <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="trend" /></span><div><span>Migration events</span><strong>{{ number_format($barangay->migration_records_count) }}</strong><small>Recorded arrivals and departures</small></div></article>
                 </div>
             </section>
 
             <div class="barangay-dashboard-columns">
                 <main class="barangay-dashboard-main">
-                    <section class="government-content-card workspace-approvals-panel" aria-labelledby="resident-approvals-title">
+                    <section class="government-content-card workspace-approvals-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="resident-approvals-title">
                         <header class="government-card-header">
-                            <div><span class="government-eyebrow">Resident Verification</span><h2 id="resident-approvals-title">Pending Resident Registrations</h2><p>Verify residency before granting access to barangay online services.</p></div>
+                            <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Resident Verification</span><h2 id="resident-approvals-title">Pending Resident Registrations</h2><p>Verify residency before granting access to barangay online services.</p></div>
                             <span class="government-count-badge {{ $residentApprovalRequests->isEmpty() ? 'is-clear' : 'is-pending' }}">{{ $residentApprovalRequests->count() }} pending</span>
                         </header>
                         @if ($residentApprovalRequests->isEmpty())
-                            <div class="government-empty-state"><span class="empty-state-mark">âœ“</span><div><strong>Verification queue is clear</strong><span>New resident registrations will appear here automatically.</span></div></div>
+                            <div class="government-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600"><span class="empty-state-mark">âœ“</span><div><strong>Verification queue is clear</strong><span>New resident registrations will appear here automatically.</span></div></div>
                         @else
-                            <div class="government-record-list">
+                            <div class="government-record-list divide-y divide-slate-100 ">
                                 @foreach ($residentApprovalRequests as $resident)
-                                    <article class="government-record-row">
+                                    <article class="government-record-row border-b border-slate-100 bg-white p-4">
                                         <span class="record-avatar">{{ str($resident->name)->substr(0, 1)->upper() }}</span>
                                         <div class="record-identity"><strong>{{ $resident->name }}</strong><span>{{ $resident->email }}</span><small>Registered {{ $resident->created_at->format('M d, Y Â· h:i A') }}</small></div>
-                                        <div class="approval-actions record-actions">
+                                        <div class="approval-actions record-actions flex flex-wrap items-center gap-2">
                                             <form method="POST" action="{{ route('barangay.residents.approve', $resident) }}">@csrf<button type="submit">Approve Resident</button></form>
                                             <form method="POST" action="{{ route('barangay.residents.reject', $resident) }}" onsubmit="return confirm('Reject this resident registration?')">@csrf<button type="submit" class="danger-button">Reject</button></form>
                                         </div>
@@ -99,15 +101,15 @@
                         @endif
                     </section>
 
-                    <section class="government-content-card workspace-documents-panel" aria-labelledby="document-requests-title">
+                    <section class="government-content-card workspace-documents-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="document-requests-title">
                         <header class="government-card-header">
-                            <div><span class="government-eyebrow">Barangay E-Services</span><h2 id="document-requests-title">Resident Document Requests</h2><p>Process requests submitted by approved Barangay {{ $barangay->name }} residents.</p></div>
+                            <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Barangay E-Services</span><h2 id="document-requests-title">Resident Document Requests</h2><p>Process requests submitted by approved Barangay {{ $barangay->name }} residents.</p></div>
                             <span class="government-count-badge {{ $pendingDocuments === 0 ? 'is-clear' : 'is-pending' }}">{{ $pendingDocuments }} pending</span>
                         </header>
                         @if ($barangayDocumentRequests->isEmpty())
-                            <div class="government-empty-state"><span class="empty-state-mark">âœ“</span><div><strong>No document requests received</strong><span>Resident requests assigned to this barangay will appear here.</span></div></div>
+                            <div class="government-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600"><span class="empty-state-mark">âœ“</span><div><strong>No document requests received</strong><span>Resident requests assigned to this barangay will appear here.</span></div></div>
                         @else
-                            <div class="table-wrap government-table-wrap">
+                            <div class="table-wrap government-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
                                 <table class="government-data-table">
                                     <thead><tr><th>Reference</th><th>Resident</th><th>Document and Purpose</th><th>GCash Payment</th><th>Status</th><th>Process Request</th></tr></thead>
                                     <tbody>@foreach ($barangayDocumentRequests as $documentRequest)
@@ -157,7 +159,7 @@
 
                 <aside class="barangay-dashboard-aside" aria-label="Quick links and report status">
                     <section class="government-side-card rbi-status-card">
-                        <header><span class="government-eyebrow">Reporting Status</span><h2>Monthly RBI Forms</h2></header>
+                        <header><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Reporting Status</span><h2>Monthly RBI Forms</h2></header>
                         <div class="rbi-status-summary"><div><strong>{{ $submittedRbi }}</strong><span>Submitted</span></div><div><strong>{{ $draftRbi }}</strong><span>Drafts</span></div></div>
                         @if ($rbiUpdates->isEmpty())
                             <p>No RBI monthly report has been created.</p>
@@ -172,15 +174,15 @@
                 </aside>
             </div>
 
-            <section class="government-content-card" aria-labelledby="rbi-history-title">
+            <section class="government-content-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="rbi-history-title">
                 <header class="government-card-header">
-                    <div><span class="government-eyebrow">Secretary Copies</span><h2 id="rbi-history-title">Monthly RBI Form History</h2><p>Review, update, and download the official copies retained by this barangay.</p></div>
-                    <div class="row-actions"><a class="button government-outline-button" href="{{ route('barangay.rbi-updates.index') }}">Open RBI Forms</a></div>
+                    <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Secretary Copies</span><h2 id="rbi-history-title">Monthly RBI Form History</h2><p>Review, update, and download the official copies retained by this barangay.</p></div>
+                    <div class="row-actions"><a class="button government-outline-button" href="{{ route('barangay.rbi-updates.index') }}">Open RBI Forms</a><a class="button government-outline-button" href="{{ $newInhabitantsUrl }}">Open Monthly Reports</a></div>
                 </header>
                 @if ($rbiUpdates->isEmpty())
-                    <div class="government-empty-state"><span class="empty-state-mark">â€”</span><div><strong>No monthly RBI forms created yet</strong><span>Create the first monthly report through RBI Forms.</span></div></div>
+                    <div class="government-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600"><span class="empty-state-mark">â€”</span><div><strong>No monthly RBI forms created yet</strong><span>Create the first monthly report through RBI Forms.</span></div></div>
                 @else
-                    <div class="table-wrap government-table-wrap"><table class="government-data-table">
+                    <div class="table-wrap government-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200"><table class="government-data-table">
                         <thead><tr><th>Reporting Month</th><th>Families</th><th>Entries</th><th>Status</th><th>Submitted</th><th>Available Actions</th></tr></thead>
                         <tbody>@foreach ($rbiUpdates as $update)<tr>
                             <td><strong>{{ optional($update->reporting_month)->format('F Y') ?: 'Not set' }}</strong><small>Barangay {{ $update->barangay_name ?: $barangay->name }}</small></td>
@@ -193,14 +195,4 @@
             </section>
         @endif
     </section>
-@if($barangay)
-<section class="panel stack"><h2>Registry Activity History</h2>
-<p>Registry edits and transfers recorded from now on.</p>
-@forelse($registryActivities as $activity)
-<article><strong>{{ $activity->description }}</strong><p>{{ $activity->user?->name ?? 'Staff' }} ? {{ $activity->created_at->format('M d, Y h:i A') }}</p>
-<details><summary>View changes</summary>@foreach($activity->changes ?? [] as $field => $change)<p>{{ str_replace('_', ' ', $field) }}: {{ $change['before'] ?? '?' }} ? {{ $change['after'] ?? '?' }}</p>@endforeach</details></article>
-@empty<p>No registry activity recorded yet.</p>@endforelse
-{{ $registryActivities->links() }}
-</section>
-@endif
 @endsection

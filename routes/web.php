@@ -41,6 +41,10 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->group(function () {
+        Route::get('/reports/population', \App\Http\Controllers\PopulationReportController::class)->name('reports.population');
+        Route::get('/reports/population/pdf', \App\Http\Controllers\PopulationReportController::class)->name('reports.population.pdf');
+        Route::get('/reports/migration', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration');
+        Route::get('/reports/migration/pdf', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration.pdf');
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     });

@@ -5,14 +5,14 @@
 @endpush
 
 @section('content')
-    <section class="panel stack">
-        <div class="page-kicker">Spatial Visualization</div>
-        <div class="page-head">
+    <section class="panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
+        <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Spatial Visualization</div>
+        <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
                 <h1>Household Population Map</h1>
                 <p>View registered households across barangays using OpenStreetMap markers and household coordinates.</p>
             </div>
-            <form class="toolbar compact-toolbar" method="GET" action="{{ route('spatial.index') }}">
+            <form class="toolbar compact-toolbar flex flex-wrap items-end gap-3" method="GET" action="{{ route('spatial.index') }}">
                 <select name="barangay_id" aria-label="Filter map by barangay">
                     <option value="">All barangays</option>
                     @foreach ($barangays as $barangay)
@@ -38,17 +38,17 @@
             </div>
         </div>
 
-        <div class="map-shell">
+        <div class="map-shell overflow-hidden rounded-xl border border-slate-200">
             <div id="household-map" class="large-map" aria-label="Interactive household distribution map"></div>
         </div>
 
-        <div class="workflow-card">
-            <h2 class="section-title">Mapped Household List</h2>
+        <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
+            <h2 class="section-title text-lg font-semibold text-slate-900">Mapped Household List</h2>
 
             @if ($markers->isEmpty())
                 <p>No households with coordinates yet. Add or edit a registry record, then click the coordinate map to record a location.</p>
             @else
-                <div class="table-wrap">
+                <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
                     <table>
                         <thead>
                             <tr>

@@ -3,12 +3,12 @@
 @section('content')
     @php($isSecretary = $resident->hasRole(App\Models\User::ROLE_BARANGAY))
 
-    <section class="panel approval-panel">
+    <section class="panel approval-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
         <div class="approval-icon {{ $resident->approval_status === App\Models\User::APPROVAL_REJECTED ? 'is-rejected' : '' }}" aria-hidden="true">
             {{ $resident->approval_status === App\Models\User::APPROVAL_REJECTED ? '!' : '…' }}
         </div>
 
-        <div class="page-kicker">{{ $isSecretary ? 'Municipal Staff Verification' : 'Resident Account Verification' }}</div>
+        <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ $isSecretary ? 'Municipal Staff Verification' : 'Resident Account Verification' }}</div>
 
         @if ($resident->approval_status === App\Models\User::APPROVAL_REJECTED)
             <h1>Registration not approved</h1>

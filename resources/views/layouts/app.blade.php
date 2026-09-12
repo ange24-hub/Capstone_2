@@ -1,15 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="municipal-ui">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#123f67">
+    <meta name="theme-color" content="#112f40">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
     <link rel="stylesheet" href="{{ asset('css/rbim.css') }}?v={{ filemtime(public_path('css/rbim.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/portal-template.css') }}?v={{ filemtime(public_path('css/portal-template.css')) }}" media="screen">
+    @vite('resources/css/app.css')
     @stack('head')
 </head>
-<body @auth class="role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'sidebar-collapsed focused-workspace' : '' }}" @endauth>
+<body @auth class="role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @endauth>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     @guest
         <div class="public-shell">
@@ -40,7 +42,7 @@
                 </div>
             </header>
 
-            <main class="public-content">
+            <main class="public-content" id="main-content">
                 @yield('content')
             </main>
 
@@ -52,18 +54,18 @@
                     </div>
                     <div class="public-footer-meta">
                         <strong>Registry of Barangay Inhabitants Management</strong>
-                        <span>Authorized public service portal Ã‚Â· Data Privacy Act compliant operations</span>
+                        <span>Authorized public service portal &middot; Municipality of Tomas Oppus</span>
                     </div>
                 </div>
                 <div class="public-footer-bottom">
-                    <span>Ã‚Â© {{ now()->year }} Municipality of Tomas Oppus. All rights reserved.</span>
+                    <span>&copy; {{ now()->year }} Municipality of Tomas Oppus. All rights reserved.</span>
                     <span>Southern Leyte, Philippines</span>
                 </div>
             </footer>
         </div>
     @else
         <div class="app-shell">
-            <aside class="app-sidebar" id="app-sidebar">
+            <aside class="app-sidebar bg-blue-950 text-white" id="app-sidebar">
                 <a class="app-brand" href="{{ route('dashboard') }}">
                     <span class="seal-crop app-brand-seal">
                         <img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal">
@@ -106,6 +108,10 @@
                         <a class="@if(request()->routeIs('resident.document-requests.create')) active @endif" href="{{ route('resident.document-requests.create') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>Request a Document</span></a>
                         <a class="@if(request()->routeIs('resident.document-requests.index')) active @endif" href="{{ route('resident.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>My Requests</span></a>
                     @endif
+                    @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
+                        <a class="{{ request()->routeIs('reports.population*') ? 'active' : '' }}" href="{{ route('reports.population') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Population Reports</span></a>
+                        <a class="{{ request()->routeIs('reports.migration*') ? 'active' : '' }}" href="{{ route('reports.migration') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Migration Reports</span></a>
+                    @endif
                 </nav>
 
                 <div class="sidebar-spacer"></div>
@@ -129,8 +135,8 @@
 
             <button class="sidebar-backdrop" type="button" aria-label="Close navigation" data-sidebar-close></button>
 
-            <div class="app-main">
-                <header class="app-header">
+            <div class="app-main min-w-0 bg-slate-50">
+                <header class="app-header border-b border-slate-200 bg-white">
                     <div class="app-header-primary">
                         <button class="desktop-sidebar-button" type="button" aria-label="Collapse navigation" aria-controls="app-sidebar" aria-expanded="true" data-sidebar-collapse>
                             <x-app-icon name="menu" />
@@ -139,8 +145,8 @@
                             <x-app-icon name="menu" />
                         </button>
                         <div>
-                        <span class="app-header-kicker">Republic of the Philippines DILG</span>
-                            <strong>Registry of Barangay Inhabitants Management</strong>
+                        <span class="app-header-kicker">Municipality of Tomas Oppus</span>
+                            <strong>{{ auth()->user()->roleLabel() }} workspace</strong>
                         </div>
                     </div>
                     <div class="app-header-meta">
@@ -154,13 +160,13 @@
                     </div>
                 </header>
 
-                <main class="app-content" id="main-content">
+                <main class="app-content min-w-0" id="main-content">
                     @yield('content')
                 </main>
 
                 <footer class="app-footer">
-                    <span>Ã‚Â© {{ now()->year }} Municipal Government of Tomas Oppus</span>
-                    <span>RBIM Ã‚Â· Official LGU Information System</span>
+                    <span>&copy; {{ now()->year }} Municipal Government of Tomas Oppus</span>
+                    <span>RBIM &middot; Official LGU Information System</span>
                 </footer>
             </div>
         </div>
@@ -176,20 +182,54 @@
                 const toggle = document.querySelector('[data-sidebar-toggle]');
                 const close = document.querySelector('[data-sidebar-close]');
                 const collapse = document.querySelector('[data-sidebar-collapse]');
+                const sidebar = document.getElementById('app-sidebar');
+                const workspace = document.querySelector('.app-main');
+                const syncCollapse = () => {
+                    const collapsed = body.classList.contains('sidebar-collapsed');
+                    collapse?.setAttribute('aria-expanded', String(!collapsed));
+                    collapse?.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
+                };
+                try {
+                    const saved = localStorage.getItem('rbim.sidebar.collapsed');
+                    if (saved !== null) body.classList.toggle('sidebar-collapsed', saved === 'true');
+                } catch (_) {}
+                syncCollapse();
+                document.querySelectorAll('.side-nav a').forEach((link) => {
+                    link.setAttribute('aria-label', link.textContent.trim());
+                    link.title = link.textContent.trim();
+                    if (link.classList.contains('active')) link.setAttribute('aria-current', 'page');
+                });
                 const setOpen = (open) => {
+                    const wasOpen = body.classList.contains('sidebar-is-open');
                     body.classList.toggle('sidebar-is-open', open);
                     toggle?.setAttribute('aria-expanded', String(open));
+                    sidebar.inert = window.innerWidth <= 960 && !open;
+                    workspace.inert = open && window.innerWidth <= 960;
+                    if (open) sidebar.querySelector('a')?.focus();
+                    else if (wasOpen) toggle?.focus();
                 };
 
                 toggle?.addEventListener('click', () => setOpen(!body.classList.contains('sidebar-is-open')));
                 collapse?.addEventListener('click', () => {
                     const isCollapsed = body.classList.toggle('sidebar-collapsed');
-                    collapse.setAttribute('aria-expanded', String(!isCollapsed));
-                    collapse.setAttribute('aria-label', isCollapsed ? 'Expand navigation' : 'Collapse navigation');
+                    syncCollapse();
+                    try { localStorage.setItem('rbim.sidebar.collapsed', String(isCollapsed)); } catch (_) {}
                 });
                 close?.addEventListener('click', () => setOpen(false));
                 document.addEventListener('keydown', (event) => event.key === 'Escape' && setOpen(false));
-                window.addEventListener('resize', () => window.innerWidth > 960 && setOpen(false));
+                document.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Tab' || !body.classList.contains('sidebar-is-open')) return;
+                    const items = [...sidebar.querySelectorAll('a,button')].filter(el => el.getClientRects().length && !el.disabled);
+                    const first = items[0], last = items[items.length - 1];
+                    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+                    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+                });
+                const syncViewport = () => {
+                    if (window.innerWidth > 960) setOpen(false);
+                    else sidebar.inert = !body.classList.contains('sidebar-is-open');
+                };
+                window.addEventListener('resize', syncViewport);
+                syncViewport();
             })();
         </script>
     @endauth

@@ -1615,6 +1615,12 @@ nav[role="navigation"] svg { width: 18px; height: 18px; }
 .active-filter a { font-weight: 900; }
 .metric-arrow-in { transform: rotate(180deg); }
 .analytics-grid { min-width: 0; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(420px, .85fr); align-items: start; gap: 18px; }
+.migration-dashboard .dashboard-filter input { width: 100%; margin-bottom: 10px; }
+.migration-chart-wrap { padding: 16px; overflow-x: auto; }
+.migration-chart-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; margin-bottom: 12px; }
+.migration-monthly-chart { display: block; width: 100%; min-width: 420px; height: auto; }
+.migration-monthly-chart text { fill: #526579; font-size: 11px; }
+.migration-chart-notice { padding: 0 16px; color: #526579; font-size: 13px; }
 .movement-list { display: grid; gap: 14px; }
 .movement-row { min-width: 0; }
 .movement-row-head,

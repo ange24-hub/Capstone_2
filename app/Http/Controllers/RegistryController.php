@@ -700,6 +700,11 @@ class RegistryController extends Controller
         $this->authorizeInhabitant($request, $inhabitant);
         $inhabitant->delete();
 
+        if ($request->input('return_to') === 'moved-out') {
+            return redirect()->route('barangay.registry.moved-out')
+                ->with('status', 'Resident and linked migration records deleted.');
+        }
+
         return redirect()->route('registry.index', $request->filled('source') ? ['source' => $request->string('source')->toString()] : [])
             ->with('status', 'Inhabitant record deleted.');
     }
