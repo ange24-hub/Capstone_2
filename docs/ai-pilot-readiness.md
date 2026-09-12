@@ -58,4 +58,4 @@ Governance risk thresholds, intervention guidelines, and incident categories rem
 - Review missing dates, duplicate identities and cross-table links before publishing analytical counts as verified figures.
 - Agree on indicator definitions and staff-approved intervention guidance before implementing governance recommendations.
 
-This document records readiness and pilot scope. It does not claim that local AI, PDF generation through the assistant, or forecasting is already implemented.
+This document preserves the original readiness audit and pilot scope. Subsequent implementation added population/migration PDFs, assistant report links, and a local qwen2.5:1.5b writing pilot; see local-ai-operations.md for its setup, evaluation, and limits. Forecasting and the full behavioral-analysis module remain separate work.

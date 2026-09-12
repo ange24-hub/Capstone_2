@@ -11,7 +11,7 @@ The Scope and Limitations and Figure 3.3 descriptions specify local AI processin
 | Module | Current position | Next acceptance criterion |
 | --- | --- | --- |
 | Population and migration reports | Database summaries and formal PDF exports exist. | Reconcile sampled outputs with source records and have staff review the document format. Keep incomplete encoding visible. |
-| On-premise assistant | Added scoped report answers and optional local narrative adapter. Runtime/model download did not complete; generation remains disabled by default. Query routing uses keywords, not general natural-language understanding. | Install and evaluate a local model, test English/Cebuano questions and role boundaries, and compare explanations to exact report facts before enabling it. |
+| On-premise assistant | Scoped report answers and a local narrative adapter are implemented. Ollama and qwen2.5:1.5b are installed for the local pilot. Query routing uses keywords, not general natural-language understanding. | Continue staff evaluation of supported questions, role boundaries, output meaning, and response times; see local-ai-operations.md. |
 | Retrieval-based assistant | Selected aggregate report facts can be supplied to the local model. | Validate supported intents and retrieval coverage. Do not describe the current keyword router as a complete RAG system. |
 | AI behavioral analysis | Not delivered by a report summary or chatbot alone. | Define concern categories, actual available fields, aggregation periods, algorithms, and staff review criteria. Treat proposed causes as hypotheses unless independently validated. |
 | Predictive analytics | Historical migration summaries exist; forecasting is not enabled. | Audit dated history and completeness; define targets; evaluate local Python/Scikit-learn models against a baseline using chronological holdout data and report errors/limitations. Missing barangay data is not zero. |
@@ -35,10 +35,10 @@ The manuscript names Bootstrap 5, while the user has requested Tailwind CSS v4 i
 ```dotenv
 LOCAL_AI_ENABLED=false
 LOCAL_AI_URL=http://127.0.0.1:11434
-LOCAL_AI_MODEL=qwen3:0.6b
+LOCAL_AI_MODEL=qwen2.5:1.5b
 LOCAL_AI_TIMEOUT=25
 ```
 
-Use a local-only runtime (`OLLAMA_NO_CLOUD=1`) bound to `127.0.0.1:11434`. The small model is a pilot candidate, not a validated production choice. Enable only after installation and real-model evaluation. The adapter accepts only literal loopback URLs, disallows redirects/proxies, rejects cloud model identifiers and remote model metadata, and sends report aggregates rather than resident names or raw questions. Failed or invalid generation falls back to the database summary. Numeric checks cannot prove semantic correctness; human evaluation remains necessary.
+Use a local-only runtime (`OLLAMA_NO_CLOUD=1`) bound to `127.0.0.1:11434`. The configured model passed limited synthetic pilot checks, not production validation. The adapter accepts only literal loopback URLs, disallows redirects/proxies, rejects cloud model identifiers and remote model metadata, and sends a server-verified textual observation rather than resident names, raw questions, or numerical totals. Laravel supplies the exact counts and limitation notes. Failed or invalid generation falls back to the database summary. These checks cannot prove semantic correctness; human evaluation remains necessary.
 
 The optional narrative does not train a model, forecast future population, validate causes, or implement the complete behavioral-analysis module.
