@@ -4,6 +4,7 @@
     @php($isBiasong = $registryBarangay?->name === 'Biasong')
     @php($usesFamilyNewInhabitants = $registryBarangay !== null)
     @php($isDedicatedRegistryPage = request()->routeIs('barangay.registry.*'))
+    @php($editThroughRbi = auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY) && request('source') && !in_array(request('sheet'), ['deceased', 'new-inhabitants'], true))
     @php($registryFilterRoute = request()->routeIs('barangay.registry.new-inhabitants') ? 'barangay.registry.new-inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'barangay.registry.deceased' : (request()->routeIs('barangay.registry.active') ? 'barangay.registry.active' : 'registry.index')))
     <section class="panel  registry-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6 {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
         <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
@@ -51,7 +52,7 @@
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <h2 class="section-title text-lg font-semibold text-slate-900">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
-                    <p>@if ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
+                    <p>@if ($editThroughRbi) {{ number_format($inhabitants->total()) }} records found. Click Edit to make corrections in RBI Forms. Saved changes appear here automatically. @elseif ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
                     @if (request('source') && ! $isDedicatedRegistryPage)
                         <div class="rbi-sheet-tabs">
                             <a class="button {{ request('sheet') !== 'deceased' ? '' : 'secondary-button' }}" href="{{ route('registry.index', ['source' => request('source')]) }}">Active Household</a>
@@ -78,6 +79,7 @@
                 <p>No records found.</p>
             @else
                 <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200 {{ request('source') ? 'rbi-source-table' : '' }}">
+                    <fieldset @disabled($editThroughRbi) class="min-w-0 border-0 p-0">
                     <table @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong) class="rbi-compact-household-columns" @endif>
                         @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong)
                             <colgroup><col style="width: 56px"><col style="width: 56px"><col span="17"></colgroup>
@@ -171,7 +173,7 @@
                             <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
                             <tr class="rbi-meta-row"><th colspan="19">Residents: {{ number_format($inhabitants->total()) }}</th></tr>
                             <tr class="rbi-group-row">
-                                <th rowspan="2">HH<br>No.</th><th rowspan="2">HH</th><th colspan="4">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2">ETHNICITY</th><th rowspan="2" scope="col">Resident No.</th>
+                                <th rowspan="2">HH<br>No.</th><th rowspan="2">HH</th><th colspan="4">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2">ETHNICITY</th><th rowspan="2" scope="col">Resident No.</th>@if($editThroughRbi)<th rowspan="2" scope="col">Action</th>@endif
                             </tr>
                             <tr>
                                 <th>Last Name</th>
@@ -211,6 +213,7 @@
                                     <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($inhabitant->remarks) }}" aria-label="Remarks"></td>
                                     <td><input form="{{ $rowForm }}" name="ethnicity" value="{{ $inhabitant->ethnicity }}" aria-label="Ethnicity"></td>
                                     <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
+                                    @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
                                     <td class="rbi-row-save" hidden>
                                         <form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">
                                             @csrf
@@ -250,6 +253,7 @@
                         </tbody>
                         @endif
                     </table>
+                    </fieldset>
                 </div>
 
                 @if (!request('sheet')){{ $inhabitants->links() }}@endif

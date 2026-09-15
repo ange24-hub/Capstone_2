@@ -17,7 +17,7 @@ class DocumentPaymentTest extends TestCase
     public function test_new_request_captures_configured_fee_and_requires_gcash(): void
     {
         config(['rbim.document_fees.'.DocumentRequest::TYPE_CLEARANCE => 75]);
-        $barangay = Barangay::create([
+        $barangay = $this->barangayFixture([
             'name' => 'Banday',
             'municipality' => Barangay::MUNICIPALITY,
             'gcash_enabled' => true,
@@ -92,8 +92,8 @@ class DocumentPaymentTest extends TestCase
 
     public function test_resident_cannot_view_another_barangays_gcash_qr(): void
     {
-        $residentBarangay = Barangay::create(['name' => 'Banday', 'municipality' => Barangay::MUNICIPALITY]);
-        $otherBarangay = Barangay::create([
+        $residentBarangay = $this->barangayFixture(['name' => 'Banday', 'municipality' => Barangay::MUNICIPALITY]);
+        $otherBarangay = $this->barangayFixture([
             'name' => 'Bogo',
             'municipality' => Barangay::MUNICIPALITY,
             'gcash_qr_path' => 'barangay-gcash-qr/2/qr.png',
@@ -109,8 +109,8 @@ class DocumentPaymentTest extends TestCase
     {
         Storage::fake('local');
         $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
-        $banday = Barangay::create(['name' => 'Banday', 'municipality' => Barangay::MUNICIPALITY]);
-        $bogo = Barangay::create(['name' => 'Bogo', 'municipality' => Barangay::MUNICIPALITY]);
+        $banday = $this->barangayFixture(['name' => 'Banday', 'municipality' => Barangay::MUNICIPALITY]);
+        $bogo = $this->barangayFixture(['name' => 'Bogo', 'municipality' => Barangay::MUNICIPALITY]);
 
         $this->actingAs($municipal)->put(route('municipal.barangays.gcash.update', $banday), [
             'gcash_enabled' => '1',
@@ -132,7 +132,7 @@ class DocumentPaymentTest extends TestCase
      */
     private function paidRequestFixture(array $requestOverrides = []): array
     {
-        $barangay = Barangay::create([
+        $barangay = $this->barangayFixture([
             'name' => 'Banday',
             'municipality' => Barangay::MUNICIPALITY,
             'gcash_enabled' => true,
@@ -158,5 +158,13 @@ class DocumentPaymentTest extends TestCase
         ], $requestOverrides));
 
         return [$request, $resident, $secretary];
+    }
+
+    private function barangayFixture(array $attributes): Barangay
+    {
+        // Migrations already seed the municipality's barangays in the test DB.
+        $barangay = Barangay::where('name', $attributes['name'])->firstOrFail();
+        $barangay->update($attributes);
+        return $barangay;
     }
 }

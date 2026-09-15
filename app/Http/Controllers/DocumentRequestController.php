@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 
 class DocumentRequestController extends Controller
 {
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         abort_unless($request->user()->barangay_id, 403, 'Your resident account is not assigned to a barangay.');
 
@@ -22,6 +22,9 @@ class DocumentRequestController extends Controller
         $amountDue = DocumentRequest::feeFor($validated['document_type']);
 
         if ($amountDue > 0 && ! $request->user()->barangay?->gcashIsReady()) {
+            if ($request->routeIs('api.resident.*')) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['document_type' => 'Online GCash collection is not yet active. Contact your barangay office.']);
+            }
             return back()->withInput()->withErrors([
                 'document_type' => 'Online GCash collection is not yet active for this paid document. Please contact your Barangay office.',
             ]);
@@ -43,6 +46,9 @@ class DocumentRequestController extends Controller
             ? ' Complete the ₱'.number_format($amountDue, 2).' GCash payment shown below before processing.'
             : ' No online payment is required for this document.';
 
+        if ($request->routeIs('api.resident.*')) {
+            return response()->json(['message' => $message, 'id' => $documentRequest->id], 201);
+        }
         return back()->with('status', $message);
     }
 

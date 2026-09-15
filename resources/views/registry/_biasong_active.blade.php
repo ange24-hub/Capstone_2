@@ -7,7 +7,7 @@
     <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
     <tr class="rbi-meta-row"><th colspan="19">Residents: {{ number_format($inhabitants->total()) }}</th></tr>
     <tr class="rbi-group-row">
-        <th rowspan="2">HH<br>No.</th><th rowspan="2">No. of<br>Families</th><th rowspan="2">No. of<br>Individuals</th><th colspan="3">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2" scope="col">Resident No.</th>
+        <th rowspan="2">HH<br>No.</th><th rowspan="2">No. of<br>Families</th><th rowspan="2">No. of<br>Individuals</th><th colspan="3">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2" scope="col">Resident No.</th>@if($editThroughRbi)<th rowspan="2" scope="col">Action</th>@endif
     </tr>
     <tr><th>LAST NAME</th><th>FIRST NAME</th><th>MIDDLE NAME</th><th>TO HOUSEHOLD<br>HEAD</th><th>BIRTH<br>(mm-dd-yy)</th><th>Grade/Year/<br>Level Completed</th><th>(OTHER INFO)</th></tr>
 </thead>
@@ -33,6 +33,7 @@
         <td><input form="{{ $rowForm }}" name="occupation" value="{{ $inhabitant->occupation }}" aria-label="Occupation"></td>
         <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($inhabitant->remarks) }}" aria-label="Remarks"></td>
         <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
+        @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
         <td class="rbi-row-save" hidden><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">@csrf @method('PUT')<input type="hidden" name="source" value="BIASONG.xlsx"><input type="hidden" name="barangay_id" value="{{ $inhabitant->barangay_id }}"><input type="hidden" name="household_number" value="{{ $inhabitant->household->household_number }}"><input type="hidden" name="address" value="{{ $inhabitant->household->address }}"><input type="hidden" name="status" value="{{ $inhabitant->status }}"></form></td>
     </tr>
 @endforeach

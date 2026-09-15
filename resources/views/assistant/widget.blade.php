@@ -5,7 +5,7 @@
         <span class="assistant-online-dot" aria-hidden="true"></span>
     </button>
 
-    <section class="assistant-panel overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl " id="rbim-assistant-panel" data-assistant-panel aria-label="RBIM Assistant" hidden>
+    <section class="assistant-panel flex max-h-[calc(100dvh-100px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl " id="rbim-assistant-panel" data-assistant-panel aria-label="RBIM Assistant" hidden>
         <header class="assistant-header">
             <div class="assistant-avatar" aria-hidden="true">AI</div>
             <div>
@@ -15,7 +15,7 @@
             <button class="assistant-close" type="button" data-assistant-close aria-label="Close assistant">×</button>
         </header>
 
-        <div class="assistant-messages" data-assistant-messages role="log" aria-live="polite">
+        <div class="assistant-messages min-h-16 shrink" data-assistant-messages role="log" aria-live="polite">
             <div class="assistant-message assistant-message-bot">
                 <div class="assistant-bubble">Hello, {{ auth()->user()->name }}. I can help with RBIM features and the information allowed for your {{ auth()->user()->roleLabel() }} account.</div>
             </div>
@@ -31,12 +31,22 @@
             @endforeach
         </div>
 
+        <details class="border-t border-slate-200 bg-slate-50 px-4 py-2 text-sm" data-assistant-catalog>
+            <summary class="cursor-pointer font-semibold text-blue-900">Explore questions / Mga mapangutana</summary>
+            <div class="mt-2 flex max-h-40 flex-wrap gap-2 overflow-y-auto pb-2">
+                @foreach (App\Services\AssistantGuide::questions(auth()->user()) as $question)
+                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>{{ $question }}</button>
+                @endforeach
+            </div>
+        </details>
+
         <form class="assistant-form" data-assistant-form>
             <label class="sr-only" for="assistant-message">Ask about the RBIM system</label>
             <textarea id="assistant-message" data-assistant-input rows="1" maxlength="500" placeholder="Ask about RBIM…" required></textarea>
             <button type="submit" data-assistant-send aria-label="Send message">➤</button>
         </form>
-        <p class="assistant-privacy">Answers stay within RBIM and follow your account permissions.</p>
+        <p class="assistant-privacy">Follow-ups: “ug senior?”, “ug last month?” or “download PDF”. Account permissions always apply.</p>
+        <button type="button" class="mb-2 text-xs font-semibold text-blue-900" data-assistant-reset>New conversation</button>
     </section>
 </div>
 
@@ -54,6 +64,8 @@
     const messages = root.querySelector('[data-assistant-messages]');
     const suggestions = root.querySelector('[data-assistant-suggestions]');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+    let previousQuestion = null;
+    const reset = root.querySelector('[data-assistant-reset]');
 
     const setOpen = (open) => {
         panel.hidden = !open;
@@ -114,38 +126,68 @@
         input.value = '';
         input.style.height = '';
         send.disabled = true;
+        reset.disabled = true;
+        panel.setAttribute('aria-busy', 'true');
         suggestions.hidden = true;
         const typing = addMessage('Checking RBIM…', 'bot');
         typing.classList.add('is-typing');
 
+        const abort = new AbortController();
+        const timeout = setTimeout(() => abort.abort(), 35000);
         try {
             const response = await fetch(root.dataset.endpoint, {
                 method: 'POST',
+                signal: abort.signal,
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrf,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify({ message: clean }),
+                body: JSON.stringify({ message: clean, previous_question: previousQuestion }),
             });
 
-            if (!response.ok) throw new Error('Request failed');
+            if (!response.ok) {
+                const problem = new Error('Request failed');
+                problem.status = response.status;
+                throw problem;
+            }
             const data = await response.json();
+            previousQuestion = data.previous_question || null;
             typing.remove();
+            if (data.interpreted_question) addMessage('Using: ' + data.interpreted_question, 'bot');
             addMessage(data.reply, 'bot', data.actions || [], data.facts ? data.mode : null);
             showSuggestions(data.suggestions || []);
         } catch (error) {
+            previousQuestion = null;
             typing.remove();
-            addMessage('I could not reach RBIM right now. Please try again.', 'bot');
+            const message = error.status === 429
+                ? 'Too many questions in a short time. Please wait a minute and try again.'
+                : [401, 419].includes(error.status)
+                    ? 'Your session has expired. Refresh the page and sign in again.'
+                    : 'I could not reach RBIM right now. Please try again with a complete question.';
+            addMessage(message, 'bot');
         } finally {
+            clearTimeout(timeout);
             send.disabled = false;
+            reset.disabled = false;
+            panel.removeAttribute('aria-busy');
             suggestions.hidden = false;
             input.focus();
         }
     };
 
     toggle.addEventListener('click', () => setOpen(panel.hidden));
+    reset.addEventListener('click', () => {
+        if (send.disabled) return;
+        previousQuestion = null;
+        messages.replaceChildren();
+        addMessage('New conversation. Ask a complete question to start a new topic.', 'bot');
+        input.value = '';
+        input.style.height = '';
+        root.querySelector('[data-assistant-catalog]').open = false;
+        input.focus();
+    });
     close.addEventListener('click', () => setOpen(false));
     form.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -164,6 +206,13 @@
     suggestions.addEventListener('click', (event) => {
         const button = event.target.closest('[data-assistant-suggestion]');
         if (button) ask(button.textContent);
+    });
+    root.querySelector('[data-assistant-catalog]').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-assistant-question]');
+        if (button && !send.disabled) {
+            root.querySelector('[data-assistant-catalog]').open = false;
+            ask(button.textContent);
+        }
     });
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && !panel.hidden) setOpen(false);

@@ -17,6 +17,12 @@ class RbimAssistant
      */
     public function respond(User $user, string $message): array
     {
+        $documentStatus = app(AssistantDocumentStatus::class)->respond($user, $message);
+        if ($documentStatus !== null) return $documentStatus;
+
+        $guide = app(AssistantGuide::class)->respond($user, $message);
+        if ($guide !== null) return $guide;
+
         $report = app(AssistantReportSummary::class)->respond($user, $message);
         if ($report !== null) return $report;
 
@@ -44,7 +50,11 @@ class RbimAssistant
             );
         }
 
-        if ($this->matches($message, ['document', 'certificate', 'clearance', 'indigency', 'request status'])) {
+        if ($user->hasRole(User::ROLE_BARANGAY) && ! $user->isApproved()) {
+            return $this->response('Your barangay account must be approved before staff records are available.', ['What is my account status?'], []);
+        }
+
+        if ($this->matches($message, ['document', 'documents', 'requests', 'certificate', 'clearance', 'indigency', 'request status'])) {
             return $this->documents($user, $message);
         }
 
@@ -88,6 +98,9 @@ class RbimAssistant
 
     private function documents(User $user, string $message): array
     {
+        if ($user->hasAnyRole([User::ROLE_RESIDENT, User::ROLE_BARANGAY]) && ! $user->isApproved()) {
+            return $this->response('An approved account is required to view document and payment status records.', ['What is my account status?'], []);
+        }
         if ($user->hasRole(User::ROLE_RESIDENT)) {
             $requests = $user->documentRequests()->latest()->get();
             $pending = $requests->whereIn('status', [DocumentRequest::STATUS_PENDING, DocumentRequest::STATUS_PROCESSING])->count();

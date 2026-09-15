@@ -26,6 +26,7 @@
 @endif
                 </div>
             @endif
+            <x-dashboard-context />
         </header>
 
         @if (session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif
@@ -36,9 +37,27 @@
         @if (! $barangay)
             <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">This account is not assigned to a barangay. Ask the municipal administrator to complete the account assignment.</div>
         @else
+            <section class="overview-community" aria-labelledby="community-summary-title">
+                <div class="dashboard-section-heading compact-heading">
+                    <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Community Overview</span><h2 id="community-summary-title">Current Barangay Records</h2></div>
+                    <span class="data-freshness">Loaded {{ now()->format('M d, Y, g:i A') }}</span>
+                </div>
+                <div class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $residentApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Resident approvals</span><strong>{{ number_format($residentApprovalRequests->count()) }}</strong><small>Registrations requiring review</small></div></article>
+                    <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Registered inhabitants</span><strong>{{ number_format($barangay->inhabitants_count) }}</strong><small>Individual registry records</small></div></article>
+@if($barangay->usesResidenceRegistry())
+                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Living in barangay</span><strong>{{ number_format($barangay->local_residents_count) }}</strong><small>Registered residents living here</small></div></article>
+@endif
+                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Households</span><strong>{{ number_format($barangay->households_count) }}</strong><small>Household profiles on record</small></div></article>
+                    <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="trend" /></span><div><span>Migration events</span><strong>{{ number_format($barangay->migration_records_count) }}</strong><small>Recorded arrivals and departures</small></div></article>
+                </div>
+            </section>
+
+            <div class="overview-workbench">
             <div class="barangay-welcome-panel barangay-focus-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm border-l-4 border-l-blue-600 p-5 sm:p-6">
                 <div class="barangay-welcome-copy">
-                    <h2>Good day, {{ str(auth()->user()->name)->before(' ') }}.</h2>
+                    <span class="overview-section-kicker">YOUR WORKSPACE</span>
+                    <h2>Ready for your review</h2>
                     <p>You have {{ $residentApprovalRequests->count() }} resident {{ \Illuminate\Support\Str::plural('registration', $residentApprovalRequests->count()) }} and {{ $pendingDocuments }} document {{ \Illuminate\Support\Str::plural('request', $pendingDocuments) }} awaiting review.</p>
                     <div class="barangay-primary-actions">
                         <a class="button government-primary-button" href="{{ route('barangay.resident-approvals.index') }}">
@@ -60,27 +79,16 @@
                 </div>
             </div>
 
-            <section aria-labelledby="community-summary-title">
-                <div class="dashboard-section-heading compact-heading">
-                    <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Community Overview</span><h2 id="community-summary-title">Current Barangay Records</h2></div>
-                    <span class="data-freshness">Database totals as of today</span>
-                </div>
-                <div class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $residentApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Resident approvals</span><strong>{{ number_format($residentApprovalRequests->count()) }}</strong><small>Registrations requiring review</small></div></article>
-                    <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Registered inhabitants</span><strong>{{ number_format($barangay->inhabitants_count) }}</strong><small>Individual registry records</small></div></article>
-@if($barangay->usesResidenceRegistry())
-                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Living in barangay</span><strong>{{ number_format($barangay->local_residents_count) }}</strong><small>Registered residents living here</small></div></article>
-@endif
-                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Households</span><strong>{{ number_format($barangay->households_count) }}</strong><small>Household profiles on record</small></div></article>
-                    <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="trend" /></span><div><span>Migration events</span><strong>{{ number_format($barangay->migration_records_count) }}</strong><small>Recorded arrivals and departures</small></div></article>
-                </div>
-            </section>
+            @if(($workspacePage ?? 'overview') === 'overview')
+                <x-dashboard-shortcuts />
+            @endif
+            </div>
 
             <div class="barangay-dashboard-columns">
                 <main class="barangay-dashboard-main">
                     <section class="government-content-card workspace-approvals-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="resident-approvals-title">
                         <header class="government-card-header">
-                            <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Resident Verification</span><h2 id="resident-approvals-title">Pending Resident Registrations</h2><p>Verify residency before granting access to barangay online services.</p></div>
+                            <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Resident Verification</span><h2 id="resident-approvals-title">Pending Resident Registrations</h2><p>Residency is checked automatically against the consolidated RBI before account approval.</p></div>
                             <span class="government-count-badge {{ $residentApprovalRequests->isEmpty() ? 'is-clear' : 'is-pending' }}">{{ $residentApprovalRequests->count() }} pending</span>
                         </header>
                         @if ($residentApprovalRequests->isEmpty())
@@ -88,11 +96,25 @@
                         @else
                             <div class="government-record-list divide-y divide-slate-100 ">
                                 @foreach ($residentApprovalRequests as $resident)
+                                    @php($rbiCheck = $residentRbiChecks[$resident->id])
                                     <article class="government-record-row border-b border-slate-100 bg-white p-4">
                                         <span class="record-avatar">{{ str($resident->name)->substr(0, 1)->upper() }}</span>
                                         <div class="record-identity"><strong>{{ $resident->name }}</strong><span>{{ $resident->email }}</span><small>Registered {{ $resident->created_at->format('M d, Y Â· h:i A') }}</small></div>
                                         <div class="approval-actions record-actions flex flex-wrap items-center gap-2">
-                                            <form method="POST" action="{{ route('barangay.residents.approve', $resident) }}">@csrf<button type="submit">Approve Resident</button></form>
+                                            <div class="resident-rbi-note rounded-xl border p-4 {{ $rbiCheck['eligible'] ? 'border-blue-200 bg-blue-50 text-blue-900' : 'border-red-200 bg-red-50 text-red-900' }}" style="flex-basis: 100%; max-width: 36rem;" role="note">
+                                                <strong>{{ $rbiCheck['label'] }}</strong>
+                                                <p>{{ $rbiCheck['note'] }}</p>
+                                                @foreach ($rbiCheck['matches'] as $match)
+                                                    <p><small>RBI #{{ $match->id }}: {{ $match->fullName() }} · Household {{ $match->household?->household_number ?? 'Not recorded' }} · {{ $match->statusLabel() }} · {{ $match->residenceLabel() }}</small></p>
+                                                @endforeach
+                                                @unless ($rbiCheck['eligible'])
+                                                    <a href="{{ route('barangay.registry.active', ['search' => $resident->name]) }}">Review consolidated RBI</a>
+                                                @endunless
+                                            </div>
+                                            <form method="POST" action="{{ route('barangay.residents.approve', $resident) }}">
+                                                @csrf
+                                                <button type="submit" @disabled(! $rbiCheck['eligible']) @if (! $rbiCheck['eligible']) style="opacity: .5; cursor: not-allowed;" title="RBI verification has not cleared this request" @endif>Approve Resident</button>
+                                            </form>
                                             <form method="POST" action="{{ route('barangay.residents.reject', $resident) }}" onsubmit="return confirm('Reject this resident registration?')">@csrf<button type="submit" class="danger-button">Reject</button></form>
                                         </div>
                                     </article>

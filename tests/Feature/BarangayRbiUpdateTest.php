@@ -45,8 +45,8 @@ class BarangayRbiUpdateTest extends TestCase
             ->assertSee('Add Another Family Form')
             ->assertSee('Add Member to This Family')
             ->assertSee('Monthly Form Certification')
-            ->assertSee('Name of Household Head')
-            ->assertSee('Deceased Registered Barangay Inhabitants')
+            ->assertSee('Household head')
+            ->assertSee('Deceased inhabitants')
             ->assertSee('Barangay Carnaga');
 
         $this->actingAs($secretary)
@@ -121,12 +121,12 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('rbi-updates.show', $update))
             ->assertOk()
-            ->assertSee('Monthly report')
+            ->assertSee('RBI Monthly Form')
             ->assertSee('A. Newly Registered Barangay Inhabitants')
             ->assertSee('Monthly Form Certification')
             ->assertSee('Pedro Dela Cruz')
             ->assertSee('Juan Santos')
-            ->assertSee('Deceased Registered Barangay Inhabitants')
+            ->assertSee('B. Name of Deceased Registered Brgy. Inhabitant')
             ->assertSee('Dela Cruz, Ana Maria S.')
             ->assertSee('Juan Santos');
 
@@ -165,16 +165,16 @@ class BarangayRbiUpdateTest extends TestCase
         $zip->close();
         unlink($temporaryDocument);
 
-        $this->assertStringContainsString('Updates of Barangay Registry of Barangay Inhabitants', $documentXml);
-        $this->assertStringContainsString('Name of Household Head', $documentXml);
+        $this->assertStringContainsString('HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', $documentXml);
+        $this->assertStringContainsString('Household head', $documentXml);
         $this->assertStringContainsString('Pedro Dela Cruz', $documentXml);
         $this->assertStringContainsString('Juan Santos', $documentXml);
-        $this->assertStringContainsString('<w:tblW w:w="13555"', $documentXml);
+        $this->assertStringContainsString('<w:tblW w:w="13500"', $documentXml);
         $this->assertStringContainsString('<w:pgSz w:w="15840" w:h="12240" w:orient="landscape"', $documentXml);
         $this->assertStringContainsString('tomas-oppus-seal.png', $documentRelationships);
         $this->assertNotFalse($sealImage);
         $this->assertStringNotContainsString('Family Form 1', $documentXml);
-        $this->assertSame(2, substr_count($documentXml, 'Updates of Barangay Registry of Barangay Inhabitants'));
+        $this->assertSame(2, substr_count($documentXml, 'HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)'));
         $this->assertSame(1, substr_count($documentXml, '<w:br w:type="page"/>'));
         $this->assertSame(2, substr_count($documentXml, 'Mercidita L. Saga'));
         $this->assertSame(2, substr_count($documentXml, 'Wenceslao L. Resus'));

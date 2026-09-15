@@ -15,7 +15,7 @@ use App\Http\Controllers\SecretaryApprovalController;
 use App\Http\Controllers\SpatialVisualizationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-
+use App\Services\MigrationPredictionService;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -40,10 +40,23 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/concerns/summary', [\App\Http\Controllers\ResidentConcernController::class, 'summary'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('concerns.summary');
+    Route::middleware('role:'.User::ROLE_RESIDENT.','.User::ROLE_BARANGAY)->group(function () {
+        Route::get('/concerns', [\App\Http\Controllers\ResidentConcernController::class, 'index'])->name('concerns.index');
+        Route::get('/concerns/create', [\App\Http\Controllers\ResidentConcernController::class, 'create'])->name('concerns.create');
+        Route::post('/concerns', [\App\Http\Controllers\ResidentConcernController::class, 'store'])->middleware('throttle:6,1')->name('concerns.store');
+        Route::get('/concerns/{concern}', [\App\Http\Controllers\ResidentConcernController::class, 'show'])->name('concerns.show');
+        Route::put('/concerns/{concern}', [\App\Http\Controllers\ResidentConcernController::class, 'update'])->name('concerns.update');
+        Route::post('/concerns/{concern}/reply', [\App\Http\Controllers\ResidentConcernController::class, 'reply'])->middleware('throttle:10,1')->name('concerns.reply');
+        Route::get('/concerns/{concern}/attachment', [\App\Http\Controllers\ResidentConcernController::class, 'attachment'])->name('concerns.attachment');
+        Route::post('/concerns/{concern}/suggest', [\App\Http\Controllers\ResidentConcernController::class, 'suggest'])->middleware('throttle:3,1')->name('concerns.suggest');
+    });
     Route::middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->group(function () {
         Route::get('/reports/population', \App\Http\Controllers\PopulationReportController::class)->name('reports.population');
         Route::get('/reports/population/pdf', \App\Http\Controllers\PopulationReportController::class)->name('reports.population.pdf');
         Route::get('/reports/migration', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration');
+        Route::get('/analysis/forecast-readiness', \App\Http\Controllers\ForecastReadinessController::class)->name('analysis.forecast-readiness');
         Route::get('/reports/migration/pdf', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration.pdf');
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -98,6 +111,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/barangay/rbi-updates', [BarangayRbiUpdateController::class, 'store'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.store');
+    Route::put('/barangay/rbi-residents/{resident}', [\App\Http\Controllers\RbiResidentController::class, 'update'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.rbi-residents.update');
 
     Route::put('/barangay/rbi-updates/{rbiUpdate}', [BarangayRbiUpdateController::class, 'update'])
         ->middleware('role:'.User::ROLE_BARANGAY)
@@ -277,4 +292,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/document-requests/{documentRequest}/gcash-payment/proof', [DocumentPaymentController::class, 'proof'])
         ->middleware('role:'.User::ROLE_RESIDENT.','.User::ROLE_BARANGAY)
         ->name('document-payments.proof');
+
+    Route::get('/test-migration-prediction', function (
+    MigrationPredictionService $service
+) {
+    $prediction = $service->predictOutMigration([
+        'out_migration_count' => 10,
+        'previous_month_out' => 9,
+        'out_3month_avg' => 9.5,
+        'year' => 2026,
+        'month' => 10,
+    ]);
+
+    return response()->json([
+        'prediction' => $prediction,
+    ]);
+});
 });

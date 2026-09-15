@@ -17,13 +17,15 @@ class RbiDocumentPreviewTest extends TestCase
         $staff = User::factory()->create(['role' => User::ROLE_BARANGAY,
             'barangay_id' => Barangay::where('name', 'San Isidro')->firstOrFail()->id]);
         $report = BarangayRbiUpdate::create(['barangay_user_id' => $staff->id, 'barangay_name' => 'San Isidro',
-            'reporting_month' => '2026-09-01', 'status' => 'draft', 'prepared_by' => 'Prepared Official', 'attested_by' => 'Noted Official',
+            'reporting_month' => '2026-09-01', 'status' => 'draft', 'prepared_by' => 'Prepared Official', 'certified_by' => 'Certified Official', 'attested_by' => 'Noted Official',
             'rows' => [['household_head' => 'Household Head', 'inhabitant_name' => 'Example, Child', 'sex' => 'Female']]]);
         $this->actingAs($staff)->get(route('rbi-updates.show', $report))->assertOk()
             ->assertSee('rbi-word-page')->assertSee('Example, Child')->assertSee('Prepared Official')
+            ->assertSee('Certified Official')->assertSee('BHW / Encoder')->assertSee('Barangay Captain / Punong Barangay')->assertDontSee('Brgy. Secretary')
             ->assertDontSee('contenteditable')->assertDontSee('Update Form')
             ->assertViewHas('wordPages', fn ($pages) => count($pages) === 1 && $pages[0]['show_signatures']);
         $response = $this->get(route('rbi-updates.export-word', $report))->assertOk();
+        $this->get(route('rbi-updates.export-pdf', $report))->assertOk()->assertHeader('content-type', 'application/pdf');
         $path = tempnam(sys_get_temp_dir(), 'rbi-layout-test-');
         try {
             file_put_contents($path, $response->streamedContent());

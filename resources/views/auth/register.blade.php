@@ -83,7 +83,8 @@
 
                             <div class="field-group">
                                 <label for="email">Email address</label>
-                                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="name@example.com" @error('email') aria-invalid="true" @enderror required>
+                                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="name@example.com" aria-describedby="registration-email-help" @error('email') aria-invalid="true" @enderror required>
+                                <small id="registration-email-help" class="block mt-2 text-sm text-slate-600">Use an active email address you own and can open. Provide the address where you want to receive files and documents from your barangay.</small>
                                 @error('email') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 

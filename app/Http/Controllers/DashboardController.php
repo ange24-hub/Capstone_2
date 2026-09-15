@@ -149,6 +149,10 @@ class DashboardController extends Controller
 
     public function barangay(Request $request): View
     {
+        if ($request->routeIs('barangay.rbi-updates.index') && $request->filled('edit_resident')) {
+            $request->validate(['edit_resident' => ['required', 'integer']]);
+            return app(RbiResidentController::class)->edit($request, \App\Models\Inhabitant::findOrFail($request->integer('edit_resident')));
+        }
         $barangay = auth()->user()->barangay;
 
         if ($barangay) {
@@ -165,6 +169,15 @@ class DashboardController extends Controller
                 ->oldest()
                 ->get()
             : collect();
+
+        $residentRbiChecks = collect();
+        if ($barangay && $residentApprovalRequests->isNotEmpty()) {
+            $verifier = app(\App\Services\ResidentRbiVerification::class);
+            $records = $verifier->recordsFor($barangay->id);
+            $residentRbiChecks = $residentApprovalRequests->mapWithKeys(fn (User $resident) => [
+                $resident->id => $verifier->check($resident, $records),
+            ]);
+        }
 
         $barangayDocumentRequests = $barangay
             ? DocumentRequest::with(['user', 'barangay'])
@@ -212,6 +225,7 @@ class DashboardController extends Controller
             'rbiUpdates' => $rbiUpdates,
             'barangay' => $barangay,
             'residentApprovalRequests' => $residentApprovalRequests,
+            'residentRbiChecks' => $residentRbiChecks,
             'barangayDocumentRequests' => $barangayDocumentRequests,
             'documentRequestStatuses' => DocumentRequest::statusLabels(),
             'draftRbiUpdate' => $draftRbiUpdate,

@@ -12,9 +12,12 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentPaymentController extends Controller
 {
-    public function submit(Request $request, DocumentRequest $documentRequest): RedirectResponse
+    public function submit(Request $request, DocumentRequest $documentRequest): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         abort_unless($request->user()->id === $documentRequest->resident_id, 403);
+        if ($request->routeIs('api.resident.*')) {
+            abort_unless((int) $request->user()->barangay_id === (int) $documentRequest->barangay_id, 403);
+        }
         abort_unless($documentRequest->requiresPayment(), 422, 'This request does not require payment.');
         abort_if($documentRequest->payment_status === DocumentRequest::PAYMENT_PAID, 422, 'This payment is already verified.');
         abort_if($documentRequest->payment_status === DocumentRequest::PAYMENT_PENDING, 422, 'This payment is already awaiting verification.');
@@ -57,6 +60,9 @@ class DocumentPaymentController extends Controller
             'payment_remarks' => null,
         ]);
 
+        if ($request->routeIs('api.resident.*')) {
+            return response()->json(['message' => 'Payment submitted for verification. Do not pay again while verification is pending.']);
+        }
         return back()->with('status', 'Your GCash payment was submitted for Barangay verification. Do not pay again while verification is pending.');
     }
 

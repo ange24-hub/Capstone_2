@@ -13,10 +13,12 @@
 .rbi-word-page .rbi-word-deceased th { height: 20pt; min-height: 20pt; }
 .rbi-word-page .rbi-word-deceased td { height: 18pt; }
 .rbi-word-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 24pt; width: 6in; margin: 8pt auto 0; break-inside: avoid; font-size: 10.5pt; }
-.rbi-word-signatures p { margin: 0; color: #000; }
+.rbi-word-signatures p { margin: 0; color: #000; text-align: center; }
 .rbi-word-signature-image { height: .66in; display: flex; justify-content: center; align-items: center; }
 .rbi-word-signature-image img { max-width: 1.97in; max-height: .66in; object-fit: contain; }
 .rbi-word-signatures strong, .rbi-word-signatures span { display: block; text-align: center; color: #000; line-height: 1.2; }
+.rbi-word-signatures strong { min-height: 2.4em; border-bottom: 1px solid #000; padding-bottom: 3pt; overflow-wrap: anywhere; text-transform: uppercase; }
+.rbi-word-signatures span { margin-top: 4pt; }
 .rbi-word-page-number { position: absolute; bottom: .2in; right: .62in; font-size: 8pt; color: #555; }
 @media (max-width: 640px) { .rbi-document-preview { padding: 12px; } }
 

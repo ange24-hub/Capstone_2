@@ -112,7 +112,7 @@ class LocalAssistantTest extends TestCase
         Http::assertNotSent(fn ($r) => str_ends_with($r->url(), '/api/chat'));
     }
 
-    public function test_cebuano_family_question_passes_only_scoped_aggregates_to_local_model(): void
+    public function test_population_summary_passes_only_scoped_aggregates_to_local_model(): void
     {
         config(['local_ai.enabled' => true, 'local_ai.model' => 'qwen3:0.6b']);
         Http::fake([
@@ -129,7 +129,7 @@ class LocalAssistantTest extends TestCase
         }
         $before = Inhabitant::orderBy('id')->get()->toArray();
         $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
-        $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Pila ka families sa among barangay?'])
+        $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Show population summary'])
             ->assertOk()->assertJsonPath('mode', 'local_ai')->assertJsonPath('facts.families', 1);
         Http::assertSent(function ($request) {
             if (!str_ends_with($request->url(), '/api/chat')) return false;

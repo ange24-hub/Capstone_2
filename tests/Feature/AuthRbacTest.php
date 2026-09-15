@@ -66,9 +66,18 @@ class AuthRbacTest extends TestCase
             'barangay_id' => $barangay->id,
         ]);
         $resident = User::factory()->create([
+            'name' => 'Juan Resident',
             'role' => User::ROLE_RESIDENT,
             'barangay_id' => $barangay->id,
             'approval_status' => User::APPROVAL_PENDING,
+        ]);
+
+        $household = \App\Models\Household::create(['barangay_id' => $barangay->id, 'household_number' => 'Approval-1']);
+        \App\Models\Inhabitant::create([
+            'barangay_id' => $barangay->id, 'household_id' => $household->id,
+            'first_name' => 'Juan', 'last_name' => 'Resident', 'sex' => 'Male',
+            'status' => \App\Models\Inhabitant::STATUS_ACTIVE,
+            'residence_status' => \App\Models\Inhabitant::RESIDENCE_HERE,
         ]);
 
         $this->actingAs($secretary)

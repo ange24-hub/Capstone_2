@@ -1,4 +1,8 @@
 @import "tailwindcss" important;
+@import "./dashboard-polish.css";
+@import "./workspace-design.css";
+@import "./workspace-motion.css";
+@import "./workspace-layout.css";
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../**/*.blade.php";
@@ -33,6 +37,7 @@
     }
     .municipal-ui body { @apply bg-slate-50! font-sans! text-sm! text-slate-700! antialiased!; }
     .municipal-ui .app-main { --ink: #0f172a; --text: #334155; --muted: #64748b; --line: #e2e8f0; }
+    .municipal-ui .app-main { background: #f4f5f7 !important; }
     .municipal-ui .app-content { @apply m-0! w-full! max-w-none! px-4! py-6! sm:px-6! lg:px-8!; }
     .municipal-ui :where(.app-content) h1 { @apply text-2xl! font-bold! tracking-tight! text-slate-900! sm:text-3xl!; }
     .municipal-ui :where(.app-content) h2:not(.rbi-word-heading h2) { @apply text-lg! font-semibold! tracking-tight! text-slate-900!; }
@@ -100,7 +105,62 @@
     .municipal-ui :is(.government-empty-state,.dashboard-empty-state) :is(strong,span) { @apply text-slate-600!; }
     .municipal-ui :is(.barangay-welcome-panel,.dashboard-hero) :is(h2,p,strong,span) { @apply text-blue-950!; }
     .municipal-ui .barangay-welcome-panel::before, .municipal-ui .barangay-welcome-panel::after { display: none !important; }
-    .municipal-ui :is(.dashboard-page-header,.profile-account-card,.profile-section,.metric-card,.workflow-card,.workspace-page,.portal-login-layout) { animation: none !important; }
+    /* One entrance per page; controls remain usable throughout the transition. */
+    @keyframes civic-enter {
+      from { opacity: .65; translate: 0 6px; }
+      to { opacity: 1; translate: 0 0; }
+    }
+    .municipal-ui :is(.app-content,.portal-login-layout,.civic-home-hero) { animation: civic-enter .28s ease-out !important; }
+    .municipal-ui :is(.profile-account-card,.profile-section,.metric-card,.workflow-card,.workspace-page,.dashboard-page-header) { animation: none !important; }
+    .municipal-ui :is(.dashboard-card,.workflow-card,.government-content-card,.government-side-card,.government-stat-card,.population-report-section,.profile-section,.auth-panel) {
+      @apply rounded-2xl! border! border-slate-200! bg-white! shadow-sm!;
+    }
+    .municipal-ui :is(.dashboard-page-header,.profile-page-heading,.page-head) {
+      @apply mb-6! border-b! border-slate-300! pb-5!;
+    }
+    .municipal-ui :is(.government-card-header,.profile-section-heading) {
+      @apply border-b! border-slate-200! bg-slate-50! px-5! py-4!;
+    }
+    .municipal-ui :is(.dashboard-filter,.population-report-filter) {
+      @apply rounded-xl! border! border-slate-200! bg-slate-50! p-4!;
+    }
+    .municipal-ui .metric-card {
+      @apply rounded-xl! border! border-slate-200! bg-white! p-5! shadow-xs!;
+      transition: border-color .18s ease, box-shadow .18s ease !important;
+    }
+    .municipal-ui .metric-warning { border-top-color: #d97706 !important; }
+    .municipal-ui .metric-danger { border-top-color: #dc2626 !important; }
+    .municipal-ui .metric-icon { @apply size-11! rounded-xl!; }
+    .municipal-ui .table-wrap { @apply overflow-x-auto! rounded-xl! border! border-slate-200!; }
+    .municipal-ui .table-wrap th { @apply bg-slate-50! text-slate-600!; }
+    .municipal-ui .table-wrap tbody tr { transition: background-color .15s ease !important; }
+    .municipal-ui .table-wrap td a:not(.button) { @apply font-semibold! text-blue-700! hover:underline!; }
+    .municipal-ui :where(.app-content) :is(.success,.errors) { @apply rounded-xl! border! p-4!; }
+    .municipal-ui :where(.app-content) .success { @apply border-blue-200! bg-blue-50! text-blue-900!; }
+    .municipal-ui :where(.app-content) .errors { @apply border-red-200! bg-red-50! text-red-900!; }
+    .municipal-ui :where(.app-content) :is(input,select,textarea):disabled { @apply bg-slate-100! text-slate-600!; }
+    .municipal-ui .side-nav .side-section {
+      @apply mt-4! mb-1! border-t! border-white/10! px-3! pt-4! text-[10px]! font-semibold! uppercase! tracking-widest! text-blue-200!;
+    }
+    .municipal-ui .side-nav a.active { box-shadow: inset 3px 0 #a8c1dc !important; }
+    .municipal-ui .sidebar-collapsed .side-section { font-size: 0 !important; padding: 0 !important; height: 1px; }
+    .municipal-ui .workspace-location { @apply mb-4! flex! flex-wrap! items-center! gap-2! text-xs! text-slate-600!; }
+    .municipal-ui .workspace-location a { @apply font-medium! text-blue-800! hover:underline!; }
+    .municipal-ui .workspace-location [aria-current] { @apply font-semibold! text-slate-800!; }
+    .municipal-ui :is(.workspace-launcher > a,.civic-home-service,.service-card) {
+      transition: border-color .2s ease, box-shadow .2s ease, translate .2s ease !important;
+    }
+    @media (hover: hover) {
+      .municipal-ui :is(.workspace-launcher > a,.civic-home-service,.service-card):hover { translate: 0 -3px; box-shadow: 0 10px 24px #112f4014 !important; }
+      .municipal-ui .metric-card:hover { border-color: #a8c1dc !important; box-shadow: 0 6px 18px #112f4010 !important; }
+    }
+    @media (max-width: 640px) {
+      .municipal-ui :is(.dashboard-header-actions,.row-actions,.profile-form-footer > div) { flex-wrap: wrap !important; gap: 8px !important; }
+      .municipal-ui :is(.government-card-header,.workflow-head,.dashboard-card-header) { flex-wrap: wrap !important; }
+      .municipal-ui .app-header-primary { min-width: 0; }
+      .municipal-ui .app-header-primary > div { min-width: 0; }
+      .municipal-ui .app-header-kicker { font-size: 9px !important; letter-spacing: .06em !important; }
+    }
     .municipal-ui .barangay-welcome-panel .button :is(span,strong,small) { @apply text-white!; }
     .municipal-ui .barangay-welcome-panel .button .action-icon { @apply bg-blue-800! text-white!; }
     .municipal-ui :where(.app-content,.public-content) .government-outline-button { @apply border-slate-300! bg-white! text-slate-700! hover:bg-blue-50!; }
@@ -135,6 +195,11 @@
     .municipal-ui .public-nav a { @apply rounded-lg! text-sm! text-slate-700! hover:bg-blue-50! hover:text-blue-900!; }
     .municipal-ui .public-nav .public-register-link { @apply bg-[#244b83]! text-white! hover:bg-[#1c4074]!; }
     .municipal-ui .public-nav .public-login-link { @apply border-blue-200! text-blue-800!; }
+    .municipal-ui .public-nav [aria-current="page"] { box-shadow: inset 0 -3px #d4ac62 !important; }
+    .municipal-ui .civic-home-service { @apply rounded-2xl! border-t-4! border-t-blue-700!; }
+    .municipal-ui .civic-home #about { background: linear-gradient(180deg, #f8fafc, #edf2f7); }
+    .municipal-ui :is(.portal-login-layout,.registration-layout) { gap: 28px !important; }
+    .municipal-ui .auth-panel { border-top: 4px solid #244b83 !important; }
     .municipal-ui .public-footer { @apply bg-[#112f40]! text-blue-50!; }
     .municipal-ui .public-footer :is(strong,span) { @apply text-blue-100!; }
     .municipal-ui .public-footer-bottom { @apply border-blue-800! bg-[#112f40]!; }
@@ -149,6 +214,26 @@
     .municipal-ui .assistant-message-user .assistant-bubble { @apply bg-[#244b83]! text-white!; }
     .municipal-ui .assistant-suggestions button { @apply rounded-full! border-blue-200! bg-blue-50! text-blue-800!; }
     .municipal-ui .assistant-form button { @apply rounded-lg! bg-[#244b83]! text-white!; }
+    /* Repeated actions stay quiet; solid navy is reserved for primary actions. */
+    .municipal-ui :is(.saved-member-actions,.saved-household-footer,.table-wrap,.monthly-family-row) :is(button,.button),
+    .municipal-ui :where(.app-content) .link-button {
+      @apply min-h-9! rounded-md! border-slate-300! bg-white! px-3! py-2! text-sm! font-medium! text-slate-700! shadow-none! hover:border-slate-400! hover:bg-slate-50!;
+    }
+    .municipal-ui :is(.saved-member-actions,.saved-household-footer,.table-wrap,.monthly-family-row) :is(.danger-button,.member-delete),
+    .municipal-ui :where(.app-content) .member-delete {
+      @apply border-transparent! bg-transparent! text-red-700! hover:border-red-200! hover:bg-red-50!;
+    }
+    .municipal-ui .saved-member-actions .member-edit {
+      @apply inline-flex! min-h-9! items-center! rounded-md! px-3! py-2! font-medium! text-slate-700! hover:bg-slate-100!;
+    }
+    .municipal-ui :is(.saved-report,.saved-household) { @apply overflow-hidden! rounded-xl! border-slate-200! bg-white! shadow-none!; }
+    .municipal-ui :is(.saved-report > summary,.saved-household-heading,.saved-household-footer) { @apply border-slate-200! bg-slate-50! text-slate-700!; }
+    .municipal-ui :is(.saved-report-toolbar,.saved-member) { @apply border-slate-200! bg-white!; }
+    .municipal-ui :is(.report-month-icon,.member-initial) { @apply bg-slate-100! text-slate-600!; }
+    .municipal-ui :is(.report-counts,.saved-household-heading > span) { @apply text-slate-500!; }
+    .municipal-ui .saved-member-actions { @apply flex! flex-wrap! items-center! gap-2!; }
+    .municipal-ui :is(.dashboard-page-header,.page-head) { background: transparent !important; border-top: 0 !important; border-left: 0 !important; border-right: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+    .municipal-ui .metric-card { border-top-width: 1px !important; border-top-color: #e2e8f0 !important; }
     .municipal-ui [hidden] { display: none !important; }
     .municipal-ui .sidebar-backdrop { @apply bg-slate-950/50!; }
     @media (max-width: 960px) {
@@ -169,6 +254,11 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .municipal-ui *, .municipal-ui *::before, .municipal-ui *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+      .municipal-ui :is(.workspace-launcher > a,.civic-home-service,.service-card):hover { translate: none !important; }
     }
   }
+}
+
+@media print {
+  .workspace-location { display: none !important; }
 }

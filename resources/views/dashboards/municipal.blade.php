@@ -12,6 +12,7 @@
                 <a class="button" href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" /> Barangay directory</a>
                 <a class="button secondary-button" href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" /> Migration trends</a>
             </div>
+            <x-dashboard-context />
         </header>
 
         @if (session('status'))
@@ -24,6 +25,8 @@
             <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span><div><span>Six-month net migration</span><strong>{{ $analyticsSummary['net_migration_6m'] >= 0 ? '+' : '' }}{{ number_format($analyticsSummary['net_migration_6m']) }}</strong><small>{{ $analyticsSummary['migration_in_6m'] }} in · {{ $analyticsSummary['migration_out_6m'] }} out</small></div></article>
             <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $analyticsSummary['high_movement_count'] > 0 ? 'metric-danger' : 'metric-success' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="map" /></span><div><span>Priority areas</span><strong>{{ number_format($analyticsSummary['high_movement_count']) }}</strong><small>High-movement barangays</small></div></article>
         </section>
+
+        <x-dashboard-shortcuts />
 
         <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="secretary-approvals">
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
@@ -113,7 +116,7 @@
                             <th>In / Out (6 months)</th>
                             <th>Net Migration</th>
                             <th>Movement Trend</th>
-                            <th>Predictive Indicator</th>
+                            <th>Recent RBI entry balance</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,7 +131,7 @@
                                     <span class="movement-indicator movement-{{ $barangay->movement_level }}">{{ ucfirst($barangay->movement_level) }}</span>
                                     <small>{{ $barangay->movement_change_percent >= 0 ? '+' : '' }}{{ $barangay->movement_change_percent }}% vs previous period</small>
                                 </td>
-                                <td class="signed-value">{{ $barangay->predicted_monthly_change >= 0 ? '+' : '' }}{{ $barangay->predicted_monthly_change }} next report</td>
+                                <td class="signed-value" title="Rounded mean of inhabitant entries minus deceased entries over up to three latest recorded reporting months. Not a population forecast.">{{ $barangay->predicted_monthly_change >= 0 ? '+' : '' }}{{ $barangay->predicted_monthly_change }} recorded average</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -157,7 +160,7 @@
                         <dl>
                             <div><dt>Movement</dt><dd>{{ $barangay->movement_total_6m }}</dd></div>
                             <div><dt>Net migration</dt><dd>{{ $barangay->net_migration_6m >= 0 ? '+' : '' }}{{ $barangay->net_migration_6m }}</dd></div>
-                            <div><dt>Projected change</dt><dd>{{ $barangay->predicted_monthly_change >= 0 ? '+' : '' }}{{ $barangay->predicted_monthly_change }}</dd></div>
+                            <div><dt>Recent RBI entry balance (not a forecast)</dt><dd>{{ $barangay->predicted_monthly_change >= 0 ? '+' : '' }}{{ $barangay->predicted_monthly_change }}</dd></div>
                         </dl>
                     </article>
                 @empty

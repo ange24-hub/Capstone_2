@@ -1,0 +1,89 @@
+/* Progressive enhancement: every control and panel remains usable without motion. */
+@layer components {
+ @media screen and (prefers-reduced-motion:no-preference) {
+  /* Individual panels own their entrances, avoiding stacked page animations. */
+  .municipal-ui body .app-main #main-content,
+  .municipal-ui body .app-main #main-content > .workspace-page {
+   animation:none !important;
+  }
+  .municipal-ui body #main-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.municipal-directory-header,.dashboard-hero) {
+   animation:workspace-reveal .42s cubic-bezier(.2,.7,.2,1) backwards !important;
+  }
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut,.barangay-welcome-panel,.government-content-card,.workflow-card,.profile-section,.profile-account-card,article.rounded-xl.bg-white,form.rounded-xl.bg-white):not(:where(.rbi-document-preview *)) {
+   animation:workspace-reveal .42s cubic-bezier(.2,.7,.2,1) .045s backwards !important;
+  }
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut):nth-child(2) { animation-delay:.09s !important; }
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut):nth-child(3) { animation-delay:.135s !important; }
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut):nth-child(4) { animation-delay:.18s !important; }
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut):nth-child(5) { animation-delay:.225s !important; }
+
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut,.workspace-launcher > a) {
+   transition:translate .2s ease,border-color .2s ease,box-shadow .2s ease !important;
+  }
+  .municipal-ui body #main-content :is(.overview-shortcut > .app-icon,.workspace-launcher > a > .app-icon,.metric-icon,.overview-shortcut-icon) {
+   transition:translate .2s ease,rotate .2s ease,background-color .2s ease !important;
+  }
+  .municipal-ui body #main-content :is(button,.button):not(:where(.rbi-document-preview *, .leaflet-control *)) {
+   transition:translate .16s ease,scale .12s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease !important;
+  }
+  .municipal-ui body #main-content :is(input,select,textarea):not(:where(.rbi-document-preview *)) {
+   transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease !important;
+  }
+  .municipal-ui body #main-content .table-wrap tbody tr {
+   transition:background-color .16s ease !important;
+  }
+  .municipal-ui body #main-content :is(.success,.errors)[role] {
+   animation:workspace-feedback .25s ease-out backwards !important;
+  }
+  .municipal-ui body #app-sidebar .side-nav a {
+   transition:background-color .18s ease,box-shadow .18s ease,color .18s ease !important;
+  }
+  .municipal-ui body #app-sidebar .side-nav .nav-mark {
+   transition:translate .18s ease !important;
+  }
+  .municipal-ui body .assistant-panel:not([hidden]) {
+   animation:workspace-reveal .22s ease-out backwards !important;
+  }
+  @media (hover:hover) and (pointer:fine) {
+   .municipal-ui body #main-content :is(.metric-card,.concern-status-card,.overview-shortcut,.workspace-launcher > a):hover {
+    translate:0 -3px !important; box-shadow:0 10px 25px #203f5614 !important;
+   }
+   .municipal-ui body #main-content :is(.overview-shortcut,.workspace-launcher > a):is(:hover,:focus-visible) > .app-icon { translate:3px 0; }
+   .municipal-ui body #main-content :is(.metric-card:hover .metric-icon,.overview-shortcut:hover .overview-shortcut-icon) { rotate:-4deg; }
+   .municipal-ui body #main-content :is(button,.button):not(:disabled):not([aria-disabled="true"]):not(:where(.rbi-document-preview *, .leaflet-control *)):hover {
+    translate:0 -1px; box-shadow:0 4px 10px #203f5614 !important;
+   }
+   .municipal-ui body #app-sidebar .side-nav a:hover .nav-mark { translate:2px 0; }
+  }
+  .municipal-ui body #main-content :is(button,.button):not(:disabled):not([aria-disabled="true"]):not(:where(.rbi-document-preview *, .leaflet-control *)):active {
+   translate:0 0 !important; scale:.985; box-shadow:none !important;
+  }
+ }
+ /* Also removes legacy animations when the preference changes while the page is open. */
+ @media screen and (prefers-reduced-motion:reduce) {
+  .municipal-ui body #main-content,
+  .municipal-ui body #main-content *,
+  .municipal-ui body #app-sidebar *,
+  .municipal-ui body .assistant-panel {
+   animation:none !important; transition:none !important; translate:none !important; rotate:none !important; scale:none !important;
+  }
+ }
+}
+
+@keyframes workspace-reveal {
+ from { opacity:.35; translate:0 9px; }
+ to { opacity:1; translate:0 0; }
+}
+@keyframes workspace-feedback {
+ from { opacity:.45; translate:0 -4px; }
+ to { opacity:1; translate:0 0; }
+}
+
+/* Supported browsers crossfade same-origin page navigation; others navigate normally. */
+@media screen and (prefers-reduced-motion:no-preference) {
+ @view-transition { navigation:auto; }
+ ::view-transition-old(root) { animation:workspace-page-out .12s ease-out both; }
+ ::view-transition-new(root) { animation:workspace-page-in .18s ease-out both; }
+}
+@keyframes workspace-page-out { to { opacity:0; } }
+@keyframes workspace-page-in { from { opacity:0; } }

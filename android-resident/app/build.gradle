@@ -1,0 +1,32 @@
+plugins { id 'com.android.application' }
+dependencies { testImplementation 'junit:junit:4.13.2' }
+
+def server = providers.gradleProperty('residentServer').orElse('https://configure-server.invalid').get()
+if (!server.startsWith('https://') || server.contains('"') || server.contains('\\')) {
+    throw new GradleException('residentServer must be an HTTPS server URL.')
+}
+android {
+    namespace 'ph.tomasoppus.rbim.resident'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ph.tomasoppus.rbim.resident'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+        buildConfigField 'String', 'SERVER_URL', '"' + server + '"'
+    }
+    buildFeatures { buildConfig true }
+    buildTypes {
+        debug { applicationIdSuffix '.debug'; versionNameSuffix '-local' }
+        release { minifyEnabled false }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+tasks.configureEach {
+    if (name == 'preReleaseBuild') {
+        doFirst {
+            if (server.contains('configure-server.invalid')) throw new GradleException('Set -PresidentServer=https://your-server before a release build.')
+        }
+    }
+}

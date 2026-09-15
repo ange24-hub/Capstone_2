@@ -12,6 +12,11 @@ class ResidentApprovalController extends Controller
     {
         $this->authorizeResident($request, $resident);
 
+        abort_unless($resident->approval_status === User::APPROVAL_PENDING, 409);
+        $verification = app(\App\Services\ResidentRbiVerification::class)->check($resident);
+        if (! $verification['eligible']) {
+            return back()->withErrors(['resident_verification' => $verification['note']]);
+        }
         $resident->update([
             'approval_status' => User::APPROVAL_APPROVED,
             'approved_at' => now(),

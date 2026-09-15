@@ -149,7 +149,9 @@
                                                 @foreach ($memberFields as $field => $label)
                                                     <div>
                                                         <label>{{ $label }}</label>
-                                                        @if ($field === 'sex')
+                                                        @if (in_array($field, ['civil_status', 'education_level', 'religion'], true))
+                                                            <x-rbi-dropdown :field="$field" :name="'rows['.$currentRowIndex.']['.$field.']'" :value="$member[$field] ?? ''" />
+                                                        @elseif ($field === 'sex')
                                                             <select name="rows[{{ $currentRowIndex }}][{{ $field }}]">
                                                                 <option value=""></option>
                                                                 <option value="Male" @selected(($member[$field] ?? '') === 'Male')>Male</option>
@@ -190,30 +192,23 @@
                     <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button type="button" class="secondary-button" id="add-rbi-deceased-row">Add Deceased Inhabitant</button></div>
 
                     <h3 class="section-title text-lg font-semibold text-slate-900" id="certification-section">Monthly Form Certification</h3>
-                    <p>The following names and signatures are repeated on every family form in the consolidated PDF.</p>
-                    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
-                        <div><label for="certified_by">Certified Correct (Barangay Secretary)</label><input id="certified_by" name="certified_by" value="{{ old('certified_by', $editingReport?->certified_by ?: $barangay->secretary_name ?: auth()->user()->name) }}"></div>
-                        <div>
-                            <label for="prepared_by">Prepared by (BHW / Encoder)</label>
-                            <input id="prepared_by" name="prepared_by" type="text" value="{{ old('prepared_by', $editingReport?->prepared_by ?: $barangay->secretary_name ?: auth()->user()->name) }}">
-                        </div>
-                        <div>
-                            <label for="attested_by">Verified by (Punong Barangay)</label>
-                            <input id="attested_by" name="attested_by" type="text" value="{{ old('attested_by', $editingReport?->attested_by ?: $barangay->punong_barangay_name) }}" placeholder="Punong Barangay name">
-                        </div>
-                        @foreach ([['prepared_signature_data', 'prepared_signature_path', 'Prepared by', 'secretary'], ['certified_signature_data', 'certified_signature_path', 'Certified Correct', 'certified'], ['attested_signature_data', 'attested_signature_path', 'Punong Barangay', 'captain']] as [$field, $pathField, $label, $type])
-                            <div class="signature-pad-field">
-                                <label>{{ $label }} signature</label>
+                    <p>Enter each signer's full name and place their signature in the same card. The document follows this same order.</p>
+                    <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+                        @foreach ([['prepared_by', 'prepared_signature_data', 'prepared_signature_path', 'Prepared by', 'BHW / Encoder', 'secretary', $editingReport?->prepared_by ?? ''], ['certified_by', 'certified_signature_data', 'certified_signature_path', 'Certified Correct', 'Barangay Secretary', 'certified', $editingReport?->certified_by ?: $barangay->secretary_name ?: auth()->user()->name], ['attested_by', 'attested_signature_data', 'attested_signature_path', 'Verified by', 'Barangay Captain / Punong Barangay', 'captain', $editingReport?->attested_by ?: $barangay->punong_barangay_name]] as [$nameField, $field, $pathField, $label, $role, $type, $defaultName])
+                            <section class="signature-pad-field flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4" aria-labelledby="{{ $nameField }}-heading">
+                                <div class="min-h-16"><p class="text-xs font-semibold uppercase tracking-wide text-blue-800">{{ $label }}</p><h4 class="text-base font-bold text-slate-900" id="{{ $nameField }}-heading">{{ $role }}</h4></div>
+                                <div><label for="{{ $nameField }}">Full name</label><input id="{{ $nameField }}" name="{{ $nameField }}" type="text" value="{{ old($nameField, $defaultName) }}" placeholder="Full name of {{ $role }}" maxlength="255"></div>
+                                <label>{{ $role }} signature</label>
                                 @if ($editingReport?->{$pathField})
-                                    <img class="signature-upload-preview" src="{{ route('rbi-updates.signature', [$editingReport, $type]) }}" alt="Saved {{ $label }} signature">
+                                    <img class="signature-upload-preview" src="{{ route('rbi-updates.signature', [$editingReport, $type]) }}" alt="Saved {{ $role }} signature">
                                     <small class="field-help">Saved signature. Draw below only to replace it.</small>
                                 @endif
-                                <div class="signature-pad" data-signature-pad>
-                                    <canvas aria-label="Draw the {{ $label }} signature"></canvas>
+                                <div class="signature-pad mt-auto" data-signature-pad>
+                                    <canvas aria-label="Draw the {{ $role }} signature"></canvas>
                                     <div class="signature-pad-actions"><span>Sign using a mouse, finger, or stylus.</span><button class="secondary-button" type="button" data-clear-signature>Clear</button></div>
                                     <input name="{{ $field }}" type="hidden">
                                 </div>
-                            </div>
+                            </section>
                         @endforeach
                     </div>
 
@@ -283,7 +278,9 @@
                 @foreach ($memberFields as $field => $label)
                     <div>
                         <label>{{ $label }}</label>
-                        @if ($field === 'sex')
+                        @if (in_array($field, ['civil_status', 'education_level', 'religion'], true))
+                            <x-rbi-dropdown :field="$field" :row-field="true" />
+                        @elseif ($field === 'sex')
                             <select data-row-field="{{ $field }}"><option value=""></option><option value="Male">Male</option><option value="Female">Female</option></select>
                         @else
                             <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}">

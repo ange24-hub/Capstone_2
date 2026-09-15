@@ -1,0 +1,185 @@
+/* Shared application content, complementary to the overview dashboard.
+   Explicit panel hooks keep document canvases, map controls and print output intact. */
+@layer components {
+ @media screen {
+  .municipal-ui .focused-workspace .app-content { --content-ink:#203f56; --content-teal:#246b5e; }
+  .municipal-ui .focused-workspace .app-content > :is(section,.panel) { min-width:0; grid-template-columns:minmax(0,1fr); }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.municipal-directory-header,.dashboard-hero) {
+   position:relative; isolation:isolate; min-width:0; margin-bottom:0 !important; padding:28px 30px !important;
+   border:0 !important; border-radius:18px !important;
+   background:url('/images/civic-lines.svg') right center / auto 100% no-repeat,linear-gradient(112deg,#163852 5%,#215568 62%,#247563) !important;
+   color:#fff !important; box-shadow:0 9px 24px #17375214 !important;
+  }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.municipal-directory-header,.dashboard-hero) :is(h1,h2) {
+   color:#fff !important; font-family:inherit !important; font-size:clamp(24px,2.2vw,32px) !important; font-weight:650 !important; letter-spacing:-.03em !important; line-height:1.25 !important; overflow-wrap:anywhere;
+  }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.municipal-directory-header,.dashboard-hero) p { color:#deebf3 !important; font-size:13px !important; line-height:1.65 !important; margin-top:9px !important; }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.municipal-directory-header,.dashboard-hero) :is(.dashboard-eyebrow,.page-kicker,.hero-kicker) { display:block; color:#afe2d2 !important; font-size:10px !important; font-weight:650 !important; letter-spacing:.12em !important; margin-bottom:8px; }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading) > div:first-child { min-width:0; flex:1 1 280px; }
+  .municipal-ui .focused-workspace .app-content .dashboard-page-header:has(> h1) { display:block !important; }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) :is(.button,button,.profile-back-link) {
+   border:1px solid #fff !important; border-radius:9px !important; background:#fff !important; color:#204662 !important; box-shadow:none !important;
+  }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) :is(.secondary-button,.outline-button,.profile-back-link) { background:#ffffff0d !important; color:#fff !important; border-color:#adc6d6 !important; }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) :is(.button,button,.profile-back-link):hover { background:#e9f5ef !important; color:#204662 !important; }
+  .municipal-ui .focused-workspace .app-content :is(.dashboard-card,.workflow-card,.government-content-card,.government-side-card,.government-stat-card,.population-report-section,.profile-section,.profile-account-card,.saved-report,.saved-household,.municipal-approval-item,article.rounded-xl.border.bg-white,form.rounded-xl.border.bg-white) {
+   min-width:0; border:1px solid #dce6ee !important; border-radius:15px !important; background:#fff !important; box-shadow:0 5px 18px #203e5906 !important;
+  }
+  .municipal-ui .focused-workspace .app-content :is(.registry-workspace,.rbi-forms-workspace).panel { background:transparent !important; border:0 !important; padding:0 !important; box-shadow:none !important; }
+  .municipal-ui .focused-workspace .app-content :is(.government-card-header,.profile-section-heading,.workflow-head,.dashboard-card-header) { border-color:#e0e9f0 !important; }
+  .municipal-ui .focused-workspace .app-content :is(.government-card-header,.profile-section-heading) { background:linear-gradient(100deg,#f3f8f6,#fff) !important; padding:21px 23px !important; }
+  .municipal-ui .focused-workspace .app-content :is(.workflow-head,.dashboard-card-header) { padding-bottom:18px !important; }
+  .municipal-ui .focused-workspace .app-content :is(.government-card-header,.profile-section-heading,.workflow-head,.dashboard-card-header,.population-report-section,article.rounded-xl) h2 { color:#203f56 !important; font-size:18px !important; font-weight:650 !important; letter-spacing:-.02em !important; }
+  .municipal-ui .focused-workspace .app-content .content-panel-heading { display:flex; align-items:center; gap:12px; padding-bottom:17px; border-bottom:1px solid #e3ebf1; margin-bottom:16px; }
+  .municipal-ui .focused-workspace .app-content .content-panel-heading > span { display:grid; place-items:center; flex:0 0 38px; height:38px; border-radius:11px; background:#e9f4ef; color:#287d69; }
+  .municipal-ui .focused-workspace .app-content .content-panel-heading .app-icon { width:21px; height:21px; }
+  .municipal-ui .focused-workspace .app-content article.concern-ai-panel.rounded-xl.border.bg-white { border-color:#cddfd9 !important; background:linear-gradient(135deg,#f0f8f4,#fff 75%) !important; }
+  .municipal-ui .focused-workspace .app-content article.concern-ai-panel.rounded-xl.border.bg-white .content-panel-heading > span { background:#dceee6; color:#246b5e; }
+  .municipal-ui .focused-workspace .app-content .concern-details-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px !important; padding:16px; border-radius:11px; background:#f5f8fb; border:1px solid #e4ebf1; }
+  .municipal-ui .focused-workspace .app-content .concern-details-grid dt { font-size:11px; margin-bottom:5px; color:#5b7285 !important; }
+  .municipal-ui .focused-workspace .app-content .concern-details-grid dd { font-weight:600; color:#294b64; overflow-wrap:anywhere; }
+  .municipal-ui .focused-workspace .app-content .concern-timeline > li { position:relative; border-left-color:#c4dfd3 !important; padding-left:22px !important; }
+  .municipal-ui .focused-workspace .app-content .concern-timeline > li::before { content:''; position:absolute; left:-6px; top:4px; width:10px; height:10px; border:2px solid #fff; border-radius:50%; background:#348672; box-shadow:0 0 0 1px #b5d6c8; }
+  .municipal-ui .focused-workspace .app-content article.concern-status-card.rounded-xl.border.bg-white { position:relative; padding:20px !important; background:linear-gradient(145deg,#fff,#f0f6fc) !important; border-radius:14px !important; border-bottom:3px solid #93b5d1 !important; }
+  .municipal-ui .focused-workspace .app-content article.concern-status-card.rounded-xl.border.bg-white strong { font-size:30px !important; font-weight:650 !important; color:#24465f !important; }
+  .municipal-ui .focused-workspace .app-content article.concern-status-card.rounded-xl.border.bg-white[data-status="resolved"] { background:linear-gradient(145deg,#fff,#edf8f1) !important; border-bottom-color:#7ab49d !important; }
+  .municipal-ui .focused-workspace .app-content article.concern-status-card.rounded-xl.border.bg-white[data-status="under_review"] { background:linear-gradient(145deg,#fff,#fff6e7) !important; border-bottom-color:#d8b474 !important; }
+  .municipal-ui .focused-workspace .app-content article.concern-status-card.rounded-xl.border.bg-white[data-status="in_progress"] { background:linear-gradient(145deg,#fff,#f4f0fc) !important; border-bottom-color:#a396c8 !important; }
+  .municipal-ui .focused-workspace .app-content .concern-status { font-weight:600 !important; color:#315c7c !important; background:#edf4fc !important; border-color:#cfdfed !important; }
+  .municipal-ui .focused-workspace .app-content .concern-status[data-status="resolved"] { color:#226549 !important; background:#eaf7ef !important; border-color:#c8e6d4 !important; }
+  .municipal-ui .focused-workspace .app-content .concern-status[data-status="under_review"] { color:#855815 !important; background:#fff6e5 !important; border-color:#ead7b4 !important; }
+  .municipal-ui .focused-workspace .app-content .concern-status[data-status="closed"] { color:#556578 !important; background:#f1f4f7 !important; border-color:#dce3ea !important; }
+  .municipal-ui .focused-workspace .app-content :is(form[method="GET"],.dashboard-filter,.population-report-filter,.registry-filter-bar) { padding:18px !important; border:1px solid #dce6ed !important; border-radius:12px !important; background:#fff !important; box-shadow:0 3px 12px #203e5904 !important; }
+  .municipal-ui .focused-workspace .app-content .table-wrap { min-width:0; max-width:100%; border:1px solid #dbe5ee !important; border-radius:12px !important; background:#fff !important; box-shadow:0 4px 16px #203e5905; }
+  .municipal-ui .focused-workspace .app-content .table-wrap th { background:#edf4f7 !important; color:#3b5c71 !important; font-size:11px !important; letter-spacing:.04em !important; }
+  .municipal-ui .focused-workspace .app-content .table-wrap tbody tr:hover { background:#eef7f3 !important; }
+  .municipal-ui .focused-workspace .app-content .table-wrap td a:not(.button) { color:#246b5e !important; text-decoration-color:#a0cdbb !important; }
+  .municipal-ui .focused-workspace .app-content :is(input,select,textarea):not(:where(.rbi-document-preview *)) { border-color:#cbdce5 !important; border-radius:9px !important; color:#23445c !important; }
+  .municipal-ui .focused-workspace .app-content :is(input,select,textarea):focus:not(:where(.rbi-document-preview *)) { border-color:#459582 !important; box-shadow:0 0 0 3px #4595821a !important; }
+  .municipal-ui .focused-workspace .app-content :is(input,select,textarea)[aria-invalid="true"]:not(:where(.rbi-document-preview *)) { border-color:#be4053 !important; box-shadow:0 0 0 2px #be405314 !important; }
+  .municipal-ui .focused-workspace .app-content :is(button,.button):not(:where(.rbi-document-preview *)) { border-radius:9px !important; }
+  .municipal-ui .focused-workspace .app-content form > button[type="submit"]:not(.secondary-button):not(.danger-button):not(.member-delete):not(:where(.rbi-document-preview *)) { background:#246b5e !important; border-color:#246b5e !important; color:#fff !important; }
+  .municipal-ui .focused-workspace .app-content form > button[type="submit"]:not(.secondary-button):not(.danger-button):not(.member-delete):hover { background:#1c564c !important; }
+  .municipal-ui .focused-workspace .app-content :is(.success,.population-coverage-notice) { background:#edf7f1 !important; border-color:#c7e1d3 !important; color:#285e49 !important; border-radius:11px !important; }
+  .municipal-ui .focused-workspace .app-content .profile-account-banner { background:url('/images/civic-lines.svg') right center / auto 170% no-repeat,linear-gradient(110deg,#204863,#287767) !important; }
+  .municipal-ui .focused-workspace .app-content .profile-page-heading .profile-back-link { display:inline-flex; align-items:center; gap:8px; padding:9px 13px; min-height:40px; font-size:12px; text-decoration:none; }
+  .municipal-ui .focused-workspace .app-content :is(.profile-section-icon,.record-avatar) { background:#e7f3ed !important; color:#28735f !important; }
+  /* Account settings use a compact form scale instead of the dashboard card scale. */
+  .municipal-ui .focused-workspace #main-content .staff-profile { width:100% !important; max-width:1000px !important; margin-inline:auto !important; gap:18px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-page-heading { padding:18px 22px !important; border-radius:12px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-page-heading h1 { font-size:25px !important; margin:4px 0 !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-page-heading p { font-size:12px !important; margin-top:5px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-layout { grid-template-columns:230px minmax(0,1fr) !important; gap:18px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile :is(.profile-account-card,.profile-section) { border-radius:10px !important; box-shadow:none !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-banner { height:64px !important; padding:14px 16px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-banner .app-icon { width:19px !important; height:19px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-body { padding:0 16px 16px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-avatar { width:46px !important; height:46px !important; margin-top:-20px !important; margin-bottom:10px !important; border-width:3px !important; border-radius:11px !important; font-size:20px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-body h2 { font-size:15px !important; line-height:1.4 !important; margin-bottom:8px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-role { padding:3px 8px !important; font-size:11px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-email { font-size:12px !important; margin:9px 0 14px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-details { gap:12px !important; padding-top:13px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-details dd { font-size:12px !important; margin-top:3px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-office-note { margin-top:14px !important; padding:10px !important; gap:7px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-office-note p { font-size:11px !important; line-height:1.5 !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-edit-form { gap:16px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-section-heading { padding:13px 16px !important; gap:10px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-section-heading h2 { font-size:15px !important; margin-bottom:3px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-section-heading p { font-size:12px !important; line-height:1.5 !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-section-icon { width:30px !important; height:30px !important; flex-basis:30px !important; border-radius:8px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-section-icon .app-icon { width:18px !important; height:18px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-fields { padding:16px !important; gap:16px !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-field label { font-size:12px !important; margin-bottom:6px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-field input { min-height:38px !important; height:38px !important; padding:7px 10px !important; font-size:13px !important; border-radius:6px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-field small { font-size:11px !important; line-height:1.5 !important; margin-top:6px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile #current_password { max-width:360px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-form-footer { gap:12px !important; }
+  .municipal-ui .focused-workspace #main-content .staff-profile .profile-form-footer :is(button,.button) { min-height:38px !important; padding:7px 13px !important; font-size:12px !important; border-radius:7px !important; }
+  @media (max-width:760px) {
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-page-heading { display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:12px !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-page-heading > div:first-child { flex:0 1 auto !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-back-link { align-self:flex-start !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-layout { grid-template-columns:minmax(0,1fr) !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-account-details { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-fields { grid-template-columns:minmax(0,1fr) !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-field-full { grid-column:auto !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-field input { min-height:44px !important; height:44px !important; font-size:16px !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile #current_password { max-width:none !important; }
+   .municipal-ui .focused-workspace #main-content .staff-profile .profile-form-footer :is(button,.button) { min-height:44px !important; }
+  }
+  @media (max-width:680px) {
+   .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.municipal-directory-header,.dashboard-hero) { padding:22px 20px !important; border-radius:14px !important; }
+   .municipal-ui .focused-workspace .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading) > div:first-child { flex-basis:100%; }
+   .municipal-ui .focused-workspace .app-content .concern-details-grid { grid-template-columns:minmax(0,1fr); }
+   .municipal-ui .focused-workspace .app-content form[method="GET"] > div { min-width:0 !important; flex:1 1 160px; }
+   .municipal-ui .focused-workspace .app-content .content-panel-heading { font-size:17px !important; }
+  }
+  @media (prefers-reduced-motion:no-preference) {
+   .municipal-ui .focused-workspace .app-content :is(.table-wrap tbody tr,.concern-status-card,button,.button) { transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease !important; }
+  }
+ }
+}
+
+/* Shared finishing details use color and texture without increasing layout dimensions. */
+@layer components {
+ @media screen {
+  .municipal-ui body #app-sidebar { background:linear-gradient(170deg,#15334a,#102b40 68%,#163f48) !important; }
+  .municipal-ui body #app-sidebar .side-nav a.active { background:linear-gradient(110deg,#237866,#256174) !important; box-shadow:inset 3px 0 #9ce0bf,0 4px 12px #081c3325 !important; }
+  .municipal-ui body #app-sidebar .side-nav a.active .nav-mark { background:#ffffff16 !important; border-radius:7px; }
+  .municipal-ui body #app-sidebar .app-brand { border-bottom-color:#ffffff15 !important; }
+  .municipal-ui body #app-sidebar .sidebar-account { background:#ffffff06 !important; border-radius:10px; }
+  .municipal-ui body .app-header .header-user { background:#edf6f2 !important; color:#275f54 !important; border-color:#cde1d7 !important; box-shadow:0 2px 6px #17375205; }
+  .municipal-ui body #main-content .workspace-location a { color:#287461 !important; font-weight:600; }
+  .municipal-ui body #main-content .workspace-location [aria-current="page"] { color:#3d5c73; }
+  .municipal-ui body #main-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) {
+   box-shadow:0 10px 26px #1737521a,inset 0 1px 0 #ffffff19 !important;
+  }
+  .municipal-ui body #main-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) :is(.dashboard-eyebrow,.page-kicker) {
+   width:fit-content; padding:4px 8px; border-radius:5px; background:#ffffff0e; border:1px solid #ffffff18;
+  }
+  .municipal-ui body #main-content :is(.government-content-card,.dashboard-card,.workflow-card,.population-report-section,.government-side-card,article.rounded-xl.bg-white,form.rounded-xl.bg-white) {
+   box-shadow:0 5px 20px #1d496109,0 1px 2px #1d496104 !important; border-color:#d9e5ed !important;
+  }
+  .municipal-ui body #main-content :is(.government-card-header,.profile-section-heading) {
+   background:linear-gradient(100deg,#eaf4ef,#f7fafc 65%,#fff) !important;
+  }
+  .municipal-ui body #main-content :is(.content-panel-heading > span,.profile-section-icon) {
+   background:linear-gradient(145deg,#e0f1e7,#edf7f5) !important; color:#24725c !important; box-shadow:inset 0 0 0 1px #bddcce70;
+  }
+  .municipal-ui body #main-content .concern-ai-panel .content-panel-heading > span { background:linear-gradient(135deg,#316b85,#23816b) !important; color:#fff !important; }
+  .municipal-ui body #main-content .concern-timeline > li::before { box-shadow:0 0 0 3px #e9f5ef,0 0 0 4px #c7e1d5 !important; }
+  .municipal-ui body #main-content :is(.metric-card,.concern-status-card) { box-shadow:0 6px 18px #28496709 !important; }
+  .municipal-ui body #main-content .metric-card .metric-icon { box-shadow:inset 0 0 0 1px #ffffff,0 3px 8px #244b8309; }
+  .municipal-ui body #main-content article.concern-status-card { position:relative; }
+  .municipal-ui body #main-content .concern-status-symbol { position:absolute; top:17px; right:17px; display:grid; place-items:center; width:32px; height:32px; border-radius:10px; background:#e7f0fb; color:#376c9e; }
+  .municipal-ui body #main-content .concern-status-symbol .app-icon { width:18px; height:18px; }
+  .municipal-ui body #main-content .concern-status-card > p { padding-right:35px; }
+  .municipal-ui body #main-content .concern-status-card[data-status="under_review"] .concern-status-symbol { background:#f9edcf; color:#88621b; }
+  .municipal-ui body #main-content .concern-status-card[data-status="in_progress"] .concern-status-symbol { background:#ece5f7; color:#7356a8; }
+  .municipal-ui body #main-content .concern-status-card[data-status="resolved"] .concern-status-symbol { background:#dcefe3; color:#28704f; }
+  .municipal-ui body #main-content .concern-status-card[data-status="closed"] .concern-status-symbol { background:#e8edf2; color:#5b7080; }
+  .municipal-ui body #main-content .table-wrap:not(.rbi-source-table):not(:where(.rbi-source-table *)) thead th {
+   background:#23485e !important; color:#f0f7fb !important; border-bottom-color:#345b70 !important;
+  }
+  .municipal-ui body #main-content .table-wrap thead th :is(a,span) { color:inherit !important; }
+  .municipal-ui body #main-content .table-wrap { box-shadow:0 4px 14px #244b8308; }
+  .municipal-ui body #main-content :is(.government-primary-button,.profile-save-button),
+  .municipal-ui body #main-content form > button[type="submit"]:not(:where(.secondary-button,.outline-button,.danger-button,.member-delete,.leaflet-control *,.rbi-document-preview *,.page-head *,.dashboard-page-header *)) {
+   background:linear-gradient(115deg,#267563,#235b70) !important; color:#fff !important; border-color:#246b60 !important; box-shadow:0 3px 8px #21685920 !important;
+  }
+  .municipal-ui body #main-content :is(.government-primary-button,.profile-save-button):hover,
+  .municipal-ui body #main-content form > button[type="submit"]:not(:where(.secondary-button,.outline-button,.danger-button,.member-delete,.leaflet-control *,.rbi-document-preview *,.page-head *,.dashboard-page-header *)):hover {
+   background:linear-gradient(115deg,#1e6153,#1d4c61) !important;
+  }
+  .municipal-ui body #main-content :is(.rbi-section-nav,.workspace-launcher) { gap:12px; }
+  .municipal-ui body #main-content .rbi-section-nav a { background:#fff; border:1px solid #d6e5df; border-radius:10px; color:#285c50; box-shadow:0 3px 10px #203f5605; }
+  .municipal-ui body #main-content .rbi-section-nav a > span { background:#e5f2eb; color:#28725b; border-radius:6px; }
+  .municipal-ui body #main-content .rbi-section-nav a:hover { background:#eef7f2; border-color:#a6cdbb; }
+  .municipal-ui body #main-content .overview-shortcut { box-shadow:0 5px 17px #25495f08; }
+  .municipal-ui body #main-content .overview-shortcut > .app-icon { padding:4px; box-sizing:content-box; background:#f0f5f9; border-radius:50%; }
+  .municipal-ui body #main-content :is(.government-empty-state,.dashboard-empty-state) {
+   background:radial-gradient(circle at 100% 0,#e4f2eb70,transparent 55%),#f7f9fc !important; border-color:#d8e4ed !important;
+  }
+  .municipal-ui body #main-content .profile-role { background:#eaf5ee !important; border-color:#cce3d5 !important; color:#2a6652 !important; }
+ }
+}

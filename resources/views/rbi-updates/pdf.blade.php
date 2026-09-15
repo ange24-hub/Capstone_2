@@ -28,10 +28,11 @@
         .section-b td { height: 6mm !important; }
         .signatures { width: 82%; margin: 2mm auto 0; border-collapse: collapse; table-layout: fixed; page-break-inside: avoid; }
         .signatures td { width: 33.33%; border: 0; padding: 0 5mm; vertical-align: top; }
-        .signature-label { margin-bottom: 0; }
-        .signature-block { height: 13mm; text-align: center; position: relative; }
-        .signature-image { display: block; height: 8mm; max-width: 43mm; margin: 0 auto -1.5mm; object-fit: contain; }
-        .official-name { display: block; padding-top: 1mm; border-bottom: .6pt solid #000; text-transform: uppercase; font-weight: 700; }
+        .signature-label { margin: 0; text-align: center; }
+        .signature-block { text-align: center; }
+        .signature-space { height: 10mm; text-align: center; }
+        .signature-image { display: block; height: 8mm; max-width: 43mm; margin: 0 auto; object-fit: contain; }
+        .official-name { display: block; min-height: 7mm; padding-top: 1mm; border-bottom: .6pt solid #000; text-transform: uppercase; font-weight: 700; overflow-wrap: break-word; }
         .official-title { display: block; margin-top: 1mm; }
         .page-number { position: absolute; right: 0; bottom: 0; font-size: 6.5pt; color: #333; }
     </style>
@@ -79,18 +80,18 @@
                 <td>
                     <p class="signature-label">Prepared by:</p>
                     <div class="signature-block">
-                        @if ($preparedSignatureDataUri)<img class="signature-image" src="{{ $preparedSignatureDataUri }}" alt="Secretary signature">@endif
-                        <span class="official-name">{{ $secretaryName }}</span>
-                        <span class="official-title">Brgy. Secretary</span>
+                        <div class="signature-space">@if ($preparedSignatureDataUri)<img class="signature-image" src="{{ $preparedSignatureDataUri }}" alt="BHW / Encoder signature">@endif</div>
+                        <span class="official-name">{{ $rbiUpdate->prepared_by }}</span>
+                        <span class="official-title">BHW / Encoder</span>
                     </div>
                 </td>
-                <td><p class="signature-label">Certified Correct:</p><div class="signature-block">@if($certifiedSignatureDataUri)<img class="signature-image" src="{{ $certifiedSignatureDataUri }}" alt="Certified Correct signature">@endif<span class="official-name">{{ $rbiUpdate->certified_by ?: $secretaryName }}</span><span class="official-title">Barangay Secretary</span></div></td>
+                <td><p class="signature-label">Certified Correct:</p><div class="signature-block"><div class="signature-space">@if($certifiedSignatureDataUri)<img class="signature-image" src="{{ $certifiedSignatureDataUri }}" alt="Barangay Secretary signature">@endif</div><span class="official-name">{{ $rbiUpdate->certified_by }}</span><span class="official-title">Barangay Secretary</span></div></td>
                 <td>
                     <p class="signature-label">Verified by:</p>
                     <div class="signature-block">
-                        @if ($attestedSignatureDataUri)<img class="signature-image" src="{{ $attestedSignatureDataUri }}" alt="Punong Barangay signature">@endif
-                        <span class="official-name">{{ $punongBarangayName }}</span>
-                        <span class="official-title">Punong Barangay</span>
+                        <div class="signature-space">@if ($attestedSignatureDataUri)<img class="signature-image" src="{{ $attestedSignatureDataUri }}" alt="Punong Barangay signature">@endif</div>
+                        <span class="official-name">{{ $rbiUpdate->attested_by }}</span>
+                        <span class="official-title">Barangay Captain / Punong Barangay</span>
                     </div>
                 </td>
             </tr>

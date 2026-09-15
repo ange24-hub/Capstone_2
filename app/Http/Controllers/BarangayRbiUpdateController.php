@@ -43,7 +43,7 @@ class BarangayRbiUpdateController extends Controller
         $rows = $this->cleanRows($validated['rows'] ?? []);
         $this->ensureHouseholdHeads($rows);
         $deceasedRows = $this->resolveDeceasedFamilies($this->cleanDeceasedRows($validated['deceased_rows'] ?? []), $rows);
-        $preparedBy = trim((string) ($validated['prepared_by'] ?? '')) ?: ($request->user()->barangay?->secretary_name ?: $request->user()->name);
+        $preparedBy = trim((string) ($validated['prepared_by'] ?? ''));
         $attestedBy = trim((string) ($validated['attested_by'] ?? '')) ?: (string) ($request->user()->barangay?->punong_barangay_name ?? '');
 
         $existingReport = BarangayRbiUpdate::where('barangay_user_id', $request->user()->id)
@@ -79,7 +79,7 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => $validated['as_of_date'] ?? null,
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
-            'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $preparedBy),
+            'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $request->user()->name),
             'certified_signature_path' => $this->storeDrawnSignature($request, 'certified_signature_data', $rbiUpdate->certified_signature_path ?? null),
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
@@ -122,7 +122,7 @@ class BarangayRbiUpdateController extends Controller
         $rows = $this->cleanRows($validated['rows'] ?? []);
         $this->ensureHouseholdHeads($rows);
         $deceasedRows = $this->resolveDeceasedFamilies($this->cleanDeceasedRows($validated['deceased_rows'] ?? []), $rows);
-        $preparedBy = trim((string) ($validated['prepared_by'] ?? '')) ?: ($request->user()->barangay?->secretary_name ?: $request->user()->name);
+        $preparedBy = trim((string) ($validated['prepared_by'] ?? ''));
         $attestedBy = trim((string) ($validated['attested_by'] ?? '')) ?: (string) ($request->user()->barangay?->punong_barangay_name ?? '');
 
         $submitted = $request->boolean('submit_to_municipal')
@@ -149,7 +149,7 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => $validated['as_of_date'] ?? null,
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
-            'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $preparedBy),
+            'certified_by' => $validated['certified_by'] ?? $rbiUpdate->certified_by,
             'certified_signature_path' => $this->storeDrawnSignature($request, 'certified_signature_data', $rbiUpdate->certified_signature_path ?? null),
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
@@ -182,7 +182,7 @@ class BarangayRbiUpdateController extends Controller
         }
 
         if (! $rbiUpdate->prepared_signature_path || ! $rbiUpdate->attested_signature_path || ! $rbiUpdate->attested_by) {
-            return back()->withErrors(['signatures' => 'The monthly form requires the Barangay Secretary and Punong Barangay names and signatures before submitting.']);
+            return back()->withErrors(['signatures' => 'The monthly form requires the BHW / Encoder and Punong Barangay signatures and the Punong Barangay name before submitting.']);
         }
 
         $rbiUpdate->update([
@@ -787,11 +787,11 @@ class BarangayRbiUpdateController extends Controller
                     .$this->wordTable($deceasedTableRows, [5679, 4900])
                     .$this->wordParagraph('', false, false, 4)
                     .($page['show_signatures'] ? $this->wordSignatureTable(
-                        $rbiUpdate->prepared_by ?: ($rbiUpdate->barangayUser->name ?? ''),
+                        $rbiUpdate->prepared_by ?? '',
                         $rbiUpdate->attested_by ?: '',
                         $signatureMedia,
                         $documentIdOffset,
-                        $rbiUpdate->certified_by ?: $rbiUpdate->prepared_by ?: ''
+                        $rbiUpdate->certified_by ?? ''
                     ) : '')
                     .$pageBreak;
             })
@@ -811,12 +811,17 @@ class BarangayRbiUpdateController extends Controller
 
     private function wordSignatureTable(string $preparedBy, string $notedBy, array $signatureMedia, int $documentIdOffset = 0, string $certifiedBy = ''): string
     {
-        $cells = '';
-        foreach ([['Prepared by:', $preparedBy, 'BHW / Encoder', 'secretary', 1], ['Certified Correct:', $certifiedBy, 'Barangay Secretary', 'certified', 4], ['Verified by:', $notedBy, 'Punong Barangay', 'captain', 2]] as [$label, $name, $title, $media, $offset]) {
+        $signatureRows = ['', '', '', ''];
+        foreach ([['Prepared by:', $preparedBy, 'BHW / Encoder', 'secretary', 1], ['Certified Correct:', $certifiedBy, 'Barangay Secretary', 'certified', 4], ['Verified by:', $notedBy, 'Barangay Captain / Punong Barangay', 'captain', 2]] as [$label, $name, $title, $media, $offset]) {
             $image = isset($signatureMedia[$media]) ? $this->wordImageDrawing($signatureMedia[$media]['relationship'], $label, $documentIdOffset + $offset) : $this->wordParagraph('', false, true, 14);
-            $cells .= '<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/></w:tcPr>'.$this->wordParagraph($label, false, false, 16).$image.$this->wordParagraph($name, true, true, 16).$this->wordParagraph($title, false, true, 16).'</w:tc>';
+            foreach ([$this->wordParagraph($label, false, true, 16), $image, $this->wordParagraph($name, true, true, 16), $this->wordParagraph($title, false, true, 16)] as $row => $content) {
+                $border = $row === 2 ? '<w:tcBorders><w:bottom w:val="single" w:sz="4" w:color="000000"/></w:tcBorders>' : '';
+                $signatureRows[$row] .= '<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/><w:vAlign w:val="center"/>'.$border.'</w:tcPr>'.$content.'</w:tc>';
+            }
         }
-        return '<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid><w:tr><w:trPr><w:cantSplit/></w:trPr>'.$cells.'</w:tr></w:tbl>';
+        $rows = '';
+        foreach ($signatureRows as $index => $cells) $rows .= '<w:tr><w:trPr><w:cantSplit/>'.($index === 1 ? '<w:trHeight w:val="1000" w:hRule="atLeast"/>' : '').'</w:trPr>'.$cells.'</w:tr>';
+        return '<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid>'.$rows.'</w:tbl>';
     }
 
     private function wordHeaderTable(string $month, string $barangay, ?array $sealMedia, int $documentPropertyId = 3): string
@@ -1103,7 +1108,7 @@ class BarangayRbiUpdateController extends Controller
         $errors = [];
 
         if ($required && ! $this->hasDrawnSignature($request, 'prepared_signature_data') && ! $currentPreparedPath) {
-            $errors['prepared_signature_data'] = 'Draw the Barangay Secretary signature for the monthly form.';
+            $errors['prepared_signature_data'] = 'Draw the BHW / Encoder signature in the Prepared by card.';
         }
 
         if ($required && ! $this->hasDrawnSignature($request, 'attested_signature_data') && ! $currentAttestedPath) {

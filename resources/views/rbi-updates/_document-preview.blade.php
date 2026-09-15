@@ -33,16 +33,16 @@
                 <div class="rbi-word-signatures" role="group" aria-label="Monthly Form Certification">
                     <div>
                         <p>Prepared by:</p>
-                        <div class="rbi-word-signature-image">@if($rbiUpdate->prepared_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'secretary']) }}" alt="Barangay Secretary digital signature">@endif</div>
-                        <strong>{{ $rbiUpdate->prepared_by ?: $rbiUpdate->barangayUser?->name }}</strong>
-                        <span>Brgy. Secretary</span>
+                        <div class="rbi-word-signature-image">@if($rbiUpdate->prepared_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'secretary']) }}" alt="BHW / Encoder signature">@endif</div>
+                        <strong>{{ $rbiUpdate->prepared_by }}</strong>
+                        <span>BHW / Encoder</span>
                     </div>
-                    <div><p>Certified Correct:</p><div class="rbi-word-signature-image">@if($rbiUpdate->certified_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'certified']) }}" alt="Certified Correct signature">@endif</div><strong>{{ $rbiUpdate->certified_by ?: $rbiUpdate->prepared_by }}</strong><span>Barangay Secretary</span></div>
+                    <div><p>Certified Correct:</p><div class="rbi-word-signature-image">@if($rbiUpdate->certified_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'certified']) }}" alt="Barangay Secretary signature">@endif</div><strong>{{ $rbiUpdate->certified_by }}</strong><span>Barangay Secretary</span></div>
                     <div>
                         <p>Verified by:</p>
                         <div class="rbi-word-signature-image">@if($rbiUpdate->attested_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'captain']) }}" alt="Punong Barangay digital signature">@endif</div>
                         <strong>{{ $rbiUpdate->attested_by }}</strong>
-                        <span>Punong Barangay</span>
+                        <span>Barangay Captain / Punong Barangay</span>
                     </div>
                 </div>
             @endif

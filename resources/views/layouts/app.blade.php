@@ -11,7 +11,7 @@
     @vite('resources/css/app.css')
     @stack('head')
 </head>
-<body @auth class="role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @endauth>
+<body @auth class="role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @endauth>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     @guest
         <div class="public-shell">
@@ -33,11 +33,11 @@
                     </a>
 
                     <nav class="public-nav" aria-label="Public navigation">
-                        <a href="{{ route('home') }}">Home</a>
+                        <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
                         <a href="{{ route('home') }}#about">About</a>
-                        <a href="{{ route('services') }}">Services</a>
-                        <a class="public-login-link" href="{{ route('login') }}">Login</a>
-                        <a class="public-register-link" href="{{ route('register') }}">Register</a>
+                        <a href="{{ route('services') }}" @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
+                        <a class="public-login-link" href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Login</a>
+                        <a class="public-register-link" href="{{ route('register') }}" @if(request()->routeIs('register')) aria-current="page" @endif>Register</a>
                     </nav>
                 </div>
             </header>
@@ -82,18 +82,23 @@
                     <strong>Registry of Barangay Inhabitants</strong>
                 </div>
 
-                <div class="side-label">Main Navigation</div>
+                <div class="side-label">Workspace</div>
                 <nav class="side-nav" aria-label="Primary navigation">
+                    <a class="{{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
+                    @if(auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
+                        <a class="{{ request()->routeIs('concerns.*') ? 'active' : '' }}" href="{{ route('concerns.summary') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>Concern Insights</span></a>
+                    @else
+                        <a class="{{ request()->routeIs('concerns.*') ? 'active' : '' }}" href="{{ route('concerns.index') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>{{ auth()->user()->hasRole(App\Models\User::ROLE_RESIDENT) ? 'My Concerns' : 'Resident Concerns' }}</span></a>
+                    @endif
                     @if (auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
-                        <a class="@if(request()->routeIs('dashboard.municipal')) active @endif" href="{{ route('dashboard.municipal') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
                         <a class="@if(request()->routeIs('municipal.approvals.*')) active @endif" href="{{ route('municipal.approvals.index') }}"><span class="nav-mark"><x-app-icon name="check" /></span><span>Account Approvals</span></a>
                         <a class="@if(request()->routeIs('municipal.barangays.*')) active @endif" href="{{ route('municipal.barangays.index') }}"><span class="nav-mark"><x-app-icon name="directory" /></span><span>Barangay Directory</span></a>
                         <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Trends</span></a>
                         <a class="@if(request()->routeIs('spatial.index')) active @endif" href="{{ route('spatial.index') }}"><span class="nav-mark"><x-app-icon name="map" /></span><span>Movement Map</span></a>
                     @elseif (auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
-                        <a class="@if(request()->routeIs('dashboard.barangay')) active @endif" href="{{ route('dashboard.barangay') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
                         <a class="@if(request()->routeIs('barangay.resident-approvals.*')) active @endif" href="{{ route('barangay.resident-approvals.index') }}"><span class="nav-mark"><x-app-icon name="check" /></span><span>Resident Approvals</span></a>
                         <a class="@if(request()->routeIs('barangay.document-requests.*')) active @endif" href="{{ route('barangay.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Document Requests</span></a>
+                        <div class="side-section">Resident records</div>
                         <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
                         <a class="@if(request()->routeIs('barangay.registry.deceased')) active @endif" href="{{ route('barangay.registry.deceased') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Deceased Records</span></a>
                         <a class="@if(request()->routeIs('barangay.registry.active') || request()->routeIs('registry.*') && !in_array(request('sheet'), ['new-inhabitants', 'deceased'], true)) active @endif" href="{{ route('barangay.registry.active') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>{{ auth()->user()->barangay?->usesResidenceRegistry() ? 'Consolidated / All Registered' : 'Resident Registry' }}</span></a>
@@ -104,13 +109,14 @@
                         <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Records</span></a>
                         <a class="@if(request()->routeIs('spatial.index')) active @endif" href="{{ route('spatial.index') }}"><span class="nav-mark"><x-app-icon name="map" /></span><span>Household Map</span></a>
                     @else
-                        <a class="@if(request()->routeIs('dashboard.resident')) active @endif" href="{{ route('dashboard.resident') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
                         <a class="@if(request()->routeIs('resident.document-requests.create')) active @endif" href="{{ route('resident.document-requests.create') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>Request a Document</span></a>
                         <a class="@if(request()->routeIs('resident.document-requests.index')) active @endif" href="{{ route('resident.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>My Requests</span></a>
                     @endif
                     @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
+                        <div class="side-section">Reports &amp; insights</div>
                         <a class="{{ request()->routeIs('reports.population*') ? 'active' : '' }}" href="{{ route('reports.population') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Population Reports</span></a>
                         <a class="{{ request()->routeIs('reports.migration*') ? 'active' : '' }}" href="{{ route('reports.migration') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Migration Reports</span></a>
+                        <a class="{{ request()->routeIs('analysis.forecast-readiness') ? 'active' : '' }}" href="{{ route('analysis.forecast-readiness') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Forecast Readiness</span></a>
                     @endif
                 </nav>
 
@@ -150,7 +156,7 @@
                         </div>
                     </div>
                     <div class="app-header-meta">
-                        <span class="system-status"><i></i> System Online</span>
+                        <span class="system-status"><x-app-icon name="shield" /> Authorized workspace</span>
                         <span class="header-date">{{ now()->format('F d, Y') }}</span>
                         @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
                             <a class="header-user" href="{{ route('profile.edit') }}" title="My Profile" aria-label="My Profile: {{ auth()->user()->name }}">{{ auth()->user()->name }}</a>
@@ -161,6 +167,11 @@
                 </header>
 
                 <main class="app-content min-w-0" id="main-content">
+                    <nav class="workspace-location" aria-label="Page location" hidden data-page-location>
+                        <a href="{{ route('dashboard') }}">Workspace</a>
+                        <span aria-hidden="true">/</span>
+                        <span aria-current="page" data-page-location-title></span>
+                    </nav>
                     @yield('content')
                 </main>
 
@@ -194,6 +205,12 @@
                     if (saved !== null) body.classList.toggle('sidebar-collapsed', saved === 'true');
                 } catch (_) {}
                 syncCollapse();
+                const pageTitle = document.querySelector('#main-content h1')?.textContent.trim();
+                if (pageTitle) {
+                    document.querySelector('[data-page-location-title]').textContent = pageTitle;
+                    document.querySelector('[data-page-location]').hidden = false;
+                    document.title = `${pageTitle} | RBIM · Tomas Oppus`;
+                }
                 document.querySelectorAll('.side-nav a').forEach((link) => {
                     link.setAttribute('aria-label', link.textContent.trim());
                     link.title = link.textContent.trim();

@@ -18,6 +18,7 @@
                 <span class="context-icon"><x-app-icon name="location" /></span>
                 <div><small>Your assigned barangay</small><strong>Barangay {{ auth()->user()->barangay?->name ?? 'Not assigned' }}</strong><span>Approved resident account</span></div>
             </div>
+            <x-dashboard-context />
         </header>
 
         @if (session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif

@@ -1,0 +1,100 @@
+/* Layout refinement only: retain the established RBIM palette and motion rules. */
+@layer components {
+ @media screen {
+  .municipal-ui body .app-shell { font-family:'Segoe UI Variable Text','Segoe UI',system-ui,sans-serif !important; }
+  .municipal-ui body #main-content :is(h1,h2,h3,h4,p,a,button,input,select,textarea,strong,small,label,dt,dd):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { font-family:'Segoe UI Variable Text','Segoe UI',system-ui,sans-serif !important; }
+  .municipal-ui body #app-sidebar .app-brand { gap:10px !important; padding-bottom:20px !important; }
+  .municipal-ui body #app-sidebar .app-brand-seal { width:44px !important; height:44px !important; flex:0 0 44px !important; }
+  .municipal-ui body #app-sidebar .app-brand strong { font-size:19px !important; letter-spacing:-.025em !important; }
+  .municipal-ui body #app-sidebar .side-nav a { min-height:40px !important; padding:9px 12px !important; gap:10px !important; font-size:12px !important; font-weight:500 !important; }
+  .municipal-ui body #app-sidebar .side-section { margin-top:20px !important; }
+  .municipal-ui body #main-content { --workspace-gap:20px; }
+  .municipal-ui body #main-content .workspace-location { margin-bottom:18px !important; font-size:11px !important; }
+  .municipal-ui body #main-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) { border-radius:14px !important; }
+  .municipal-ui .focused-workspace #main-content :is(.page-head,.dashboard-page-header,.dashboard-hero):not(:where(.rbi-document-preview *,.rbi-word-page *)) { padding:22px 26px !important; min-height:0 !important; margin-bottom:22px !important; }
+  .municipal-ui .focused-workspace #main-content :is(.page-head,.dashboard-page-header,.dashboard-hero) h1 { font-size:clamp(23px,2vw,29px) !important; line-height:1.2 !important; letter-spacing:-.035em !important; }
+  .municipal-ui body #main-content :is(.content-panel-heading,.government-card-header h2,.dashboard-card-header h2) { font-size:16px !important; letter-spacing:-.025em !important; font-weight:650 !important; }
+  .municipal-ui body #main-content .content-panel-heading > span { width:32px !important; height:32px !important; border-radius:9px !important; }
+  .municipal-ui body #main-content :is(.government-content-card,.government-side-card,.dashboard-card,.workflow-card,article.rounded-xl.bg-white,form.rounded-xl.bg-white) { border-radius:13px !important; }
+  .municipal-ui body #main-content .government-card-header { padding:18px 20px !important; gap:14px !important; }
+  .municipal-ui body #main-content .table-wrap:not(.rbi-source-table):not(:where(.rbi-document-preview *,.rbi-word-page *)) { border-radius:10px !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-page-header { min-height:0 !important; padding:23px 28px !important; grid-template-columns:minmax(0,1fr) 205px !important; gap:16px 28px !important; margin-bottom:22px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard { gap:22px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard > :is(.dashboard-page-header,.overview-workbench),
+  .municipal-ui .dashboard-workspace #main-content .overview-community .dashboard-metrics { margin-bottom:0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-title-group h1 { font-size:clamp(26px,2.3vw,32px) !important; margin:9px 0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-title-group p { max-width:590px; font-size:13px !important; line-height:1.6 !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-header-actions { gap:8px !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-header-actions .button { min-height:35px !important; padding:8px 12px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-context { padding:15px 18px !important; gap:12px !important; border-radius:11px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-context-date { padding-top:10px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-context-date strong { font-size:21px !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-section-heading { align-items:center !important; margin-bottom:14px !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-section-heading h2 { font-size:17px !important; margin-top:3px !important; }
+  .municipal-ui .dashboard-workspace #main-content .government-eyebrow { font-size:9px !important; letter-spacing:.11em !important; }
+  .municipal-ui .dashboard-workspace #main-content .data-freshness { font-size:10px !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-metrics { gap:14px !important; margin-bottom:22px !important; }
+  .municipal-ui .dashboard-workspace #main-content .metric-card { display:block !important; min-height:143px !important; padding:18px !important; border-radius:13px !important; }
+  .municipal-ui .dashboard-workspace #main-content .metric-card .metric-icon { position:absolute; right:15px; top:15px; width:30px !important; height:30px !important; border-radius:9px !important; }
+  .municipal-ui .dashboard-workspace #main-content .metric-card .metric-icon .app-icon { width:17px !important; height:17px !important; }
+  .municipal-ui .dashboard-workspace #main-content .metric-card div > span { display:block; padding-right:30px; min-height:30px; font-size:12px !important; line-height:1.4 !important; }
+  .municipal-ui .dashboard-workspace #main-content .metric-card strong { display:block; font-size:30px !important; margin:6px 0 5px !important; }
+  .municipal-ui .dashboard-workspace #main-content .metric-card small { display:block; font-size:11px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-workbench { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr); gap:20px; margin-bottom:22px; align-items:stretch; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-welcome-panel { display:flex !important; flex-direction:column !important; padding:22px !important; margin:0 !important; gap:18px !important; border-radius:13px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-welcome-copy h2 { font-size:20px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-primary-actions { display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:10px !important; margin-top:18px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-primary-actions .button { min-height:58px !important; padding:12px 14px !important; justify-content:flex-start !important; gap:12px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-primary-actions .action-icon { width:32px !important; height:32px !important; flex:0 0 32px !important; border-radius:9px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-primary-actions .button::after { content:'\2192'; margin-left:auto; font-size:19px; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-office-card { margin-top:auto; padding:13px 15px !important; border-radius:10px !important; display:grid !important; grid-template-columns:1fr 1fr; gap:3px 14px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-office-card > :is(strong,small,.office-card-label) { grid-column:1; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-office-card > strong { font-size:13px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-office-card dl { grid-column:2; grid-row:1 / 4; border:0 !important; margin:0 !important; padding:0 !important; display:grid !important; gap:6px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-office-card dl div { display:block !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-office-card dd { margin:1px 0 0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcuts { margin:0 0 22px; gap:14px; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcuts-heading { grid-column:1 / -1; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcuts-heading h2 { font-size:17px !important; margin:0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcuts-heading p { margin:4px 0 0 !important; font-size:12px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcuts-heading .overview-section-kicker { margin-bottom:6px; }
+  .municipal-ui .dashboard-workspace #main-content .overview-workbench .overview-shortcuts { display:flex; flex-direction:column; margin:0; }
+  .municipal-ui .dashboard-workspace #main-content .overview-workbench .overview-shortcuts-heading { padding:3px 2px 0; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcut { padding:16px !important; gap:12px !important; border-radius:12px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-workbench .overview-shortcut { flex:1; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcut-icon { width:36px !important; height:36px !important; flex:0 0 36px !important; border-radius:10px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcut-copy strong { font-size:12px !important; }
+  .municipal-ui .dashboard-workspace #main-content .overview-shortcut-copy small { font-size:11px !important; }
+  .municipal-ui .dashboard-workspace #main-content .government-side-card { padding:20px !important; }
+  .municipal-ui .dashboard-workspace #main-content .government-side-card h2 { font-size:17px !important; }
+  .municipal-ui .dashboard-workspace #main-content .rbi-status-summary strong { font-size:26px !important; }
+  .municipal-ui .dashboard-workspace #main-content .dashboard-context-card { padding:10px 14px !important; }
+  @media (min-width:1200px) {
+   .municipal-ui .dashboard-workspace #main-content .dashboard-metrics { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important; }
+  }
+  @media (max-width:1050px) {
+   .municipal-ui .dashboard-workspace #main-content .overview-workbench { grid-template-columns:minmax(0,1fr); }
+   .municipal-ui .dashboard-workspace #main-content .overview-workbench .overview-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+   .municipal-ui .dashboard-workspace #main-content .overview-shortcut { flex-wrap:wrap; }
+   .municipal-ui .dashboard-workspace #main-content .overview-shortcut-copy { flex-basis:100%; order:2; }
+   .municipal-ui .dashboard-workspace #main-content .overview-shortcut > .app-icon { margin-left:auto; }
+  }
+  @media (max-width:680px) {
+   .municipal-ui .dashboard-workspace #main-content .dashboard-page-header { grid-template-columns:minmax(0,1fr) !important; padding:20px !important; gap:16px !important; }
+   .municipal-ui .dashboard-workspace #main-content .overview-context { grid-column:1 !important; grid-row:auto !important; }
+   .municipal-ui .dashboard-workspace #main-content .overview-context-date { padding-top:0 !important; }
+   .municipal-ui .dashboard-workspace #main-content .dashboard-header-actions .button { min-height:44px !important; }
+   .municipal-ui .dashboard-workspace #main-content .dashboard-metrics { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; }
+   .municipal-ui .dashboard-workspace #main-content .metric-card { min-height:146px !important; padding:14px !important; }
+   .municipal-ui .dashboard-workspace #main-content .metric-card .metric-icon { top:12px; right:10px; width:25px !important; height:25px !important; }
+   .municipal-ui .dashboard-workspace #main-content .metric-card strong { font-size:27px !important; }
+   .municipal-ui .dashboard-workspace #main-content .barangay-welcome-panel { padding:18px !important; }
+   .municipal-ui .dashboard-workspace #main-content .barangay-office-card { grid-template-columns:minmax(0,1fr); }
+   .municipal-ui .dashboard-workspace #main-content .barangay-office-card dl { grid-column:1; grid-row:auto; margin-top:9px !important; }
+   .municipal-ui .dashboard-workspace #main-content .overview-workbench .overview-shortcuts { grid-template-columns:minmax(0,1fr); }
+   .municipal-ui .dashboard-workspace #main-content .overview-shortcut { flex-wrap:nowrap; min-height:76px; }
+   .municipal-ui .dashboard-workspace #main-content .overview-shortcut-copy { flex-basis:auto; order:0; }
+   .municipal-ui .focused-workspace #main-content :is(.page-head,.dashboard-page-header,.dashboard-hero) { padding:20px !important; }
+  }
+ }
+}
