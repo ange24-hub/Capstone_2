@@ -9,13 +9,32 @@ use App\Support\PopulationMarkers;
 
 class PopulationSummary
 {
-    public function build(?int $barangayId): array
+    public const SECTIONS = [
+        'summary' => 'Full summary',
+        'residents' => 'Registered residents',
+        'families' => 'Families',
+        'households' => 'Households',
+        'seniors' => 'Senior citizens',
+        'pwd' => 'Persons with disability',
+        'sex' => 'Population by sex',
+        'ages' => 'Population by age',
+        'coverage' => 'Summary by barangay',
+        'area-ages' => 'Age groups by barangay',
+    ];
+
+    public function build(?int $barangayId, string $section = 'summary'): array
     {
         $generatedAt = now();
         $today = $generatedAt->copy()->startOfDay();
         $barangays = Barangay::when($barangayId, fn ($q) => $q->whereKey($barangayId))->orderBy('name')->get(['id', 'name']);
+        $withNames = in_array($section, ['residents', 'families', 'households', 'seniors', 'pwd'], true);
+        $columns = ['barangay_id', 'household_id', 'family_number', 'sex', 'birth_date', 'remarks', 'status', 'residence_status', 'updated_at'];
+        if ($withNames) {
+            $columns = array_merge($columns, ['id', 'first_name', 'middle_name', 'last_name', 'suffix', 'relationship_to_head']);
+        }
         $records = Inhabitant::whereIn('barangay_id', $barangays->modelKeys())
-            ->get(['barangay_id', 'household_id', 'family_number', 'sex', 'birth_date', 'remarks', 'status', 'residence_status', 'updated_at']);
+            ->when($withNames, fn ($query) => $query->orderBy('last_name')->orderBy('first_name')->orderBy('id'))
+            ->get($columns);
         $householdRows = Household::whereIn('barangay_id', $barangays->modelKeys())->get(['id', 'barangay_id', 'household_number']);
         $householdLookup = $householdRows->keyBy('id');
         $households = $householdRows->groupBy('barangay_id')->map(fn ($items) => $items
@@ -30,6 +49,8 @@ class PopulationSummary
         $statuses = ['Active' => 0, 'Migrated out' => 0, 'Inactive' => 0, 'Other / unspecified' => 0];
         $confirmedLivingHere = 0;
         $demographics = [];
+        $namedRecords = collect();
+        $areaNames = $barangays->pluck('name', 'id');
         foreach ($records as $record) {
             $demographics[$record->barangay_id] ??= ['sex' => array_fill_keys(array_keys($sex), 0), 'ages' => array_fill_keys(array_keys($ages), 0), 'pwd' => 0, 'seniors' => 0, 'seniorRemarksOnly' => 0];
             $sexLabel = match (strtolower(trim((string) $record->sex))) {
@@ -38,6 +59,7 @@ class PopulationSummary
             $sex[$sexLabel]++;
             $demographics[$record->barangay_id]['sex'][$sexLabel]++;
             $ageLabel = 'Unknown / invalid birth date';
+            $age = null;
             try {
                 $birth = $record->birth_date;
                 if ($birth && $birth->lte($today)) {
@@ -52,6 +74,19 @@ class PopulationSummary
             $demographics[$record->barangay_id]['pwd'] += PopulationMarkers::has($record->remarks, 'pwd') ? 1 : 0;
             $seniorByAge = $ageLabel === '60+';
             $seniorByRemarks = PopulationMarkers::has($record->remarks, 'sc');
+            if ($withNames) {
+                $household = $householdLookup->get($record->household_id);
+                $validHousehold = $household && $household->barangay_id === $record->barangay_id;
+                $namedRecords->push([
+                    'name' => $record->fullName(), 'barangay_id' => $record->barangay_id,
+                    'barangay' => $areaNames[$record->barangay_id], 'family' => trim((string) $record->family_number),
+                    'household' => $validHousehold ? $this->baseHouseholdNumber($household->household_number) : null,
+                    'household_number' => $validHousehold ? trim((string) $household->household_number) : null,
+                    'sex' => $sexLabel, 'age' => $age, 'relationship' => $record->relationship_to_head,
+                    'senior' => $seniorByAge || $seniorByRemarks,
+                    'pwd' => PopulationMarkers::has($record->remarks, 'pwd'),
+                ]);
+            }
             $demographics[$record->barangay_id]['seniors'] += ($seniorByAge || $seniorByRemarks) ? 1 : 0;
             $demographics[$record->barangay_id]['seniorRemarksOnly'] += (!$seniorByAge && $seniorByRemarks) ? 1 : 0;
             $statuses[match ($record->status) {
@@ -89,6 +124,7 @@ class PopulationSummary
         });
 
         return compact('generatedAt', 'sex', 'ages', 'statuses', 'coverage', 'confirmedLivingHere') + [
+            'detailGroups' => $withNames ? $this->detailGroups($section, $namedRecords, $householdRows, $areaNames) : collect(),
             'scopeLabel' => $barangayId ? 'Barangay '.$barangays->firstOrFail()->name : 'Tomas Oppus — available barangay records',
             'totalRecords' => $records->count(), 'totalHouseholds' => (int) $households->sum(),
             'encodedHouseholdRows' => $householdRows->count(),
@@ -100,6 +136,92 @@ class PopulationSummary
             'recordsWithoutFamily' => (int) $coverage->sum('recordsWithoutFamily'),
             'coveredBarangays' => $coverage->where('records', '>', 0)->count(), 'totalBarangays' => $barangays->count(),
         ];
+    }
+
+    private function detailGroups(string $section, $members, $households, $areaNames)
+    {
+        $groups = collect();
+        if ($section === 'households') {
+            foreach ($households as $household) {
+                $number = $this->baseHouseholdNumber($household->household_number);
+                $key = $household->barangay_id.'|household:'.$number;
+                $groups->put($key, ['title' => 'Household '.($number !== '' ? $number : '(number not encoded)'),
+                    'barangay' => $areaNames[$household->barangay_id], 'household_number' => $number, 'members' => collect()]);
+            }
+        }
+        $householdSizes = $members->filter(fn ($member) => $member['household'] !== null)
+            ->countBy(fn ($member) => $member['barangay_id'].'|household:'.$member['household']);
+        foreach ($members as $member) {
+            if (($section === 'seniors' && ! $member['senior']) || ($section === 'pwd' && ! $member['pwd'])) {
+                continue;
+            }
+            $householdKey = $member['barangay_id'].'|household:'.$member['household'];
+            if ($section === 'families') {
+                if ($member['family'] !== '') {
+                    $key = $member['barangay_id'].'|family:'.$member['family'];
+                    $title = 'Family '.$member['family'];
+                } elseif ($member['household'] !== null && $householdSizes->get($householdKey) === 1) {
+                    $key = $householdKey;
+                    $title = 'Single-person family · Household '.$member['household'];
+                } else {
+                    continue; // Unidentified families must not become invented family groups.
+                }
+            } elseif ($section === 'households') {
+                if (! $groups->has($householdKey) || $member['household'] === null) {
+                    continue;
+                }
+                $key = $householdKey;
+                $title = $groups[$key]['title'];
+            } else {
+                $key = 'residents';
+                $title = self::SECTIONS[$section];
+            }
+            if (! $groups->has($key)) {
+                $groups->put($key, ['title' => $title, 'barangay' => $member['barangay'], 'members' => collect()]);
+            }
+            $groups[$key]['members']->push($member);
+        }
+        return $groups->map(function ($group) use ($section) {
+            if (in_array($section, ['families', 'households'], true)) {
+                $group['head_name'] = $this->groupHead($group, $section);
+            }
+            return $group;
+        })->sortBy(fn ($group) => $group['barangay'].' '.$group['title'], SORT_NATURAL)->values();
+    }
+
+    private function groupHead(array $group, string $section): string
+    {
+        $members = $group['members'];
+        $relationship = fn ($member) => mb_strtolower(trim((string) $member['relationship']));
+        $generic = ['head', 'self'];
+        $household = ['household head', 'head of household'];
+        $family = ['family head', 'head of family'];
+        if ($section === 'families') {
+            $heads = $members->filter(fn ($member) => in_array($relationship($member), $family, true));
+            if ($heads->isEmpty()) {
+                $heads = $members->filter(fn ($member) => in_array($relationship($member), array_merge($generic, $household), true));
+            }
+        } else {
+            $heads = $members->filter(fn ($member) => in_array($relationship($member), $household, true));
+            if ($heads->isEmpty()) {
+                $heads = $members->filter(fn ($member) => in_array($relationship($member), $generic, true));
+                // Additional decimal families must not replace the base household head.
+                $baseHeads = $heads->filter(fn ($member) => $member['household_number'] === $group['household_number']);
+                if ($baseHeads->isNotEmpty()) {
+                    $heads = $baseHeads;
+                }
+            }
+        }
+        if ($heads->count() === 1) {
+            return $heads->first()['name'] ?: 'Head name not encoded';
+        }
+        if ($heads->count() > 1) {
+            return 'Multiple heads recorded - needs verification';
+        }
+        if ($members->count() === 1 && $relationship($members->first()) === '') {
+            return $members->first()['name'] ?: 'Head name not encoded';
+        }
+        return 'Head not identified';
     }
 
     private function baseHouseholdNumber(string $number): string

@@ -40,19 +40,16 @@
             <section class="overview-community" aria-labelledby="community-summary-title">
                 <div class="dashboard-section-heading compact-heading">
                     <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Community Overview</span><h2 id="community-summary-title">Current Barangay Records</h2></div>
-                    <span class="data-freshness">Loaded {{ now()->format('M d, Y, g:i A') }}</span>
+                    <span class="data-freshness">Loaded {{ now('Asia/Manila')->format('M d, Y, g:i A').' PhST' }}</span>
                 </div>
-                <div class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $residentApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Resident approvals</span><strong>{{ number_format($residentApprovalRequests->count()) }}</strong><small>Registrations requiring review</small></div></article>
-                    <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Registered inhabitants</span><strong>{{ number_format($barangay->inhabitants_count) }}</strong><small>Individual registry records</small></div></article>
-@if($barangay->usesResidenceRegistry())
-                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Living in barangay</span><strong>{{ number_format($barangay->local_residents_count) }}</strong><small>Registered residents living here</small></div></article>
-@endif
-                    <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="home" /></span><div><span>Households</span><strong>{{ number_format($barangay->households_count) }}</strong><small>Household profiles on record</small></div></article>
-                    <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="trend" /></span><div><span>Migration events</span><strong>{{ number_format($barangay->migration_records_count) }}</strong><small>Recorded arrivals and departures</small></div></article>
-                </div>
+                @if (isset($populationCounts))
+                    <x-resident-population-charts :counts="$populationCounts" :barangay="$barangay" :approvals="$residentApprovalRequests->count()" />
+                @endif
             </section>
 
+            @if (($workspacePage ?? 'overview') === 'overview')
+                @include('dashboards.partials.barangay-workspace')
+            @else
             <div class="overview-workbench">
             <div class="barangay-welcome-panel barangay-focus-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm border-l-4 border-l-blue-600 p-5 sm:p-6">
                 <div class="barangay-welcome-copy">
@@ -192,10 +189,14 @@
                         <a class="button government-outline-button primary-block" href="{{ $newInhabitantsUrl }}">Manage Monthly Reports</a>
                     </section>
 
-                    <section class="government-side-card security-card"><span class="security-mark">DPA</span><div><strong>Data Privacy Reminder</strong><p>Access resident information only for authorized barangay functions. Keep account credentials confidential.</p></div></section>
                 </aside>
             </div>
 
+            @endif
+            @if (($workspacePage ?? 'overview') === 'overview')
+                <details class="overview-report-history">
+                    <summary>Monthly RBI form history <span>{{ $rbiUpdates->count() }} reports</span></summary>
+            @endif
             <section class="government-content-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="rbi-history-title">
                 <header class="government-card-header">
                     <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Secretary Copies</span><h2 id="rbi-history-title">Monthly RBI Form History</h2><p>Review, update, and download the official copies retained by this barangay.</p></div>
@@ -215,6 +216,16 @@
                     </table></div>
                 @endif
             </section>
+            @if (($workspacePage ?? 'overview') === 'overview')
+                </details>
+            @endif
         @endif
     </section>
+@endsection
+
+@section('footer-reminder')
+    <div class="footer-privacy-reminder">
+        <span class="footer-privacy-mark" aria-hidden="true">DPA</span>
+        <div><strong>Data Privacy Reminder</strong><p>Access resident information only for authorized barangay functions. Keep account credentials confidential.</p></div>
+    </div>
 @endsection

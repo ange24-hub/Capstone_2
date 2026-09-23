@@ -35,7 +35,7 @@
                     <h2 class="section-title text-lg font-semibold text-slate-900">Pending Barangay Secretary Accounts</h2>
                     <p>Approve only verified secretaries assigned to the correct Tomas Oppus barangay.</p>
                 </div>
-                <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $secretaryApprovalRequests->count() }} pending</span>
+                <x-status-badge status="pending">{{ $secretaryApprovalRequests->count() }} pending</x-status-badge>
             </div>
 
             @if ($secretaryApprovalRequests->isEmpty())

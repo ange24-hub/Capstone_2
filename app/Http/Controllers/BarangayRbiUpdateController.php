@@ -40,9 +40,7 @@ class BarangayRbiUpdateController extends Controller
         $barangayName = $this->assignedBarangayName($request);
 
         $validated = $request->validate($this->formRules());
-        $rows = $this->cleanRows($validated['rows'] ?? []);
-        $this->ensureHouseholdHeads($rows);
-        $deceasedRows = $this->resolveDeceasedFamilies($this->cleanDeceasedRows($validated['deceased_rows'] ?? []), $rows);
+        [$rows, $deceasedRows] = $this->sectionRows($request, $validated);
         $preparedBy = trim((string) ($validated['prepared_by'] ?? ''));
         $attestedBy = trim((string) ($validated['attested_by'] ?? '')) ?: (string) ($request->user()->barangay?->punong_barangay_name ?? '');
 
@@ -52,7 +50,7 @@ class BarangayRbiUpdateController extends Controller
 
         if ($existingReport) {
             return redirect()
-                ->route('barangay.rbi-updates.index', ['edit' => $existingReport->id])
+                ->route($this->formRoute($request), ['edit' => $existingReport->id])
                 ->withErrors(['reporting_month' => 'A monthly form already exists for this month. It has been reopened so you can add the new family rows without replacing the existing entries.']);
         }
 
@@ -93,9 +91,19 @@ class BarangayRbiUpdateController extends Controller
 
         if ($submitted) {
             return redirect()
-                ->route('barangay.rbi-updates.index', ['new' => 1])
+                ->route($this->formRoute($request), ['new' => 1])
                 ->with('status', 'Monthly RBI form submitted successfully. The form below is now ready for a new report.')
                 ->with('submitted_rbi_update_id', $rbiUpdate->id);
+        }
+
+        if ($request->input('form_section') === 'residents') {
+            return redirect()->route('barangay.rbi-updates.residents', ['new' => 1])
+                ->with('status', 'Resident entries saved successfully. The form is now blank. You can review or update the saved report in Monthly RBI Form History.');
+        }
+
+        if ($request->filled('form_section')) {
+            return redirect()->route($this->formRoute($request), ['edit' => $rbiUpdate->id])
+                ->with('status', 'Monthly RBI draft saved. Continue this report in either subpage.');
         }
 
         return back()->with('status', 'Monthly RBI report saved. You can continue adding family rows before submitting.');
@@ -119,9 +127,7 @@ class BarangayRbiUpdateController extends Controller
                 ->withInput();
         }
 
-        $rows = $this->cleanRows($validated['rows'] ?? []);
-        $this->ensureHouseholdHeads($rows);
-        $deceasedRows = $this->resolveDeceasedFamilies($this->cleanDeceasedRows($validated['deceased_rows'] ?? []), $rows);
+        [$rows, $deceasedRows] = $this->sectionRows($request, $validated, $rbiUpdate);
         $preparedBy = trim((string) ($validated['prepared_by'] ?? ''));
         $attestedBy = trim((string) ($validated['attested_by'] ?? '')) ?: (string) ($request->user()->barangay?->punong_barangay_name ?? '');
 
@@ -163,9 +169,14 @@ class BarangayRbiUpdateController extends Controller
 
         if ($request->boolean('submit_to_municipal')) {
             return redirect()
-                ->route('barangay.rbi-updates.index', ['new' => 1])
+                ->route($this->formRoute($request), ['new' => 1])
                 ->with('status', 'Monthly RBI form submitted successfully. The form below is now ready for a new report.')
                 ->with('submitted_rbi_update_id', $rbiUpdate->id);
+        }
+
+        if ($request->input('form_section') === 'residents') {
+            return redirect()->route('barangay.rbi-updates.residents', ['new' => 1])
+                ->with('status', 'Resident entries saved successfully. The form is now blank. You can review or update the saved report in Monthly RBI Form History.');
         }
 
         return back()->with('status', $submitted
@@ -191,7 +202,7 @@ class BarangayRbiUpdateController extends Controller
         ]);
 
         return redirect()
-            ->route('barangay.rbi-updates.index', ['new' => 1])
+            ->route($this->formRoute($request), ['new' => 1])
             ->with('status', 'Monthly RBI form submitted successfully. The form below is now ready for a new report.')
             ->with('submitted_rbi_update_id', $rbiUpdate->id);
     }
@@ -279,9 +290,32 @@ class BarangayRbiUpdateController extends Controller
         ])->setPaper('a4', 'landscape')->download($filename);
     }
 
+    private function formRoute(Request $request): string
+    {
+        return match ($request->input('form_section')) {
+            'residents' => 'barangay.rbi-updates.residents',
+            'deceased' => 'barangay.rbi-updates.deceased',
+            default => 'barangay.rbi-updates.index',
+        };
+    }
+
+    private function sectionRows(Request $request, array $validated, ?BarangayRbiUpdate $report = null): array
+    {
+        $section = $validated['form_section'] ?? null;
+        $rows = $this->cleanRows($section === 'deceased' ? ($report?->rows ?? []) : ($validated['rows'] ?? []));
+        $this->ensureHouseholdHeads($rows);
+        // A subpage owns only its own rows; omitted entries on the other page must survive.
+        $deceasedRows = $section === 'residents'
+            ? $this->cleanDeceasedRows($report?->deceased_rows ?? [])
+            : $this->resolveDeceasedFamilies($this->cleanDeceasedRows($validated['deceased_rows'] ?? []), $rows);
+
+        return [$rows, $deceasedRows];
+    }
+
     private function formRules(): array
     {
         return [
+            'form_section' => ['nullable', Rule::in(['residents', 'deceased'])],
             'reporting_month' => ['required', 'date_format:Y-m'],
             'as_of_date' => ['nullable', 'date'],
             'prepared_by' => ['nullable', 'string', 'max:255'],
@@ -1157,8 +1191,12 @@ class BarangayRbiUpdateController extends Controller
         if ($families->count() === 1) {
             return collect($deceasedRows)->map(function (array $row) use ($families): array {
                 $family = $families->first();
-                $row['household_id'] = $row['household_id'] ?: $family['household_id'];
-                $row['household_head'] = $row['household_head'] ?: $family['household_head'];
+                if ($row['household_id'] === '' && $row['household_head'] === '') {
+                    $row['household_id'] = $family['household_id'];
+                    $row['household_head'] = $family['household_head'];
+                } elseif ($row['household_id'] === '' && $row['household_head'] === $family['household_head']) {
+                    $row['household_id'] = $family['household_id'];
+                }
 
                 return $row;
             })->all();

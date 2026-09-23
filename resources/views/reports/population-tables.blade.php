@@ -1,3 +1,5 @@
+@php($selectedSection = $selectedSection ?? 'summary')
+@if($selectedSection === 'summary')
 <section class="population-report-section">
     <h2>1. Population, families and households</h2>
     <div class="table-wrap"><table class="clean-table"><thead><tr><th>Indicator</th><th class="number">Count</th></tr></thead><tbody>
@@ -9,14 +11,20 @@
     </tbody></table></div>
     <p class="report-caption">Counts cover available registry records, including active, migrated-out and inactive records.</p>
 </section>
+@endif
+@if(in_array($selectedSection, ['summary', 'sex'], true))
 <section class="population-report-section"><h2>2. Population by sex</h2><div class="table-wrap"><table class="clean-table"><thead><tr><th>Category</th><th class="number">Residents</th></tr></thead><tbody>
 @foreach($report['sex'] as $label => $count)<tr><td>{{ $label }}</td><td class="number">{{ number_format($count) }}</td></tr>@endforeach
 <tr class="total-row"><td>Total</td><td class="number">{{ number_format($report['totalRecords']) }}</td></tr>
 </tbody></table></div></section>
+@endif
+@if(in_array($selectedSection, ['summary', 'ages'], true))
 <section class="population-report-section"><h2>3. Population by age</h2><div class="table-wrap"><table class="clean-table"><thead><tr><th>Age group (years)</th><th class="number">Residents</th></tr></thead><tbody>
 @foreach($report['ages'] as $label => $count)<tr><td>{{ $label }}</td><td class="number">{{ number_format($count) }}</td></tr>@endforeach
 <tr class="total-row"><td>Total</td><td class="number">{{ number_format($report['totalRecords']) }}</td></tr>
 </tbody></table></div></section>
+@endif
+@if($selectedSection === 'summary')
 <section class="population-report-notes"><h2>Notes and counting basis</h2>
     <ol>
         <li>Source: inhabitant and household records as of {{ $report['generatedAt']->format('d F Y') }}. {{ $report['coveredBarangays'] }} of {{ $report['totalBarangays'] }} barangays in scope have resident records. Coverage is not yet verified as complete; this is a registry summary, not an official census.</li>
@@ -26,8 +34,9 @@
         <li>No resident records means “Not yet encoded”, not zero population. Unknown ages and unspecified sex remain shown separately.</li>
     </ol>
 </section>
-@if($report['totalBarangays'] > 1)
-<div class="population-area-page">
+@endif
+@if(($report['totalBarangays'] > 1 && $selectedSection === 'summary') || $selectedSection === 'coverage')
+<div class="{{ $selectedSection === 'summary' ? 'population-area-page' : '' }}">
 <section class="population-report-section"><h2>4. Summary by barangay</h2>
 <p class="report-caption">{{ $report['scopeLabel'] }} | As of {{ $report['generatedAt']->format('d F Y') }}</p>
 <div class="table-wrap"><table class="clean-table population-coverage-table"><thead><tr><th>Barangay</th><th class="number">Residents</th><th class="number">Male</th><th class="number">Female</th><th class="number">Families</th><th class="number">Households</th><th class="number">SC</th><th class="number">PWD</th></tr></thead><tbody>
@@ -40,7 +49,9 @@
 </tbody></table></div>
 <p class="report-caption">SC = senior citizens identified by birth date or remarks. PWD = marked in remarks. Pending = family / household information not yet identified. Male + female may differ from the total where sex is unspecified.</p>
 </section></div>
-<div class="population-area-page">
+@endif
+@if(($report['totalBarangays'] > 1 && $selectedSection === 'summary') || $selectedSection === 'area-ages')
+<div class="{{ $selectedSection === 'summary' ? 'population-area-page' : '' }}">
 <section class="population-report-section"><h2>5. Age groups by barangay</h2>
 <p class="report-caption">{{ $report['scopeLabel'] }} | As of {{ $report['generatedAt']->format('d F Y') }}</p>
 <div class="table-wrap"><table class="clean-table population-coverage-table"><thead><tr><th>Barangay</th>@foreach(array_keys($report['ages']) as $label)<th class="number">{{ $loop->last ? 'Age unknown' : $label }}</th>@endforeach<th class="number">Sex unspecified</th></tr></thead><tbody>

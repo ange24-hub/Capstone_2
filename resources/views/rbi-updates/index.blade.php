@@ -5,6 +5,9 @@
 @section('content')
     @php
         $editingReport = $draftRbiUpdate;
+        $rbiSection = $rbiSection ?? 'residents';
+        $rbiFormRoute = $rbiSection === 'deceased' ? 'barangay.rbi-updates.deceased' : 'barangay.rbi-updates.residents';
+        $sectionParameters = $editingReport ? ['edit' => $editingReport->id] : (request()->boolean('new') ? ['new' => 1] : []);
         $formRows = array_map([\App\Support\HouseholdRbi::class, 'normalize'], old('rows', $editingReport?->rows ?: [['household_head' => '']]));
         $memberFields = collect($rbiRowFields)->except('household_head')->all();
         $formFamilies = [];
@@ -27,7 +30,7 @@
         $submittedReport = session('submitted_rbi_update_id')
             ? $rbiUpdates->firstWhere('id', (int) session('submitted_rbi_update_id'))
             : null;
-        $defaultReportingMonth = request()->boolean('new')
+        $defaultReportingMonth = request()->boolean('new') || ($rbiSection === 'residents' && ! $editingReport)
             ? ''
             : (optional($editingReport?->reporting_month)->format('Y-m') ?: now()->format('Y-m'));
     @endphp
@@ -36,12 +39,12 @@
         <div class="dashboard-hero rounded-xl border border-slate-200 bg-white bg-none shadow-sm border-l-4 border-l-blue-600 p-5 sm:p-6">
             <div>
                 <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">RBI Monthly Reporting</div>
-                <h1>RBI Forms</h1>
+                <h1>{{ $rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Add residents' }}</h1>
                 <p>{{ $barangay?->name }} &middot; Manage household updates, prepare monthly reports, and submit to Municipal LGU.</p>
                 <div class="hero-actions flex flex-wrap gap-3">
                     <a class="button" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @if ($editingReport)
-                        <a class="button secondary-button" href="{{ route('barangay.rbi-updates.index', ['new' => 1]) }}">Start Another Month</a>
+                        <a class="button secondary-button" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start Another Month</a>
                     @endif
                 </div>
             </div>
@@ -51,9 +54,14 @@
             </div>
         </div>
 
+        <nav class="rbi-subpages" aria-label="RBI Forms subpages">
+            <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if ($rbiSection === 'residents') aria-current="page" @endif><x-app-icon name="users" /><span>Add residents</span></a>
+            <a href="{{ route('barangay.rbi-updates.deceased', $sectionParameters) }}" @if ($rbiSection === 'deceased') aria-current="page" @endif><x-app-icon name="document" /><span>Deceased inhabitants</span></a>
+        </nav>
+        <p class="rbi-subpage-help">Use Add Residents for new family members and Deceased Inhabitants to record deaths. Each form saves its own entries in the monthly RBI report.</p>
         <nav class="rbi-section-nav" aria-label="RBI form sections">
             <a href="#monthly-report"><span>01</span> Monthly report</a>
-            <a href="#family-section"><span>02</span> Family members</a>
+            <a href="#{{ $rbiSection === 'deceased' ? 'deceased-section' : 'family-section' }}"><span>02</span> {{ $rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Family members' }}</a>
             <a href="#certification-section"><span>03</span> Certification</a>
             <a href="#report-history"><span>04</span> Report history</a>
         </nav>
@@ -68,7 +76,7 @@
                         <h2 class="section-title text-lg font-semibold text-slate-900">{{ optional($submittedReport->reporting_month)->format('F Y') }} RBI form is now displayed in the records</h2>
                         <p>Municipal LGU has received this form. A copy also remains in the secretary's Monthly RBI Form History below.</p>
                     </div>
-                    <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $submittedReport->statusLabel() }}</span>
+                    <x-status-badge :status="$submittedReport->status">{{ $submittedReport->statusLabel() }}</x-status-badge>
                 </div>
                 <div class="toolbar flex flex-wrap items-end gap-3">
                     <a class="button" href="{{ route('rbi-updates.show', $submittedReport) }}">View Submitted Form</a>
@@ -91,141 +99,26 @@
                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
-                        <h2 class="section-title text-lg font-semibold text-slate-900">Monthly report</h2>
-                        <p>Choose a month, add the families, and complete the certification before saving.</p>
+                        <h2 class="section-title text-lg font-semibold text-slate-900">{{ $rbiSection === 'deceased' ? 'Deceased Inhabitants Form' : 'Add Residents Form' }}</h2>
+                        <p>Choose a month, {{ $rbiSection === 'deceased' ? 'record deceased inhabitants' : 'add the families' }}, and complete the certification before saving.</p>
                     </div>
-                    @if ($editingReport)<span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $editingReport->statusLabel() }}</span>@endif
+                    @if ($editingReport)<x-status-badge :status="$editingReport->status">{{ $editingReport->statusLabel() }}</x-status-badge>@endif
                 </div>
 
-                <form method="POST" action="{{ $editingReport ? route('barangay.rbi-updates.update', $editingReport) : route('barangay.rbi-updates.store') }}" id="rbi-monthly-form">
-                    @csrf
-                    @if ($editingReport) @method('PUT') @endif
-
-                    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
-                        <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
-                        <div>
-                            <label for="reporting_month">For the month of</label>
-                            <input id="reporting_month" name="reporting_month" type="month" value="{{ old('reporting_month', $defaultReportingMonth) }}" required>
-                            @if (request()->boolean('new'))
-                                <small class="field-help">Select the month for the new report. To add entries to an already submitted month, use “Update form” in the history below.</small>
-                            @endif
-                        </div>
-                    </div>
-
-                    <h3 class="section-title text-lg font-semibold text-slate-900" id="family-section">Family members</h3>
-                    <div id="family-forms" class=" grid gap-6">
-                        @foreach ($formFamilies as $family)
-                            <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card>
-                                <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                                    <div>
-                                        <span class="step-pill" data-family-number>Family {{ $loop->iteration }}</span>
-                                        <h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4>
-                                    </div>
-                                    <button class="secondary-button" type="button" data-remove-family @disabled(count($formFamilies) === 1)>Remove Family</button>
-                                </div>
-
-                                <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
-                                    <div>
-                                        <label>Household head</label>
-                                        <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head required autocomplete="off">
-                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household">
-                                        <small class="field-help">Choose a registry match when available. A typed name is allowed for a newly registered household.</small>
-                                    </div>
-                                </div>
-
-                                <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
-                                <div class=" grid gap-6" data-family-members>
-                                    @foreach (($family['members'] ?: [[]]) as $member)
-                                        @php($currentRowIndex = $rowInputIndex++)
-                                        <article class="member-entry-card" data-member-card>
-                                            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                                                <strong data-member-number>Member {{ $loop->iteration }}</strong>
-                                                <button class="secondary-button" type="button" data-remove-member @disabled(count($family['members']) === 1)>Remove Member</button>
-                                            </div>
-                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][household_head]" value="{{ $family['household_head'] }}" data-household-head-hidden>
-                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][household_number]" value="{{ $family['household_number'] ?? '' }}" data-household-number-hidden><input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
-                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
-                                            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
-                                                @foreach ($memberFields as $field => $label)
-                                                    <div>
-                                                        <label>{{ $label }}</label>
-                                                        @if (in_array($field, ['civil_status', 'education_level', 'religion'], true))
-                                                            <x-rbi-dropdown :field="$field" :name="'rows['.$currentRowIndex.']['.$field.']'" :value="$member[$field] ?? ''" />
-                                                        @elseif ($field === 'sex')
-                                                            <select name="rows[{{ $currentRowIndex }}][{{ $field }}]">
-                                                                <option value=""></option>
-                                                                <option value="Male" @selected(($member[$field] ?? '') === 'Male')>Male</option>
-                                                                <option value="Female" @selected(($member[$field] ?? '') === 'Female')>Female</option>
-                                                            </select>
-                                                        @else
-                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" value="{{ $member[$field] ?? '' }}">
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </article>
-                                    @endforeach
-                                </div>
-                                <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
-                            </article>
-                        @endforeach
-                    </div>
-                    <div class="form-actions split-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
-                        <small class="field-help">Each family becomes a complete RBI form/page inside one monthly PDF.</small>
-                        <button type="button" id="add-family-form">Add Another Family Form</button>
-                    </div>
-
-                    <h3 class="section-title text-lg font-semibold text-slate-900">Deceased inhabitants</h3>
-                    <div class="table-wrap form-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
-                        <table id="rbi-deceased-rows-table">
-                            <thead><tr><th>Household / Family</th>@foreach ($rbiDeceasedRowFields as $label)<th>{{ $label }}</th>@endforeach</tr></thead>
-                            <tbody>
-                                @foreach ($formDeceasedRows as $index => $row)
-                                    <tr>
-                                        <td><select name="deceased_rows[{{ $index }}][household_head]" data-deceased-family data-selected="{{ $row['household_head'] ?? '' }}"><option value="">Select family</option></select></td>
-                                        @foreach ($rbiDeceasedRowFields as $field => $label)<td><input name="deceased_rows[{{ $index }}][{{ $field }}]" type="{{ $field === 'death_date' ? 'date' : 'text' }}" value="{{ $row[$field] ?? '' }}" aria-label="{{ $label }}"></td>@endforeach
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button type="button" class="secondary-button" id="add-rbi-deceased-row">Add Deceased Inhabitant</button></div>
-
-                    <h3 class="section-title text-lg font-semibold text-slate-900" id="certification-section">Monthly Form Certification</h3>
-                    <p>Enter each signer's full name and place their signature in the same card. The document follows this same order.</p>
-                    <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
-                        @foreach ([['prepared_by', 'prepared_signature_data', 'prepared_signature_path', 'Prepared by', 'BHW / Encoder', 'secretary', $editingReport?->prepared_by ?? ''], ['certified_by', 'certified_signature_data', 'certified_signature_path', 'Certified Correct', 'Barangay Secretary', 'certified', $editingReport?->certified_by ?: $barangay->secretary_name ?: auth()->user()->name], ['attested_by', 'attested_signature_data', 'attested_signature_path', 'Verified by', 'Barangay Captain / Punong Barangay', 'captain', $editingReport?->attested_by ?: $barangay->punong_barangay_name]] as [$nameField, $field, $pathField, $label, $role, $type, $defaultName])
-                            <section class="signature-pad-field flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4" aria-labelledby="{{ $nameField }}-heading">
-                                <div class="min-h-16"><p class="text-xs font-semibold uppercase tracking-wide text-blue-800">{{ $label }}</p><h4 class="text-base font-bold text-slate-900" id="{{ $nameField }}-heading">{{ $role }}</h4></div>
-                                <div><label for="{{ $nameField }}">Full name</label><input id="{{ $nameField }}" name="{{ $nameField }}" type="text" value="{{ old($nameField, $defaultName) }}" placeholder="Full name of {{ $role }}" maxlength="255"></div>
-                                <label>{{ $role }} signature</label>
-                                @if ($editingReport?->{$pathField})
-                                    <img class="signature-upload-preview" src="{{ route('rbi-updates.signature', [$editingReport, $type]) }}" alt="Saved {{ $role }} signature">
-                                    <small class="field-help">Saved signature. Draw below only to replace it.</small>
-                                @endif
-                                <div class="signature-pad mt-auto" data-signature-pad>
-                                    <canvas aria-label="Draw the {{ $role }} signature"></canvas>
-                                    <div class="signature-pad-actions"><span>Sign using a mouse, finger, or stylus.</span><button class="secondary-button" type="button" data-clear-signature>Clear</button></div>
-                                    <input name="{{ $field }}" type="hidden">
-                                </div>
-                            </section>
-                        @endforeach
-                    </div>
-
-                    <div class="form-actions split-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
-                        <span>Save your changes first, then submit the saved report from Monthly RBI Form History below.</span>
-                        <div class="toolbar compact-toolbar flex flex-wrap items-end gap-3">
-                            <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Form' : 'Save Monthly Draft' }}</button>
-                        </div>
-                    </div>
-                </form>
+                @if ($rbiSection === 'deceased')
+                    @include('rbi-updates.forms.deceased')
+                @else
+                    @include('rbi-updates.forms.residents')
+                @endif
             </div>
         @endif
 
         <div class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history">
             <div class="history-heading"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Saved reports</div><h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2></div>
             <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
-            @include('rbi-updates._saved-inhabitants')
+            @if ($rbiSection === 'residents')
+                @include('rbi-updates._saved-inhabitants')
+            @endif
             @if ($rbiUpdates->isEmpty() && $newInhabitantRecords->isEmpty())
                 <p>No monthly RBI forms created yet.</p>
             @endif
@@ -240,11 +133,11 @@
                                     <td>{{ optional($report->reporting_month)->format('F Y') ?: 'Not set' }}</td>
                                     <td>{{ $familyCount }}</td>
                                     <td>{{ count($report->rows ?? []) }}</td>
-                                    <td><span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $report->statusLabel() }}</span></td>
+                                    <td><x-status-badge :status="$report->status">{{ $report->statusLabel() }}</x-status-badge></td>
                                     <td>{{ optional($report->submitted_at)->format('M d, Y h:i A') ?: 'Not submitted' }}</td>
                                     <td><div class="rbi-history-actions">
                                         <a href="{{ route('rbi-updates.show', $report) }}">View form</a>
-                                        <a href="{{ route('barangay.rbi-updates.index', ['edit' => $report->id]) }}">{{ $report->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue draft' : 'Update form' }}</a>
+                                        <a href="{{ route($rbiFormRoute, ['edit' => $report->id]) }}">{{ $report->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue draft' : 'Update form' }}</a>
                                         <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
                                         <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
                                         @include('rbi-updates._registry-action', ['report' => $report])
@@ -265,6 +158,7 @@
         @endforeach
     </datalist>
 
+    @if ($rbiSection === 'residents')
     <template id="member-entry-template">
         <article class="member-entry-card" data-member-card>
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
@@ -304,13 +198,22 @@
         </article>
     </template>
 
+    @endif
     <script>
         (() => {
+            const monthlyForm = document.getElementById('rbi-monthly-form');
+            let unsaved = false;
+            monthlyForm?.addEventListener('input', () => unsaved = true);
+            monthlyForm?.addEventListener('change', () => unsaved = true);
+            monthlyForm?.addEventListener('click', event => { if (event.target.closest('[data-remove-family], [data-remove-member], [data-add-member], #add-family-form, #add-rbi-deceased-row, [data-clear-signature]')) unsaved = true; });
+            monthlyForm?.addEventListener('submit', () => unsaved = false);
+            monthlyForm?.addEventListener('pointerdown', event => { if (event.target.closest('canvas')) unsaved = true; });
+            window.addEventListener('beforeunload', event => { if (unsaved) { event.preventDefault(); event.returnValue = ''; } });
             const familyForms = document.getElementById('family-forms');
             const familyTemplate = document.getElementById('family-form-template');
             const memberTemplate = document.getElementById('member-entry-template');
             const existingHouseholds = @json($rbiHouseholds);
-            let nextRowIndex = {{ $rowInputIndex }};
+            let nextRowIndex = {{ count($formRows) }};
 
             const syncHouseholdHead = (familyCard) => {
                 const headInput = familyCard.querySelector('[data-family-head]');
@@ -337,18 +240,29 @@
                 refreshDeceasedFamilyOptions();
             };
 
+            const savedFamilies = @json(collect($editingReport?->rows ?? [])->map(fn ($row) => ['id' => $row['household_id'] ?? '', 'label' => $row['household_head'] ?? '', 'household_number' => $row['household_number'] ?? ''])->unique('label')->values());
             const refreshDeceasedFamilyOptions = () => {
-                const heads = [...familyForms.querySelectorAll('[data-family-card]')].map((card) => card.querySelector('[data-household-head-hidden]')?.value.trim()).filter(Boolean);
-                document.querySelectorAll('[data-deceased-family]').forEach((select) => {
-                    const selected = select.value || select.dataset.selected || '';
-                    select.innerHTML = '<option value="">Select family</option>' + heads.map((head) => {
-                        const safeHead = head.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-                        return `<option value="${safeHead}">${safeHead}</option>`;
-                    }).join('');
-                    select.value = heads.includes(selected) ? selected : (heads.length === 1 ? heads[0] : '');
+                const families = [...existingHouseholds, ...savedFamilies.filter(family => family.label && !existingHouseholds.some(household => household.label === family.label))];
+                document.querySelectorAll('[data-deceased-family]').forEach(select => {
+                    const selected = select.dataset.selected || select.value || '';
+                    const hiddenId = select.closest('td').querySelector('[data-deceased-household-id]');
+                    const selectedId = hiddenId?.value || '';
+                    select.replaceChildren(new Option('Select family', ''));
+                    families.forEach(family => {
+                        const option = new Option(family.label + (family.household_number ? ` (Household ${family.household_number})` : ''), family.label);
+                        option.dataset.householdId = family.id || '';
+                        select.add(option);
+                    });
+                    const match = [...select.options].find(option => selectedId ? option.dataset.householdId === selectedId : option.value === selected);
+                    if (match) match.selected = true;
+                    else if (selected) select.add(new Option(selected, selected, true, true));
                     select.dataset.selected = '';
                 });
             };
+            document.getElementById('rbi-deceased-rows-table')?.addEventListener('change', event => {
+                if (!event.target.matches('[data-deceased-family]')) return;
+                event.target.closest('td').querySelector('[data-deceased-household-id]').value = event.target.selectedOptions[0]?.dataset.householdId || '';
+            });
 
             const refreshMemberNumbers = (familyCard) => {
                 const members = [...familyCard.querySelectorAll('[data-member-card]')];
@@ -359,7 +273,7 @@
             };
 
             const refreshFamilyNumbers = () => {
-                const families = [...familyForms.querySelectorAll('[data-family-card]')];
+                const families = [...(familyForms?.querySelectorAll('[data-family-card]') || [])];
                 families.forEach((family, index) => {
                     family.querySelector('[data-family-number]').textContent = `Family ${index + 1}`;
                     family.querySelector('[data-remove-family]').disabled = families.length === 1;
@@ -411,7 +325,7 @@
             });
 
             document.getElementById('rbi-monthly-form')?.addEventListener('submit', () => {
-                familyForms.querySelectorAll('[data-family-card]').forEach(syncHouseholdHead);
+                familyForms?.querySelectorAll('[data-family-card]').forEach(syncHouseholdHead);
             });
 
             refreshFamilyNumbers();
@@ -421,13 +335,13 @@
                 const body = document.querySelector('#rbi-deceased-rows-table tbody');
                 const index = body.querySelectorAll('tr').length;
                 const row = document.createElement('tr');
-                row.insertAdjacentHTML('beforeend', '<td><select name="deceased_rows[' + index + '][household_head]" data-deceased-family><option value="">Select family</option></select></td>');
+                row.insertAdjacentHTML('beforeend', '<td><input type="hidden" name="deceased_rows[' + index + '][household_id]" data-deceased-household-id><select aria-label="Household for deceased inhabitant" name="deceased_rows[' + index + '][household_head]" data-deceased-family><option value="">Select family</option></select></td>');
                 @foreach ($rbiDeceasedRowFields as $field => $label)
                     row.insertAdjacentHTML('beforeend', `<td><input name="deceased_rows[${index}][{{ $field }}]" type="{{ $field === 'death_date' ? 'date' : 'text' }}" aria-label="{{ $label }}"></td>`);
                 @endforeach
                 body.appendChild(row);
                 refreshDeceasedFamilyOptions();
-                row.querySelector('input')?.focus();
+                row.querySelector('input:not([type="hidden"])')?.focus();
             });
 
             const initializeSignaturePad = (pad) => {

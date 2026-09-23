@@ -108,6 +108,14 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.index');
 
+    Route::get('/barangay/rbi-updates/add-residents', [DashboardController::class, 'barangay'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.rbi-updates.residents');
+
+    Route::get('/barangay/rbi-updates/deceased-inhabitants', [DashboardController::class, 'barangay'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.rbi-updates.deceased');
+
     Route::post('/barangay/rbi-updates', [BarangayRbiUpdateController::class, 'store'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.store');

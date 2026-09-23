@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#112f40">
+    <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
     <link rel="stylesheet" href="{{ asset('css/rbim.css') }}?v={{ filemtime(public_path('css/rbim.css')) }}">
@@ -100,6 +100,12 @@
                         <a class="@if(request()->routeIs('barangay.document-requests.*')) active @endif" href="{{ route('barangay.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Document Requests</span></a>
                         <div class="side-section">Resident records</div>
                         <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
+                        @if(request()->routeIs('barangay.rbi-updates.*'))
+                            <div class="rbi-sidebar-subpages">
+                                <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if(request()->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents')) aria-current="page" @endif>Add residents</a>
+                                <a href="{{ route('barangay.rbi-updates.deceased', request()->only('edit', 'new')) }}" @if(request()->routeIs('barangay.rbi-updates.deceased')) aria-current="page" @endif>Deceased inhabitants</a>
+                            </div>
+                        @endif
                         <a class="@if(request()->routeIs('barangay.registry.deceased')) active @endif" href="{{ route('barangay.registry.deceased') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Deceased Records</span></a>
                         <a class="@if(request()->routeIs('barangay.registry.active') || request()->routeIs('registry.*') && !in_array(request('sheet'), ['new-inhabitants', 'deceased'], true)) active @endif" href="{{ route('barangay.registry.active') }}"><span class="nav-mark"><x-app-icon name="users" /></span><span>{{ auth()->user()->barangay?->usesResidenceRegistry() ? 'Consolidated / All Registered' : 'Resident Registry' }}</span></a>
 @if(auth()->user()->barangay?->usesResidenceRegistry())
@@ -157,7 +163,7 @@
                     </div>
                     <div class="app-header-meta">
                         <span class="system-status"><x-app-icon name="shield" /> Authorized workspace</span>
-                        <span class="header-date">{{ now()->format('F d, Y') }}</span>
+                        <time class="header-date" datetime="{{ now('Asia/Manila')->toDateString() }}">{{ now('Asia/Manila')->format('F d, Y') }}</time>
                         @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
                             <a class="header-user" href="{{ route('profile.edit') }}" title="My Profile" aria-label="My Profile: {{ auth()->user()->name }}">{{ auth()->user()->name }}</a>
                         @else
@@ -175,7 +181,8 @@
                     @yield('content')
                 </main>
 
-                <footer class="app-footer">
+                <footer class="app-footer @hasSection('footer-reminder') app-footer-with-reminder @endif">
+                    @yield('footer-reminder')
                     <span>&copy; {{ now()->year }} Municipal Government of Tomas Oppus</span>
                     <span>RBIM &middot; Official LGU Information System</span>
                 </footer>

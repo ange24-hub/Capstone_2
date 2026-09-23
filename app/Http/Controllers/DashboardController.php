@@ -149,7 +149,7 @@ class DashboardController extends Controller
 
     public function barangay(Request $request): View
     {
-        if ($request->routeIs('barangay.rbi-updates.index') && $request->filled('edit_resident')) {
+        if ($request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased') && $request->filled('edit_resident')) {
             $request->validate(['edit_resident' => ['required', 'integer']]);
             return app(RbiResidentController::class)->edit($request, \App\Models\Inhabitant::findOrFail($request->integer('edit_resident')));
         }
@@ -191,7 +191,7 @@ class DashboardController extends Controller
             ->get();
         $draftRbiUpdate = $request->integer('edit')
             ? $rbiUpdates->first(fn (BarangayRbiUpdate $update): bool => $update->id === $request->integer('edit'))
-            : ($request->routeIs('barangay.rbi-updates.index') && ! $request->boolean('new')
+            : ($request->routeIs('barangay.rbi-updates.deceased') && ! $request->boolean('new')
                 ? ($rbiUpdates->firstWhere('status', BarangayRbiUpdate::STATUS_DRAFT)
                     ?: $rbiUpdates->first(fn (BarangayRbiUpdate $update): bool => optional($update->reporting_month)->format('Y-m') === now()->format('Y-m')))
                 : null);
@@ -217,8 +217,11 @@ class DashboardController extends Controller
                 ->values()
             : collect();
 
-        return view($request->routeIs('barangay.rbi-updates.index') ? 'rbi-updates.index' : 'dashboards.barangay', [
-            'newInhabitantRecords' => $barangay && $request->routeIs('barangay.rbi-updates.index')
+        return view($request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased') ? 'rbi-updates.index' : 'dashboards.barangay', [
+            'populationCounts' => $barangay && $request->routeIs('dashboard.barangay')
+                ? app(\App\Services\BarangayDashboardPopulation::class)->counts($barangay)
+                : null,
+            'newInhabitantRecords' => $barangay && $request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased')
                 ? \App\Models\NewInhabitant::where('barangay_id', $barangay->id)->orderByDesc('reporting_month')->orderBy('source_position')->orderBy('id')->get()
                 : collect(),
             'registryActivities' => $barangay ? \App\Models\RegistryActivity::with('user')->where('barangay_id', $barangay->id)->latest('id')->paginate(15, ['*'], 'activity_page') : collect(),
@@ -228,6 +231,7 @@ class DashboardController extends Controller
             'residentRbiChecks' => $residentRbiChecks,
             'barangayDocumentRequests' => $barangayDocumentRequests,
             'documentRequestStatuses' => DocumentRequest::statusLabels(),
+            'rbiSection' => $request->routeIs('barangay.rbi-updates.deceased') ? 'deceased' : 'residents',
             'draftRbiUpdate' => $draftRbiUpdate,
             'rbiRowFields' => BarangayRbiUpdate::rowFields(),
             'rbiDeceasedRowFields' => BarangayRbiUpdate::deceasedRowFields(),

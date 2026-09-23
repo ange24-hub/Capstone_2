@@ -1,0 +1,234 @@
+/* The first cascade layer owns shared visual tokens and component appearance.
+   Existing styles continue to own page layout and document/print formatting. */
+@layer civic {
+  :root {
+    --civic-navy: #142d4e;
+    --civic-navy-hover: #203f63;
+    --civic-primary: #2457a7;
+    --civic-primary-hover: #194587;
+    --civic-primary-soft: #edf3fc;
+    --civic-canvas: #e8eff8;
+    --civic-surface: #ffffff;
+    --civic-subtle: #eef4fc;
+    --civic-ink: #172b45;
+    --civic-text: #40516a;
+    --civic-muted: #5c6d82;
+    --civic-border: #dce3ed;
+    --civic-success: #176747;
+    --civic-success-soft: #edf8f1;
+    --civic-warning: #85530b;
+    --civic-warning-soft: #fff7e6;
+    --civic-danger: #b02e38;
+    --civic-danger-soft: #fff1f2;
+    --civic-radius: 12px;
+    --civic-control-radius: 8px;
+    --civic-shadow: 0 2px 5px rgb(20 45 78 / 3%);
+    --civic-space-1: 4px;
+    --civic-space-2: 8px;
+    --civic-space-3: 12px;
+    --civic-space-4: 16px;
+    --civic-space-5: 20px;
+    --civic-space-6: 24px;
+    --civic-space-8: 32px;
+  }
+
+  @media screen {
+    .municipal-ui .population-category-nav { display: grid !important; grid-template-columns: 3fr 2fr !important; gap: 20px 24px !important; padding: 20px 24px 0 !important; background: #fff !important; border: 1px solid var(--civic-border) !important; border-radius: 14px !important; box-shadow: var(--civic-shadow) !important; }
+    .municipal-ui .population-category-group { min-width: 0 !important; }
+    .municipal-ui .population-category-group:nth-child(2) { padding-left: 24px !important; border-left: 1px solid var(--civic-border) !important; }
+    .municipal-ui .population-category-label { display: block !important; margin-bottom: 12px !important; color: var(--civic-muted) !important; font-size: 10px !important; font-weight: 650 !important; letter-spacing: .09em !important; text-transform: uppercase !important; }
+    .municipal-ui .population-category-links { display: grid !important; grid-template-columns: repeat(3, minmax(0,1fr)) !important; gap: 8px !important; }
+    .municipal-ui .population-category-group:nth-child(2) .population-category-links { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+    .municipal-ui .population-category-link { display: flex !important; align-items: center !important; gap: 9px !important; min-height: 62px !important; padding: 10px !important; border: 1px solid transparent !important; border-radius: 9px !important; background: #f4f7fc !important; color: var(--civic-text) !important; font-size: 12px !important; font-weight: 600 !important; line-height: 1.4 !important; text-decoration: none !important; transition: background-color .15s, border-color .15s !important; }
+    .municipal-ui .population-category-icon { display: grid !important; place-items: center !important; flex: 0 0 30px !important; width: 30px !important; height: 30px !important; border-radius: 8px !important; background: #e7eef9 !important; color: var(--civic-primary) !important; }
+    .municipal-ui .population-category-icon .app-icon { width: 17px !important; height: 17px !important; }
+    .municipal-ui .population-category-link:hover { background: #e8f0fc !important; border-color: #c1d3ed !important; }
+    .municipal-ui .population-category-link[aria-current="page"] { background: var(--civic-navy) !important; color: #fff !important; border-color: var(--civic-navy) !important; box-shadow: 0 3px 8px #142d4e18 !important; }
+    .municipal-ui .population-category-link[aria-current="page"] .population-category-icon { background: #ffffff18 !important; color: #c5dbff !important; }
+    .municipal-ui .population-category-hint { display: flex !important; align-items: center !important; gap: 8px !important; grid-column: 1 / -1 !important; border-top: 1px solid #e8edf5 !important; padding: 12px 0 !important; color: var(--civic-muted) !important; font-size: 12px !important; line-height: 1.5 !important; }
+    .municipal-ui .population-category-hint .app-icon { width: 15px !important; height: 15px !important; flex-shrink: 0 !important; color: var(--civic-primary) !important; }
+    @media (max-width: 1200px) {
+      .municipal-ui .population-category-nav { grid-template-columns: minmax(0,1fr) !important; gap: 18px !important; }
+      .municipal-ui .population-category-group:nth-child(2) { border-left: 0 !important; padding-left: 0 !important; }
+      .municipal-ui .population-category-group:nth-child(2) .population-category-links { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+    }
+    @media (max-width: 600px) {
+      .municipal-ui .population-category-nav { padding: 16px 16px 0 !important; gap: 16px !important; }
+      .municipal-ui .population-category-links, .municipal-ui .population-category-group:nth-child(2) .population-category-links { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+      .municipal-ui .population-category-link { gap: 8px !important; padding: 9px !important; }
+    }
+    .municipal-ui .population-detail-group { margin-top: 24px !important; }
+    .municipal-ui .population-detail-group h3 { margin: 0 0 12px; font-size: 16px; }
+    .municipal-ui .population-detail-group h3 small { font-size: 13px; color: var(--civic-muted); }
+    .municipal-ui .population-member-table { min-width: 780px; }
+    .municipal-ui body { background: var(--civic-canvas) !important; color: var(--civic-text) !important; }
+    .municipal-ui .app-main { background: var(--civic-canvas) !important; }
+    .municipal-ui .app-content { padding: 28px 32px !important; }
+    .municipal-ui :is(.app-content, .public-content) { font-size: 14px !important; line-height: 1.6 !important; }
+    .municipal-ui :is(.app-content, .public-content) :is(h1,h2,h3,h4):not(:where(.rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .civic-home-hero *, .registration-guide *)) { color: var(--civic-ink) !important; letter-spacing: -.025em !important; }
+    .municipal-ui :is(.app-content, .public-content) h1:not(:where(.rbi-document-preview *, .rbi-word-page *, .civic-home-hero *)) { font-size: clamp(24px, 2.2vw, 30px) !important; line-height: 1.25 !important; font-weight: 700 !important; }
+    .municipal-ui .app-content :is(.section-title,.content-panel-heading,.dashboard-card-header h2,.government-card-header h2) { font-size: 17px !important; font-weight: 650 !important; }
+    .municipal-ui .app-content :is(.dashboard-eyebrow,.government-eyebrow,.page-kicker,.overview-section-kicker) { color: var(--civic-primary) !important; font-size: 11px !important; letter-spacing: .09em !important; font-weight: 650 !important; }
+    .municipal-ui :is(.field-help,.auth-copy,.workspace-location) { color: var(--civic-muted) !important; font-size: 13px !important; }
+    .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) {
+      background: linear-gradient(110deg, #dbe9fc, #edf4ff 65%, #e0f0f1) !important; border: 1px solid #bed1e9 !important;
+      border-left: 4px solid var(--civic-primary) !important;
+      border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important;
+      padding: 24px !important; min-height: 0 !important; animation: none !important;
+    }
+    .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero)::before,
+    .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero)::after { display: none !important; }
+    .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) :is(p,.dashboard-title-group p) { color: var(--civic-muted) !important; font-size: 14px !important; line-height: 1.6 !important; }
+    .municipal-ui .app-content .dashboard-title-group h1 { margin: 8px 0 !important; }
+    .municipal-ui :is(.overview-context,.dashboard-context-card,.hero-mini-card) { background: var(--civic-subtle) !important; border: 1px solid var(--civic-border) !important; border-radius: 10px !important; box-shadow: none !important; }
+    .municipal-ui :is(.overview-context,.dashboard-context-card,.hero-mini-card) :is(strong,.ph-clock-time) { color: var(--civic-ink) !important; }
+    .municipal-ui :is(.overview-context,.dashboard-context-card,.hero-mini-card) :is(span,small) { color: var(--civic-muted) !important; }
+    .municipal-ui .dashboard-workspace .dashboard-page-header { grid-template-columns: minmax(0,1fr) 250px !important; gap: 16px 24px !important; }
+    .municipal-ui .overview-context { padding: 16px !important; gap: 10px !important; align-self: center !important; }
+    .municipal-ui .overview-context-office { display: none !important; }
+    .municipal-ui .overview-context-caption { display: none !important; }
+    .municipal-ui .overview-context-date { display: grid !important; grid-template-columns: auto 1fr !important; gap: 6px 10px !important; padding: 0 !important; border: 0 !important; text-align: left !important; }
+    .municipal-ui .overview-context-date > strong { text-align: right !important; font-size: 18px !important; }
+    .municipal-ui .overview-context-date :is(.ph-clock-label,.ph-clock-time) { grid-column: 1 / -1 !important; margin: 0 !important; }
+    .municipal-ui .overview-context-date .ph-clock-label { margin-top: 6px !important; }
+    .municipal-ui .overview-context-date .ph-clock-time { font-size: 22px !important; line-height: 1.3 !important; }
+    .municipal-ui :is(.overview-context-icon,.context-icon) { background: var(--civic-primary-soft) !important; color: var(--civic-primary) !important; }
+
+    /* Navigation: one stable visual hierarchy for all three roles. */
+    .municipal-ui .app-sidebar { background: var(--civic-navy) !important; border-color: var(--civic-navy) !important; scrollbar-color: #7187a1 var(--civic-navy) !important; }
+    .municipal-ui .app-brand { border-color: #ffffff20 !important; }
+    .municipal-ui .app-brand strong { font-size: 19px !important; color: #fff !important; }
+    .municipal-ui :is(.app-brand small,.app-brand em,.sidebar-office span,.side-label,.side-section) { color: #b6c7dd !important; }
+    .municipal-ui .sidebar-office { background: #ffffff06 !important; border-color: #ffffff16 !important; }
+    .municipal-ui .side-nav a { min-height: 44px !important; font-size: 13px !important; line-height: 1.4 !important; color: #e1e9f4 !important; border-radius: var(--civic-control-radius) !important; background: transparent !important; box-shadow: none !important; }
+    .municipal-ui .side-nav a:hover { background: var(--civic-navy-hover) !important; color: #fff !important; }
+    .municipal-ui .side-nav a.active { background: #2a4d78 !important; color: #fff !important; box-shadow: inset 3px 0 #a4c7ff !important; font-weight: 600 !important; }
+    .municipal-ui .side-nav .nav-mark { background: transparent !important; color: inherit !important; }
+    .municipal-ui .rbi-sidebar-subpages a { min-height: 40px !important; font-size: 12px !important; }
+    .municipal-ui .rbi-sidebar-subpages a[aria-current] { background: #ffffff12 !important; color: #fff !important; }
+    .municipal-ui .sidebar-account { border-color: #ffffff20 !important; }
+    .municipal-ui .sidebar-account :is(span,small) { color: #b6c7dd !important; }
+    .municipal-ui .sidebar-account .account-avatar { background: #2a4d78 !important; color: #fff !important; }
+    .municipal-ui .sidebar-logout button { color: #e1e9f4 !important; }
+    .municipal-ui .sidebar-logout button:hover { background: var(--civic-navy-hover) !important; }
+    .municipal-ui .app-header { background: var(--civic-surface) !important; border-color: var(--civic-border) !important; box-shadow: none !important; min-height: 76px !important; }
+    .municipal-ui .app-header-kicker { color: var(--civic-muted) !important; font-size: 10px !important; }
+    .municipal-ui .app-header strong { color: var(--civic-ink) !important; font-size: 14px !important; }
+    .municipal-ui .system-status { color: var(--civic-muted) !important; background: transparent !important; }
+    .municipal-ui .header-user { background: var(--civic-subtle) !important; border-color: var(--civic-border) !important; color: var(--civic-ink) !important; font-size: 13px !important; }
+    .municipal-ui .app-footer { border-color: var(--civic-border) !important; background: transparent !important; color: var(--civic-muted) !important; }
+
+    /* Shared surfaces include dashboards, registry, requests, reports and profiles. */
+    .municipal-ui .app-content :is(.dashboard-card,.workflow-card,.government-content-card,.government-side-card,.government-stat-card,.population-report-section,.profile-section,.profile-account-card,.saved-report,.saved-household,.municipal-approval-item,.barangay-welcome-panel,.metric-card,.overview-shortcut,.workspace-launcher > a,article.rounded-xl.bg-white,form.rounded-xl.bg-white) {
+      background: var(--civic-surface) !important; border: 1px solid var(--civic-border) !important;
+      border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important;
+      animation: none !important; translate: none !important;
+    }
+    .municipal-ui .app-content :is(.government-card-header,.profile-section-heading) { background: #edf4ff !important; border-color: var(--civic-border) !important; padding: 20px 24px !important; }
+    .municipal-ui .app-content :is(.workflow-head,.dashboard-card-header,.content-panel-heading) { border-color: var(--civic-border) !important; }
+    .municipal-ui .app-content :is(.content-panel-heading > span,.overview-shortcut-icon,.workspace-launcher-icon,.profile-section-icon) { background: var(--civic-primary-soft) !important; color: var(--civic-primary) !important; border-radius: 10px !important; }
+    .municipal-ui .app-content :is(.overview-shortcut,.workspace-launcher > a):hover { border-color: #9ab5dc !important; box-shadow: 0 3px 10px #142d4e0a !important; }
+    .municipal-ui .app-content :is(.overview-shortcut-copy strong,.workspace-launcher strong) { color: var(--civic-ink) !important; font-size: 14px !important; }
+    .municipal-ui .app-content :is(.overview-shortcut-copy small,.workspace-launcher em) { color: var(--civic-muted) !important; font-size: 12px !important; }
+    .municipal-ui .app-content :is(.barangay-office-card,.dashboard-filter,.population-report-filter,.concern-details-grid) { background: var(--civic-subtle) !important; border-color: var(--civic-border) !important; border-radius: 10px !important; }
+    .municipal-ui .app-content :is(.dashboard-filter,.population-report-filter) :is(label,p) { color: var(--civic-text) !important; }
+    .municipal-ui .app-content .metric-card { padding: 20px !important; min-height: 144px !important; --metric-color: var(--civic-primary) !important; --metric-bg: var(--civic-primary-soft) !important; }
+    .municipal-ui .app-content .metric-card::after { display: none !important; }
+    .municipal-ui .app-content .metric-card { background: linear-gradient(135deg, #fff, var(--metric-bg)) !important; border-top: 3px solid var(--metric-color) !important; }
+    .municipal-ui .app-content .metric-card strong { font-size: 32px !important; line-height: 1.2 !important; font-weight: 700 !important; letter-spacing: -.04em !important; color: var(--civic-ink) !important; font-variant-numeric: tabular-nums; }
+    .municipal-ui .app-content .metric-card div > span { color: var(--civic-text) !important; font-size: 13px !important; }
+    .municipal-ui .app-content .metric-card small { color: var(--civic-muted) !important; font-size: 12px !important; }
+    .municipal-ui .app-content .metric-icon { color: var(--metric-color) !important; background: var(--metric-bg) !important; }
+    .municipal-ui .app-content .metric-success { --metric-color: var(--civic-success) !important; --metric-bg: var(--civic-success-soft) !important; }
+    .municipal-ui .app-content .metric-warning { --metric-color: var(--civic-warning) !important; --metric-bg: var(--civic-warning-soft) !important; }
+    .municipal-ui .app-content .metric-danger { --metric-color: var(--civic-danger) !important; --metric-bg: var(--civic-danger-soft) !important; }
+    .municipal-ui :is(.brgy-work-card,.brgy-quick-links > a,.resident-request-card) { background: var(--civic-surface) !important; border-color: var(--civic-border) !important; border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important; }
+    .municipal-ui .app-content :is(.dashboard-empty-state,.government-empty-state) { background: var(--civic-subtle) !important; border: 1px dashed #c4cfde !important; border-radius: 10px !important; color: var(--civic-muted) !important; box-shadow: none !important; }
+
+    /* Controls exclude the formatted RBI document and third-party map controls. */
+    .municipal-ui :is(.app-content,.public-content) :is(button,.button,.profile-back-link):not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *)) {
+      min-height: 42px !important; border-radius: var(--civic-control-radius) !important;
+      background: var(--civic-primary) !important; border: 1px solid var(--civic-primary) !important;
+      color: #fff !important; font-size: 14px !important; font-weight: 600 !important;
+      box-shadow: none !important; transition: background-color .15s, border-color .15s !important;
+    }
+    .municipal-ui :is(.app-content,.public-content) :is(button,.button,.profile-back-link):hover:not(:disabled):not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *)) { background: var(--civic-primary-hover) !important; border-color: var(--civic-primary-hover) !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.government-outline-button,.profile-back-link) { background: #fff !important; color: var(--civic-text) !important; border-color: #c4cfde !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.government-outline-button,.profile-back-link):hover:not(:disabled) { background: var(--civic-primary-soft) !important; color: var(--civic-primary) !important; border-color: #9ab5dc !important; }
+    .municipal-ui .app-content .barangay-primary-actions .government-primary-button :is(span,strong,small) { color: #fff !important; }
+    .municipal-ui .app-content .barangay-primary-actions .government-outline-button :is(span,strong,small) { color: var(--civic-text) !important; }
+    .municipal-ui :is(.app-content,.public-content) .danger-button { background: var(--civic-danger-soft) !important; color: var(--civic-danger) !important; border-color: #efbfc4 !important; }
+    .municipal-ui :is(.app-content,.public-content) .danger-button:hover:not(:disabled) { background: #ffe3e6 !important; border-color: var(--civic-danger) !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(button,.button):disabled { opacity: .5 !important; cursor: not-allowed !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=range]),select,textarea):not(:where(.rbi-document-preview *, .rbi-word-page *, .rbi-source-table *)) {
+      background-color: #fff !important; border: 1px solid #bfcbdc !important; border-radius: var(--civic-control-radius) !important;
+      color: var(--civic-ink) !important; font-size: 14px !important; min-height: 42px !important; box-shadow: none !important;
+    }
+    .municipal-ui :is(.app-content,.public-content) :is(input,textarea)::placeholder { color: var(--civic-muted) !important; opacity: 1; }
+    .municipal-ui :is(.app-content,.public-content) :is(input,select,textarea):is([readonly],:disabled) { background-color: #f0f3f7 !important; color: var(--civic-muted) !important; }
+    .municipal-ui :is(.app-content,.public-content) label { color: var(--civic-text) !important; font-size: 13px !important; font-weight: 600 !important; }
+    .municipal-ui :is(a,button,input,select,textarea,summary):focus-visible { outline: 3px solid #5a8cdb !important; outline-offset: 3px !important; box-shadow: none !important; }
+    .municipal-ui :is(.app-content,.public-content) [aria-invalid=true] { border-color: var(--civic-danger) !important; }
+    .municipal-ui :is(.rbi-subpages,.rbi-section-nav) a { border-radius: var(--civic-control-radius) !important; font-size: 13px !important; }
+    .municipal-ui .rbi-subpages a[aria-current] { color: var(--civic-primary) !important; background: var(--civic-primary-soft) !important; border-color: #a8c1e6 !important; }
+
+    /* Data remains dense enough for office work, with comfortable row spacing. */
+    .municipal-ui .app-content :is(.table-wrap,.clean-table-wrap):not(:where(.rbi-source-table,.rbi-document-preview *,.rbi-word-page *)) { border: 1px solid var(--civic-border) !important; border-radius: 10px !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) th:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: var(--civic-subtle) !important; color: var(--civic-muted) !important; font-size: 11px !important; font-weight: 650 !important; letter-spacing: .055em !important; padding: 13px 16px !important; border-color: var(--civic-border) !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) td:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { padding: 14px 16px !important; color: var(--civic-text) !important; font-size: 13px !important; border-color: #e9edf3 !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) tbody tr:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: #fff !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) tbody tr:nth-child(even):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: #fafbfd !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) tbody tr:hover:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: #f0f5fd !important; }
+    .municipal-ui .app-content .row-actions a { font-size: 13px !important; font-weight: 600 !important; color: var(--civic-primary) !important; text-underline-offset: 3px; }
+    .municipal-ui .app-content .row-actions a:hover { text-decoration: underline; }
+    .municipal-ui .app-content .directory-filter-group button { background: #fff !important; color: var(--civic-text) !important; border-color: #c4cfde !important; }
+    .municipal-ui .app-content .directory-filter-group button:is(.is-active,:hover) { background: var(--civic-primary-soft) !important; color: var(--civic-primary) !important; border-color: #9ab5dc !important; }
+    .municipal-ui .app-content .directory-filter-group button.is-active { box-shadow: inset 0 -2px var(--civic-primary) !important; }
+    .municipal-ui .municipal-directory-summary-grid article { border: 1px solid var(--civic-border) !important; border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important; }
+    .municipal-ui .municipal-directory-page :is(.municipal-directory-summary-grid article > span,.municipal-directory-card > header small,.directory-card-metrics dt,.account-status) { font-size: 11px !important; color: var(--civic-muted) !important; }
+    .municipal-ui .municipal-directory-page :is(.municipal-directory-summary-grid small,.municipal-directory-card > header p,.directory-card-office,.directory-latest-report > small,.directory-missing-report span,.directory-report-history article span,.directory-gcash-settings form > small,#barangay-directory-count) { font-size: 12px !important; color: var(--civic-muted) !important; line-height: 1.5 !important; }
+    .municipal-ui .municipal-directory-page :is(.directory-latest-report > strong,.directory-missing-report strong,.directory-report-history summary,.directory-report-history article strong,.directory-gcash-settings > summary) { font-size: 13px !important; color: var(--civic-text) !important; }
+    .municipal-ui .municipal-directory-card > header { background: var(--civic-subtle) !important; padding: 16px !important; }
+    .municipal-ui .municipal-directory-card :is(.directory-card-office,.directory-gcash-settings) { padding: 12px 16px !important; }
+    .municipal-ui .municipal-directory-card .payment-status { font-size: 11px !important; }
+    .municipal-ui :is(.badge,.count-chip,.government-count-badge) { font-size: 12px !important; line-height: 1.5 !important; border-radius: 6px !important; font-weight: 600 !important; }
+    .municipal-ui :is(.badge.pending,.badge.draft,.badge.processing,.government-count-badge.is-pending) { background: var(--civic-warning-soft) !important; color: var(--civic-warning) !important; border-color: #edcf94 !important; }
+    .municipal-ui :is(.badge.approved,.badge.completed,.badge.released,.badge.resolved,.badge.ready,.badge.submitted) { background: var(--civic-success-soft) !important; color: var(--civic-success) !important; border-color: #b9ddc9 !important; }
+    .municipal-ui :is(.badge.rejected,.badge.cancelled) { background: var(--civic-danger-soft) !important; color: var(--civic-danger) !important; border-color: #efbfc4 !important; }
+    .municipal-ui :is(.success,.status-message) { background: var(--civic-success-soft) !important; color: var(--civic-success) !important; border: 1px solid #b9ddc9 !important; border-radius: 10px !important; padding: 14px 18px !important; }
+    .municipal-ui .errors { background: var(--civic-danger-soft) !important; color: var(--civic-danger) !important; border: 1px solid #efbfc4 !important; border-radius: 10px !important; }
+
+    /* Public access uses the same controls, type and municipal identity. */
+    .municipal-ui .ph-government-bar { background: var(--civic-navy) !important; }
+    .municipal-ui .public-site-header { background: #fff !important; border-color: var(--civic-border) !important; box-shadow: none !important; }
+    .municipal-ui .public-nav a[aria-current] { color: var(--civic-primary) !important; }
+    .municipal-ui .portal-login-intro { background: var(--civic-navy) !important; }
+    .municipal-ui .registration-guide { background: var(--civic-navy) !important; }
+    .municipal-ui .registration-guide h1 { color: #fff !important; }
+    .municipal-ui .service-card { border: 1px solid var(--civic-border) !important; border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important; }
+    .municipal-ui .service-icon { display: inline-flex; align-items: center; justify-content: center; background: var(--civic-primary-soft) !important; color: var(--civic-primary) !important; }
+    .municipal-ui .portal-login-intro h2 { color: #fff !important; }
+    .municipal-ui .auth-panel { border-color: var(--civic-border) !important; border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important; }
+    .municipal-ui .public-footer { background: var(--civic-navy) !important; }
+    .municipal-ui .app-content :is(.dashboard-page-header,.metric-card,.overview-shortcut,.workflow-card,.profile-section) { transform: none !important; }
+
+    @media (max-width: 960px) {
+      .municipal-ui .app-content { padding: 20px !important; }
+      .municipal-ui .app-header { min-height: 68px !important; }
+    }
+    @media (max-width: 680px) {
+      .municipal-ui .app-content { padding: 16px !important; }
+      .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) { padding: 20px !important; }
+      .municipal-ui .app-content .dashboard-page-header { grid-template-columns: minmax(0,1fr) !important; }
+      .municipal-ui .overview-context { grid-column: 1 !important; grid-row: auto !important; }
+      .municipal-ui .app-content .dashboard-header-actions { width: 100%; }
+      .municipal-ui .app-content .dashboard-header-actions .button { flex: 1 1 auto; }
+      .municipal-ui :is(.app-content,.public-content) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea):not(:where(.rbi-document-preview *, .rbi-word-page *, .rbi-source-table *)) { font-size: 16px !important; }
+      .municipal-ui .app-content .metric-card { padding: 16px !important; }
+      .municipal-ui .header-user { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .municipal-ui *, .municipal-ui *::before, .municipal-ui *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  }
+}

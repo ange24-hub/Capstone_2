@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Population Summary</title>
+<html lang="en"><head><meta charset="utf-8"><title>{{ $reportTitle ?? 'Population Summary' }}</title>
 <style>
 @page { margin: 30pt 34pt 34pt; }
 body { font-family: DejaVu Serif, serif; color: #172536; font-size: 8.5pt; line-height: 1.2; }
@@ -18,6 +18,21 @@ tr { page-break-inside: avoid; } thead { display: table-header-group; }
 .population-report-notes { font-size: 7pt; line-height: 1.25; }
 ol { margin: 4pt 0; padding-left: 15pt; } li { margin-bottom: 3pt; }
 .report-caption { font-size: 7.5pt; margin: 4pt 0; color: #374557; }
+.population-member-table { table-layout: fixed; font-size: 8pt; }
+.population-member-table th, .population-member-table td { padding: 5pt 3pt; vertical-align: top; word-wrap: break-word; }
+.population-member-table th:nth-child(1) { width: 26%; }
+.population-member-table th:nth-child(2) { width: 14%; }
+.population-member-table th:nth-child(3) { width: 10%; }
+.population-member-table th:nth-child(4) { width: 14%; }
+.population-member-table th:nth-child(5) { width: 19%; }
+.population-member-table th:nth-child(6) { width: 10%; }
+.population-member-table th:nth-child(7) { width: 7%; }
+.population-detail-group h3 { font-size: 10pt; page-break-after: avoid; }
+.population-detail-group { margin-bottom: 14pt; }
+.population-head-table th:nth-child(1) { width: 25%; }
+.population-head-table th:nth-child(2) { width: 25%; }
+.population-head-table th:nth-child(3) { width: 50%; }
+.population-head-table th, .population-head-table td { padding: 6pt; vertical-align: top; }
 .population-area-page { page-break-before: always; }
 .population-coverage-table { font-size: 7pt; }
 .population-coverage-table th:first-child { width: 21%; }
@@ -25,7 +40,7 @@ ol { margin: 4pt 0; padding-left: 15pt; } li { margin-bottom: 3pt; }
 footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt solid #8793a0; padding-top: 4pt; font-size: 7pt; color: #465361; }
 .page-number { float: right; } .page-number:after { content: counter(page); }
 </style></head><body>
-<footer>SB-ISPGM | Population Summary | {{ $report['generatedAt']->format('d M Y') }} <span class="page-number">Page </span></footer>
-<header class="report-header"><p>Republic of the Philippines</p><p>Province of Southern Leyte</p><p class="office">Municipality of Tomas Oppus</p><h1>POPULATION SUMMARY REPORT</h1><p class="office">{{ $report['scopeLabel'] }}</p><p class="report-meta">As of {{ $report['generatedAt']->format('d F Y') }} &nbsp; | &nbsp; Generated {{ $report['generatedAt']->format('h:i A T') }}</p></header>
-@include('reports.population-tables')
+<footer>RBIM | {{ $reportTitle ?? 'Population Summary' }} | {{ $report['generatedAt']->format('d M Y') }} <span class="page-number">Page </span></footer>
+<header class="report-header"><p>Republic of the Philippines</p><p>Province of Southern Leyte</p><p class="office">Municipality of Tomas Oppus</p><h1>{{ strtoupper($reportTitle ?? 'Population Summary') }} REPORT</h1><p class="office">{{ $report['scopeLabel'] }}</p><p class="report-meta">As of {{ $report['generatedAt']->format('d F Y') }} &nbsp; | &nbsp; Generated {{ $report['generatedAt']->format('h:i A T') }}</p></header>
+@include('reports.population-content')
 </body></html>

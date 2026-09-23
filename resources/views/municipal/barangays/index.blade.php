@@ -29,9 +29,9 @@
                 <input id="barangay-directory-search" type="search" placeholder="Enter barangay or local name..." autocomplete="off">
             </div>
             <div class="directory-filter-group" role="group" aria-label="Filter barangays by report status">
-                <button type="button" class="is-active" data-directory-filter="all">All Barangays</button>
-                <button type="button" data-directory-filter="reported">With Reports</button>
-                <button type="button" data-directory-filter="missing">Awaiting Reports</button>
+                <button type="button" class="is-active" aria-pressed="true" data-directory-filter="all">All Barangays</button>
+                <button type="button" aria-pressed="false" data-directory-filter="reported">With Reports</button>
+                <button type="button" aria-pressed="false" data-directory-filter="missing">Awaiting Reports</button>
             </div>
             <span id="barangay-directory-count">Showing {{ $barangays->count() }} barangays</span>
         </div>
@@ -150,7 +150,10 @@
             search.addEventListener('input', refresh);
             filters.forEach((button) => button.addEventListener('click', () => {
                 activeFilter = button.dataset.directoryFilter;
-                filters.forEach((item) => item.classList.toggle('is-active', item === button));
+                filters.forEach((item) => {
+                    item.classList.toggle('is-active', item === button);
+                    item.setAttribute('aria-pressed', String(item === button));
+                });
                 refresh();
             }));
         })();

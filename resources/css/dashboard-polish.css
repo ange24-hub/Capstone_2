@@ -117,3 +117,26 @@
  }
 }
 @keyframes overview-arrive { from { opacity:.65; } to { opacity:1; } }
+
+/* Compact barangay overview: keep actions and Philippine time within the banner. */
+@layer components {
+ @media screen {
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-page-header { min-height:0 !important; padding:20px 26px !important; grid-template-columns:minmax(0,1fr) 250px !important; grid-template-rows:auto auto !important; gap:12px 26px !important; align-items:start !important; margin-bottom:18px !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-title-group h1 { font-size:30px !important; margin:7px 0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-title-group p { margin:0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions { align-self:start !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context { padding:14px 16px !important; gap:0 !important; align-self:center !important; display:block !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context-office,
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context-caption { display:none !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context-date { display:grid !important; grid-template-columns:auto 1fr; align-items:center; gap:6px 10px !important; padding:0 !important; border:0 !important; text-align:left !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context-date strong { font-size:18px !important; text-align:right; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context-date .ph-clock-label { grid-column:1 / -1; margin:6px 0 0 !important; }
+  .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context-date .ph-clock-time { grid-column:1 / -1; margin:0 !important; font-size:24px !important; line-height:1.25; }
+  @media (max-width:680px) {
+   .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-page-header { grid-template-columns:minmax(0,1fr) !important; padding:18px !important; gap:12px !important; }
+   .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-title-group h1 { font-size:27px !important; }
+   .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .overview-context { padding:12px 14px !important; }
+   .municipal-ui .dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions { gap:8px !important; }
+  }
+ }
+}

@@ -99,7 +99,7 @@
                                 <div class="request-reference"><small>Reference</small><strong>{{ $request->reference_number }}</strong></div>
                                 <div class="request-document"><strong>{{ $request->typeLabel() }}</strong><span>{{ $request->purpose }}</span><small>Requested {{ $request->created_at->format('M d, Y · h:i A') }}</small></div>
                                 <div class="request-status-stack">
-                                    <span class="request-status request-status-{{ $request->status }}">{{ $request->statusLabel() }}</span>
+                                    <x-status-badge :status="$request->status" class="request-status request-status-{{ $request->status }}">{{ $request->statusLabel() }}</x-status-badge>
                                     @if ($request->requiresPayment())<span class="payment-status payment-status-{{ $request->payment_status }}">{{ $request->paymentStatusLabel() }}</span>@endif
                                 </div>
                             </div>
