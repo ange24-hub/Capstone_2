@@ -81,7 +81,7 @@ class RegistryController extends Controller
     public function newInhabitants(Request $request): RedirectResponse
     {
         abort_unless($request->user()->barangay, 403);
-        return redirect()->route('barangay.rbi-updates.index');
+        return redirect()->route('barangay.rbi-updates.history');
     }
 
     public function deceasedRecords(Request $request): View
@@ -100,7 +100,7 @@ class RegistryController extends Controller
     {
         $isBarangaySecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
         if ($isBarangaySecretary && $request->input('sheet') === 'new-inhabitants') {
-            return redirect()->route('barangay.rbi-updates.index');
+            return redirect()->route('barangay.rbi-updates.history');
         }
 
         if ($isBarangaySecretary) {
@@ -496,7 +496,7 @@ class RegistryController extends Controller
             \App\Models\RegistryActivity::create(['barangay_id' => $record->barangay_id, 'user_id' => $request->user()->id,
                 'inhabitant_id' => $active->id, 'description' => 'Added saved member to Consolidated RBI: '.$active->fullName()]);
         });
-        return redirect()->route('barangay.rbi-updates.index')->with('status', 'Member added to Consolidated / All Registered.');
+        return redirect()->route('barangay.rbi-updates.history')->with('status', 'Member added to Consolidated / All Registered.');
     }
 
     public function addNewFamilyToActive(Request $request): RedirectResponse

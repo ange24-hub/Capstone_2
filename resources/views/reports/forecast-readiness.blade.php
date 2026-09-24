@@ -2,10 +2,11 @@
 @section('content')
 <section class="grid gap-6" aria-labelledby="forecast-title">
     <header class="dashboard-page-header">
+            <x-workspace-heading icon="activity">
         <span class="dashboard-eyebrow">Predictive analytics preparation</span>
         <h1 id="forecast-title">Forecast Readiness</h1>
         <p>{{ $report['scope'] }} &middot; {{ $report['start']->format('M Y') }}–{{ $report['end']->copy()->subMonth()->format('M Y') }} · 24 completed months</p>
-    </header>
+    </x-workspace-heading></header>
     @unless($report['secretary'])
     <form method="GET" action="{{ route('analysis.forecast-readiness') }}" class="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-5">
         <div><label for="forecast-area">Barangay</label><select id="forecast-area" name="barangay_id"><option value="">All barangays</option>@foreach($barangays as $area)<option value="{{ $area->id }}" @selected($report['barangayId'] === $area->id)>{{ $area->name }}</option>@endforeach</select></div>

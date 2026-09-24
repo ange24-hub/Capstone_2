@@ -1,0 +1,72 @@
+@media screen {
+    body:has(.rbi-report-view) .app-main { background: #f2f5f8; }
+    .rbi-report-view { display: grid; gap: 18px; width: 100%; min-width: 0; max-width: 1440px; margin: 0 auto; color: #203b52; }
+    .rbi-report-view .rbi-report-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 24px; background: #fff; border: 1px solid #d7e1ec; border-top: 4px solid #285d92; border-radius: 12px; box-shadow: 0 3px 12px #19395606; }
+    .rbi-report-heading { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .rbi-report-emblem { display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 50px; border-radius: 10px; background: #e7f0fb; color: #285d92; }
+    .rbi-report-emblem svg { width: 25px; height: 25px; }
+    .rbi-report-eyebrow { color: #476d92; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    .rbi-report-view .rbi-report-header h1 { color: #193c5e; font-size: clamp(24px, 2.3vw, 29px); font-weight: 700; line-height: 1.2; letter-spacing: -.035em; margin: 5px 0 7px; }
+    .rbi-report-view .rbi-report-header p { margin: 0; color: #536d83; font-size: 14px; line-height: 1.5; }
+    .rbi-report-heading p span { padding: 0 6px; color: #8c9daa; }
+    .rbi-report-downloads { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .rbi-report-view .rbi-report-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 9px 13px; border: 1px solid #bfd0e1; border-radius: 7px; color: #285d92; background: #fff; font-size: 13px; font-weight: 600; line-height: 1.4; text-decoration: none; transition: background-color 170ms ease, border-color 170ms ease, box-shadow 170ms ease; }
+    .rbi-report-button svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .rbi-report-view .rbi-report-pdf { background: #285d92; color: #fff; border-color: #285d92; }
+    .rbi-report-view .rbi-report-pdf:hover { background: #1d466f; border-color: #1d466f; box-shadow: 0 3px 9px #285d9226; }
+    .rbi-report-view .rbi-report-word { background: #f0f7f3; color: #27664b; border-color: #bed7c8; }
+    .rbi-report-view .rbi-report-word:hover { background: #e2f0e7; border-color: #83af96; }
+    .rbi-report-view a:focus-visible { outline: 3px solid #6997c3; outline-offset: 3px; }
+    .rbi-report-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(180px, 1.2fr); gap: 10px; }
+    .rbi-workspace-overview .rbi-report-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    html.municipal-ui .rbi-forms-workspace:has(.rbi-workspace-overview) { gap: 18px; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages { background: #e8eef5; border-color: #d7e1ec; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages > a { color: #476580; transition: background-color 170ms ease, color 170ms ease; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages > a[aria-current="page"] { color: #fff; background: #285d92; box-shadow: 0 2px 5px #19395612; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages > a:hover { color: #193c5e; background: #fff; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav { padding: 6px; border: 1px solid #d7e1ec; border-radius: 10px; background: #fff; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav a { color: #476580; white-space: normal; transition: background-color 170ms ease; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav a span { color: #285d92; border-color: #d7e1ec; background: #e8f1fc; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav a:hover { background: #edf3fa; }
+    .rbi-report-metric { --metric-color: #285d92; --metric-tint: #e8f1fc; display: flex; align-items: center; gap: 11px; min-width: 0; padding: 14px; border: 1px solid #dbe4ed; border-radius: 10px; background: #fff; border-bottom: 3px solid var(--metric-color); transition: box-shadow 180ms ease; }
+    .rbi-report-metric:hover { box-shadow: 0 4px 12px #1939560c; }
+    .rbi-metric-icon { display: grid; place-items: center; width: 34px; height: 36px; flex-shrink: 0; border-radius: 8px; color: var(--metric-color); background: var(--metric-tint); }
+    .rbi-metric-icon svg { width: 18px; height: 18px; }
+    .rbi-report-metric > div { min-width: 0; }
+    .rbi-metric-label { display: block; color: #566c7e; font-size: 13px; line-height: 1.4; margin-bottom: 5px; }
+    .rbi-report-metric strong { display: block; font-size: 23px; line-height: 1.15; color: #203b52; font-variant-numeric: tabular-nums; }
+    .rbi-metric-status { --metric-color: #ac7928; --metric-tint: #fff3da; }
+    .rbi-metric-residents { --metric-color: #2d7858; --metric-tint: #e5f3ea; }
+    .rbi-metric-deceased { --metric-color: #755e91; --metric-tint: #f0eaf7; }
+    .rbi-metric-submitted { --metric-color: #5f788c; --metric-tint: #edf2f6; }
+    .rbi-report-metric .rbi-report-status { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 5px; background: #fff2d7; color: #855917; font-size: 13px; font-weight: 600; }
+    .rbi-report-metric .rbi-report-status-submitted { background: #e4f2e9; color: #226344; }
+    .rbi-metric-status:has(.rbi-report-status-submitted) { --metric-color: #2d7858; --metric-tint: #e5f3ea; }
+    .rbi-metric-submitted strong { font-size: 14px; line-height: 1.4; }
+    .rbi-metric-submitted small { display: block; font-size: 12px; color: #62798b; margin-top: 3px; }
+    .rbi-preview-panel { min-width: 0; overflow: hidden; background: #fff; border: 1px solid #d7e1ec; border-radius: 12px; }
+    .rbi-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 0; }
+    .rbi-report-view .rbi-preview-heading h2 { display: flex; align-items: center; gap: 8px; margin: 0; color: #244864; font-size: 17px; font-weight: 600; }
+    .rbi-preview-heading svg { width: 18px; height: 18px; color: #416e96; }
+    .rbi-preview-heading > span { border: 1px solid #d4e0eb; border-radius: 5px; background: #f3f7fb; color: #466985; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
+    .rbi-report-view .rbi-preview-panel > p { margin: 6px 20px 14px; color: #63788a; font-size: 13px; line-height: 1.5; }
+    .rbi-report-view .rbi-document-preview { border: 0; border-top: 1px solid #d7e1ec; border-radius: 0; background: #e8edf2; margin: 0; padding: 22px; }
+    .rbi-report-header, .rbi-report-metrics { animation: rbi-report-appear 220ms ease-out both; }
+    @keyframes rbi-report-appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 1050px) { .rbi-report-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 640px) {
+        .rbi-report-view { gap: 12px; }
+        .rbi-report-view .rbi-report-header { padding: 16px; gap: 16px; }
+        .rbi-report-heading { gap: 10px; }
+        .rbi-report-emblem { width: 36px; height: 42px; }
+        .rbi-report-downloads { width: 100%; }
+        .rbi-report-downloads .rbi-report-button { flex: 1 1 180px; }
+        .rbi-report-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .rbi-report-metric { padding: 12px; gap: 8px; }
+        .rbi-metric-submitted { grid-column: 1 / -1; }
+        .rbi-report-view .rbi-document-preview { padding: 14px; }
+        .rbi-preview-heading { padding: 14px 14px 0; }
+        .rbi-report-view .rbi-preview-panel > p { margin-left: 14px; margin-right: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .rbi-report-view *, .rbi-report-view *::before, .rbi-report-view *::after, .rbi-forms-workspace .rbi-subpages > a, .rbi-forms-workspace .rbi-section-nav a { animation: none !important; transition: none !important; } }
+}

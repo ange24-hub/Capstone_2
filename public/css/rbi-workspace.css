@@ -88,3 +88,182 @@
  .rbi-forms-workspace .signature-pad-actions { flex-wrap: wrap; gap: 8px; }
  .rbi-forms-workspace .saved-member-actions button { max-width: 100%; }
 }
+
+.rbi-duplicate-notice { margin: 12px 0; padding: 12px 16px; border: 1px solid #f59e0b; border-radius: 8px; background: #fffbeb; color: #92400e; font-size: 13px; }
+.rbi-duplicate-notice[hidden] { display: none; }
+.rbi-duplicate-notice ul { margin: 6px 0 0; padding-left: 20px; list-style: disc; }
+.rbi-duplicate-row { outline: 2px solid #f59e0b; outline-offset: -2px; }
+
+/* Compact RBI workspace with readable form text. */
+@media screen {
+    body:has(.rbi-forms-workspace) .app-main { background: #f4f5f2; }
+    html.municipal-ui .rbi-forms-workspace { --rbi-navy: #183e37; --rbi-line: #dce3dc; gap: 14px; max-width: 1320px; font-size: 15px; background: transparent; }
+    html.municipal-ui .rbi-forms-workspace .rbi-workspace-header {
+        padding: 18px 22px; gap: 20px; border: 1px solid #dce3dc; border-left: 4px solid #28745b; border-radius: 10px;
+        background: #fff; background-image: none; color: #203d30;
+        box-shadow: none; overflow: hidden;
+    }
+    .rbi-forms-workspace .rbi-workspace-header::after { display: none; }
+    .rbi-header-eyebrow { display: flex; align-items: center; gap: 10px; color: #37654d; font-size: 14px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .rbi-header-eyebrow > span > span { padding: 0 7px; color: #6f8175; }
+    .rbi-header-icon { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid #527165; border-radius: 8px; }
+    .rbi-header-icon svg { width: 17px; height: 17px; }
+    html.municipal-ui .rbi-forms-workspace .rbi-workspace-header h1 { color: #203d30; font-size: clamp(25px, 2.3vw, 29px); font-weight: 700; line-height: 1.2; letter-spacing: -.04em; margin: 8px 0 6px; }
+    html.municipal-ui .rbi-forms-workspace .rbi-workspace-header p { color: #526458; font-size: 15px; margin: 0 0 10px; max-width: 560px; line-height: 1.6; }
+    .rbi-office-tag { display: inline-flex; align-items: center; gap: 7px; color: #37654d; font-size: 14px; font-weight: 600; }
+    .rbi-office-tag svg { width: 15px; height: 15px; }
+    html.municipal-ui .rbi-forms-workspace .hero-side { gap: 0; align-self: center; border: 0; border-radius: 0; background: transparent; padding: 0; flex-shrink: 0; }
+    html.municipal-ui .rbi-forms-workspace .hero-mini-card { border: 0; border-radius: 0; min-width: 120px; background: transparent; padding: 8px 16px; gap: 6px; }
+    html.municipal-ui .rbi-forms-workspace .hero-mini-card + .hero-mini-card { border-left: 1px solid #dce3dc; }
+    html.municipal-ui .rbi-forms-workspace .hero-mini-card strong { color: #203d30; font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    html.municipal-ui .rbi-forms-workspace .hero-mini-card span { max-width: none; color: #4b6151; font-size: 14px; font-weight: 500; }
+    .rbi-stat-dot { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; }
+    .rbi-stat-submitted { background: #2d8156; }
+    .rbi-stat-draft { background: #b17a20; }
+    html.municipal-ui .rbi-forms-workspace .hero-actions { display: inline-flex; margin: 0 0 0 16px; vertical-align: middle; }
+    html.municipal-ui .rbi-forms-workspace .hero-actions .button { min-height: 34px; padding: 7px 12px; background: transparent; border: 1px solid #c3d1c5; color: #285840; font-size: 14px; }
+    html.municipal-ui .rbi-forms-workspace .hero-actions .button:hover { background: #edf3e9; border-color: #74997d; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages { display: flex; flex-direction: row; gap: 6px; width: fit-content; max-width: 100%; padding: 4px; margin: 0; background: #e7ece6; border: 1px solid #dbe2d9; border-radius: 9px; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages > a { padding: 9px 14px; border: 0; border-radius: 7px; background: transparent; color: #4b6055; font-size: 15px; font-weight: 600; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages > a[aria-current="page"] { background: #fff; color: #175842; box-shadow: 0 1px 5px #183e371a; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages > a:hover { color: #143e36; background: #f8faf7; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpages svg { width: 18px; height: 18px; }
+    html.municipal-ui .rbi-forms-workspace .rbi-subpage-help { font-size: 14px; color: #607065; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav { background: transparent; border: 0; border-radius: 0; padding: 0 0 10px; gap: 10px; border-bottom: 1px solid #d8dfd6; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav a { border: 0; padding: 8px 10px; color: #435b4d; font-size: 14px; background: transparent; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav a span { display: grid; place-items: center; flex-shrink: 0; width: 27px; height: 27px; border: 1px solid #bdcec0; border-radius: 50%; background: #fff; color: #315c45; font-size: 12px; }
+    html.municipal-ui .rbi-forms-workspace .rbi-section-nav a:hover { background: #e6ece3; }
+    html.municipal-ui .rbi-forms-workspace .workflow-card { border: 1px solid #dce3dc; border-radius: 12px; padding: 18px; background: #fff; box-shadow: 0 2px 8px #193b2a05; }
+    html.municipal-ui .rbi-forms-workspace .report-editor { border-top: 3px solid #28745b; }
+    html.municipal-ui .rbi-forms-workspace .workflow-head { margin-bottom: 14px; padding-bottom: 12px; gap: 12px; }
+    html.municipal-ui .rbi-forms-workspace .workflow-head h2 { margin: 8px 0 4px; font-size: 22px; }
+    html.municipal-ui .rbi-forms-workspace .workflow-head p { margin: 4px 0 0; }
+    html.municipal-ui .rbi-forms-workspace .form-grid { gap: 14px 18px; }
+    html.municipal-ui .rbi-forms-workspace .field-help { font-size: 13px; line-height: 1.5; }
+    html.municipal-ui .rbi-forms-workspace #rbi-monthly-form > h3 { margin: 22px 0 12px; padding-top: 18px; font-size: 19px; }
+    html.municipal-ui .rbi-forms-workspace .family-entry-card h4 { font-size: 18px; }
+    html.municipal-ui .rbi-forms-workspace .family-entry-card h5 { margin: 16px 0 12px; font-size: 16px; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad-field .min-h-16 { min-height: 0; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad-actions { font-size: 13px; }
+    html.municipal-ui .rbi-forms-workspace .form-actions { margin-top: 14px; padding-top: 14px; }
+    html.municipal-ui .rbi-forms-workspace .official-report-history th { font-size: 12px; padding: 12px; }
+    html.municipal-ui .rbi-forms-workspace .official-report-history td { font-size: 14px; padding: 12px; }
+    html.municipal-ui .rbi-forms-workspace .saved-report summary { padding: 14px 16px; }
+    html.municipal-ui .rbi-forms-workspace .saved-member-name strong { font-size: 15px; }
+    html.municipal-ui .rbi-forms-workspace .report-month small { font-size: 13px; }
+    html.municipal-ui .rbi-forms-workspace .section-title { color: #203d30; letter-spacing: -.025em; }
+    html.municipal-ui .rbi-forms-workspace .step-pill { color: #267052; background: #edf4ed; font-size: 12px; letter-spacing: .06em; padding: 5px 9px; border-radius: 4px; }
+    html.municipal-ui .rbi-forms-workspace .page-kicker { color: #387257; }
+    html.municipal-ui .rbi-forms-workspace .workflow-head p { color: #627368; font-size: 15px; }
+    html.municipal-ui .rbi-forms-workspace label { font-size: 14px; color: #394e41; font-weight: 600; }
+    html.municipal-ui .rbi-forms-workspace input:not([type=hidden]), html.municipal-ui .rbi-forms-workspace select { background: #fcfdfb; color: #263e31; border-color: #c9d4c8; border-radius: 7px; min-height: 40px; font-size: 15px; padding: 8px 10px; box-shadow: none; }
+    html.municipal-ui .rbi-forms-workspace input:focus, html.municipal-ui .rbi-forms-workspace select:focus { outline: 2px solid #367c5b; outline-offset: 1px; border-color: #367c5b; background: #fff; }
+    html.municipal-ui .rbi-forms-workspace input[readonly] { color: #5d7061; background: #edf1ea; }
+    html.municipal-ui .rbi-forms-workspace .field-help { color: #607466; }
+    html.municipal-ui .rbi-forms-workspace .family-entry-card { background: #f5f7f2; border-color: #d9e2d4; border-left: 3px solid #8fa27b; padding: 14px; }
+    html.municipal-ui .rbi-forms-workspace .member-entry-card { border-color: #dce4d7; background: #fff; padding: 14px; }
+    html.municipal-ui .rbi-forms-workspace [data-member-number] { color: #276148; font-size: 15px; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad-field { background: #f6f7f2; border-color: #d8e0d2; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad-field h4 { color: #294334; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad-field > div > p { color: #486c4a; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad { border-color: #97ad98; }
+    html.municipal-ui .rbi-forms-workspace .signature-pad-actions { background: #eef2e9; color: #4b6350; }
+    html.municipal-ui .rbi-forms-workspace button, html.municipal-ui .rbi-forms-workspace .button { min-height: 38px; border: 1px solid #b8c9bb; background: #fff; color: #285840; border-radius: 7px; font-weight: 600; font-size: 14px; box-shadow: none; }
+    html.municipal-ui .rbi-forms-workspace button:hover:not(:disabled), html.municipal-ui .rbi-forms-workspace .button:hover { background: #edf3e9; border-color: #74997d; color: #173e28; }
+    html.municipal-ui .rbi-forms-workspace button[type=submit], html.municipal-ui .rbi-forms-workspace #add-family-form { color: #fff; background: #226449; border-color: #226449; padding: 10px 18px; }
+    html.municipal-ui .rbi-forms-workspace button[type=submit]:hover:not(:disabled), html.municipal-ui .rbi-forms-workspace #add-family-form:hover { background: #174c36; border-color: #174c36; color: #fff; }
+    html.municipal-ui .rbi-forms-workspace button[data-remove-member], html.municipal-ui .rbi-forms-workspace button[data-remove-family], html.municipal-ui .rbi-forms-workspace .member-delete { color: #9b3d35; border-color: #e5cbc6; background: #fff9f7; }
+    html.municipal-ui .rbi-forms-workspace button:focus-visible, html.municipal-ui .rbi-forms-workspace a:focus-visible, html.municipal-ui .rbi-forms-workspace summary:focus-visible { outline: 3px solid #609d7b; outline-offset: 3px; }
+    html.municipal-ui .rbi-forms-workspace #rbi-monthly-form > .form-actions:last-child { padding: 12px 14px; border-color: #d7dfd0; background: #f0f3e9; color: #4e6552; }
+    html.municipal-ui .rbi-forms-workspace .official-report-history th { color: #47614c; background: #edf2e9; }
+    html.municipal-ui .rbi-forms-workspace .official-report-history tbody tr:hover { background: #f6f9f2; }
+    html.municipal-ui .rbi-forms-workspace .saved-report summary { background: #f1f5ec; }
+    html.municipal-ui .rbi-forms-workspace .report-month-icon, html.municipal-ui .rbi-forms-workspace .member-initial { background: #e4eddd; color: #376a46; border-color: #ccdac5; }
+    html.municipal-ui .rbi-forms-workspace .rbi-history-actions > a { border-color: #c7d6c5; color: #315f40; }
+    @media (max-width: 1000px) {
+        html.municipal-ui .rbi-forms-workspace .hero-side { flex-direction: row; }
+        html.municipal-ui .rbi-forms-workspace .hero-mini-card { min-width: 110px; padding: 8px 12px; }
+    }
+    @media (max-width: 760px) {
+        html.municipal-ui .rbi-forms-workspace .rbi-workspace-header { flex-direction: column; align-items: stretch; gap: 14px; padding: 16px; }
+        html.municipal-ui .rbi-forms-workspace .hero-side { align-self: stretch; width: 100%; }
+        html.municipal-ui .rbi-forms-workspace .hero-mini-card { flex: 1; }
+    }
+    @media (max-width: 640px) {
+        html.municipal-ui .rbi-forms-workspace { gap: 14px; }
+        html.municipal-ui .rbi-forms-workspace .rbi-subpages { width: 100%; }
+        html.municipal-ui .rbi-forms-workspace .rbi-subpages > a { flex: 1; padding: 10px; font-size: 14px; }
+        html.municipal-ui .rbi-forms-workspace .rbi-section-nav { gap: 4px; }
+        html.municipal-ui .rbi-forms-workspace .workflow-card { padding: 18px; }
+        html.municipal-ui .rbi-forms-workspace .family-entry-card, html.municipal-ui .rbi-forms-workspace .member-entry-card { padding: 14px; }
+        .rbi-header-eyebrow { font-size: 12px; letter-spacing: .03em; }
+        html.municipal-ui .rbi-forms-workspace .hero-actions { display: flex; margin: 14px 0 0; }
+    }
+}
+
+.rbi-household-pagination { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; color:#4b6151; font-size:14px; }
+.rbi-page-links { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+.rbi-page-links a, .rbi-page-links > span { display:inline-flex; align-items:center; justify-content:center; min-width:34px; min-height:34px; padding:6px 10px; border-radius:6px; }
+.rbi-page-links a { background:#fff; border:1px solid #c7d6c5; color:#285840; text-decoration:none; }
+.rbi-page-links a:hover { background:#edf3e9; }
+.rbi-page-links [aria-current=page] { background:#226449; color:#fff; font-weight:600; }
+.rbi-page-links [aria-disabled=true] { color:#748177; }
+
+/* Saved household history and page controls. */
+#saved-inhabitant-records { gap: 12px; margin: 18px 0 0; }
+#saved-inhabitant-records .saved-report { border: 1px solid #cfdbe5; border-radius: 12px; box-shadow: 0 3px 12px #19395608; }
+#saved-inhabitant-records .saved-report > summary { padding: 14px 18px; gap: 14px; background: #edf3f9; border-bottom: 1px solid transparent; transition: background-color 180ms ease; }
+#saved-inhabitant-records .saved-report > summary:hover { background: #e2ecf6; }
+#saved-inhabitant-records .saved-report[open] > summary { border-bottom-color: #d2deeb; }
+#saved-inhabitant-records .report-month-icon { width: 36px; height: 40px; color: #fff; background: #24578b; border: 0; border-radius: 8px; }
+#saved-inhabitant-records .report-month strong { color: #183d62; font-size: 17px; }
+#saved-inhabitant-records .report-month small { color: #536b80; font-size: 13px; }
+#saved-inhabitant-records .report-counts { padding: 6px 10px; color: #305572; background: #fff; border: 1px solid #d6e2ed; border-radius: 6px; font-size: 13px; }
+#saved-inhabitant-records .report-expand { color: #24578b; transition: transform 200ms ease; }
+#saved-inhabitant-records .saved-report-content { padding: 0 18px 18px; border: 0; }
+#saved-inhabitant-records .saved-report[open] > .saved-report-content { animation: rbi-history-enter 220ms ease-out both; }
+#saved-inhabitant-records .saved-report-toolbar { padding: 14px 0 8px; font-size: 13px; }
+#saved-inhabitant-records .saved-report-content > .field-help { margin: 4px 0 12px; font-size: 13px; color: #5a6b77; }
+#saved-inhabitant-records .saved-household { border: 1px solid #d3e2dd; border-radius: 9px; margin-top: 10px; }
+#saved-inhabitant-records .saved-household-heading { padding: 11px 14px; background: #edf5f1; border-bottom: 1px solid #d6e6dd; }
+#saved-inhabitant-records .saved-household-heading h3 { display: flex; align-items: center; gap: 9px; color: #215441; font-size: 16px; }
+#saved-inhabitant-records .rbi-household-icon { display: grid; place-items: center; width: 28px; height: 28px; background: #d8eae0; color: #286047; border-radius: 6px; }
+#saved-inhabitant-records .rbi-household-icon svg { width: 17px; height: 17px; }
+#saved-inhabitant-records .saved-household-heading > span { font-size: 13px; color: #456858; }
+#saved-inhabitant-records .saved-member { padding: 12px 14px; gap: 12px; background: #fff; border-top: 1px solid #e8edf0; transition: background-color 160ms ease; }
+#saved-inhabitant-records .saved-member:hover { background: #f5f9fc; }
+#saved-inhabitant-records .saved-member-name { flex: 1 1 220px; min-width: 0; }
+#saved-inhabitant-records .saved-member-name strong { color: #263f52; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+#saved-inhabitant-records .member-initial { flex-shrink: 0; width: 32px; height: 32px; background: #e5eef8; color: #285986; font-size: 13px; font-weight: 700; }
+#saved-inhabitant-records .saved-member-actions { gap: 6px; }
+#saved-inhabitant-records button, #saved-inhabitant-records .button, #saved-inhabitant-records .member-edit { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 7px 11px; border-radius: 6px; font-size: 13px; line-height: 1.4; font-weight: 600; text-decoration: none; transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
+#saved-inhabitant-records .member-edit, #saved-inhabitant-records .rbi-download-action { border: 1px solid #b9cfe3; background: #fff; color: #24578b; }
+#saved-inhabitant-records .member-edit:hover, #saved-inhabitant-records .rbi-download-action:hover { border-color: #6e99bf; background: #edf4fb; color: #193f65; }
+#saved-inhabitant-records .member-delete { border: 1px solid #e7c4c5; background: #fff4f3; color: #a23439; }
+#saved-inhabitant-records .member-delete:hover { border-color: #cd8f91; background: #fce5e4; color: #87282d; }
+#saved-inhabitant-records .rbi-add-member-action { border: 1px solid #aacfbf; background: #edf7f1; color: #226249; }
+#saved-inhabitant-records .rbi-add-member-action:hover { border-color: #70a88d; background: #dceddf; color: #194c37; }
+#saved-inhabitant-records .rbi-add-household-action { border: 1px solid #286b50; background: #286b50; color: #fff; }
+#saved-inhabitant-records .rbi-add-household-action:hover { border-color: #1c523c; background: #1c523c; color: #fff; }
+#saved-inhabitant-records .rbi-submit-action { border: 1px solid #24578b; background: #24578b; color: #fff; }
+#saved-inhabitant-records .rbi-submit-action:hover { border-color: #193f65; background: #193f65; color: #fff; }
+#saved-inhabitant-records .saved-household-footer { padding: 12px 14px; background: #f5f8f5; border-top: 1px solid #dce7df; }
+#saved-inhabitant-records .saved-household-footer > span:not(.badge) { color: #506558; font-size: 13px; }
+#saved-inhabitant-records .badge { color: #226249; background: #e6f3e9; border-color: #bfd9c7; font-size: 12px; }
+#saved-inhabitant-records .rbi-household-pagination { padding: 10px 12px; border: 1px solid #d8e2eb; border-radius: 9px; background: #f7f9fc; color: #4f6578; font-size: 13px; }
+#saved-inhabitant-records .rbi-page-links a { border-color: #c9d8e7; color: #24578b; transition: background-color 160ms ease, border-color 160ms ease; }
+#saved-inhabitant-records .rbi-page-links a:hover { background: #e4eef8; border-color: #86a8c7; }
+#saved-inhabitant-records .rbi-page-links [aria-current=page] { background: #24578b; color: #fff; box-shadow: 0 2px 5px #24578b20; }
+#saved-inhabitant-records :is(button, a, summary):focus-visible { outline: 3px solid #719bc4; outline-offset: 3px; }
+@keyframes rbi-history-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) {
+    #saved-inhabitant-records .saved-report > summary { padding: 12px; gap: 9px; }
+    #saved-inhabitant-records .saved-report-content { padding: 0 10px 12px; }
+    #saved-inhabitant-records .report-counts { margin-left: 48px; padding: 4px 8px; }
+    #saved-inhabitant-records .saved-member-actions { width: 100%; padding-left: 0; }
+    #saved-inhabitant-records .saved-report-toolbar > div { gap: 7px; }
+    #saved-inhabitant-records .rbi-household-pagination { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #saved-inhabitant-records *, #saved-inhabitant-records *::before, #saved-inhabitant-records *::after { animation: none !important; transition: none !important; }
+}

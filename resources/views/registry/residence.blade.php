@@ -2,7 +2,8 @@
 
 @section('content')
 <section class="panel  registry-workspace residence-list rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
-    <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5"><div><h1>{{ App\Models\Inhabitant::residenceLabels()[$scope] }}</h1><p>Barangay {{ $barangay->name }} — current residence of registered residents.</p></div>
+    <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
+            <x-workspace-heading icon="home" label="Resident registry"><h1>{{ App\Models\Inhabitant::residenceLabels()[$scope] }}</h1><p>Barangay {{ $barangay->name }} — current residence of registered residents.</p></x-workspace-heading>
         <a class="button" href="{{ route('barangay.residence.download', ['scope'=>$scope]) }}">Download CSV</a>
     </div>
     @if(session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>@endif

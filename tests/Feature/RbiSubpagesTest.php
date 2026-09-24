@@ -83,7 +83,8 @@ class RbiSubpagesTest extends TestCase
             $this->assertStringNotContainsString('value="Saved Resident"', $matches[1]);
             $this->assertStringNotContainsString('value="Saved Encoder"', $matches[1]);
             $this->assertStringContainsString('name="reporting_month" type="month" value=""', $matches[1]);
-            $response->assertSee(route('barangay.rbi-updates.residents', ['edit' => $report->id]));
+            $response->assertSee(route('barangay.rbi-updates.history'));
+            $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee(route('barangay.rbi-updates.residents', ['edit' => $report->id]));
         };
         $assertBlank();
         $this->assertSame('Saved Resident', $report->fresh()->rows[0]['inhabitant_name']);

@@ -2,7 +2,8 @@
 
 @section('content')
 <section class="panel  registry-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
-    <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5"><div><h1>Moved Out</h1><p>Departure records for Barangay {{ $barangay->name }}.</p></div><a class="button secondary-button" href="{{ route('barangay.registry.active') }}">Active Household</a></div>
+    <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
+            <x-workspace-heading icon="users" label="Movement records"><h1>Moved Out</h1><p>Departure records for Barangay {{ $barangay->name }}.</p></x-workspace-heading><a class="button secondary-button" href="{{ route('barangay.registry.active') }}">Active Household</a></div>
     @if(session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>@endif
     @if($errors->any())<div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">@foreach($errors->all() as $error)<div>{{ $error }}</div>@endforeach</div>@endif
     <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">

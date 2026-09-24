@@ -1,24 +1,28 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/home-glass.css') }}?v={{ filemtime(public_path('css/home-glass.css')) }}" media="screen">
+@endpush
+
 @section('content')
 <div class="civic-home">
     <section class="civic-home-hero relative isolate overflow-hidden bg-blue-950 text-white" aria-labelledby="home-title">
         <div class="civic-home-pattern pointer-events-none absolute inset-0" aria-hidden="true"></div>
-        <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-6 pb-24 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)] lg:gap-16 lg:pb-28">
-            <div class="min-w-0">
+        <div class="home-running-lights" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="home-hero-layout relative mx-auto grid items-center">
+            <div class="home-hero-copy min-w-0">
                 <p class="mb-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[.18em] text-amber-200 sm:text-xs">
                     <span class="h-px w-8 bg-amber-300" aria-hidden="true"></span>
                     Official Digital Services Portal
                 </p>
-                <h1 id="home-title" class="m-0 max-w-2xl font-serif text-[2.6rem] font-bold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-[4rem]">
-                    Sabay sa pagbabago,<br>
-                    tungo sa mas<br class="hidden sm:block">
-                    <span class="text-amber-200">magandang bukas.</span>
+                <h1 id="home-title">
+                    Smart Barangay Information System
+                    <span class="home-title-secondary">for Population and Governance Management</span>
                 </h1>
                 <p class="mb-0 mt-6 max-w-xl text-base leading-7 text-blue-100 sm:text-lg">
                     Access barangay services, submit document requests, and securely manage resident information across the 29 barangays of Tomas Oppus.
                 </p>
-                <div class="mt-8 flex flex-col gap-3 min-[420px]:flex-row">
+                <div class="home-hero-actions mt-8 flex flex-col gap-3 min-[420px]:flex-row">
                     <a href="{{ route('register') }}" class="civic-home-primary inline-flex min-h-12 items-center justify-center gap-3 rounded-lg border border-amber-200 bg-amber-200 px-6 py-3 text-sm font-semibold text-blue-950 shadow-sm transition-colors hover:border-amber-100 hover:bg-amber-100">
                         Create an account <x-app-icon name="arrow-right" />
                     </a>
@@ -26,10 +30,11 @@
                         Sign in to your account
                     </a>
                 </div>
-                <div class="mt-9 flex flex-wrap gap-x-7 gap-y-3 border-t border-white/15 pt-5 text-xs text-blue-100 sm:gap-x-10">
+                <div class="home-hero-trust mt-9 flex flex-wrap gap-x-7 gap-y-3 border-t border-white/15 pt-5 text-xs text-blue-100 sm:gap-x-10">
                     <span><strong class="mr-1 text-base font-semibold text-white">29</strong> Barangays</span>
                     <span class="inline-flex items-center gap-2"><x-app-icon name="shield" /> Secure resident records</span>
                     <span class="inline-flex items-center gap-2"><x-app-icon name="document" /> Online public services</span>
+                    <button class="home-motion-toggle" type="button" data-home-motion aria-pressed="false" hidden>Pause motion</button>
                 </div>
             </div>
             <div class="civic-home-identity relative flex items-center justify-center gap-5 text-left lg:flex-col lg:gap-0 lg:text-center">
@@ -101,3 +106,7 @@
     </section>
 </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/home-motion.js') }}?v={{ filemtime(public_path('js/home-motion.js')) }}" defer></script>
+@endpush

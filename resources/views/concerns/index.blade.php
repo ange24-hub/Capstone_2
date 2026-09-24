@@ -2,7 +2,7 @@
 @section('content')
 <section class="grid min-w-0 grid-cols-1 gap-6">
     <header class="dashboard-page-header flex flex-wrap items-start justify-between gap-4">
-        <div><span class="dashboard-eyebrow">Barangay {{ auth()->user()->barangay->name }}</span><h1>{{ $staff ? 'Resident Concerns' : 'My Concerns' }}</h1><p>{{ $staff ? 'Review service concerns and keep residents informed of the action taken.' : 'Submit a concern, add details, and follow updates from your barangay.' }}</p></div>
+            <x-workspace-heading icon="inbox"><span class="dashboard-eyebrow">Barangay {{ auth()->user()->barangay->name }}</span><h1>{{ $staff ? 'Resident Concerns' : 'My Concerns' }}</h1><p>{{ $staff ? 'Review service concerns and keep residents informed of the action taken.' : 'Submit a concern, add details, and follow updates from your barangay.' }}</p></x-workspace-heading>
         @unless($staff)<a class="button" href="{{ route('concerns.create') }}">Submit a concern</a>@endunless
     </header>
     @include('concerns._feedback')

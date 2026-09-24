@@ -1,0 +1,49 @@
+/* Use the shared header layer so legacy important theme rules cannot override this page. */
+@layer workspace-headers {
+@media screen {
+    .municipal-ui .migration-dashboard { display: grid !important; gap: 18px !important; min-width: 0; }
+    .municipal-ui .migration-dashboard .migration-filters { display: flex !important; flex-wrap: wrap; align-items: end; gap: 14px; padding: 16px 20px; border: 1px solid #d7e1ec; border-radius: 10px; background: #fff; }
+    .migration-filter-field { flex: 0 1 160px; min-width: 0; }
+    .migration-area-field { flex: 1 1 230px; max-width: 360px; }
+    .municipal-ui .migration-filters label, .migration-filter-scope > span { display: block; margin: 0 0 6px !important; font-size: 13px !important; color: #536d83 !important; }
+    .municipal-ui .migration-filters :is(input, select) { width: 100% !important; min-height: 40px !important; margin: 0 !important; padding: 8px 11px !important; border: 1px solid #bfd0e1 !important; border-radius: 7px !important; background: #fff !important; color: #203b52 !important; font-size: 14px !important; }
+    .migration-filter-scope { margin-right: auto; padding-bottom: 8px; }
+    .municipal-ui .migration-filters button { display: inline-flex !important; align-items: center; justify-content: center; gap: 7px; min-height: 40px !important; padding: 9px 16px !important; border-radius: 7px !important; border: 1px solid #285d92 !important; background: #285d92 !important; color: #fff !important; font-size: 13px !important; }
+    .migration-filters button svg { width: 17px; height: 17px; }
+    .municipal-ui .migration-filters button:hover { background: #1d466f !important; }
+    .municipal-ui .migration-dashboard .dashboard-metrics { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 12px !important; }
+    .municipal-ui .migration-dashboard .metric-card { --migration-accent: #285d92; --migration-tint: #e8f1fc; display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 12px !important; min-height: 0 !important; padding: 16px !important; border: 1px solid #d7e1ec !important; border-bottom: 3px solid var(--migration-accent) !important; border-radius: 10px !important; background: #fff !important; box-shadow: none !important; }
+    .municipal-ui .migration-dashboard .metric-success { --migration-accent: #2d7858; --migration-tint: #e5f3ea; }
+    .municipal-ui .migration-dashboard .metric-warning { --migration-accent: #ac7928; --migration-tint: #fff3da; }
+    .municipal-ui .migration-dashboard .metric-info { --migration-accent: #755e91; --migration-tint: #f0eaf7; }
+    .municipal-ui .migration-dashboard .metric-danger { --migration-accent: #a64545; --migration-tint: #fbeaea; }
+    .municipal-ui .migration-dashboard .metric-icon { width: 36px !important; height: 38px !important; flex-shrink: 0; border-radius: 8px !important; background: var(--migration-tint) !important; color: var(--migration-accent) !important; }
+    .municipal-ui .migration-dashboard .metric-card strong { margin: 5px 0 !important; font-size: 26px !important; line-height: 1.15 !important; color: #203b52 !important; }
+    .municipal-ui .migration-dashboard .metric-card small { font-size: 12px !important; color: #63788a !important; }
+    .municipal-ui .migration-dashboard .dashboard-card { min-width: 0 !important; padding: 20px !important; border: 1px solid #d7e1ec !important; border-radius: 12px !important; background: #fff !important; box-shadow: 0 3px 12px #19395606 !important; }
+    .municipal-ui .migration-dashboard .dashboard-card-header { padding: 0 0 14px !important; margin-bottom: 16px !important; background: transparent !important; border-bottom: 1px solid #e1e8ef !important; }
+    .municipal-ui .migration-dashboard h2 { margin: 5px 0 !important; font-size: 19px !important; color: #193c5e !important; }
+    .municipal-ui .migration-dashboard .dashboard-card-header p { margin: 0 !important; font-size: 14px !important; color: #536d83 !important; }
+    .migration-forecast-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .municipal-ui .migration-forecast-stats article { padding: 14px !important; border: 1px solid #dce5ee !important; border-radius: 9px !important; background: #f5f8fc !important; }
+    .municipal-ui .migration-dashboard .migration-estimate { background: #eef7f1 !important; border-color: #bed7c8 !important; border-left: 4px solid #2d7858 !important; padding: 18px !important; }
+    .municipal-ui .migration-dashboard .migration-analysis { display: grid !important; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important; gap: 18px !important; align-items: start !important; }
+    #migration-monthly-panel { order: -1; }
+    .municipal-ui #migration-area-panel .movement-list { max-height: 430px; overflow-y: auto; padding-right: 8px; }
+    .municipal-ui .migration-dashboard .migration-chart-wrap { padding: 6px 0 16px !important; }
+    .migration-monthly-details > summary { cursor: pointer; padding: 12px; border: 1px solid #d7e1ec; border-radius: 7px; background: #f3f7fb; color: #285d92; font-weight: 600; font-size: 13px; }
+    .migration-monthly-details[open] > summary { margin-bottom: 10px; }
+    .municipal-ui .migration-dashboard :is(button, summary, input, select):focus-visible { outline: 3px solid #6997c3 !important; outline-offset: 3px !important; }
+    @media (max-width: 1050px) {
+        .municipal-ui .migration-dashboard .dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        .municipal-ui .migration-dashboard .migration-analysis { grid-template-columns: minmax(0, 1fr) !important; }
+    }
+    @media (max-width: 640px) {
+        .migration-forecast-stats { grid-template-columns: minmax(0, 1fr); }
+        .municipal-ui .migration-dashboard .dashboard-card { padding: 16px !important; }
+        .municipal-ui .migration-dashboard .metric-card { padding: 12px !important; flex-wrap: wrap; }
+        .migration-filter-field, .migration-area-field { flex: 1 1 100%; max-width: none; }
+        .migration-filters button { width: 100%; }
+    }
+}
+}

@@ -1,10 +1,13 @@
 @extends('layouts.app')
 
-@push('head')<link rel="stylesheet" href="{{ asset('css/rbi-workspace.css') }}?v={{ filemtime(public_path('css/rbi-workspace.css')) }}">@endpush
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/rbi-workspace.css') }}?v={{ filemtime(public_path('css/rbi-workspace.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/rbi-report-view.css') }}?v={{ filemtime(public_path('css/rbi-report-view.css')) }}">
+@endpush
 
 @section('content')
     @php
-        $editingReport = $draftRbiUpdate;
+        $editingReport = ($rbiSection ?? '') === 'history' ? null : $draftRbiUpdate;
         $rbiSection = $rbiSection ?? 'residents';
         $rbiFormRoute = $rbiSection === 'deceased' ? 'barangay.rbi-updates.deceased' : 'barangay.rbi-updates.residents';
         $sectionParameters = $editingReport ? ['edit' => $editingReport->id] : (request()->boolean('new') ? ['new' => 1] : []);
@@ -35,36 +38,49 @@
             : (optional($editingReport?->reporting_month)->format('Y-m') ?: now()->format('Y-m'));
     @endphp
 
-    <section class="panel  rbi-forms-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
-        <div class="dashboard-hero rounded-xl border border-slate-200 bg-white bg-none shadow-sm border-l-4 border-l-blue-600 p-5 sm:p-6">
-            <div>
-                <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">RBI Monthly Reporting</div>
-                <h1>{{ $rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Add residents' }}</h1>
-                <p>{{ $barangay?->name }} &middot; Manage household updates, prepare monthly reports, and submit to Municipal LGU.</p>
-                <div class="hero-actions flex flex-wrap gap-3">
-                    <a class="button" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
+    <section class="panel rbi-forms-workspace">
+        <div class="rbi-report-view rbi-workspace-overview">
+            <header class="rbi-report-header">
+                <div class="rbi-report-heading">
+                    <span class="rbi-report-emblem" aria-hidden="true"><x-app-icon name="document" /></span>
+                    <div>
+                        <span class="rbi-report-eyebrow">RBI Monthly Form</span>
+                        <h1>{{ $rbiSection === 'history' ? 'Report history' : ($rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Add residents') }}</h1>
+                        <p>Barangay {{ $barangay?->name ?: 'not set' }} <span aria-hidden="true">&middot;</span> Monthly reporting</p>
+                    </div>
+                </div>
+                <div class="rbi-report-downloads" aria-label="Workspace actions">
+                    <a class="rbi-report-button rbi-report-pdf" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @if ($editingReport)
-                        <a class="button secondary-button" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start Another Month</a>
+                        <a class="rbi-report-button rbi-report-word" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start Another Month</a>
                     @endif
                 </div>
-            </div>
-            <div class="hero-side">
-                <div class="hero-mini-card rounded-xl border border-blue-100 bg-blue-50 p-4 text-blue-900"><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count() }}</strong><span>Submitted monthly forms</span></div>
-                <div class="hero-mini-card rounded-xl border border-blue-100 bg-blue-50 p-4 text-blue-900"><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong><span>Draft monthly forms</span></div>
+            </header>
+            <div class="rbi-report-metrics" aria-label="Monthly reports summary">
+                <article class="rbi-report-metric rbi-metric-residents">
+                    <span class="rbi-metric-icon" aria-hidden="true"><x-app-icon name="check" /></span>
+                    <div><span class="rbi-metric-label">Submitted reports</span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count() }}</strong></div>
+                </article>
+                <article class="rbi-report-metric rbi-metric-status">
+                    <span class="rbi-metric-icon" aria-hidden="true"><x-app-icon name="document" /></span>
+                    <div><span class="rbi-metric-label">Draft reports</span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong></div>
+                </article>
             </div>
         </div>
 
         <nav class="rbi-subpages" aria-label="RBI Forms subpages">
             <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if ($rbiSection === 'residents') aria-current="page" @endif><x-app-icon name="users" /><span>Add residents</span></a>
             <a href="{{ route('barangay.rbi-updates.deceased', $sectionParameters) }}" @if ($rbiSection === 'deceased') aria-current="page" @endif><x-app-icon name="document" /><span>Deceased inhabitants</span></a>
+            <a href="{{ route('barangay.rbi-updates.history') }}" @if($rbiSection === 'history') aria-current="page" @endif><x-app-icon name="calendar" /><span>Report history</span></a>
         </nav>
-        <p class="rbi-subpage-help">Use Add Residents for new family members and Deceased Inhabitants to record deaths. Each form saves its own entries in the monthly RBI report.</p>
+        @if($rbiSection !== 'history')
         <nav class="rbi-section-nav" aria-label="RBI form sections">
             <a href="#monthly-report"><span>01</span> Monthly report</a>
             <a href="#{{ $rbiSection === 'deceased' ? 'deceased-section' : 'family-section' }}"><span>02</span> {{ $rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Family members' }}</a>
             <a href="#certification-section"><span>03</span> Certification</a>
-            <a href="#report-history"><span>04</span> Report history</a>
+            <a href="{{ route('barangay.rbi-updates.history') }}"><span>04</span> Report history</a>
         </nav>
+        @endif
         @if (session('status'))
             <div class="status-message">{{ session('status') }}</div>
         @endif
@@ -86,7 +102,7 @@
             </div>
         @endif
         @if ($errors->any())
-            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+            <div role="alert" class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
                 <strong>Please check the monthly form:</strong>
                 <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
             </div>
@@ -94,7 +110,7 @@
 
         @if (! $barangay)
             <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">This secretary account is not assigned to a barangay.</div>
-        @else
+        @elseif($rbiSection !== 'history')
             <div class="workflow-card report-editor rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="monthly-report">
                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
@@ -113,43 +129,9 @@
             </div>
         @endif
 
-        <div class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history">
-            <div class="history-heading"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Saved reports</div><h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2></div>
-            <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
-            @if ($rbiSection === 'residents')
-                @include('rbi-updates._saved-inhabitants')
-            @endif
-            @if ($rbiUpdates->isEmpty() && $newInhabitantRecords->isEmpty())
-                <p>No monthly RBI forms created yet.</p>
-            @endif
-            @if ($rbiUpdates->isNotEmpty())
-                <div class="table-wrap official-report-history w-full overflow-x-auto rounded-xl border border-slate-200">
-                    <table>
-                        <thead><tr><th>Month</th><th>Families</th><th>Inhabitants</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            @foreach ($rbiUpdates as $report)
-                                @php($familyCount = collect($report->rows ?? [])->pluck('household_head')->filter()->unique()->count())
-                                <tr>
-                                    <td>{{ optional($report->reporting_month)->format('F Y') ?: 'Not set' }}</td>
-                                    <td>{{ $familyCount }}</td>
-                                    <td>{{ count($report->rows ?? []) }}</td>
-                                    <td><x-status-badge :status="$report->status">{{ $report->statusLabel() }}</x-status-badge></td>
-                                    <td>{{ optional($report->submitted_at)->format('M d, Y h:i A') ?: 'Not submitted' }}</td>
-                                    <td><div class="rbi-history-actions">
-                                        <a href="{{ route('rbi-updates.show', $report) }}">View form</a>
-                                        <a href="{{ route($rbiFormRoute, ['edit' => $report->id]) }}">{{ $report->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue draft' : 'Update form' }}</a>
-                                        <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
-                                        <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
-                                        @include('rbi-updates._registry-action', ['report' => $report])
-                                        @include('rbi-updates._submit-action', ['report' => $report])
-                                    </div></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </div>
+        @if($rbiSection === 'history')
+            @include('rbi-updates._history')
+        @endif
     </section>
 
     <datalist id="rbi-household-heads">
@@ -202,6 +184,7 @@
     <script>
         (() => {
             const monthlyForm = document.getElementById('rbi-monthly-form');
+            if (!monthlyForm) return;
             let unsaved = false;
             monthlyForm?.addEventListener('input', () => unsaved = true);
             monthlyForm?.addEventListener('change', () => unsaved = true);
@@ -372,4 +355,5 @@
             document.querySelectorAll('[data-signature-pad]').forEach(initializeSignaturePad);
         })();
     </script>
+    <script src="{{ asset('js/rbi-duplicates.js') }}?v={{ filemtime(public_path('js/rbi-duplicates.js')) }}" defer></script>
 @endsection

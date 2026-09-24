@@ -2,7 +2,7 @@
 @section('content')
 <section class="dashboard-page population-report grid gap-6" aria-labelledby="migration-report-title">
 <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-<div class="dashboard-title-group"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="migration-report-title">Monthly Migration Report</h1><p>{{ $report['scopeLabel'] }} &middot; {{ $selectedYear }}</p></div>
+            <x-workspace-heading icon="trend"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="migration-report-title">Monthly Migration Report</h1><p>{{ $report['scopeLabel'] }} &middot; {{ $selectedYear }}</p></x-workspace-heading>
 <a class="button" href="{{ route('reports.migration.pdf', array_filter(['barangay_id' => $selectedBarangayId, 'year' => $selectedYear])) }}"><x-app-icon name="document" /> Download PDF</a>
 </header>
 <form class="population-report-filter flex flex-wrap items-end gap-3" method="GET" action="{{ route('reports.migration') }}">

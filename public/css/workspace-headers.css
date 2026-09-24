@@ -1,0 +1,94 @@
+/* Declare before the legacy theme: important declarations reverse layer priority. */
+@layer workspace-headers {
+/* Shared page heading treatment, matching the RBI View Form. */
+html.municipal-ui .app-content .workspace-heading { display: flex !important; align-items: center !important; gap: 14px !important; flex: 1 1 340px !important; min-width: 0 !important; }
+html.municipal-ui .app-content .workspace-heading-copy { min-width: 0 !important; }
+html.municipal-ui .app-content .workspace-heading-emblem { display: grid !important; place-items: center !important; flex: 0 0 46px !important; width: 46px !important; height: 50px !important; border-radius: 10px !important; background: #e7f0fb !important; color: #285d92 !important; }
+html.municipal-ui .app-content .workspace-heading-emblem svg { width: 25px !important; height: 25px !important; }
+html.municipal-ui .app-content .workspace-heading-copy > .dashboard-eyebrow { display: block !important; margin: 0 !important; }
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 22px 24px !important;
+    border: 1px solid #d7e1ec !important;
+    border-top: 4px solid #285d92 !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    box-shadow: 0 3px 12px #19395606 !important;
+    color: #203b52 !important;
+}
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) h1 {
+    margin: 5px 0 7px !important;
+    color: #193c5e !important;
+    font-size: clamp(24px, 2.3vw, 29px) !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -.035em !important;
+}
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) p {
+    margin: 0 !important;
+    color: #536d83 !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) :is(.dashboard-eyebrow, .government-eyebrow, .page-kicker) {
+    color: #476d92 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: .09em !important;
+    text-transform: uppercase !important;
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+}
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) .button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    min-height: 40px !important;
+    padding: 9px 13px !important;
+    border: 1px solid #285d92 !important;
+    border-radius: 7px !important;
+    background: #285d92 !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    transition: background-color 170ms ease, box-shadow 170ms ease !important;
+}
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) .secondary-button {
+    background: #f0f7f3 !important;
+    color: #27664b !important;
+    border-color: #bed7c8 !important;
+}
+html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) .button:hover {
+    background: #1d466f !important;
+    color: #fff !important;
+    box-shadow: 0 3px 9px #285d9226 !important;
+}
+html.municipal-ui .app-content .overview-context-date {
+    border: 1px solid #d7e1ec !important;
+    border-bottom: 3px solid #285d92 !important;
+    border-radius: 10px !important;
+    background: #f3f7fb !important;
+    padding: 14px 18px !important;
+    color: #203b52 !important;
+}
+html.municipal-ui .app-content .overview-context-date .ph-clock-label { color: #536d83 !important; overflow-wrap: anywhere !important; }
+@media (max-width: 640px) {
+    html.municipal-ui .app-content .workspace-heading { gap: 10px !important; flex-basis: 100% !important; }
+    html.municipal-ui .app-content .workspace-heading-emblem { flex-basis: 36px !important; width: 36px !important; height: 42px !important; }
+    html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) { padding: 16px !important; gap: 16px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html.municipal-ui .app-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading) .button { transition: none !important; }
+}
+
+}

@@ -13,11 +13,11 @@
 
     <section class="barangay-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="barangay-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <div class="dashboard-title-group">
+            <x-workspace-heading icon="building">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident Verification' : (($workspacePage ?? 'overview') === 'documents' ? 'Barangay E-Services' : 'Barangay Administration') }}</span>
                 <h1 id="barangay-dashboard-title">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident approvals' : (($workspacePage ?? 'overview') === 'documents' ? 'Document requests' : 'Barangay '.($barangay?->name ?? 'Dashboard')) }}</h1>
                 <p>{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Review and verify resident accounts assigned to your barangay.' : (($workspacePage ?? 'overview') === 'documents' ? 'Process resident requests, payments, and release updates in one focused workspace.' : 'Process resident services, maintain community records, and prepare monthly RBI reports.') }}</p>
-            </div>
+            </x-workspace-heading>
             @if ($barangay)
                 <div class="dashboard-header-actions">
                     <a class="button" href="{{ route('barangay.registry.active') }}"><x-app-icon name="users" /> Resident registry</a>
@@ -210,7 +210,7 @@
                         <tbody>@foreach ($rbiUpdates as $update)<tr>
                             <td><strong>{{ optional($update->reporting_month)->format('F Y') ?: 'Not set' }}</strong><small>Barangay {{ $update->barangay_name ?: $barangay->name }}</small></td>
                             <td>{{ collect($update->rows ?? [])->pluck('household_head')->filter()->unique()->count() }}</td><td>{{ count($update->rows ?? []) }}</td>
-                            <td><span class="request-status request-status-{{ $update->status }}">{{ $update->statusLabel() }}</span></td><td>{{ optional($update->submitted_at)->format('M d, Y Â· h:i A') ?: 'Not submitted' }}</td>
+                            <td><span class="request-status request-status-{{ $update->status }}">{{ $update->statusLabel() }}</span></td><td>{{ $update->submitted_at?->copy()->timezone('Asia/Manila')->format('M d, Y Â· h:i A') ?: 'Not submitted' }}</td>
                             <td class="row-actions"><a href="{{ route('rbi-updates.show', $update) }}">View</a><a href="{{ route('barangay.rbi-updates.index', ['edit' => $update->id]) }}">{{ $update->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue Draft' : 'Update form' }}</a><a href="{{ route('rbi-updates.export-pdf', $update) }}">PDF</a><a href="{{ route('rbi-updates.export-word', $update) }}">Word</a>@if ($update->source_file_path)<a href="{{ route('rbi-updates.download', $update) }}">Original</a>@endif @include('rbi-updates._registry-action', ['report' => $update])</td>
                         </tr>@endforeach</tbody>
                     </table></div>

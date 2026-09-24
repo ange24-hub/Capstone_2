@@ -14,6 +14,7 @@ class Household extends Model
     protected $fillable = [
         'barangay_id',
         'household_number',
+        'household_name',
         'purok',
         'address',
         'latitude',

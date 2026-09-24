@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <section class="mx-auto grid min-w-0 max-w-4xl grid-cols-1 gap-6">
-    <header class="dashboard-page-header"><span class="dashboard-eyebrow">Barangay {{ auth()->user()->barangay->name }}</span><h1>Submit a concern</h1><p>Describe the issue clearly so your barangay can review and respond.</p></header>
+    <header class="dashboard-page-header">
+            <x-workspace-heading icon="inbox"><span class="dashboard-eyebrow">Barangay {{ auth()->user()->barangay->name }}</span><h1>Submit a concern</h1><p>Describe the issue clearly so your barangay can review and respond.</p></x-workspace-heading></header>
     @include('concerns._feedback')
     <aside class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">This inbox is not monitored for emergencies. For immediate danger or urgent assistance, contact the appropriate emergency service directly.</aside>
     <form method="POST" action="{{ route('concerns.store') }}" enctype="multipart/form-data" class="grid gap-5 rounded-xl border border-slate-200 bg-white p-5 sm:p-7">

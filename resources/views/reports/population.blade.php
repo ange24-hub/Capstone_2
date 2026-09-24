@@ -2,7 +2,7 @@
 @section('content')
 <section class="dashboard-page population-report grid gap-6" aria-labelledby="population-report-title">
     <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-        <div class="dashboard-title-group"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="population-report-title">{{ $reportTitle }}</h1><p>{{ $report['scopeLabel'] }}</p></div>
+            <x-workspace-heading icon="users"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="population-report-title">{{ $reportTitle }}</h1><p>{{ $report['scopeLabel'] }}</p></x-workspace-heading>
         <a class="button" href="{{ route('reports.population.pdf', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $selectedSection])) }}"><x-app-icon name="document" /> Download PDF{{ $selectedSection !== 'summary' ? ' - '.$reportTitle : '' }}</a>
     </header>
     @unless($isSecretary)

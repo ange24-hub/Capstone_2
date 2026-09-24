@@ -1,0 +1,113 @@
+@layer workspace-headers {
+@media screen {
+    html.municipal-ui body:has(.civic-home) .public-shell { overflow-x: clip !important; overflow-y: visible !important; }
+    html.municipal-ui body:has(.civic-home) .public-site-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 50 !important;
+        background: rgb(255 255 255 / 88%) !important;
+        backdrop-filter: blur(16px) saturate(130%);
+        -webkit-backdrop-filter: blur(16px) saturate(130%);
+        border-bottom: 1px solid rgb(184 207 219 / 55%) !important;
+        box-shadow: 0 4px 24px #102e4510 !important;
+    }
+    html.municipal-ui .civic-home #about { scroll-margin-top: calc(var(--home-header-height, 150px) + 20px) !important; }
+    html.municipal-ui .home-motion-toggle { border: 1px solid #ffffff40 !important; border-radius: 6px !important; padding: 5px 9px !important; color: #e1eef6 !important; background: #ffffff0a !important; font-size: 11px !important; cursor: pointer; }
+    html.municipal-ui .home-motion-toggle[hidden] { display: none !important; }
+    html.municipal-ui .home-motion-toggle:focus-visible { outline: 2px solid #e9cb7f !important; outline-offset: 3px; }
+    html.municipal-ui .civic-home-hero {
+        background: radial-gradient(ellipse at 85% 25%, #32677970, transparent 55%), linear-gradient(120deg, #102e40, #173e53 60%, #164c53) !important;
+    }
+    .civic-home-hero .civic-home-pattern { opacity: .55; }
+    .home-running-lights { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .home-running-lights i { position: absolute; left: -30%; top: 18%; width: 28%; height: 2px; border-radius: 100%; background: linear-gradient(90deg, transparent, #8dd9d470, #e6f9ee90, transparent); opacity: 0; transform: rotate(-12deg); }
+    .home-running-lights i:nth-child(2) { top: 55%; width: 20%; background: linear-gradient(90deg, transparent, #e5c47870, transparent); }
+    .home-running-lights i:nth-child(3) { top: 84%; width: 34%; }
+    html.municipal-ui .home-hero-layout { max-width: 1180px !important; width: 100% !important; grid-template-columns: minmax(0, 1fr) 280px !important; gap: 48px !important; padding: 40px 28px !important; }
+    html.municipal-ui .home-hero-copy > p:first-child { margin: 0 0 14px !important; font-size: 10px !important; letter-spacing: .12em !important; }
+    html.municipal-ui .civic-home #home-title { margin: 0 !important; max-width: 660px !important; font-family: inherit !important; font-size: clamp(27px, 2.6vw, 36px) !important; line-height: 1.2 !important; font-weight: 700 !important; letter-spacing: -.03em !important; color: #fff !important; }
+    html.municipal-ui .home-title-secondary { display: block; margin-top: 10px; font-size: clamp(18px, 1.7vw, 23px) !important; font-weight: 500 !important; line-height: 1.4 !important; letter-spacing: -.01em !important; color: #e7cc86 !important; }
+    html.municipal-ui .home-hero-copy > h1 + p { margin-top: 18px !important; max-width: 620px !important; font-size: 14px !important; line-height: 1.7 !important; color: #dae7ef !important; }
+    html.municipal-ui .home-hero-actions { margin-top: 22px !important; gap: 10px !important; }
+    html.municipal-ui .home-hero-actions a { min-height: 42px !important; padding: 10px 16px !important; font-size: 13px !important; }
+    html.municipal-ui .home-hero-trust { margin-top: 22px !important; gap: 10px 18px !important; padding: 12px 14px !important; font-size: 11px !important; }
+    html.municipal-ui .civic-home-seal { width: 152px !important; height: 152px !important; flex: 0 0 152px !important; border-width: 4px !important; }
+    html.municipal-ui .civic-home-identity { flex-direction: column !important; gap: 18px !important; text-align: center !important; }
+    html.municipal-ui .civic-home-identity > div:last-child { margin: 0 !important; }
+    html.municipal-ui .civic-home-identity strong { font-family: inherit !important; font-size: 23px !important; }
+    html.municipal-ui .civic-home-identity p { font-size: 11px !important; }
+    html.municipal-ui .civic-home-identity::before, html.municipal-ui .civic-home-identity::after { display: none !important; }
+    html.municipal-ui .civic-home > section:not(.civic-home-hero) { max-width: 1180px !important; margin-inline: auto !important; }
+    html.municipal-ui .civic-home > section[aria-label="Online service shortcuts"] { margin-top: 20px !important; padding-inline: 28px !important; }
+    html.municipal-ui .civic-home #about { padding: 40px 28px !important; }
+    html.municipal-ui .civic-home-identity {
+        padding: 24px 20px !important;
+        border: 1px solid rgb(221 240 247 / 20%) !important;
+        border-top-color: rgb(235 248 255 / 38%) !important;
+        border-radius: 14px !important;
+        background: linear-gradient(145deg, rgb(255 255 255 / 11%), rgb(255 255 255 / 3%)) !important;
+        box-shadow: 0 20px 50px #051c3026, inset 0 1px 0 #ffffff15 !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    html.municipal-ui .home-hero-trust {
+        padding: 12px 14px !important;
+        border: 1px solid #ffffff22 !important;
+        border-radius: 12px !important;
+        background: #ffffff07 !important;
+        backdrop-filter: blur(8px);
+    }
+    html.municipal-ui .home-hero-actions a {
+        transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease !important;
+    }
+    html.municipal-ui .home-hero-actions a:not(.civic-home-primary) { background: #ffffff0d !important; border-color: #ffffff50 !important; backdrop-filter: blur(10px); }
+    html.municipal-ui .home-hero-actions a:hover { transform: translateY(-3px) !important; box-shadow: 0 10px 24px #051c3040 !important; }
+    html.municipal-ui .home-hero-actions a:not(.civic-home-primary):hover { background: #ffffff20 !important; }
+    html.municipal-ui .civic-home-service {
+        background: rgb(255 255 255 / 93%) !important;
+        border: 1px solid rgb(208 224 235 / 85%) !important;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 8px 24px #133f5610 !important;
+        transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease !important;
+    }
+    html.municipal-ui .civic-home-service:hover { transform: translateY(-4px) !important; border-color: #80b3bc !important; box-shadow: 0 14px 30px #133f561c !important; }
+    html.municipal-ui .civic-home a:focus-visible { outline: 3px solid #d6b965 !important; outline-offset: 4px !important; }
+    @media (prefers-reduced-motion: no-preference) {
+        .civic-home[data-motion] .home-running-lights i { animation: home-light-travel 9s linear infinite !important; }
+        .civic-home[data-motion] .home-running-lights i:nth-child(2) { animation-duration: 12s !important; animation-delay: -5s !important; }
+        .civic-home[data-motion] .home-running-lights i:nth-child(3) { animation-duration: 11s !important; animation-delay: -8s !important; }
+        .civic-home[data-motion="paused"] .home-running-lights i { animation-play-state: paused !important; }
+        html:has(.civic-home) { scroll-behavior: smooth !important; }
+        .civic-home[data-motion] .civic-home-pattern { animation: home-ambient-drift 12s ease-in-out infinite alternate !important; }
+        .civic-home[data-motion] .civic-home-seal { animation: home-seal-float 6s ease-in-out infinite !important; }
+        .civic-home[data-motion="paused"] :is(.civic-home-pattern, .civic-home-seal) { animation-play-state: paused !important; }
+        .home-hero-copy { animation: home-glass-enter 650ms ease-out both !important; }
+        .civic-home-identity { animation: home-glass-enter 750ms 100ms ease-out both !important; }
+        .civic-home-pattern { animation: home-light-settle 4s ease-out both !important; }
+        .civic-home-service { animation: home-glass-enter 600ms 200ms ease-out both !important; }
+        .civic-home-service:nth-child(2) { animation-delay: 280ms !important; }
+        .civic-home-service:nth-child(3) { animation-delay: 360ms !important; }
+    }
+    @keyframes home-light-travel { 0% { left: -35%; opacity: 0; } 12%, 80% { opacity: .65; } 100% { left: 110%; opacity: 0; } }
+    @keyframes home-ambient-drift { from { opacity: .35; transform: translateX(-10px) scale(1.03); } to { opacity: .7; transform: translateX(10px) scale(1.06); } }
+    @keyframes home-seal-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes home-glass-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes home-light-settle { from { opacity: .2; transform: translateX(12px) scale(1.03); } to { opacity: .55; transform: translateX(0) scale(1); } }
+    @media (max-width: 800px) {
+        html.municipal-ui .home-hero-layout { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; padding: 28px 20px !important; }
+        html.municipal-ui .civic-home-identity { flex-direction: row !important; justify-content: flex-start !important; text-align: left !important; }
+        html.municipal-ui .civic-home-seal { width: 76px !important; height: 76px !important; flex-basis: 76px !important; }
+    }
+    @media (max-width: 640px) {
+        html.municipal-ui .civic-home-identity { padding: 20px 16px !important; border-radius: 18px !important; }
+        html.municipal-ui .home-hero-trust { padding: 14px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        html.municipal-ui .civic-home *, html.municipal-ui .civic-home *::before, html.municipal-ui .civic-home *::after { animation: none !important; transition: none !important; }
+        html.municipal-ui .civic-home :is(.civic-home-service, .home-hero-actions a):hover { transform: none !important; }
+    }
+    @supports not (backdrop-filter: blur(1px)) {
+        html.municipal-ui body:has(.civic-home) .public-site-header, html.municipal-ui .civic-home-service { background: #fff !important; }
+    }
+}
+}

@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <section class="grid min-w-0 grid-cols-1 gap-6">
-    <header class="dashboard-page-header flex flex-wrap items-start justify-between gap-4"><div><span class="dashboard-eyebrow">{{ $concern->barangay->name }} · {{ \App\Models\ResidentConcern::statuses()[$concern->status] }}</span><h1 class="break-words">{{ $concern->title }}</h1><p class="break-all">{{ $concern->reference }} · Submitted {{ $concern->created_at->format('M d, Y g:i A') }}</p></div><a class="button secondary-button" href="{{ route('concerns.index') }}">Back to concerns</a></header>
+    <header class="dashboard-page-header flex flex-wrap items-start justify-between gap-4">
+            <x-workspace-heading icon="inbox"><span class="dashboard-eyebrow">{{ $concern->barangay->name }} · {{ \App\Models\ResidentConcern::statuses()[$concern->status] }}</span><h1 class="break-words">{{ $concern->title }}</h1><p class="break-all">{{ $concern->reference }} · Submitted {{ $concern->created_at->format('M d, Y g:i A') }}</p></x-workspace-heading><a class="button secondary-button" href="{{ route('concerns.index') }}">Back to concerns</a></header>
     @include('concerns._feedback')
     <div class="grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <div class="grid min-w-0 grid-cols-1 gap-6">

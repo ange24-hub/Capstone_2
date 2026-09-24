@@ -3,8 +3,8 @@
 @section('content')
 <section class="staff-profile profile-workspace grid gap-6" aria-labelledby="profile-title">
     <header class="profile-page-heading flex flex-wrap items-start justify-between gap-4">
-        <div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Account settings</span><h1 id="profile-title">My Profile</h1><p>Manage your personal details and account security.</p></div>
-        <a class="profile-back-link" href="{{ route('dashboard') }}"><x-app-icon name="home" /> Back to dashboard</a>
+            <x-workspace-heading icon="users"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Account settings</span><h1 id="profile-title">My Profile</h1><p>Manage your personal details and account security.</p></x-workspace-heading>
+        <a class="button secondary-button" href="{{ route('dashboard') }}"><x-app-icon name="home" /> Back to dashboard</a>
     </header>
     @if(session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif
     @if($errors->any())<div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert"><strong>Please review your details.</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif

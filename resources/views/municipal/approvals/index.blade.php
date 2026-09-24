@@ -3,11 +3,11 @@
 @section('content')
     <section class="dashboard-page workspace-page" aria-labelledby="approval-page-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <div class="dashboard-title-group">
+            <x-workspace-heading icon="shield">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Account Authorization</span>
                 <h1 id="approval-page-title">Barangay secretary approvals</h1>
                 <p>Review pending staff registrations before granting access to protected barangay records.</p>
-            </div>
+            </x-workspace-heading>
             <div class="dashboard-context-card">
                 <span class="context-icon"><x-app-icon name="shield" /></span>
                 <div><small>Verification queue</small><strong>{{ $secretaryApprovalRequests->count() }} pending</strong><span>Municipal LGU review</span></div>

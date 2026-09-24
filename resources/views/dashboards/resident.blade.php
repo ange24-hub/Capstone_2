@@ -1,19 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    @php
-        $pendingRequests = $documentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count();
-        $activeRequests = $documentRequests->whereIn('status', [App\Models\DocumentRequest::STATUS_PROCESSING, App\Models\DocumentRequest::STATUS_READY])->count();
-        $completedRequests = $documentRequests->where('status', App\Models\DocumentRequest::STATUS_COMPLETED)->count();
-    @endphp
 
     <section class="dashboard-page resident-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="resident-dashboard-title">
         <header class="dashboard-page-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <div class="dashboard-title-group">
+            <x-workspace-heading icon="home">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">{{ ($workspacePage ?? 'overview') === 'create' ? 'New Transaction' : (($workspacePage ?? 'overview') === 'history' ? 'Transaction History' : 'Resident Services') }}</span>
                 <h1 id="resident-dashboard-title">{{ ($workspacePage ?? 'overview') === 'create' ? 'Request a document' : (($workspacePage ?? 'overview') === 'history' ? 'My document requests' : 'Good day, '.str(auth()->user()->name)->before(' ').'.') }}</h1>
                 <p>{{ ($workspacePage ?? 'overview') === 'create' ? 'Choose a barangay document and submit its purpose.' : (($workspacePage ?? 'overview') === 'history' ? 'Track statuses, payment verification, and barangay remarks.' : 'Request barangay documents and follow every update from one place.') }}</p>
-            </div>
+            </x-workspace-heading>
             <div class="dashboard-context-card rounded-xl border border-slate-200 bg-white p-4 text-slate-700 ">
                 <span class="context-icon"><x-app-icon name="location" /></span>
                 <div><small>Your assigned barangay</small><strong>Barangay {{ auth()->user()->barangay?->name ?? 'Not assigned' }}</strong><span>Approved resident account</span></div>
@@ -27,7 +22,7 @@
         @endif
 
         <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Request summary">
-            <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="document" /></span><div><span>All requests</span><strong>{{ number_format($documentRequests->count()) }}</strong><small>Your complete request history</small></div></article>
+            <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="document" /></span><div><span>All requests</span><strong>{{ number_format($documentRequests->total()) }}</strong><small>Your complete request history</small></div></article>
             <article class="metric-card metric-warning rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="clock" /></span><div><span>Awaiting review</span><strong>{{ number_format($pendingRequests) }}</strong><small>Submitted to your barangay</small></div></article>
             <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span><div><span>In progress</span><strong>{{ number_format($activeRequests) }}</strong><small>Processing or ready to claim</small></div></article>
             <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="check" /></span><div><span>Completed</span><strong>{{ number_format($completedRequests) }}</strong><small>Finished transactions</small></div></article>
@@ -83,15 +78,16 @@
             </div>
         @endif
 
-        <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-history-title">
+        <section id="request-history" class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-history-title" style="scroll-margin-top: 100px">
             <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Transaction history</span><h2 id="request-history-title">My document requests</h2><p>Latest requests appear first. Open payment details only when action is required.</p></div>
-                <span class="count-chip">{{ $documentRequests->count() }} total</span>
+                <span class="count-chip">{{ $documentRequests->total() }} total</span>
             </header>
 
             @if ($documentRequests->isEmpty())
                 <div class="dashboard-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"><span class="empty-icon"><x-app-icon name="inbox" /></span><strong>No requests yet</strong><span>Your first document request will appear here.</span></div>
             @else
+                <p class="field-help">Showing {{ $documentRequests->firstItem() }}–{{ $documentRequests->lastItem() }} of {{ $documentRequests->total() }} requests · 5 per page</p>
                 <div class="request-card-list">
                     @foreach ($documentRequests as $request)
                         <article class="resident-request-card">
@@ -145,6 +141,7 @@
                         </article>
                     @endforeach
                 </div>
+                <div class="mt-5">{{ $documentRequests->onEachSide(1)->links() }}</div>
             @endif
         </section>
     </section>

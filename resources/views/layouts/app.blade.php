@@ -8,6 +8,8 @@
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
     <link rel="stylesheet" href="{{ asset('css/rbim.css') }}?v={{ filemtime(public_path('css/rbim.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/portal-template.css') }}?v={{ filemtime(public_path('css/portal-template.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/workspace-headers.css') }}?v={{ filemtime(public_path('css/workspace-headers.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/workspace-sidebar.css') }}?v={{ filemtime(public_path('css/workspace-sidebar.css')) }}" media="screen">
     @vite('resources/css/app.css')
     @stack('head')
 </head>
@@ -104,6 +106,7 @@
                             <div class="rbi-sidebar-subpages">
                                 <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if(request()->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents')) aria-current="page" @endif>Add residents</a>
                                 <a href="{{ route('barangay.rbi-updates.deceased', request()->only('edit', 'new')) }}" @if(request()->routeIs('barangay.rbi-updates.deceased')) aria-current="page" @endif>Deceased inhabitants</a>
+                                <a href="{{ route('barangay.rbi-updates.history') }}" @if(request()->routeIs('barangay.rbi-updates.history')) aria-current="page" @endif>Report history</a>
                             </div>
                         @endif
                         <a class="@if(request()->routeIs('barangay.registry.deceased')) active @endif" href="{{ route('barangay.registry.deceased') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Deceased Records</span></a>
@@ -163,7 +166,7 @@
                     </div>
                     <div class="app-header-meta">
                         <span class="system-status"><x-app-icon name="shield" /> Authorized workspace</span>
-                        <time class="header-date" datetime="{{ now('Asia/Manila')->toDateString() }}">{{ now('Asia/Manila')->format('F d, Y') }}</time>
+                        <time class="header-date" data-ph-header-date aria-label="Device local date and time"></time>
                         @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
                             <a class="header-user" href="{{ route('profile.edit') }}" title="My Profile" aria-label="My Profile: {{ auth()->user()->name }}">{{ auth()->user()->name }}</a>
                         @else
@@ -194,6 +197,7 @@
 
     @stack('scripts')
     @auth
+        <script src="{{ asset('js/philippine-clock.js') }}?v={{ filemtime(public_path('js/philippine-clock.js')) }}" defer></script>
         <script>
             (() => {
                 const body = document.body;

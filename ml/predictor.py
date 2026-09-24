@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
+from pathlib import Path
 
 app = Flask(__name__)
 
-MODEL_PATH = "rbim_out_migration_model.joblib"
+MODEL_PATH = Path(__file__).resolve().parent / "rbim_out_migration_model.joblib"
 
 model = joblib.load(MODEL_PATH)
 

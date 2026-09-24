@@ -6,14 +6,14 @@ use App\Models\Barangay;
 use App\Models\Inhabitant;
 use App\Models\MigrationRecord;
 use App\Models\User;
-use Illuminate\Http\Client\ConnectionException;
+use App\Services\MigrationPredictionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class MigrationDashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, MigrationPredictionService $predictionService): View
     {
         $request->validate([
             'year' => ['nullable', 'integer', 'between:1900,9999'],
@@ -53,9 +53,9 @@ class MigrationDashboardController extends Controller
         */
 
         $records = MigrationRecord::with([
-                'barangay',
-                'inhabitant.household',
-            ])
+            'barangay',
+            'inhabitant.household',
+        ])
             ->whereYear('movement_date', $selectedYear)
             ->when(
                 $selectedBarangayId,
@@ -102,8 +102,7 @@ class MigrationDashboardController extends Controller
         */
 
         $recordsByMonth = $records->groupBy(
-            fn (MigrationRecord $record): int =>
-                $record->movement_date->month
+            fn (MigrationRecord $record): int => $record->movement_date->month
         );
 
         $monthlyTrend = collect(range(1, 12))
@@ -131,122 +130,47 @@ class MigrationDashboardController extends Controller
                 ];
             });
 
-        /*
-        |--------------------------------------------------------------------------
-        | Out-Migration prediction
-        |
-        | The Python model expects:
-        | - out_migration_count
-        | - previous_month_out
-        | - out_3month_avg
-        | - year
-        | - month
-        |--------------------------------------------------------------------------
-        */
-
-        $predictionMonth = now()->month;
-
-        /*
-         * Get the latest available migration data before the prediction.
-         *
-         * We intentionally retrieve the last 4 months so that the model
-         * can calculate:
-         *   - current/latest out-migration
-         *   - previous month
-         *   - three-month average
-         */
-
-        $predictionRecords = MigrationRecord::query()
-            ->when(
-                $selectedBarangayId,
-                fn ($query) => $query->where(
-                    'barangay_id',
-                    $selectedBarangayId
-                )
-            )
-            ->where('movement_date', '<=', now())
-            ->where(
-                'movement_date',
-                '>=',
-                now()->copy()->subMonths(4)->startOfMonth()
-            )
-            ->get();
-
-        $outByMonth = $predictionRecords
-            ->groupBy(
-                fn (MigrationRecord $record): string =>
-                    $record->movement_date->format('Y-m')
-            )
-            ->map(
-                fn ($items) =>
-                    $items
-                        ->where('type', MigrationRecord::TYPE_OUT)
-                        ->count()
-            );
-
-        $currentMonthKey = now()->format('Y-m');
-        $previousMonthKey = now()->copy()->subMonth()->format('Y-m');
-
-        $currentMonthOut = (int) (
-            $outByMonth->get($currentMonthKey, 0)
+        // Use completed calendar months, anchored to the selected reporting year.
+        $currentMonth = now()->startOfMonth();
+        $anchor = $selectedYear < $currentMonth->year
+            ? Carbon::create($selectedYear, 12, 1)->startOfDay()
+            : $currentMonth->copy()->subMonth();
+        $predictionMonthLabel = $anchor->copy()->addMonth()->format('F Y');
+        $sourceMonthLabel = $anchor->format('F Y');
+        $previousMonthLabel = $anchor->copy()->subMonth()->format('F Y');
+        $history = MigrationRecord::query()
+            ->when($selectedBarangayId, fn ($query) => $query->where('barangay_id', $selectedBarangayId))
+            ->whereBetween('movement_date', [
+                $anchor->copy()->subMonths(3)->toDateString(),
+                $anchor->copy()->endOfMonth()->toDateString(),
+            ])->get();
+        $outByMonth = $history->where('type', MigrationRecord::TYPE_OUT)
+            ->groupBy(fn (MigrationRecord $record) => $record->movement_date->format('Y-m'))
+            ->map->count();
+        $countAt = fn (int $offset): int => (int) $outByMonth->get(
+            $anchor->copy()->subMonths($offset)->format('Y-m'), 0
         );
-
-        $previousMonthOut = (int) (
-            $outByMonth->get($previousMonthKey, 0)
-        );
-
-        $threeMonthValues = collect([
-            now()->copy()->subMonths(3)->format('Y-m'),
-            now()->copy()->subMonths(2)->format('Y-m'),
-            now()->copy()->subMonth()->format('Y-m'),
-        ])->map(
-            fn (string $month) =>
-                (int) $outByMonth->get($month, 0)
-        );
-
-        $threeMonthAverage = round(
-            $threeMonthValues->avg(),
-            2
-        );
-
+        $currentMonthOut = $countAt(0);
+        $previousMonthOut = $countAt(1);
+        $threeMonthAverage = round(($countAt(0) + $countAt(1) + $countAt(2)) / 3, 2);
         $predictedOutMigration = null;
+        $predictionMethod = null;
         $predictionError = null;
 
-        /*
-         * Call the local Python ML service.
-         */
-
-        try {
-            $response = Http::timeout(5)
-                ->post(
-                    'http://127.0.0.1:5001/predict',
-                    [
-                        'out_migration_count' => $currentMonthOut,
-                        'previous_month_out' => $previousMonthOut,
-                        'out_3month_avg' => $threeMonthAverage,
-                        'year' => now()->year,
-                        'month' => $predictionMonth,
-                    ]
-                );
-
-            if ($response->successful()) {
-                $predictedOutMigration = $response->json(
-                    'predicted_next_month_out_migration'
-                );
-
-                if ($predictedOutMigration !== null) {
-                    $predictedOutMigration = max(
-                        0,
-                        round((float) $predictedOutMigration, 2)
-                    );
-                }
-            } else {
-                $predictionError = 'Migration prediction service returned an error.';
-            }
-        } catch (ConnectionException) {
-            $predictionError = 'Migration prediction service is unavailable.';
-        } catch (\Throwable $exception) {
-            $predictionError = 'Unable to retrieve migration prediction.';
+        if ($selectedYear > $currentMonth->year) {
+            $predictionError = 'Choose the current year or a past year to estimate migration.';
+        } elseif ($history->filter(fn ($record) => $record->movement_date->gte($anchor->copy()->subMonths(2)))->isEmpty()) {
+            $predictionError = 'No migration events recorded in the three completed source months. Add dated movement records to view an estimate.';
+        } else {
+            $predictedOutMigration = $predictionService->predictOutMigration([
+                'out_migration_count' => $currentMonthOut,
+                'previous_month_out' => $previousMonthOut,
+                'out_3month_avg' => round(($countAt(1) + $countAt(2) + $countAt(3)) / 3, 2),
+                'year' => $anchor->year,
+                'month' => $anchor->month,
+            ]);
+            $predictionMethod = $predictedOutMigration === null ? '3-month moving average' : 'Gradient Boosting prototype';
+            $predictedOutMigration ??= $threeMonthAverage;
         }
 
         /*
@@ -311,6 +235,11 @@ class MigrationDashboardController extends Controller
             'predictedOutMigration' => $predictedOutMigration,
 
             'predictionError' => $predictionError,
+            'predictionMethod' => $predictionMethod,
+            'predictionMonthLabel' => $predictionMonthLabel,
+            'sourceMonthLabel' => $sourceMonthLabel,
+            'previousMonthLabel' => $previousMonthLabel,
+            'demoRecordCount' => $records->merge($history)->where('reason', 'RBIM migration demo v1')->count(),
         ]);
     }
 }

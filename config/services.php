@@ -2,6 +2,10 @@
 
 return [
 
+    'migration_prediction' => [
+        'url' => env('MIGRATION_PREDICTION_URL', 'http://127.0.0.1:5001'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

@@ -8,11 +8,11 @@
 
     <section class="municipal-directory-page panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6" aria-labelledby="municipal-directory-title">
         <div class="government-page-heading">
-            <div>
+            <x-workspace-heading icon="directory" label="Municipal directory">
                 <nav class="government-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('dashboard.municipal') }}">Municipal Dashboard</a><span>/</span><strong>Barangay Directory</strong></nav>
                 <h1 id="municipal-directory-title">Tomas Oppus Barangay Directory</h1>
                 <p>Municipal overview of barangay registry activity, assigned secretaries, RBI reports, and approved GCash collection profiles.</p>
-            </div>
+            </x-workspace-heading>
             <a class="button government-outline-button" href="{{ route('dashboard.municipal') }}">Back to Municipal Dashboard</a>
         </div>
 
@@ -94,7 +94,7 @@
                         <div class="directory-latest-report">
                             <span>Latest municipal submission</span>
                             <strong>{{ optional($latestReport->reporting_month)->format('F Y') ?: 'Reporting month not set' }}</strong>
-                            <small>Received {{ optional($latestReport->submitted_at)->format('M d, Y · h:i A') }}</small>
+                            <small>Received {{ $latestReport->submitted_at?->copy()->timezone('Asia/Manila')->format('M d, Y · h:i A') }}</small>
                             <div class="row-actions"><a href="{{ route('rbi-updates.show', $latestReport) }}">Review latest</a><a href="{{ route('rbi-updates.export-pdf', $latestReport) }}">PDF</a></div>
                         </div>
                     @else

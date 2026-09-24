@@ -80,7 +80,7 @@
                     @include('rbi-updates.forms._certification')
 
                     <div class="form-actions split-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
-                        <span>Save your changes first, then submit the saved report from Monthly RBI Form History below.</span>
+                        <span>Save your changes first, then submit the saved report from Report history.</span>
                         <div class="toolbar compact-toolbar flex flex-wrap items-end gap-3">
                             <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Residents' : 'Save Residents' }}</button>
                         </div>

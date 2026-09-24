@@ -2,12 +2,11 @@
 
 @section('content')
     <section class="panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
-        <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Central Registry</div>
         <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
-            <div>
+            <x-workspace-heading icon="users"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Central Registry</div>
                 <h1>Edit {{ $inhabitant->fullName() }}</h1>
                 <p>{{ $inhabitant->barangay->name }} household {{ $inhabitant->household->household_number }}</p>
-            </div>
+            </x-workspace-heading>
             <a class="button secondary-button" href="{{ route('registry.index', request('source') ? ['source' => request('source')] : []) }}">Back to {{ request('source') ?: 'Registry' }}</a>
         </div>
 

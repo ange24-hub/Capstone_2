@@ -3,11 +3,11 @@
 @section('content')
     <section class="dashboard-page municipal-dashboard" aria-labelledby="municipal-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <div class="dashboard-title-group">
+            <x-workspace-heading icon="building">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Municipal Administration</span>
                 <h1 id="municipal-dashboard-title">Municipal overview</h1>
                 <p>Review urgent account approvals, received RBI reports, and population movement across Tomas Oppus.</p>
-            </div>
+            </x-workspace-heading>
             <div class="dashboard-header-actions">
                 <a class="button" href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" /> Barangay directory</a>
                 <a class="button secondary-button" href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" /> Migration trends</a>

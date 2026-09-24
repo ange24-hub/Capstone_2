@@ -217,13 +217,31 @@ class DashboardController extends Controller
                 ->values()
             : collect();
 
-        return view($request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased') ? 'rbi-updates.index' : 'dashboards.barangay', [
+        $newInhabitantRecords = $barangay && $request->routeIs('barangay.rbi-updates.history')
+            ? \App\Models\NewInhabitant::where('barangay_id', $barangay->id)->orderByDesc('reporting_month')->orderBy('source_position')->orderBy('id')->get()
+            : collect();
+        $savedReportMonths = $newInhabitantRecords->groupBy(fn ($record) => optional($record->reporting_month)->format('F Y') ?: ($record->month_submitted ?: 'Month not set'));
+        $savedHouseholds = collect();
+        foreach ($savedReportMonths as $month => $records) {
+            foreach ($records->groupBy('household_number') as $household => $members) {
+                $savedHouseholds->push(['month' => $month, 'household' => $household, 'members' => $members]);
+            }
+        }
+        $perPage = 1;
+        $page = min(max(1, $request->integer('household_page', 1)), max(1, (int) ceil($savedHouseholds->count() / $perPage)));
+        $savedHouseholdPage = new \Illuminate\Pagination\LengthAwarePaginator(
+            $savedHouseholds->forPage($page, $perPage)->values(), $savedHouseholds->count(), $perPage, $page,
+            ['path' => $request->url(), 'pageName' => 'household_page']
+        );
+        $savedHouseholdPage->appends($request->except('household_page'))->fragment('saved-inhabitant-records');
+
+        return view($request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased', 'barangay.rbi-updates.history') ? 'rbi-updates.index' : 'dashboards.barangay', [
             'populationCounts' => $barangay && $request->routeIs('dashboard.barangay')
                 ? app(\App\Services\BarangayDashboardPopulation::class)->counts($barangay)
                 : null,
-            'newInhabitantRecords' => $barangay && $request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased')
-                ? \App\Models\NewInhabitant::where('barangay_id', $barangay->id)->orderByDesc('reporting_month')->orderBy('source_position')->orderBy('id')->get()
-                : collect(),
+            'newInhabitantRecords' => $newInhabitantRecords,
+            'savedReportMonths' => $savedReportMonths,
+            'savedHouseholdPage' => $savedHouseholdPage,
             'registryActivities' => $barangay ? \App\Models\RegistryActivity::with('user')->where('barangay_id', $barangay->id)->latest('id')->paginate(15, ['*'], 'activity_page') : collect(),
             'rbiUpdates' => $rbiUpdates,
             'barangay' => $barangay,
@@ -231,7 +249,7 @@ class DashboardController extends Controller
             'residentRbiChecks' => $residentRbiChecks,
             'barangayDocumentRequests' => $barangayDocumentRequests,
             'documentRequestStatuses' => DocumentRequest::statusLabels(),
-            'rbiSection' => $request->routeIs('barangay.rbi-updates.deceased') ? 'deceased' : 'residents',
+            'rbiSection' => $request->routeIs('barangay.rbi-updates.history') ? 'history' : ($request->routeIs('barangay.rbi-updates.deceased') ? 'deceased' : 'residents'),
             'draftRbiUpdate' => $draftRbiUpdate,
             'rbiRowFields' => BarangayRbiUpdate::rowFields(),
             'rbiDeceasedRowFields' => BarangayRbiUpdate::deceasedRowFields(),
@@ -246,9 +264,17 @@ class DashboardController extends Controller
 
     public function resident(Request $request): View
     {
+        $requestCounts = auth()->user()->documentRequests()
+            ->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
+
         return view('dashboards.resident', [
             'documentTypes' => DocumentRequest::typeLabels(),
-            'documentRequests' => auth()->user()->documentRequests()->with('barangay')->latest()->get(),
+            'documentRequests' => auth()->user()->documentRequests()->with('barangay')
+                ->latest()->orderByDesc('id')->paginate(5)->withQueryString()->fragment('request-history'),
+            'pendingRequests' => $requestCounts->get(DocumentRequest::STATUS_PENDING, 0),
+            'activeRequests' => $requestCounts->get(DocumentRequest::STATUS_PROCESSING, 0)
+                + $requestCounts->get(DocumentRequest::STATUS_READY, 0),
+            'completedRequests' => $requestCounts->get(DocumentRequest::STATUS_COMPLETED, 0),
             'workspacePage' => match (true) {
                 $request->routeIs('resident.document-requests.create') => 'create',
                 $request->routeIs('resident.document-requests.index') => 'history',

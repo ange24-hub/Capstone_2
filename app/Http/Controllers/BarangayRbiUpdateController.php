@@ -54,6 +54,8 @@ class BarangayRbiUpdateController extends Controller
                 ->withErrors(['reporting_month' => 'A monthly form already exists for this month. It has been reopened so you can add the new family rows without replacing the existing entries.']);
         }
 
+        app(\App\Services\RbiDuplicateEntries::class)->validate($rows, $deceasedRows, $barangayName, $validated['reporting_month']);
+
         if ($request->boolean('submit_to_municipal') && empty($rows) && empty($deceasedRows)) {
             return back()
                 ->withErrors(['rows' => 'Enter at least one newly registered or deceased inhabitant before submitting this monthly report.'])
@@ -128,6 +130,11 @@ class BarangayRbiUpdateController extends Controller
         }
 
         [$rows, $deceasedRows] = $this->sectionRows($request, $validated, $rbiUpdate);
+        app(\App\Services\RbiDuplicateEntries::class)->validate(
+            ($validated['form_section'] ?? null) === 'deceased' ? [] : $rows,
+            ($validated['form_section'] ?? null) === 'residents' ? [] : $deceasedRows,
+            $barangayName, $validated['reporting_month'], $rbiUpdate->id
+        );
         $preparedBy = trim((string) ($validated['prepared_by'] ?? ''));
         $attestedBy = trim((string) ($validated['attested_by'] ?? '')) ?: (string) ($request->user()->barangay?->punong_barangay_name ?? '');
 
@@ -187,6 +194,10 @@ class BarangayRbiUpdateController extends Controller
     public function submit(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
     {
         $this->authorizeBarangayReportOwner($request, $rbiUpdate);
+        app(\App\Services\RbiDuplicateEntries::class)->validate(
+            $rbiUpdate->rows ?? [], $rbiUpdate->deceased_rows ?? [], $this->assignedBarangayName($request),
+            $rbiUpdate->reporting_month->format('Y-m'), $rbiUpdate->id
+        );
 
         if (empty($this->cleanRows($rbiUpdate->rows ?? [])) && empty($this->cleanDeceasedRows($rbiUpdate->deceased_rows ?? []))) {
             return back()->withErrors(['rows' => 'Add at least one family member or deceased inhabitant before submitting to Municipal LGU.']);

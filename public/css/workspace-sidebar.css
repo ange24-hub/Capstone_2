@@ -1,0 +1,54 @@
+/* Share the first-declared layer to take precedence over legacy theme rules. */
+@layer workspace-headers {
+@media screen {
+    html.municipal-ui #app-sidebar {
+        background: linear-gradient(165deg, #18354c 0%, #10283d 65%, #123c43 100%) !important;
+        border-right: 1px solid #294758 !important;
+        border-top: 3px solid #c8aa68 !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: #496878 transparent !important;
+    }
+    html.municipal-ui #app-sidebar .app-brand { gap: 12px !important; border-color: #ffffff16 !important; padding-bottom: 18px !important; margin-bottom: 16px !important; }
+    html.municipal-ui #app-sidebar .app-brand small { color: #a9c0d1 !important; font-size: 9px !important; letter-spacing: .1em !important; }
+    html.municipal-ui #app-sidebar .app-brand strong { font-size: 21px !important; line-height: 1.2 !important; letter-spacing: -.035em !important; color: #fff !important; }
+    html.municipal-ui #app-sidebar .app-brand em { display: inline-block; margin-top: 7px !important; color: #dec792 !important; font-size: 9px !important; letter-spacing: .15em !important; font-style: normal; }
+    html.municipal-ui #app-sidebar .sidebar-office { padding: 12px 14px !important; margin-bottom: 18px !important; border: 1px solid #ffffff12 !important; border-left: 2px solid #73b7ac !important; border-radius: 9px !important; background: #ffffff05 !important; }
+    html.municipal-ui #app-sidebar .sidebar-office span { color: #8fc7be !important; font-size: 9px !important; letter-spacing: .1em !important; }
+    html.municipal-ui #app-sidebar .sidebar-office strong { display: block; margin-top: 5px; color: #dfeaf0 !important; font-size: 11px !important; font-weight: 500 !important; line-height: 1.5 !important; }
+    html.municipal-ui #app-sidebar :is(.side-label, .side-section) { color: #91aebe !important; font-size: 9px !important; font-weight: 600 !important; letter-spacing: .14em !important; text-transform: uppercase; }
+    html.municipal-ui #app-sidebar .side-label { padding: 0 12px !important; margin: 0 0 8px !important; }
+    html.municipal-ui #app-sidebar .side-section { margin: 16px 10px 6px !important; padding: 14px 2px 0 !important; border-top: 1px solid #ffffff12 !important; }
+    html.municipal-ui #app-sidebar .side-nav { gap: 4px !important; }
+    html.municipal-ui #app-sidebar .side-nav > a {
+        min-height: 44px !important; padding: 8px 10px !important; gap: 11px !important;
+        border: 1px solid transparent !important; border-radius: 9px !important;
+        color: #cbdce6 !important; font-size: 13px !important; font-weight: 500 !important;
+        line-height: 1.4 !important; background: transparent !important; box-shadow: none !important;
+        transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease !important;
+    }
+    html.municipal-ui #app-sidebar .side-nav .nav-mark { display: grid; place-items: center; width: 30px !important; height: 30px !important; flex: 0 0 30px !important; border-radius: 7px !important; background: #ffffff06 !important; color: #9fb9ca !important; }
+    html.municipal-ui #app-sidebar .nav-mark svg { width: 18px !important; height: 18px !important; }
+    html.municipal-ui #app-sidebar .side-nav > a:hover { background: #ffffff09 !important; border-color: #ffffff0c !important; color: #fff !important; }
+    html.municipal-ui #app-sidebar .side-nav > a.active { background: #225b60 !important; border-color: #3d797a !important; color: #fff !important; box-shadow: inset 3px 0 #d9bb79 !important; font-weight: 600 !important; }
+    html.municipal-ui #app-sidebar .side-nav > a.active .nav-mark { color: #c4eee5 !important; background: #ffffff10 !important; }
+    html.municipal-ui #app-sidebar .rbi-sidebar-subpages { margin: 0 0 6px 25px !important; padding: 2px 0 2px 13px !important; border-left: 1px solid #527881 !important; }
+    html.municipal-ui #app-sidebar .rbi-sidebar-subpages a { min-height: 34px !important; padding: 7px 10px !important; border-radius: 6px !important; font-size: 12px !important; color: #b9ceda !important; }
+    html.municipal-ui #app-sidebar .rbi-sidebar-subpages a[aria-current="page"] { background: #ffffff0e !important; color: #d9f4ec !important; }
+    html.municipal-ui #app-sidebar .sidebar-account { margin-top: 18px !important; padding: 14px 10px !important; border-top: 1px solid #ffffff16 !important; background: transparent !important; }
+    html.municipal-ui #app-sidebar .sidebar-account .account-avatar { background: #d1e9e2 !important; color: #214d4b !important; border-radius: 10px !important; }
+    html.municipal-ui #app-sidebar .sidebar-account strong { color: #edf4f7 !important; }
+    html.municipal-ui #app-sidebar .sidebar-account :is(span:not(.account-avatar), small) { color: #9eb7c6 !important; }
+    html.municipal-ui #app-sidebar .sidebar-logout button { border: 1px solid #ffffff12 !important; border-radius: 8px !important; min-height: 40px !important; color: #b8ccd8 !important; background: transparent !important; font-size: 12px !important; }
+    html.municipal-ui #app-sidebar .sidebar-logout button:hover { color: #ffe0d8 !important; background: #763f3f35 !important; border-color: #ad7b6b60 !important; }
+    html.municipal-ui #app-sidebar :is(a, button):focus-visible { outline: 2px solid #e0c88f !important; outline-offset: 2px !important; }
+    @media (min-width: 961px) {
+        html.municipal-ui body.sidebar-collapsed #app-sidebar .side-section { font-size: 0 !important; padding: 0 !important; margin: 12px 6px 4px !important; height: 1px !important; }
+        html.municipal-ui body.sidebar-collapsed #app-sidebar .side-nav > a { padding: 8px !important; justify-content: center !important; }
+        html.municipal-ui body.sidebar-collapsed #app-sidebar .rbi-sidebar-subpages { display: none !important; }
+        html.municipal-ui body.sidebar-collapsed #app-sidebar .sidebar-account { padding-inline: 0 !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        html.municipal-ui #app-sidebar .side-nav > a { transition: none !important; }
+    }
+}
+}

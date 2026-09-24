@@ -6,7 +6,7 @@ The page audits the 24 completed calendar months immediately before the current 
 
 Secretaries are restricted to their assigned barangay; their RBI submission counts use their own forms. Municipal users can inspect available municipal records or filter by barangay. Multiple forms in a month count once in the coverage table and individually in monthly form totals. Current/future reporting months and future submission timestamps are excluded. Migration counts are events, not unique residents.
 
-No-record months are shown as unverified, never as confirmed zero movement. An RBI submission does not prove complete migration reporting. The 24-month display window is an audit window, not a model training sufficiency criterion. All forecasting remains disabled: no completeness source, comparable population time series or evaluated forecasting model exists yet.
+No-record months are shown as unverified, never as confirmed zero movement. An RBI submission does not prove complete migration reporting. The 24-month display window is an audit window, not a model training sufficiency criterion. Validated forecasting remains unavailable: no completeness source, comparable population time series or evaluated forecasting model exists yet. The separate Migration Trends dashboard offers exploratory departure estimates using an optional prototype model or a recorded three-month average; see [migration demo and estimates](migration-demo.md).
 
 Next dependencies: staff-approved monthly completeness tracking; comparable historical population snapshots; local model evaluation on chronological holdout data against a baseline; uncertainty and staff review. These remain unfinished. No ML accuracy or population growth claim is made by this page.
 

@@ -112,6 +112,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.residents');
 
+    Route::get('/barangay/rbi-updates/history', [DashboardController::class, 'barangay'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.rbi-updates.history');
+
     Route::get('/barangay/rbi-updates/deceased-inhabitants', [DashboardController::class, 'barangay'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.deceased');
@@ -282,6 +286,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/spatial-visualization', SpatialVisualizationController::class)
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('spatial.index');
+
+    Route::get('/spatial-visualization/layers/{layer}', \App\Http\Controllers\GisLayerController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('spatial.layers');
+
+    Route::post('/spatial-visualization/households', [\App\Http\Controllers\MapHouseholdController::class, 'store'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('spatial.households.store');
+
+    Route::put('/spatial-visualization/households/{household}', [\App\Http\Controllers\MapHouseholdController::class, 'update'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('spatial.households.update');
 
     Route::post('/resident/document-requests', [DocumentRequestController::class, 'store'])
         ->middleware('role:'.User::ROLE_RESIDENT)

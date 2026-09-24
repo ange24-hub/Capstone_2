@@ -7,9 +7,8 @@
     @php($editThroughRbi = auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY) && request('source') && !in_array(request('sheet'), ['deceased', 'new-inhabitants'], true))
     @php($registryFilterRoute = request()->routeIs('barangay.registry.new-inhabitants') ? 'barangay.registry.new-inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'barangay.registry.deceased' : (request()->routeIs('barangay.registry.active') ? 'barangay.registry.active' : 'registry.index')))
     <section class="panel  registry-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6 {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
-        <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
         <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
-            <div>
+            <x-workspace-heading icon="users"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
                 <h1>{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'New Inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'Deceased Records' : (request()->routeIs('barangay.registry.active') ? ($isBiasong ? 'Resident Registry' : 'Consolidated / All Registered') : ($registryBarangay ? 'Barangay '.$registryBarangay->name.' RBI Data' : 'Multi-Barangay Registry'))) }}</h1>
                 <p>
                     @if (request()->routeIs('barangay.registry.new-inhabitants'))
@@ -24,7 +23,7 @@
                         {{ auth()->user()->name }} is signed in as {{ auth()->user()->roleLabel() }}.
                     @endif
                 </p>
-            </div>
+            </x-workspace-heading>
         </div>
 
         @if (session('status'))

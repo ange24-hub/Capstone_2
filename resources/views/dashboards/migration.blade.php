@@ -1,34 +1,47 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/migration-workspace.css') }}?v={{ filemtime(public_path('css/migration-workspace.css')) }}">
+@endpush
+
 @section('content')
     @php
         $netMovement = $totalIn - $totalOut;
-        $selectedBarangay = $barangays->firstWhere('id', (int) request('barangay_id'));
+        $selectedBarangay = $barangays->firstWhere('id', (int) $selectedBarangayId);
     @endphp
 
     <section class="dashboard-page migration-dashboard" aria-labelledby="migration-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <div class="dashboard-title-group">
+            <x-workspace-heading icon="trend">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
                 <h1 id="migration-dashboard-title">Migration trends</h1>
                 <p>Compare monthly arrivals and departures for {{ $selectedYear }}.</p>
-            </div>
-                <form class="dashboard-filter" method="GET" action="{{ route('migration.dashboard') }}">
-                    <label for="migration-year">Year</label>
-                    <input id="migration-year" name="year" type="number" min="1900" max="9999" value="{{ $selectedYear }}" required>
-                    @error('year')<p role="alert">{{ $message }}</p>@enderror
-                    @if (! auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
-                    <label for="migration-barangay"><x-app-icon name="filter" /> View data for</label>
-                    <div><select id="migration-barangay" name="barangay_id"><option value="">All barangays</option>@foreach ($barangays as $barangay)<option value="{{ $barangay->id }}" @selected((string) request('barangay_id') === (string) $barangay->id)>{{ $barangay->name }}</option>@endforeach</select><button type="submit">Apply filter</button></div>
-                    @else
-                        <p>Barangay {{ auth()->user()->barangay?->name }}</p>
-                        <button type="submit">Apply filter</button>
-                    @endif
-                </form>
+            </x-workspace-heading>
         </header>
+
+        <form class="migration-filters" method="GET" action="{{ route('migration.dashboard') }}" aria-label="Migration filters">
+            <div class="migration-filter-field">
+                <label for="migration-year">Reporting year</label>
+                <input id="migration-year" name="year" type="number" min="1900" max="9999" value="{{ $selectedYear }}" required>
+                @error('year')<p role="alert">{{ $message }}</p>@enderror
+            </div>
+            @if (! auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
+                <div class="migration-filter-field migration-area-field">
+                    <label for="migration-barangay">Barangay</label>
+                    <select id="migration-barangay" name="barangay_id"><option value="">All barangays</option>@foreach ($barangays as $barangay)<option value="{{ $barangay->id }}" @selected((string) $selectedBarangayId === (string) $barangay->id)>{{ $barangay->name }}</option>@endforeach</select>
+                </div>
+            @else
+                <div class="migration-filter-scope"><span>Barangay scope</span><strong>{{ auth()->user()->barangay?->name }}</strong></div>
+            @endif
+            <button type="submit"><x-app-icon name="filter" />Apply filters</button>
+        </form>
 
         @if ($selectedBarangay)
             <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} · {{ $selectedYear }}</span><a href="{{ route('migration.dashboard', ['year' => $selectedYear]) }}">Clear barangay filter</a></div>
+        @endif
+
+        @if ($demoRecordCount > 0)
+            <p role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">Demo data included: {{ $demoRecordCount }} synthetic migration events. Remove demo data before using official reports.</p>
         @endif
 
         <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Migration summary">
@@ -54,7 +67,7 @@
                     </h2>
 
                     <p>
-                        Estimated next-month out-migration based on recent recorded migration patterns.
+                        Estimate for {{ $predictionMonthLabel }} using completed months through {{ $sourceMonthLabel }}.
                     </p>
                 </div>
 
@@ -63,11 +76,11 @@
                 </span>
             </header>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-5">
+            <div class="migration-forecast-stats">
 
                 <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                     <span class="text-sm text-slate-500">
-                        Current Month
+                        {{ $sourceMonthLabel }}
                     </span>
 
                     <strong class="mt-1 block text-2xl text-slate-900">
@@ -81,7 +94,7 @@
 
                 <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                     <span class="text-sm text-slate-500">
-                        Previous Month
+                        {{ $previousMonthLabel }}
                     </span>
 
                     <strong class="mt-1 block text-2xl text-slate-900">
@@ -111,25 +124,24 @@
 
             @if ($predictedOutMigration !== null)
 
-                <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+                <div class="migration-estimate mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
 
                     <div class="flex flex-wrap items-center justify-between gap-4">
 
                         <div>
                             <span class="text-sm font-semibold uppercase tracking-wider text-emerald-700">
-                                Next-Month Prediction
+                                Estimate for {{ $predictionMonthLabel }}
                             </span>
 
                             <div class="mt-1 text-3xl font-bold text-emerald-900">
                                 {{ number_format(round($predictedOutMigration)) }}
                                 <span class="text-base font-medium">
-                                    expected out-migrants
+                                    estimated departure events
                                 </span>
                             </div>
 
                             <p class="mt-2 text-sm text-emerald-800">
-                                Prediction generated by the RBIM Gradient Boosting model
-                                using recent migration records.
+                                Based on recorded migration events in the selected barangay scope.
                             </p>
                         </div>
 
@@ -139,11 +151,11 @@
                             </span>
 
                             <strong class="block text-sm text-slate-900">
-                                Gradient Boosting
+                                {{ $predictionMethod }}
                             </strong>
 
                             <span class="block text-xs text-slate-500">
-                                RBI-based prototype
+                                Exploratory estimate
                             </span>
                         </div>
 
@@ -160,7 +172,7 @@
                     </strong>
 
                     <p class="mt-1 text-sm text-amber-800">
-                        Make sure the local migration prediction service is running.
+                        {{ $predictionError }}
                     </p>
 
                 </div>
@@ -168,16 +180,19 @@
             @endif
 
             <p class="mt-4 text-xs text-slate-500">
-                Note: The initial predictive model was developed using RBI-derived
-                records with synthetically assigned dates for model-development purposes.
-                Predictions should be treated as prototype estimates and not as official
-                migration statistics.
+                @if ($predictionMethod === 'Gradient Boosting prototype')
+                    The prototype model used synthetically assigned training dates.
+                @else
+                    When the model service is unavailable, the estimate uses the mean of the last three completed months.
+                @endif
+                Months without recorded events contribute zero recorded events; reporting completeness is unverified.
+                These estimates are not validated forecasts or official migration statistics.
             </p>
 
         </section>
 
-        <div class="analytics-grid">
-            <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="barangay-movement-title">
+        <div class="analytics-grid migration-analysis">
+            <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="barangay-movement-title" id="migration-area-panel">
                 <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Area comparison</span><h2 id="barangay-movement-title">Movement by barangay</h2><p>Areas with the most movement appear first.</p></div><span class="count-chip">{{ $barangayStats->count() }} areas</span></header>
                 @if ($barangayStats->isEmpty())
                     <div class="dashboard-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"><span class="empty-icon"><x-app-icon name="map" /></span><strong>No movement data</strong><span>Recorded migration events will appear here.</span></div>
@@ -197,7 +212,7 @@
                 @endif
             </section>
 
-            <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="municipal-trend-title">
+            <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="municipal-trend-title" id="migration-monthly-panel">
                 <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Over time</span><h2 id="municipal-trend-title">Monthly trend · {{ $selectedYear }}</h2><p>January–December. Months without recorded events show zero.</p></div><span class="section-icon"><x-app-icon name="calendar" /></span></header>
                 @php
                     $chartMax = max(4, (int) ceil(max($monthlyTrend->max('in'), $monthlyTrend->max('out')) / 4) * 4);
@@ -226,7 +241,9 @@
                 @if ($totalIn + $totalOut === 0)
                     <p class="migration-chart-notice">No migration events recorded for {{ $selectedYear }}.</p>
                 @endif
+                <details class="migration-monthly-details"><summary>View monthly breakdown</summary>
                     <div class="table-wrap clean-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200"><table class="clean-table compact-data-table"><thead><tr><th>Month</th><th>Arrivals</th><th>Departures</th><th>Net</th></tr></thead><tbody>@foreach ($monthlyTrend as $month)<tr><td><strong>{{ \Illuminate\Support\Carbon::createFromFormat('!Y-m', $month['month'])->format('M Y') }}</strong></td><td><span class="value-in">{{ $month['in'] }}</span></td><td><span class="value-out">{{ $month['out'] }}</span></td>@php($monthNet = $month['in'] - $month['out'])<td><strong class="{{ $monthNet < 0 ? 'negative' : 'positive' }}">{{ $monthNet > 0 ? '+' : '' }}{{ $monthNet }}</strong></td></tr>@endforeach</tbody></table></div>
+                </details>
             </section>
         </div>
 
