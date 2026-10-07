@@ -1,34 +1,52 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/municipal-dashboard.css') }}?v={{ filemtime(public_path('css/municipal-dashboard.css')) }}">
+@endpush
+
 @section('content')
+    @php
+        $reportingBarangays = $barangays->filter(fn ($barangay) => $rbiUpdates->where('barangay_name', $barangay->name)->isNotEmpty())->count();
+        $reportCoverage = $barangays->count() ? round($reportingBarangays / $barangays->count() * 100) : 0;
+    @endphp
     <section class="dashboard-page municipal-dashboard" aria-labelledby="municipal-dashboard-title">
-        <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <x-workspace-heading icon="building">
-                <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Municipal Administration</span>
+        <header class="municipal-hero">
+            <div class="municipal-hero-copy">
+                <span class="municipal-eyebrow">Municipal Administration <span aria-hidden="true">/</span> Tomas Oppus</span>
                 <h1 id="municipal-dashboard-title">Municipal overview</h1>
-                <p>Review urgent account approvals, received RBI reports, and population movement across Tomas Oppus.</p>
-            </x-workspace-heading>
-            <div class="dashboard-header-actions">
-                <a class="button" href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" /> Barangay directory</a>
-                <a class="button secondary-button" href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" /> Migration trends</a>
+                <p>A view of barangay reporting, account approvals, and population movement.</p>
+                <div class="municipal-hero-actions">
+                    <a href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" />Barangay directory<x-app-icon name="arrow-right" /></a>
+                    <a href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" />Migration trends</a>
+                </div>
             </div>
-            <x-dashboard-context />
+            <div class="municipal-hero-context">
+                <span class="municipal-hero-emblem"><x-app-icon name="building" /></span>
+                <div><strong>{{ $barangays->count() }}</strong><span>barangays connected to your overview</span></div>
+                <small>Southern Leyte, Philippines</small>
+            </div>
         </header>
 
         @if (session('status'))
             <div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>
         @endif
 
-        <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Municipal summary">
+        <section class="dashboard-metrics municipal-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Municipal summary">
             <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="form" /></span><div><span>RBI reports received</span><strong>{{ number_format($rbiUpdates->count()) }}</strong><small>Submitted barangay reports</small></div></article>
             <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $secretaryApprovalRequests->isEmpty() ? 'metric-success' : 'metric-warning' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Pending approvals</span><strong>{{ number_format($secretaryApprovalRequests->count()) }}</strong><small>Secretary accounts to review</small></div></article>
             <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span><div><span>Six-month net migration</span><strong>{{ $analyticsSummary['net_migration_6m'] >= 0 ? '+' : '' }}{{ number_format($analyticsSummary['net_migration_6m']) }}</strong><small>{{ $analyticsSummary['migration_in_6m'] }} in · {{ $analyticsSummary['migration_out_6m'] }} out</small></div></article>
             <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $analyticsSummary['high_movement_count'] > 0 ? 'metric-danger' : 'metric-success' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="map" /></span><div><span>Priority areas</span><strong>{{ number_format($analyticsSummary['high_movement_count']) }}</strong><small>High-movement barangays</small></div></article>
         </section>
 
-        <x-dashboard-shortcuts />
+        <nav class="municipal-shortcuts" aria-label="Municipal quick access">
+            <a href="{{ route('municipal.approvals.index') }}"><span><x-app-icon name="shield" /></span><div><strong>Account approvals</strong><small>{{ $secretaryApprovalRequests->count() }} awaiting review</small></div><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('reports.population') }}"><span><x-app-icon name="users" /></span><div><strong>Population reports</strong><small>Review registered residents</small></div><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('spatial.index') }}"><span><x-app-icon name="map" /></span><div><strong>GIS mapping</strong><small>Explore households and hazards</small></div><x-app-icon name="arrow-right" /></a>
+        </nav>
 
-        <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="secretary-approvals">
+        <div class="municipal-work-grid">
+
+        <div class="workflow-card municipal-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="secretary-approvals">
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <span class="step-pill">Account Authorization</span>
@@ -40,6 +58,7 @@
 
             @if ($secretaryApprovalRequests->isEmpty())
                 <div class="dashboard-empty-state compact rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+                    <span class="municipal-empty-icon"><x-app-icon name="check" /></span>
                     <strong>No secretary accounts awaiting approval</strong>
                     <span>New secretary registrations will appear here automatically.</span>
                 </div>
@@ -75,35 +94,42 @@
             @endif
         </div>
 
-        <div class="workflow-card municipal-directory-summary rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="incoming-rbi-reports">
+        <div class="workflow-card municipal-panel municipal-directory-summary rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="incoming-rbi-reports">
             <div>
-                <span class="step-pill">Direct Municipal Receiving</span>
+                <span class="step-pill">Barangay Reporting</span>
                 <h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI Reports by Barangay</h2>
-                <p>The complete barangay list and all received RBI reports now have a separate, searchable directory so this dashboard stays concise.</p>
+                <p>Review submitted forms and find the latest reports in the barangay directory.</p>
             </div>
             <div class="directory-summary-metrics">
                 <div><strong>{{ $barangays->count() }}</strong><span>Total barangays</span></div>
-                <div><strong>{{ $barangays->filter(fn ($barangay) => $rbiUpdates->where('barangay_name', $barangay->name)->isNotEmpty())->count() }}</strong><span>With reports</span></div>
+                <div><strong>{{ $reportingBarangays }}</strong><span>With reports</span></div>
                 <div><strong>{{ $rbiUpdates->count() }}</strong><span>Reports received</span></div>
+            </div>
+            <div class="municipal-report-coverage">
+                <div><span>Barangays with submitted reports</span><strong>{{ $reportingBarangays }} / {{ $barangays->count() }}</strong></div>
+                <progress max="100" value="{{ $reportCoverage }}" aria-label="Barangays with submitted reports">{{ $reportCoverage }}%</progress>
+                <small>Across all recorded reporting months</small>
             </div>
             @if ($latestMunicipalReport = $rbiUpdates->first())
                 <div class="municipal-latest-received" aria-label="Latest RBI report received">
                     <span>Latest received</span>
                     <strong>{{ $latestMunicipalReport->barangay_name ?: 'Barangay not set' }} · {{ optional($latestMunicipalReport->reporting_month)->format('F Y') ?: 'Month not set' }}</strong>
                     <small>{{ $latestMunicipalReport->rbiFamilies->count() }} family/families · {{ count($latestMunicipalReport->rows ?? []) }} inhabitant entries</small>
+                    <a href="{{ route('rbi-updates.show', $latestMunicipalReport) }}">View latest report <x-app-icon name="arrow-right" /></a>
                 </div>
             @endif
             <a class="button" href="{{ route('municipal.barangays.index') }}">Open Barangay Directory</a>
         </div>
+        </div>
 
-        <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="trend-monitoring">
+        <div class="workflow-card municipal-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="trend-monitoring">
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <span class="step-pill">Trend Monitoring</span>
                     <h2 class="section-title text-lg font-semibold text-slate-900">Population and Migration Comparison</h2>
                     <p>Compare the latest RBI population change, six-month in/out-migration, and movement against the previous six months.</p>
                 </div>
-                <a class="secondary-button" href="{{ route('migration.dashboard') }}">Open Detailed Migration Monitor</a>
+                <a class="button secondary-button" href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" />View migration details</a>
             </div>
 
             <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
@@ -139,7 +165,7 @@
             </div>
         </div>
 
-        <div class="workflow-card decision-support rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="decision-support">
+        <div class="workflow-card municipal-panel decision-support rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="decision-support">
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <span class="step-pill">AI-assisted Decision Support</span>

@@ -16,7 +16,8 @@
                     <p>Barangay {{ $rbiUpdate->barangay_name ?: 'not set' }} <span aria-hidden="true">&middot;</span> {{ optional($rbiUpdate->reporting_month)->format('F Y') ?: 'Month not set' }}</p>
                 </div>
             </div>
-            <div class="rbi-report-downloads" aria-label="Download report">
+            <div class="rbi-report-downloads" aria-label="Report actions">
+                <button class="rbi-report-button" type="button" onclick="window.print()"><x-app-icon name="document" />Print Report</button>
                 <a class="rbi-report-button rbi-report-pdf" href="{{ route('rbi-updates.export-pdf', $rbiUpdate) }}"><x-app-icon name="document" />Download Consolidated PDF</a>
                 <a class="rbi-report-button rbi-report-word" href="{{ route('rbi-updates.export-word', $rbiUpdate) }}"><x-app-icon name="form" />Download Word Document</a>
                 @if ($rbiUpdate->source_file_path)<a class="rbi-report-button" href="{{ route('rbi-updates.download', $rbiUpdate) }}">Original Upload</a>@endif

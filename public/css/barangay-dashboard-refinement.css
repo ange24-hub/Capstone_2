@@ -1,0 +1,122 @@
+/* First layer: this dashboard's visual rules precede the shared important theme. */
+@layer barangay-dashboard-refinement {
+@media screen {
+    html.municipal-ui body.role-barangay.dashboard-workspace .app-shell,
+    html.municipal-ui body.role-barangay.dashboard-workspace .barangay-dashboard :is(h1,h2,h3,h4,p,span,strong,small,a,button,input,select,textarea,dt,dd,label) {
+        font-family:'Aptos','Segoe UI Variable Text','Segoe UI',sans-serif !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace .app-main,
+    html.municipal-ui body.role-barangay.dashboard-workspace .app-content {
+        background:#e9eef0 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard {
+        gap:21px !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard > .dashboard-page-header {
+        min-height:0 !important;
+        padding:24px 28px !important;
+        border:1px solid #b9cdd0 !important;
+        border-top:4px solid #648d9d !important;
+        border-radius:14px !important;
+        background:linear-gradient(112deg,#dce9ef 0%,#e1ede9 70%,#e8ece3 100%) !important;
+        box-shadow:0 7px 22px #294b5a14 !important;
+        color:#243d4a !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard > .dashboard-page-header::before,
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard > .dashboard-page-header::after,
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-hero-weave { display:none !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-page-header .workspace-heading-emblem {
+        width:48px !important; height:50px !important; flex-basis:48px !important;
+        border:1px solid #b5cecf !important;
+        border-radius:10px !important;
+        background:#cfe1e2 !important;
+        color:#376879 !important;
+        box-shadow:none !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-page-header :is(h1,.dashboard-title-group h1) {
+        margin:5px 0 6px !important;
+        color:#213f50 !important;
+        font-size:clamp(25px,2.3vw,32px) !important;
+        font-weight:650 !important;
+        line-height:1.2 !important;
+        letter-spacing:-.025em !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-page-header p {
+        max-width:620px !important; color:#4a6570 !important;
+        font-size:13px !important; line-height:1.55 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-page-header .dashboard-eyebrow {
+        color:#426c71 !important; font-size:10px !important; letter-spacing:.1em !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions .button {
+        min-height:38px !important; padding:8px 13px !important;
+        border:1px solid #416c80 !important; border-radius:7px !important;
+        background:#416c80 !important; color:#fff !important;
+        box-shadow:none !important; font-size:12px !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions .button.secondary-button {
+        background:#edf3f0 !important; color:#355d68 !important; border-color:#a9c4be !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions .button:hover { background:#31576b !important; color:#fff !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .overview-context {
+        background:#eff4f1 !important; color:#2f505b !important;
+        border:1px solid #b8cfca !important; border-radius:10px !important;
+        box-shadow:none !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .overview-context-date {
+        padding:0 !important; background:transparent !important;
+        border:0 !important; border-radius:0 !important;
+        box-shadow:none !important; color:#385b67 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .overview-context-date :is(strong,.ph-clock-time) { color:#26495a !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .overview-context-date :is(span,.ph-clock-label) { color:#5a737b !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-section-heading h2 {
+        color:#274656 !important; font-size:19px !important; font-weight:650 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .data-freshness {
+        background:#e2eae7 !important; border-color:#bed0ca !important; color:#536d72 !important;
+        font-size:11px !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .community-analytics {
+        border:1px solid #c9d9d7 !important; border-radius:13px !important;
+        background:#e4ece9 !important; box-shadow:0 5px 17px #31556112 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-chart {
+        padding:17px 15px 14px !important; border-radius:9px !important;
+        box-shadow:inset 0 3px 0 var(--sector-color) !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-chart-heading h3 {
+        color:#294757 !important; font-size:15px !important; font-weight:650 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-chart-summary strong { font-size:26px !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-donut { max-width:120px !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-operations { background:#dbe8e3 !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-footer {
+        background:#d4e3e0 !important; color:#45636d !important; border-top-color:#b7cfca !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .population-footer a { color:#315f73 !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard :is(.brgy-work-card,.brgy-quick-links,.brgy-office-summary,.overview-report-history) {
+        border-radius:10px !important; box-shadow:0 4px 15px #294b5a0c !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-pending-card {
+        background:#f3eedf !important; border:1px solid #dbd0b7 !important; border-top:3px solid #ae9561 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-reporting-card {
+        background:#e3eeea !important; border:1px solid #c0d6cd !important; border-top:3px solid #719d8d !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-work-card > header h2 { color:#284859 !important; font-size:17px !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-task-list > a {
+        min-height:61px !important; color:#2b5060 !important;
+    }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-quick-links { border-color:#c6d5d2 !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-quick-links > a { padding:14px 16px !important; }
+    html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .brgy-office-summary {
+        background:#e1ece8 !important; border:1px solid #c1d5cd !important;
+    }
+    @media (max-width:760px) {
+        html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard > .dashboard-page-header { padding:20px !important; }
+        html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions { width:100%; }
+        html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions .button { flex:1 1 170px; }
+    }
+}
+}

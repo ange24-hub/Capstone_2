@@ -3,6 +3,7 @@ namespace Tests\Feature;
 
 use App\Models\{Barangay, BarangayRbiUpdate, NewInhabitant, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class MunicipalReportReceiptTest extends TestCase
@@ -19,6 +20,10 @@ class MunicipalReportReceiptTest extends TestCase
 
     public function test_barangay_submission_reaches_admin_but_drafts_remain_private(): void
     {
+        Storage::fake('local');
+        $signature = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
+        Storage::put('signatures/secretary.png', $signature);
+        Storage::put('signatures/captain.png', $signature);
         $barangay = Barangay::where('name', 'Canlupao')->firstOrFail();
         $staff = User::factory()->create(['role' => 'barangay', 'barangay_id' => $barangay->id]);
         $admin = User::factory()->create(['role' => 'municipal_lgu', 'barangay_id' => null]);

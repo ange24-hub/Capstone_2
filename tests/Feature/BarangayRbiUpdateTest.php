@@ -54,8 +54,6 @@ class BarangayRbiUpdateTest extends TestCase
                 'reporting_month' => '2026-08',
                 'prepared_by' => 'Mercidita L. Saga',
                 'attested_by' => 'Wenceslao L. Resus',
-                'prepared_signature_data' => $signatureData,
-                'attested_signature_data' => $signatureData,
                 'rows' => [[
                     'household_head' => 'Pedro Dela Cruz',
                     'inhabitant_name' => 'Dela Cruz, Ana Maria S.',
@@ -76,12 +74,21 @@ class BarangayRbiUpdateTest extends TestCase
                     'deceased_name' => 'Juan Santos',
                     'death_date' => '2026-08-12',
                 ]],
-                'submit_to_municipal' => '1',
             ])
-            ->assertRedirect(route('barangay.rbi-updates.index', ['new' => 1]))
-            ->assertSessionHas('submitted_rbi_update_id');
+            ->assertRedirect()->assertSessionHasNoErrors();
 
         $update = BarangayRbiUpdate::firstOrFail();
+        $this->assertSame(BarangayRbiUpdate::STATUS_DRAFT, $update->status);
+        $this->assertNull($update->prepared_signature_path);
+        $this->assertNull($update->attested_signature_path);
+        $this->get(route('barangay.rbi-updates.certification', ['rbiUpdate' => $update, 'action' => 'submit']))
+            ->assertOk()->assertSee('Upload signature');
+        $this->post(route('barangay.rbi-updates.submit', $update), [
+            'prepared_signature_data' => $signatureData,
+            'attested_signature_data' => $signatureData,
+        ])->assertRedirect(route('barangay.rbi-updates.index', ['new' => 1]))
+            ->assertSessionHasNoErrors()->assertSessionHas('submitted_rbi_update_id');
+        $update->refresh();
 
         $this->assertSame('Carnaga', $update->barangay_name);
         $this->assertSame('Pedro Dela Cruz', $update->household_head);
@@ -112,7 +119,6 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('dashboard.municipal'))
             ->assertOk()
-            ->assertSee('Direct Municipal Receiving')
             ->assertSee('Monthly RBI Reports by Barangay')
             ->assertSee('Carnaga')
             ->assertSee('August 2026')
@@ -220,17 +226,13 @@ class BarangayRbiUpdateTest extends TestCase
         $this->assertCount(2, $draft->rows);
 
         $this->actingAs($secretary)
-            ->get(route('barangay.rbi-updates.index'))
+            ->get(route('barangay.rbi-updates.index', ['edit' => $draft->id]))
             ->assertOk()
             ->assertSee('Continue Monthly Draft')
             ->assertSee('Dela Cruz Family')
             ->assertSee('Santos Family');
 
-        $this->actingAs($secretary)
-            ->get(route('barangay.rbi-updates.index', ['edit' => $draft->id]))
-            ->assertOk()
-            ->assertSee('Continue Monthly Draft')
-            ->assertSee('Monthly RBI Form History');
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee('Monthly RBI Form History');
     }
 
     public function test_large_family_continues_before_the_next_household_starts(): void
@@ -316,7 +318,7 @@ class BarangayRbiUpdateTest extends TestCase
             ->assertOk()
             ->assertSee('Update Submitted Monthly Form')
             ->assertSee('Ana Dela Cruz')
-            ->assertSee('Save Updated Form');
+            ->assertSee('Save Updated Residents');
 
         $this->actingAs($secretary)
             ->put(route('barangay.rbi-updates.update', $report), [

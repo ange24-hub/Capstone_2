@@ -41,7 +41,13 @@ class PopulationReportTest extends TestCase
         $all = $this->get(route('reports.population'))->assertOk()->viewData('report');
         $this->assertSame(4, $all['totalFamilies']);
         $this->assertSame(2, $all['singlePersonFamiliesAdded']);
-        $this->assertStringContainsString('A household with one recorded resident also counts as one family', view('reports.population-pdf', compact('report'))->render());
+        $pdfHtml = view('reports.population-pdf', compact('report'))->render();
+        $this->assertStringNotContainsString('A household with one recorded resident also counts as one family', $pdfHtml);
+        $this->assertStringNotContainsString('Notes and counting basis', $pdfHtml);
+        $this->assertStringContainsString('Total registered residents', $pdfHtml);
+        $this->get(route('reports.population', ['barangay_id' => $area->id, 'print' => 1]))
+            ->assertOk()->assertSee('Families')->assertSee('Households')
+            ->assertDontSee('Notes and counting basis')->assertDontSee('Counts cover available registry records');
     }
 
     public function test_pwd_and_seniors_use_remarks_and_birth_dates_without_double_counting(): void

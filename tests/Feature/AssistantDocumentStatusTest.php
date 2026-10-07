@@ -44,7 +44,7 @@ class AssistantDocumentStatusTest extends TestCase
         $this->requestFor($resident, 'OWN-1', 'pending');
         $this->requestFor($resident, 'OWN-2', 'ready', 'paid');
         $this->requestFor($outside, 'OTHER', 'pending');
-        foreach (['Pila ang pending document requests?' => 'Pending review: 1', 'Show unpaid payment counts' => 'Awaiting GCash payment: 1', 'Show paid payment counts' => 'Payment verified: 1'] as $question => $expected) {
+        foreach (['Pila ang pending document requests?' => 'Pending review: 1', 'Show unpaid payment counts' => 'Payment required before release: 1', 'Show paid payment counts' => 'Payment verified: 1'] as $question => $expected) {
             $response = $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => $question])->assertOk();
             $this->assertStringContainsString($expected, $response->json('reply'));
         }

@@ -124,10 +124,12 @@ class ResidentMobileApiTest extends TestCase
         $user = $this->resident(); $headers = $this->headers($user);
         config(['rbim.document_fees.'.DocumentRequest::TYPE_CLEARANCE => 50]);
         $payload = ['document_type' => DocumentRequest::TYPE_CLEARANCE, 'purpose' => 'Employment'];
-        $this->postJson("$this->api/documents", $payload, $headers)->assertUnprocessable();
+        $id = $this->postJson("$this->api/documents", $payload, $headers)->assertCreated()->json('id');
+        $this->assertSame(DocumentRequest::PAYMENT_AWAITING_ASSESSMENT, DocumentRequest::findOrFail($id)->payment_status);
+        $this->postJson("$this->api/documents/$id/payment", [], $headers)->assertUnprocessable();
         $user->barangay->update(['gcash_enabled' => true, 'gcash_merchant_name' => 'Barangay Looc', 'gcash_account_identifier' => '09123456789', 'gcash_qr_path' => 'qr.png']);
         $this->app['auth']->forgetGuards();
-        $id = $this->postJson("$this->api/documents", $payload, $headers)->assertCreated()->json('id');
+        DocumentRequest::findOrFail($id)->update(['amount_due' => 50, 'payment_status' => DocumentRequest::PAYMENT_UNPAID]);
         $this->postJson("$this->api/documents/$id/payment", ['payer_name' => $user->name, 'payer_mobile' => '09123456789',
             'payment_reference' => '1234567890123', 'payment_transaction_at' => now()->subMinute()->toDateTimeString(),
             'payment_proof' => UploadedFile::fake()->image('receipt.png')], $headers)->assertOk();

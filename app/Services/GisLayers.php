@@ -45,11 +45,13 @@ class GisLayers
         if (in_array($layer, ['barangay-boundaries', 'building-points'], true)) {
             $boundaries = $layer === 'barangay-boundaries' ? $data : $this->read('barangay-boundaries');
             $names = [];
+            $geometries = [];
             $codes = [];
             foreach ($boundaries['features'] as $feature) {
                 $code = (string) $feature['properties']['BARANGAY_C'];
                 $name = $feature['properties']['Name'];
                 $names[$code] = $name;
+                $geometries[$code] = $feature['geometry'];
                 if (! $scope || $this->normalize($name) === $this->normalize($scope->name)) {
                     $codes[] = $code;
                 }
@@ -61,7 +63,11 @@ class GisLayers
                 foreach ($data['features'] as &$feature) {
                     $code = (string) $feature['properties']['BARANGAY_C'];
                     // Source building points are reference geometry, not registry households.
-                    $feature['properties'] = ['barangay' => $names[$code], 'barangay_code' => $code];
+                    [$longitude, $latitude] = $feature['geometry']['coordinates'];
+                    $feature['properties'] = [
+                        'barangay' => $names[$code], 'barangay_code' => $code,
+                        'within_barangay_boundary' => $this->containsGeometry($geometries[$code], $latitude, $longitude),
+                    ];
                 }
                 unset($feature);
             }
@@ -80,20 +86,28 @@ class GisLayers
     public function contains(Barangay $barangay, float $latitude, float $longitude): bool
     {
         foreach ($this->read('barangay-boundaries', $barangay)['features'] as $feature) {
-            $geometry = $feature['geometry'];
-            $polygons = $geometry['type'] === 'Polygon' ? [$geometry['coordinates']] : $geometry['coordinates'];
-            foreach ($polygons as $rings) {
-                if (! $this->insideRing($rings[0], $longitude, $latitude)) {
-                    continue;
-                }
-                foreach (array_slice($rings, 1) as $hole) {
-                    if ($this->insideRing($hole, $longitude, $latitude)) {
-                        continue 2;
-                    }
-                }
-
+            if ($this->containsGeometry($feature['geometry'], $latitude, $longitude)) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    private function containsGeometry(array $geometry, float $latitude, float $longitude): bool
+    {
+        $polygons = $geometry['type'] === 'Polygon' ? [$geometry['coordinates']] : $geometry['coordinates'];
+        foreach ($polygons as $rings) {
+            if (! $this->insideRing($rings[0], $longitude, $latitude)) {
+                continue;
+            }
+            foreach (array_slice($rings, 1) as $hole) {
+                if ($this->insideRing($hole, $longitude, $latitude)) {
+                    continue 2;
+                }
+            }
+
+            return true;
         }
 
         return false;
@@ -105,6 +119,14 @@ class GisLayers
         for ($i = 0, $j = count($ring) - 1; $i < count($ring); $j = $i++) {
             [$xi, $yi] = $ring[$i];
             [$xj, $yj] = $ring[$j];
+            // Include an outer boundary point; the same check excludes hole edges.
+            $cross = ($x - $xi) * ($yj - $yi) - ($y - $yi) * ($xj - $xi);
+            $tolerance = 1e-10;
+            if (abs($cross) <= $tolerance * max(abs($xj - $xi), abs($yj - $yi))
+                && $x >= min($xi, $xj) - $tolerance && $x <= max($xi, $xj) + $tolerance
+                && $y >= min($yi, $yj) - $tolerance && $y <= max($yi, $yj) + $tolerance) {
+                return true;
+            }
             if (($yi > $y) !== ($yj > $y) && $x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi) {
                 $inside = ! $inside;
             }

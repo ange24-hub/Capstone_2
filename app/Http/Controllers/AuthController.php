@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Barangay;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -56,6 +59,61 @@ class AuthController extends Controller
         ]);
     }
 
+    public function showForgotPassword(): View
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendPasswordResetLink(Request $request): RedirectResponse
+    {
+        $credentials = $request->validate(['email' => ['required', 'email']]);
+
+        // Keep the response identical for known and unknown emails to prevent account discovery.
+        try {
+            Password::sendResetLink($credentials);
+        } catch (\Throwable $exception) {
+            Log::warning('Password reset notification could not be delivered.', [
+                'exception' => $exception::class,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+
+        return back()->with('status', 'If an account uses that email address, a password reset link has been sent.');
+    }
+
+    public function showResetPassword(Request $request, string $token): View
+    {
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email'),
+        ]);
+    }
+
+    public function resetPassword(Request $request): RedirectResponse
+    {
+        $credentials = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
+        ]);
+
+        $status = Password::reset($credentials, function (User $user, string $password): void {
+            $user->forceFill([
+                'password' => Hash::make($password),
+                'remember_token' => Str::random(60),
+            ])->save();
+
+            $user->tokens()->delete();
+            event(new PasswordReset($user));
+        });
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
+        }
+
+        return redirect()->route('login')->with('status', __($status));
+    }
+
     public function register(Request $request): RedirectResponse
     {
         $request->merge([
@@ -71,7 +129,7 @@ class AuthController extends Controller
             'role' => ['required', 'in:resident,barangay'],
             'barangay_id' => ['required', 'exists:barangays,id'],
             'access_code' => ['nullable', 'string', 'max:100'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
 
         $validator->after(function ($validator) use ($request): void {

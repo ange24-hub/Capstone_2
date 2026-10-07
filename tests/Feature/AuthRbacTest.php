@@ -81,7 +81,7 @@ class AuthRbacTest extends TestCase
         ]);
 
         $this->actingAs($secretary)
-            ->get(route('dashboard.barangay'))
+            ->get(route('barangay.resident-approvals.index'))
             ->assertOk()
             ->assertSee($resident->name)
             ->assertSee('Pending Resident Registrations');
@@ -356,7 +356,7 @@ class AuthRbacTest extends TestCase
         ]);
 
         $this->actingAs($secretary)
-            ->get(route('dashboard.barangay'))
+            ->get(route('barangay.document-requests.index'))
             ->assertOk()
             ->assertSee($documentRequest->reference_number)
             ->assertSee($resident->name);

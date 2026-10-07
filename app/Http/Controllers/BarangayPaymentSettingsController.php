@@ -34,6 +34,7 @@ class BarangayPaymentSettingsController extends Controller
 
         $hasOpenPayments = DocumentRequest::where('barangay_id', $barangay->id)
             ->where('amount_due', '>', 0)
+            ->where(fn ($query) => $query->whereNull('payment_method')->orWhere('payment_method', DocumentRequest::PAYMENT_METHOD_GCASH))
             ->whereIn('payment_status', [
                 DocumentRequest::PAYMENT_UNPAID,
                 DocumentRequest::PAYMENT_PENDING,
@@ -41,7 +42,7 @@ class BarangayPaymentSettingsController extends Controller
             ])
             ->exists();
 
-        if ($profileChanged && $hasOpenPayments) {
+        if ($profileChanged && $barangay->gcashIsReady() && $hasOpenPayments) {
             return back()->withErrors([
                 'gcash_merchant_name' => 'This GCash profile cannot be changed while the Barangay has unpaid or unverified document requests.',
             ]);
@@ -61,7 +62,6 @@ class BarangayPaymentSettingsController extends Controller
             'gcash_approved_by' => $request->user()->id,
             'gcash_approved_at' => now(),
         ]);
-
         if ($previousQrPath && $qrPath !== $previousQrPath) {
             Storage::disk('local')->delete($previousQrPath);
         }

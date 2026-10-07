@@ -10,11 +10,18 @@ use App\Models\Household;
 use App\Models\Inhabitant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class RbiReportRegistryTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Storage::fake('local');
+    }
 
     private function setupReport(array $rows, string $month = '2026-09-01'): array
     {
@@ -34,7 +41,12 @@ class RbiReportRegistryTest extends TestCase
 
     private function add(BarangayRbiUpdate $report)
     {
-        return $this->post(route('barangay.rbi-updates.add-to-registry', $report));
+        $signature = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+        return $this->post(route('barangay.rbi-updates.add-to-registry', $report), [
+            'prepared_signature_data' => $signature,
+            'attested_signature_data' => $signature,
+            'attested_by' => 'Example Captain',
+        ]);
     }
 
     public function test_existing_household_repeated_clicks_and_relational_links(): void
@@ -43,7 +55,7 @@ class RbiReportRegistryTest extends TestCase
         $household = Household::create(['barangay_id' => $barangay->id, 'household_number' => '15']);
         Inhabitant::create(['barangay_id' => $barangay->id, 'household_id' => $household->id,
             'first_name' => 'Parent', 'last_name' => 'Example', 'sex' => 'Male', 'status' => 'active', 'relationship_to_head' => 'Head']);
-        $this->get(route('barangay.rbi-updates.index'))->assertOk()->assertSee('Add to Consolidated RBI');
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee('Add to Consolidated RBI');
         $this->get(route('dashboard.barangay'))->assertOk()->assertSee('Add to Consolidated RBI');
         $this->add($report)->assertSessionHasNoErrors();
         $this->add($report)->assertSessionHasNoErrors();

@@ -1,9 +1,18 @@
 @extends('layouts.app')
 @section('content')
-<section class="dashboard-page population-report grid gap-6" aria-labelledby="population-report-title">
-    <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <x-workspace-heading icon="users"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="population-report-title">{{ $reportTitle }}</h1><p>{{ $report['scopeLabel'] }}</p></x-workspace-heading>
-        <a class="button" href="{{ route('reports.population.pdf', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $selectedSection])) }}"><x-app-icon name="document" /> Download PDF{{ $selectedSection !== 'summary' ? ' - '.$reportTitle : '' }}</a>
+<section class="dashboard-page population-report population-spreadsheet grid gap-6" aria-labelledby="population-report-title">
+    <header class="population-report-header">
+        <div class="population-report-heading">
+            <span class="population-report-eyebrow">Registry reports</span>
+            <h1 id="population-report-title">{{ $reportTitle }}</h1>
+            <p>{{ $report['scopeLabel'] }}</p>
+            <p class="report-print-meta">As of {{ $report['generatedAt']->format('d F Y') }} | Generated {{ $report['generatedAt']->format('h:i A T') }}</p>
+        </div>
+        <div class="population-report-actions">
+            <a class="button secondary-button population-print-button" href="{{ route('reports.population', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $selectedSection, 'print' => 1])) }}" target="_blank" rel="noopener"><x-app-icon name="document" /> Print Report</a>
+            <a class="button" href="{{ route('reports.population.pdf', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $selectedSection])) }}"><x-app-icon name="document" /> Download PDF</a>
+            <a class="button secondary-button" href="{{ route('reports.population.excel', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $selectedSection])) }}"><x-app-icon name="document" /> Download Excel</a>
+        </div>
     </header>
     @unless($isSecretary)
     <form class="population-report-filter flex flex-wrap items-end gap-3" method="GET" action="{{ route('reports.population') }}"><input type="hidden" name="section" value="{{ $selectedSection }}"><div><label for="report-barangay">Barangay</label><select id="report-barangay" name="barangay_id"><option value="">All barangays — available records</option>@foreach($barangays as $barangay)<option value="{{ $barangay->id }}" @selected($selectedBarangayId === $barangay->id)>{{ $barangay->name }}</option>@endforeach</select></div><button type="submit">Apply filter</button></form>
@@ -36,3 +45,14 @@
     @if($detailPagination){{ $detailPagination->links() }}@endif
 </section>
 @endsection
+
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/population-spreadsheet.css') }}?v={{ filemtime(public_path('css/population-spreadsheet.css')) }}">
+    @if(in_array($selectedSection, ['coverage', 'area-ages'], true) || ($report['totalBarangays'] > 1 && in_array($selectedSection, ['summary', 'sex', 'ages'], true)))<style>@media print { @page { size: A4 landscape; } }</style>@endif
+@endpush
+
+@if($printMode)
+    @push('scripts')
+        <script>window.addEventListener('load', () => window.print());</script>
+    @endpush
+@endif

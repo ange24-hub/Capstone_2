@@ -2,11 +2,12 @@
                     @csrf
                     <input type="hidden" name="form_section" value="deceased">
                     @if ($editingReport) @method('PUT') @endif
+                    <p class="field-help"><x-required-mark /> Required fields must be filled out.</p>
 
                     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                         <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
                         <div>
-                            <label for="reporting_month">For the month of</label>
+                            <label for="reporting_month">For the month of <x-required-mark /></label>
                             <input id="reporting_month" name="reporting_month" type="month" value="{{ old('reporting_month', $defaultReportingMonth) }}" required>
                             @if (request()->boolean('new'))
                                 <small class="field-help">Select the month for the new report. To add entries to an already submitted month, use “Update form” in the history below.</small>

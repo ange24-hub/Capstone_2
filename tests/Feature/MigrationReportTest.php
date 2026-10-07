@@ -27,7 +27,7 @@ class MigrationReportTest extends TestCase
         $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $params = ['barangay_id' => $area->id, 'year' => 2026];
         $response = $this->actingAs($staff)->get(route('reports.migration', $params))->assertOk()
-            ->assertSee('Download PDF')->assertSee('No recorded events');
+            ->assertSee('Print Report')->assertSee('Download PDF')->assertSee('No recorded events');
         $report = $response->viewData('report');
         $this->assertCount(12, $report['months']);
         $this->assertSame([1, 2, -1, 3], [$report['in'], $report['out'], $report['net'], $report['total']]);
@@ -45,6 +45,10 @@ class MigrationReportTest extends TestCase
         $empty = $this->get(route('reports.migration', ['year' => 2024]))->assertOk()->viewData('report');
         $this->assertSame(0, $empty['total']);
         $this->assertCount(12, $empty['months']);
+        $html = view('reports.migration-pdf', compact('report'))->render();
+        $this->assertStringNotContainsString('Notes and counting basis', $html);
+        $this->assertStringContainsString('Monthly movements in 2026', $html);
+        $this->assertStringContainsString('Annual total', $html);
         $pdf = $this->get(route('reports.migration.pdf', $params))->assertOk()->assertHeader('content-type', 'application/pdf');
         $this->assertStringStartsWith('%PDF-', $pdf->getContent());
         $this->assertStringContainsString('2026.pdf', $pdf->headers->get('content-disposition'));

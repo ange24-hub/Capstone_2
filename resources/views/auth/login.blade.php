@@ -18,6 +18,10 @@
         <h1>Sign in</h1>
         <p class="auth-copy">Enter your email or assigned staff ID to access your account.</p>
 
+        @if (session('status'))
+            <div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>
+        @endif
+
         @if ($errors->any())
             <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
                 <ul>
@@ -36,6 +40,8 @@
 
             <label for="password">Password</label>
             <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+            <p class="auth-help-link"><a href="{{ route('password.request') }}">Forgot your password?</a></p>
 
             <div class="check-row">
                 <input id="remember" name="remember" type="checkbox" value="1">

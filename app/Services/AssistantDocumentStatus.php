@@ -16,10 +16,10 @@ class AssistantDocumentStatus
         $status = preg_match('/\b(pending|processing|ready|completed|rejected|unpaid|paid|verified|verification|status|bayad)\b/u', $q);
         if (! $document || ! $status) return null;
         if (! $user->hasAnyRole([User::ROLE_RESIDENT, User::ROLE_BARANGAY])) {
-            return $this->answer('Document and payment status records are available to the requesting resident and their assigned barangay staff.');
+            return $this->answer(AssistantLanguage::text('Document and payment status records are available to the requesting resident and their assigned barangay staff.'));
         }
         if (! $user->isApproved() || ($user->hasRole(User::ROLE_BARANGAY) && ! $user->barangay_id)) {
-            return $this->answer('An approved account is required to view document and payment status records. Barangay staff also need an assigned barangay.');
+            return $this->answer(AssistantLanguage::text('An approved account is required to view document and payment status records. Barangay staff also need an assigned barangay.'));
         }
         $resident = $user->hasRole(User::ROLE_RESIDENT);
         $query = DocumentRequest::query()->when($resident,
@@ -38,23 +38,23 @@ class AssistantDocumentStatus
         if ($latest) {
             $request = $query->orderByDesc('created_at')->orderByDesc('id')->first(['reference_number', 'document_type', 'status', 'payment_status', 'amount_due']);
             $reply = $request
-                ? 'Your latest request '.$request->reference_number.' ('.$request->typeLabel().') is '.$request->statusLabel().'. Payment: '.($request->requiresPayment() ? $request->paymentStatusLabel().' (PHP '.number_format((float) $request->amount_due, 2).')' : 'No payment required').'. Check My Requests if you mean another request.'
-                : 'You have no document requests recorded.';
+                ? AssistantLanguage::text('Your latest request ').$request->reference_number.' ('.$request->typeLabel().') is '.$request->statusLabel().AssistantLanguage::text('. Payment: ').($request->requiresPayment() ? $request->paymentStatusLabel().($request->hasAssessedFee() ? ' (PHP '.number_format((float) $request->amount_due, 2).')' : '') : AssistantLanguage::text('No payment required')).AssistantLanguage::text('. Check My Requests if you mean another request.')
+                : AssistantLanguage::text('You have no document requests recorded.');
             return $this->answer($reply, $user);
         }
         if ($filters) $query->whereIn($column, $filters);
         $counts = $query->selectRaw($column.', COUNT(*) as total')->groupBy($column)->pluck('total', $column);
         $selected = $filters ? array_intersect_key($labels, array_flip($filters)) : $labels;
-        $reply = ($resident ? 'Your document requests' : 'Document requests for your assigned barangay')." (all recorded dates):\n";
+        $reply = ($resident ? AssistantLanguage::text('Your document requests') : AssistantLanguage::text('Document requests for your assigned barangay')).AssistantLanguage::text(" (all recorded dates):\n");
         foreach ($selected as $value => $label) $reply .= $label.': '.(int) ($counts[$value] ?? 0)."\n";
-        $reply .= $payment ? 'Payment verification and document release are separate statuses.' : 'These counts describe request status, not payment verification.';
+        $reply .= $payment ? AssistantLanguage::text('Payment verification and document release are separate statuses.') : AssistantLanguage::text('These counts describe request status, not payment verification.');
         return $this->answer($reply, $user);
     }
 
     private function answer(string $reply, ?User $user = null): array
     {
-        return ['reply' => $reply, 'scope' => 'RBIM system only',
-            'suggestions' => ['Pila ang pending document requests?', 'Show payment status counts', 'What do request statuses mean?'],
-            'actions' => $user ? [['label' => 'Open Document Requests', 'url' => route($user->hasRole(User::ROLE_RESIDENT) ? 'resident.document-requests.index' : 'barangay.document-requests.index')]] : []];
+        return ['reply' => $reply, 'scope' => AssistantLanguage::text('RBIM system only'),
+            'suggestions' => ['Pila ang pending document requests?', AssistantLanguage::text('Show payment status counts'), AssistantLanguage::text('What do request statuses mean?')],
+            'actions' => $user ? [['label' => AssistantLanguage::text('Open Document Requests'), 'url' => route($user->hasRole(User::ROLE_RESIDENT) ? 'resident.document-requests.index' : 'barangay.document-requests.index')]] : []];
     }
 }

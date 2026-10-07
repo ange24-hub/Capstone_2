@@ -22,7 +22,6 @@ class ResidentApprovalController extends Controller
             'approved_at' => now(),
             'approved_by' => $request->user()->id,
         ]);
-
         return back()->with('status', $resident->name.' has been approved as a resident of Barangay '.$resident->barangay->name.'.');
     }
 
@@ -35,7 +34,6 @@ class ResidentApprovalController extends Controller
             'approved_at' => null,
             'approved_by' => $request->user()->id,
         ]);
-
         return back()->with('status', $resident->name.'\'s registration has been rejected.');
     }
 

@@ -20,10 +20,13 @@
     map.getPane('hazards').style.zIndex = 350;
     map.createPane('boundaries');
     map.getPane('boundaries').style.zIndex = 450;
+    map.createPane('buildings');
+    map.getPane('buildings').style.zIndex = 460;
     map.createPane('households');
     map.getPane('households').style.zIndex = 500;
     // SVG paths remain clickable above the boundary canvas without blocking the rest of the map.
     const householdRenderer = L.svg({ pane: 'households' });
+    const buildingRenderer = L.canvas({ pane: 'buildings' });
     const households = L.featureGroup().addTo(map);
     const layersControl = L.control.layers({ OpenStreetMap: streets, Satellite: satellite }, {
         'Registered households': households
@@ -58,11 +61,23 @@
             edit.textContent = 'Edit household';
             content.append(edit);
         }
+        const hazardButton = document.createElement('button');
+        hazardButton.type = 'button';
+        hazardButton.className = 'gis-hazard-check';
+        hazardButton.textContent = 'Check hazard overlays';
+        const hazardResult = document.createElement('div');
+        hazardResult.className = 'gis-hazard-result';
+        hazardResult.setAttribute('role', 'status');
+        hazardButton.addEventListener('click', event => {
+            event.stopPropagation();
+            inspectHazards(household, hazardButton, hazardResult);
+        });
+        content.append(hazardButton, hazardResult);
         const marker = L.circleMarker([household.latitude, household.longitude], {
             pane: 'households', renderer: householdRenderer, bubblingMouseEvents: false,
             radius: 5, color: '#fff', weight: 1.5, fillColor: '#2563eb', fillOpacity: 1
         }).bindTooltip(label).bindPopup(content, {
-            className: 'gis-household-popup', minWidth: 180, maxWidth: 240, maxHeight: 180
+            className: 'gis-household-popup', minWidth: 200, maxWidth: 280, maxHeight: 300
         }).addTo(households);
         if (Number(config.focusHouseholdId) === household.id) savedMarker = marker;
     });
@@ -117,11 +132,36 @@
     const descriptors = [
         { key: 'municipal-boundary', name: 'Municipal boundary', visible: true },
         { key: 'barangay-boundaries', name: 'Barangay boundaries', visible: true },
-        { key: 'building-points', name: 'Source building points', visible: true },
+        { key: 'building-points', name: 'Building polygons (symbols)', visible: true },
         { key: 'flood', name: 'Flood susceptibility' },
         { key: 'landslide', name: 'Landslide susceptibility' },
         { key: 'storm-surge', name: 'Storm surge susceptibility' }
     ];
+    const layerRequests = new Map();
+    async function fetchLayerData(descriptor) {
+        if (!layerRequests.has(descriptor.key)) {
+            const request = (async () => {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 30000);
+                try {
+                    const response = await fetch(config.layers[descriptor.key], {
+                        headers: { Accept: 'application/json' }, credentials: 'same-origin', signal: controller.signal
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) throw new Error('Invalid map layer');
+                    return data;
+                } finally {
+                    clearTimeout(timeout);
+                }
+            })().catch(error => {
+                layerRequests.delete(descriptor.key);
+                throw error;
+            });
+            layerRequests.set(descriptor.key, request);
+        }
+        return layerRequests.get(descriptor.key);
+    }
     let areaBounds = null;
     const failed = new Set();
     const pending = new Set();
@@ -130,7 +170,7 @@
         const errors = descriptors.filter(d => failed.has(d.key)).map(d => d.name);
         status.textContent = pending.size ? 'Loading map layers...' : errors.length
             ? `Could not load: ${errors.join(', ')}. Retry or refresh your sign-in.`
-            : 'Map ready. Select a point for details. Open the layers button to show hazard overlays.';
+            : 'Map ready. Select a household or building polygon for details. Open the layers button to show hazard overlays.';
         retry.hidden = errors.length === 0 || pending.size > 0;
     };
     const fit = bounds => {
@@ -150,31 +190,80 @@
         if (['LF', 'LL'].includes(value) || value.includes('LOW')) return { color: '#1f78b4', label: 'Low' };
         return { color: '#64748b', label: 'Unclassified' };
     };
+    async function inspectHazards(household, button, result) {
+        button.disabled = true;
+        result.textContent = 'Checking supplied map areas...';
+        const point = [Number(household.longitude), Number(household.latitude)];
+        const hazards = descriptors.filter(descriptor => ['flood', 'landslide', 'storm-surge'].includes(descriptor.key));
+        const checks = await Promise.allSettled(hazards.map(async descriptor => {
+            const data = await fetchLayerData(descriptor);
+            const matches = data.features.filter(feature => window.GisGeometry.containsPoint(feature.geometry, point));
+            if (!matches.length) return [descriptor.name, 'No supplied overlay at this point'];
+            if (descriptor.key === 'storm-surge') return [descriptor.name, 'Within mapped storm-surge area; level not specified'];
+            const labels = [...new Set(matches.map(feature => classification(feature, descriptor.key).label))];
+            return [descriptor.name, `${labels.join(', ')} susceptibility`];
+        }));
+        const list = document.createElement('ul');
+        checks.forEach((check, index) => {
+            const item = document.createElement('li');
+            const [name, value] = check.status === 'fulfilled' ? check.value
+                : [hazards[index].name, 'Layer unavailable; try again'];
+            const label = document.createElement('strong');
+            label.textContent = `${name}: `;
+            item.append(label, document.createTextNode(value));
+            list.append(item);
+        });
+        const note = document.createElement('small');
+        note.textContent = 'Map overlap only. Confirm site conditions with the LGU before decisions.';
+        result.replaceChildren(list, note);
+        button.disabled = false;
+    }
+    // Screen-sized polygon symbols keep point-only building references visible at every zoom.
+    function buildingCorners(latlng) {
+        const center = map.project(latlng);
+        return [[-4, -3], [4, -3], [4, 3], [-4, 3]].map(([x, y]) =>
+            map.unproject(L.point(center.x + x, center.y + y)));
+    }
+    map.on('zoomend', () => {
+        const buildings = descriptors.find(descriptor => descriptor.key === 'building-points');
+        buildings.group.eachLayer(group => group.eachLayer(layer => {
+            const [longitude, latitude] = layer.feature.geometry.coordinates;
+            layer.setLatLngs(buildingCorners(L.latLng(latitude, longitude)));
+        }));
+    });
     function makeLayer(data, descriptor) {
         const key = descriptor.key;
         const boundary = key.endsWith('boundary') || key === 'barangay-boundaries';
         const building = key === 'building-points';
         return L.geoJSON(data, {
-            pane: boundary ? 'boundaries' : building ? 'overlayPane' : 'hazards',
+            pane: boundary ? 'boundaries' : building ? 'buildings' : 'hazards',
             style: feature => boundary ? {
                 color: key === 'municipal-boundary' ? '#172b43' : '#64748b',
                 weight: key === 'municipal-boundary' ? 2.5 : 1.5,
-                fillOpacity: 0, dashArray: key === 'barangay-boundaries' ? '5 5' : null
+                fill: false, dashArray: key === 'barangay-boundaries' ? '5 5' : null
+            } : building ? {
+                color: feature.properties.within_barangay_boundary ? '#0f766e' : '#9a3412', weight: 1,
+                fillColor: feature.properties.within_barangay_boundary ? '#14b8a6' : '#f97316', fillOpacity: 0.85
             } : { color: classification(feature, key).color, weight: 0.5, fillOpacity: 0.45 },
-            pointToLayer: (_feature, latlng) => L.circleMarker(latlng, {
-                radius: 3, color: '#0f766e', weight: 0.5, fillColor: '#14b8a6', fillOpacity: 0.85
+            pointToLayer: (feature, latlng) => L.polygon(buildingCorners(latlng), {
+                pane: 'buildings', renderer: buildingRenderer, bubblingMouseEvents: false
             }),
             onEachFeature: (feature, layer) => {
                 if (building) {
                     const [longitude, latitude] = feature.geometry.coordinates;
-                    const content = popup('Source building point', [
+                    const content = popup('Building reference polygon', [
                         ['Barangay', feature.properties.barangay], ['Latitude', latitude], ['Longitude', longitude],
-                        ['Source', 'SB-ISPGM reference layer; not a registry household']
+                        ['Boundary check', feature.properties.within_barangay_boundary ? 'Inside assigned barangay on this map' : 'Outside assigned barangay on this map; confirm location and barangay'],
+                        ['Source', 'Supplied Tomas Oppus building-point layer; not a registry household'],
+                        ['Geometry', 'Polygon symbol at the source location; actual building outline unavailable']
                     ]);
                     const addButton = document.createElement('button');
                     addButton.type = 'button';
                     addButton.textContent = document.querySelector('#gis-household-form input[name="_method"]') ? 'Use this location' : 'Add household here';
                     addButton.addEventListener('click', () => {
+                        const barangayInput = document.getElementById('gis-household-barangay');
+                        const option = Array.from(barangayInput.options).find(option => normalize(option.textContent) === normalize(feature.properties.barangay));
+                        if (option) barangayInput.value = option.value;
                         chooseLocation(latitude, longitude);
                         map.closePopup();
                         formPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -184,7 +273,8 @@
                         const normalized = name.replace(/\([^)]*\)/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
                         return ({ ponong: 'punong', higosan: 'higosoan' })[normalized] || normalized;
                     };
-                    if (!config.writableBarangayName || normalize(config.writableBarangayName) === normalize(feature.properties.barangay)) {
+                    const barangayInput = document.getElementById('gis-household-barangay');
+                    if (feature.properties.within_barangay_boundary && Array.from(barangayInput.options).some(option => option.value && normalize(option.textContent) === normalize(feature.properties.barangay))) {
                         content.append(addButton);
                     }
                     layer.bindPopup(content);
@@ -193,7 +283,7 @@
                     label.textContent = feature.properties?.Name || 'Tomas Oppus';
                     layer.bindTooltip(label, { sticky: true });
                 } else {
-                    layer.bindPopup(popup(descriptor.name, [['Susceptibility', classification(feature, key).label], ['Source', 'SB-ISPGM supplied layer']]));
+                    layer.bindPopup(popup(descriptor.name, [['Susceptibility', classification(feature, key).label], ['Source', 'Supplied Tomas Oppus hazard shapefile']]));
                 }
             }
         });
@@ -203,15 +293,8 @@
         pending.add(descriptor.key);
         failed.delete(descriptor.key);
         report();
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
         try {
-            const response = await fetch(config.layers[descriptor.key], {
-                headers: { Accept: 'application/json' }, credentials: 'same-origin', signal: controller.signal
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) throw new Error('Invalid map layer');
+            const data = await fetchLayerData(descriptor);
             const layer = makeLayer(data, descriptor);
             descriptor.group.addLayer(layer);
             descriptor.loaded = true;
@@ -228,7 +311,6 @@
             failed.add(descriptor.key);
             console.error(`GIS ${descriptor.key}:`, error);
         } finally {
-            clearTimeout(timeout);
             pending.delete(descriptor.key);
             report();
         }

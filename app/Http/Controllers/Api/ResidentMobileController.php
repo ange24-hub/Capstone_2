@@ -87,8 +87,9 @@ class ResidentMobileController extends Controller
     public function catalog(Request $request)
     {
         return response()->json(['document_types' => collect(DocumentRequest::typeLabels())->map(fn ($label, $key) => [
-            'key' => $key, 'label' => $label, 'fee' => DocumentRequest::feeFor($key),
-            'available' => DocumentRequest::feeFor($key) <= 0 || $request->user()->barangay->gcashIsReady(),
+            'key' => $key, 'label' => $label, 'fee' => $key === DocumentRequest::TYPE_INDIGENCY ? 0 : null,
+            'fee_label' => $key === DocumentRequest::TYPE_INDIGENCY ? 'No fee' : 'Fee to be set by secretary',
+            'available' => true,
         ])->values(), 'categories' => collect(ResidentConcern::categories())->map(fn ($label, $key) => compact('key', 'label'))->values()]);
     }
 
@@ -115,9 +116,10 @@ class ResidentMobileController extends Controller
 
     private function documentData(DocumentRequest $document): array
     {
-        return [...$document->only(['id', 'reference_number', 'purpose', 'status', 'amount_due', 'payment_status',
+        return [...$document->only(['id', 'reference_number', 'purpose', 'status', 'amount_due', 'payment_status', 'payment_method',
             'payment_reference', 'payment_remarks', 'remarks', 'created_at']), 'type_label' => $document->typeLabel(),
-            'status_label' => $document->statusLabel(), 'payment_status_label' => $document->paymentStatusLabel()];
+            'status_label' => $document->statusLabel(), 'payment_status_label' => $document->paymentStatusLabel(),
+            'amount_due_label' => $document->amountDueLabel(), 'payment_open' => $document->paymentIsOpen()];
     }
 
     public function documents(Request $request)

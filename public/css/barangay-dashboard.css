@@ -1,0 +1,300 @@
+/* Barangay dashboard — a warmer, place-specific civic workspace. */
+.dashboard-workspace.role-barangay .app-main {
+    background:
+        radial-gradient(circle at 85% 8%, rgba(39, 137, 126, .12), transparent 28rem),
+        linear-gradient(145deg, #e8f0ef 0%, #edf2f6 48%, #e7edf2 100%);
+}
+
+.barangay-dashboard {
+    --brgy-navy: #123b50;
+    --brgy-deep: #092c3e;
+    --brgy-teal: #218579;
+    --brgy-sand: #d6a84e;
+    --brgy-paper: #f7f4ec;
+    gap: 28px;
+}
+
+/* Hero: replaces the generic white page header with a civic identity panel. */
+html.municipal-ui .app-content .barangay-dashboard > .dashboard-page-header {
+    position: relative !important;
+    isolation: isolate;
+    overflow: hidden;
+    align-items: center !important;
+    min-height: 214px !important;
+    padding: 30px 32px !important;
+    border: 0 !important;
+    border-radius: 22px !important;
+    background:
+        linear-gradient(112deg, rgba(8, 39, 56, .98) 0%, rgba(14, 67, 77, .97) 62%, rgba(28, 112, 101, .94) 100%) !important;
+    box-shadow: 0 18px 42px rgba(12, 44, 58, .18) !important;
+    color: #fff !important;
+}
+
+.barangay-dashboard > .dashboard-page-header::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background-image:
+        linear-gradient(45deg, transparent 46%, rgba(255,255,255,.055) 47% 53%, transparent 54%),
+        linear-gradient(-45deg, transparent 46%, rgba(255,255,255,.045) 47% 53%, transparent 54%);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(90deg, transparent 28%, #000 72%);
+}
+
+.barangay-dashboard > .dashboard-page-header::after {
+    content: "TOMAS OPPUS  •  SOUTHERN LEYTE";
+    position: absolute;
+    right: 32px;
+    bottom: 17px;
+    color: rgba(235, 244, 238, .65);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .22em;
+}
+
+.barangay-hero-weave {
+    position: absolute;
+    z-index: -1;
+    top: -80px;
+    right: 215px;
+    width: 260px;
+    height: 260px;
+    border: 42px solid rgba(214, 168, 78, .12);
+    border-radius: 50%;
+    box-shadow: 0 0 0 18px rgba(255,255,255,.025);
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header .workspace-heading-emblem {
+    width: 62px !important;
+    height: 68px !important;
+    flex-basis: 62px !important;
+    border: 1px solid rgba(255,255,255,.22) !important;
+    border-radius: 18px 18px 18px 6px !important;
+    background: rgba(255,255,255,.12) !important;
+    color: #f3ce7b !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.12) !important;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header h1 {
+    margin-top: 7px !important;
+    color: #fff !important;
+    font-size: clamp(30px, 3vw, 42px) !important;
+    letter-spacing: -.045em !important;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header p {
+    max-width: 600px;
+    color: rgba(233, 244, 244, .78) !important;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header :is(.dashboard-eyebrow, .government-eyebrow) {
+    color: #f0c96f !important;
+}
+
+.barangay-dashboard .dashboard-header-actions {
+    align-self: flex-start;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header .button {
+    min-height: 44px !important;
+    border-color: rgba(255,255,255,.2) !important;
+    border-radius: 10px !important;
+    background: #f3f0e7 !important;
+    color: #123b50 !important;
+    box-shadow: 0 7px 16px rgba(4, 27, 37, .16) !important;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header .secondary-button {
+    background: rgba(255,255,255,.1) !important;
+    color: #fff !important;
+    backdrop-filter: blur(8px);
+}
+
+html.municipal-ui .app-content .barangay-dashboard .dashboard-page-header .button:hover {
+    border-color: #f0c96f !important;
+    background: #f0c96f !important;
+    color: #123042 !important;
+}
+
+.barangay-dashboard .overview-context {
+    flex: 0 0 290px;
+}
+
+.barangay-dashboard .overview-context-office,
+.barangay-dashboard .overview-context-caption {
+    display: none;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .overview-context-date {
+    border: 1px solid rgba(255,255,255,.19) !important;
+    border-bottom: 0 !important;
+    border-radius: 16px 16px 16px 5px !important;
+    background: rgba(5, 35, 48, .38) !important;
+    padding: 17px 20px !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.08) !important;
+    backdrop-filter: blur(10px);
+}
+
+.barangay-dashboard .overview-context-date > span:first-child,
+.barangay-dashboard .overview-context-date > strong {
+    color: #fff;
+}
+
+html.municipal-ui .app-content .barangay-dashboard .overview-context-date .ph-clock-label {
+    color: rgba(227,241,240,.68) !important;
+}
+
+/* Section title feels editorial instead of another card header. */
+.barangay-dashboard .overview-community {
+    display: grid;
+    gap: 15px;
+}
+
+.barangay-dashboard .dashboard-section-heading {
+    align-items: center;
+    padding: 0 5px 0 17px;
+    border-left: 4px solid var(--brgy-sand);
+}
+
+.barangay-dashboard .dashboard-section-heading h2 {
+    margin-top: 5px;
+    color: var(--brgy-deep);
+    font-size: 24px;
+    letter-spacing: -.025em;
+}
+
+.barangay-dashboard .dashboard-section-heading .government-eyebrow {
+    color: var(--brgy-teal) !important;
+}
+
+.barangay-dashboard .data-freshness {
+    padding: 7px 11px;
+    border: 1px solid rgba(30, 111, 101, .15);
+    border-radius: 99px;
+    background: rgba(255,255,255,.48);
+    color: #55706f;
+}
+
+/* Data zone: individual tinted tiles break up the wall of white. */
+.barangay-dashboard .community-analytics {
+    overflow: hidden;
+    border: 1px solid rgba(23, 73, 84, .12);
+    border-radius: 22px;
+    background: #dce8e7;
+    box-shadow: 0 15px 38px rgba(20, 56, 67, .09);
+}
+
+.barangay-dashboard .population-chart-grid {
+    gap: 12px;
+    padding: 14px;
+}
+
+.barangay-dashboard .population-chart {
+    overflow: hidden;
+    padding: 22px 18px 16px;
+    border: 1px solid rgba(23, 73, 84, .1) !important;
+    border-radius: 16px 16px 16px 5px;
+    background: linear-gradient(155deg, rgba(255,255,255,.87), rgba(244,247,242,.68));
+    box-shadow: inset 0 4px 0 var(--sector-color);
+}
+
+.barangay-dashboard .population-chart:nth-child(2) { background: linear-gradient(155deg, #f4eff8, #ebe6f1); }
+.barangay-dashboard .population-chart:nth-child(3) { background: linear-gradient(155deg, #e9f4f4, #e1edef); }
+.barangay-dashboard .population-chart:nth-child(4) { background: linear-gradient(155deg, #faf3e5, #f1eadb); }
+
+.barangay-dashboard .population-donut {
+    max-width: 142px;
+}
+
+.barangay-dashboard .population-donut .donut-track {
+    stroke: rgba(38, 76, 86, .1);
+}
+
+.barangay-dashboard .population-chart-footnote {
+    border-top-color: rgba(42, 77, 85, .12);
+}
+
+.barangay-dashboard .population-operations {
+    gap: 10px;
+    padding: 12px 14px;
+    border-top-color: rgba(23, 73, 84, .12);
+    background: #cddfdd;
+}
+
+.barangay-dashboard .population-operations > :is(a, div) {
+    min-height: 68px;
+    padding: 10px 16px;
+    border: 1px solid rgba(24, 76, 82, .1) !important;
+    border-radius: 12px;
+    background: rgba(248,250,246,.66);
+}
+
+.barangay-dashboard .population-operations > a:hover {
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.barangay-dashboard .population-footer {
+    border-top-color: rgba(23, 73, 84, .12);
+    background: var(--brgy-deep);
+    color: rgba(255,255,255,.67);
+}
+
+.barangay-dashboard .population-footer a {
+    color: #f0c96f;
+}
+
+/* Workspace below the fold uses color as wayfinding. */
+.barangay-dashboard .brgy-work-card,
+.barangay-dashboard .brgy-quick-links,
+.barangay-dashboard .brgy-office-summary,
+.barangay-dashboard .overview-report-history {
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(19, 55, 64, .06);
+}
+
+.barangay-dashboard .brgy-pending-card {
+    background: linear-gradient(140deg, #f8ead0, #fbf6ea 72%);
+    border-color: #dfc58f;
+}
+
+.barangay-dashboard .brgy-reporting-card {
+    background: linear-gradient(140deg, #dceceb, #edf4f3 72%);
+    border-color: #b8d3cf;
+}
+
+.barangay-dashboard .brgy-quick-links {
+    overflow: hidden;
+    border-color: rgba(23,73,84,.12);
+}
+
+.barangay-dashboard .brgy-office-summary {
+    border-color: #c4d9d3;
+    background: #dceae4;
+}
+
+@media (max-width: 1180px) {
+    html.municipal-ui .app-content .barangay-dashboard > .dashboard-page-header {
+        align-items: flex-start !important;
+    }
+    .barangay-dashboard .overview-context { flex: 1 1 100%; }
+    .barangay-dashboard .overview-context-date { max-width: 360px; }
+}
+
+@media (max-width: 760px) {
+    html.municipal-ui .app-content .barangay-dashboard > .dashboard-page-header {
+        padding: 23px 20px 45px !important;
+        border-radius: 16px !important;
+    }
+    .barangay-dashboard .dashboard-header-actions { width: 100%; }
+    .barangay-dashboard .overview-context-date { max-width: none; }
+    .barangay-dashboard .dashboard-section-heading { align-items: flex-start; }
+    .barangay-dashboard .data-freshness { padding: 0; border: 0; background: transparent; }
+    .barangay-dashboard .population-chart-grid { padding: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .barangay-dashboard .population-operations > a { transition: none; }
+}

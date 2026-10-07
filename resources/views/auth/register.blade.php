@@ -5,37 +5,21 @@
 
     <section class="registration-page">
         <div class="registration-layout">
-            <aside class="registration-guide bg-blue-900 bg-none text-white" aria-label="Registration information">
-                <span class="registration-eyebrow">RBIM Account Enrollment</span>
-                <h1>Join your barangay’s digital registry.</h1>
-                <p>Create a secure account connected to the barangay where you live or serve.</p>
-
-                <div class="registration-steps">
-                    <div>
-                        <span>1</span>
-                        <p><strong>Choose an account type</strong><small>Register as a resident or barangay secretary.</small></p>
-                    </div>
-                    <div>
-                        <span>2</span>
-                        <p><strong>Enter your information</strong><small>Select your barangay and provide valid account details.</small></p>
-                    </div>
-                    <div>
-                        <span>3</span>
-                        <p><strong>Wait for verification</strong><small>Your account becomes available after the appropriate LGU approval.</small></p>
-                    </div>
+            <header class="registration-guide" aria-label="Municipal registration information">
+                <span class="seal-crop registration-seal"><img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal"></span>
+                <div class="registration-guide-copy">
+                    <span class="registration-eyebrow">Republic of the Philippines <span aria-hidden="true">·</span> Southern Leyte</span>
+                    <h1>Municipality of Tomas Oppus</h1>
+                    <p>Registry of Barangay Inhabitants Management System</p>
                 </div>
-
-                <div class="registration-security-note">
-                    <strong>Protected registration</strong>
-                    <span>Barangay secretary accounts require an LGU-issued access code.</span>
-                </div>
-            </aside>
+                <span class="registration-guide-tag">Official account registration</span>
+            </header>
 
             <div class="registration-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm p-5 sm:p-8">
                 <div class="registration-card-head">
-                    <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Create Account</div>
+                    <div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Create account</div>
                     <h2 id="registration-title">Resident registration</h2>
-                    <p id="registration-description">Create a resident account and send it to your barangay secretary for verification.</p>
+                    <p id="registration-description">Submit your details for review by your barangay secretary.</p>
                 </div>
 
                 @if ($errors->any())
@@ -84,7 +68,7 @@
                             <div class="field-group">
                                 <label for="email">Email address</label>
                                 <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="name@example.com" aria-describedby="registration-email-help" @error('email') aria-invalid="true" @enderror required>
-                                <small id="registration-email-help" class="block mt-2 text-sm text-slate-600">Use an active email address you own and can open. Provide the address where you want to receive files and documents from your barangay.</small>
+                                <small id="registration-email-help" class="block mt-2 text-sm text-slate-600">Use an email address you can access for barangay notices and documents.</small>
                                 @error('email') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
@@ -186,7 +170,7 @@
                 title.textContent = isSecretary ? 'Barangay secretary registration' : 'Resident registration';
                 description.textContent = isSecretary
                     ? 'Create an official secretary account for Municipal LGU verification.'
-                    : 'Create a resident account and send it to your barangay secretary for verification.';
+                    : 'Submit your details for review by your barangay secretary.';
                 approvalNote.textContent = isSecretary
                     ? 'The Municipal LGU will review this secretary account before workspace access is enabled.'
                     : 'Your barangay secretary will review this resident account before portal access is enabled.';

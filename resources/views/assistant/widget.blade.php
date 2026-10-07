@@ -17,7 +17,13 @@
 
         <div class="assistant-messages min-h-16 shrink" data-assistant-messages role="log" aria-live="polite">
             <div class="assistant-message assistant-message-bot">
-                <div class="assistant-bubble">Hello, {{ auth()->user()->name }}. I can help with RBIM features and the information allowed for your {{ auth()->user()->roleLabel() }} account.</div>
+                <div class="assistant-bubble">
+                    @if (session('assistant.language.'.auth()->id(), 'en') === 'ceb')
+                        Maayong adlaw, {{ auth()->user()->name }}. Makatabang ko bahin sa RBIM ug sa impormasyon nga gitugotan sa imong {{ auth()->user()->roleLabel() }} account.
+                    @else
+                        Hello, {{ auth()->user()->name }}. I can help with RBIM features and the information allowed for your {{ auth()->user()->roleLabel() }} account.
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -39,6 +45,14 @@
                 @endforeach
             </div>
         </details>
+
+        <label class="flex items-center gap-2 border-t border-slate-200 px-4 py-2 text-sm text-slate-700">
+            Tubag / Reply
+            <select data-assistant-language class="rounded border border-slate-300 bg-white px-2 py-1">
+                <option value="en" @selected(session('assistant.language.'.auth()->id(), 'en') === 'en')>English</option>
+                <option value="ceb" @selected(session('assistant.language.'.auth()->id(), 'en') === 'ceb')>Bisaya</option>
+            </select>
+        </label>
 
         <form class="assistant-form" data-assistant-form>
             <label class="sr-only" for="assistant-message">Ask about the RBIM system</label>
@@ -64,6 +78,8 @@
     const messages = root.querySelector('[data-assistant-messages]');
     const suggestions = root.querySelector('[data-assistant-suggestions]');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+    const language = root.querySelector('[data-assistant-language]');
+    const wording = (english, bisaya) => language.value === 'ceb' ? bisaya : english;
     let previousQuestion = null;
     const reset = root.querySelector('[data-assistant-reset]');
 
@@ -84,8 +100,8 @@
             const source = document.createElement('div');
             source.className = 'mb-2 text-xs font-semibold text-slate-600';
             source.textContent = mode === 'local_ai'
-                ? 'Database summary with local AI explanation'
-                : 'Database summary';
+                ? wording('Database summary with local AI explanation', 'Summary sa database uban sa local AI nga pagpasabot')
+                : wording('Database summary', 'Summary sa database');
             bubble.prepend(source);
         }
         row.appendChild(bubble);
@@ -127,9 +143,10 @@
         input.style.height = '';
         send.disabled = true;
         reset.disabled = true;
+        language.disabled = true;
         panel.setAttribute('aria-busy', 'true');
         suggestions.hidden = true;
-        const typing = addMessage('Checking RBIM…', 'bot');
+        const typing = addMessage(wording('Checking RBIM…', 'Gitan-aw ang RBIM…'), 'bot');
         typing.classList.add('is-typing');
 
         const abort = new AbortController();
@@ -144,7 +161,7 @@
                     'X-CSRF-TOKEN': csrf,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify({ message: clean, previous_question: previousQuestion }),
+                body: JSON.stringify({ message: clean, previous_question: previousQuestion, language: language.value }),
             });
 
             if (!response.ok) {
@@ -153,24 +170,26 @@
                 throw problem;
             }
             const data = await response.json();
+            if (['en', 'ceb'].includes(data.language)) language.value = data.language;
             previousQuestion = data.previous_question || null;
             typing.remove();
-            if (data.interpreted_question) addMessage('Using: ' + data.interpreted_question, 'bot');
+            if (data.interpreted_question) addMessage(wording('Using: ', 'Gigamit nga pangutana: ') + data.interpreted_question, 'bot');
             addMessage(data.reply, 'bot', data.actions || [], data.facts ? data.mode : null);
             showSuggestions(data.suggestions || []);
         } catch (error) {
             previousQuestion = null;
             typing.remove();
             const message = error.status === 429
-                ? 'Too many questions in a short time. Please wait a minute and try again.'
+                ? wording('Too many questions in a short time. Please wait a minute and try again.', 'Daghan ra kaayong pangutana sa mubo nga panahon. Paghulat og usa ka minuto ug sulayi pag-usab.')
                 : [401, 419].includes(error.status)
-                    ? 'Your session has expired. Refresh the page and sign in again.'
-                    : 'I could not reach RBIM right now. Please try again with a complete question.';
+                    ? wording('Your session has expired. Refresh the page and sign in again.', 'Na-expire ang imong session. I-refresh ang page ug pag-sign in pag-usab.')
+                    : wording('I could not reach RBIM right now. Please try again with a complete question.', 'Dili nako makontak ang RBIM karon. Palihog sulayi pag-usab gamit ang kompleto nga pangutana.');
             addMessage(message, 'bot');
         } finally {
             clearTimeout(timeout);
             send.disabled = false;
             reset.disabled = false;
+            language.disabled = false;
             panel.removeAttribute('aria-busy');
             suggestions.hidden = false;
             input.focus();
@@ -182,7 +201,7 @@
         if (send.disabled) return;
         previousQuestion = null;
         messages.replaceChildren();
-        addMessage('New conversation. Ask a complete question to start a new topic.', 'bot');
+        addMessage(wording('New conversation. Ask a complete question to start a new topic.', 'Bag-ong panag-istorya. Pangutana og kompleto aron magsugod og bag-ong hilisgutan.'), 'bot');
         input.value = '';
         input.style.height = '';
         root.querySelector('[data-assistant-catalog]').open = false;

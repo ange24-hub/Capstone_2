@@ -250,7 +250,7 @@ public class MainActivity extends Activity {
             if (options == null || options.length() == 0) { text(panel, "No options available. Contact your barangay.", 15, MUTED, false); return; }
             if (!concerns) for (int i=0;i<options.length();i++) {
                 JSONObject option = options.optJSONObject(i);
-                try { option.put("display", option.optString("label") + " — PHP " + option.optDouble("fee") + (option.optBoolean("available") ? "" : " (unavailable)")); } catch (JSONException ignored) {}
+                try { option.put("display", option.optString("label") + " — " + option.optString("fee_label", "Fee to be set by secretary") + (option.optBoolean("available") ? "" : " (unavailable)")); } catch (JSONException ignored) {}
             }
             Spinner choice = choices(panel, concerns ? "Category" : "Document type", options, concerns ? "label" : "display");
             EditText title = concerns ? field(panel, "Concern title", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES) : null;
@@ -289,12 +289,14 @@ public class MainActivity extends Activity {
                     button(panel, "Send information", () -> call("POST", "concerns/" + id + "/reply", json("message", value(message)), response -> detail(true, id, 1)));
                 }
             } else {
-                text(panel, "Amount due: PHP " + str(data, "amount_due"), 17, NAVY, true);
+                text(panel, "Amount due: " + str(data, "amount_due_label"), 17, NAVY, true);
                 text(panel, str(data, "payment_status_label"), 14, TEAL, true);
                 text(panel, str(data, "remarks"), 14, NAVY, false); text(panel, str(data, "payment_remarks"), 14, MUTED, false);
                 text(panel, str(data, "payment_reference").isEmpty() ? "" : "GCash reference: " + str(data, "payment_reference"), 12, MUTED, false);
                 String status = str(data, "payment_status"); JSONObject payment = result.optJSONObject("payment");
-                if (data.optDouble("amount_due") > 0 && ("unpaid".equals(status) || "rejected".equals(status))) {
+                if (data.optBoolean("payment_open") && data.optDouble("amount_due") > 0 && ("unpaid".equals(status) || "rejected".equals(status))) {
+                    if ("in_person".equals(str(data, "payment_method"))) text(panel, "In-person payment selected. Pay at the barangay office and wait for the secretary to confirm receipt.", 14, MUTED, false);
+                    else button(panel, "I will pay in person", () -> call("POST", "documents/" + id + "/in-person-payment", new JSONObject(), response -> detail(false, id, page)));
                     if (payment == null) text(panel, "GCash collection is unavailable. Contact your barangay.", 14, MUTED, false);
                     else {
                         text(panel, "Pay only the official barangay account", 16, NAVY, true);

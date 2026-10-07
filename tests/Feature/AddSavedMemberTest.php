@@ -9,7 +9,7 @@ class AddSavedMemberTest extends TestCase {
   $b=Barangay::where('name','San Roque')->firstOrFail();
   $u=User::factory()->create(['role'=>'barangay','barangay_id'=>$b->id]);
   $r=NewInhabitant::create(['barangay_id'=>$b->id,'household_number'=>'12','first_name'=>'Example','last_name'=>'Person','sex'=>'Male']);
-  $this->actingAs($u)->get(route('barangay.rbi-updates.index'))->assertOk()->assertSee(route('registry.new-inhabitants.add-to-active',$r));
+  $this->actingAs($u)->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee(route('registry.new-inhabitants.add-to-active',$r));
   $this->post(route('registry.new-inhabitants.add-to-active',$r))->assertSessionHasNoErrors();
   $active=Inhabitant::findOrFail($r->fresh()->active_inhabitant_id);
   $this->assertSame('12',$active->household->household_number);

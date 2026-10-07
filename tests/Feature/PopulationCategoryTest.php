@@ -36,16 +36,18 @@ class PopulationCategoryTest extends TestCase
         Household::create(['barangay_id' => $area->id, 'household_number' => '99']);
         $this->member($other, '64', '64', 'PrivateOtherArea');
         $families = $this->actingAs($staff)->get(route('reports.population', ['section' => 'families']))
-            ->assertOk()->assertSee('FamilyHead Example')->assertDontSee('FamilyChild Example')->assertSee('DecimalFamily Example')
+            ->assertOk()->assertSee('FamilyHead Example')->assertSee('FamilyChild Example')->assertSee('DecimalFamily Example')
             ->assertSee('SinglePerson Example')->assertDontSee('UnassignedOne Example')->assertDontSee('PrivateOtherArea')
+            ->assertSeeInOrder(['Name', 'Age', 'Household Number', 'Birthdate'])
             ->assertDontSee('<h2>2. Population by sex', false)->viewData('report');
         $this->assertSame(4, $families['totalFamilies']);
         $this->assertCount(4, $families['detailGroups']);
         $this->assertSame(['Family 64', 'Family 64.1', 'Family 64.10'], $families['detailGroups']->take(3)->pluck('title')->all());
         $this->assertCount(2, $families['detailGroups']->first()['members']);
         $houses = $this->get(route('reports.population', ['section' => 'households']))->assertOk()
-            ->assertDontSee('UnassignedOne Example')->assertSee('Household 99')->assertSee('Head not identified')
-            ->assertSee('FamilyHead Example')->assertDontSee('FamilyChild Example')->assertDontSee('DecimalFamily Example')->assertDontSee('AnotherFamily Example')
+            ->assertSee('UnassignedOne Example')->assertSee('Name not encoded')
+            ->assertSee('FamilyHead Example')->assertSee('FamilyChild Example')->assertSee('DecimalFamily Example')->assertSee('AnotherFamily Example')
+            ->assertSeeInOrder(['Name', 'Age', 'Household Number', 'Birthdate'])
             ->viewData('report');
         $this->assertCount($houses['totalHouseholds'], $houses['detailGroups']);
         $this->assertSame(4, $houses['totalHouseholds']);
@@ -54,12 +56,17 @@ class PopulationCategoryTest extends TestCase
             $html = view('reports.population-pdf', ['report' => $report, 'selectedSection' => $section,
                 'reportTitle' => PopulationSummary::SECTIONS[$section]])->render();
             $this->assertStringContainsString('FamilyHead Example', $html);
-            $this->assertStringNotContainsString('FamilyChild Example', $html);
-            $this->assertStringNotContainsString('UnassignedOne Example', $html);
-            $this->assertStringNotContainsString('Relationship to head', $html);
-            if ($section === 'households') {
-                $this->assertStringNotContainsString('DecimalFamily Example', $html);
+            $this->assertStringContainsString('FamilyChild Example', $html);
+            $this->assertStringNotContainsString('Residents are listed under', $html);
+            $this->assertStringNotContainsString('completeness has not been verified', $html);
+            if ($section === 'families') {
+                $this->assertStringNotContainsString('UnassignedOne Example', $html);
+            } else {
+                $this->assertStringContainsString('UnassignedOne Example', $html);
             }
+            $this->assertStringNotContainsString('Relationship to head', $html);
+            $this->assertStringContainsString('<th>Household Number</th>', $html);
+            if ($section === 'households') $this->assertStringContainsString('DecimalFamily Example', $html);
             $this->get(route('reports.population.pdf', ['section' => $section]))->assertOk()->assertHeader('content-type', 'application/pdf');
         }
         $municipal = app(PopulationSummary::class)->build(null, 'families');
@@ -77,10 +84,14 @@ class PopulationCategoryTest extends TestCase
         $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
         foreach (['families', 'households'] as $section) {
             $response = $this->actingAs($staff)->get(route('reports.population', ['section' => $section]))->assertOk()
-                ->assertDontSee('ChildOnly Example')->assertDontSee('FirstHead Example')->assertDontSee('SecondHead Example')
-                ->assertSee('Head not identified')->assertSee('Multiple heads recorded - needs verification');
-            $response->assertSee(($section === 'families' ? 'RecordedFamilyHead' : 'RecordedHouseholdHead').' Example')
-                ->assertDontSee(($section === 'families' ? 'RecordedHouseholdHead' : 'RecordedFamilyHead').' Example');
+                ->assertSee('ChildOnly Example')->assertSee('FirstHead Example')->assertSee('SecondHead Example')
+                ->assertSee('RecordedFamilyHead Example')->assertSee('RecordedHouseholdHead Example');
+            $groups = $response->viewData('report')['detailGroups']->keyBy('title');
+            $label = $section === 'families' ? 'Family' : 'Household';
+            $this->assertSame('Head not identified', $groups[$label.' 1']['head_name']);
+            $this->assertSame('Multiple heads recorded - needs verification', $groups[$label.' 2']['head_name']);
+            $this->assertSame(($section === 'families' ? 'RecordedFamilyHead' : 'RecordedHouseholdHead').' Example',
+                $groups[$label.' 3']['head_name']);
         }
     }
 
@@ -97,7 +108,9 @@ class PopulationCategoryTest extends TestCase
         $this->actingAs($staff);
         foreach (['seniors' => [3, 'AgeSenior', 'PwdOnly'], 'pwd' => [2, 'PwdOnly', 'AgeSenior']] as $section => [$count, $included, $excluded]) {
             $response = $this->get(route('reports.population', ['section' => $section]))->assertOk()
-                ->assertSee($included.' Example')->assertDontSee($excluded.' Example')->assertDontSee('NotQualified Example');
+                ->assertSee($included.' Example')->assertDontSee($excluded.' Example')->assertDontSee('NotQualified Example')
+                ->assertSeeInOrder(['Name', 'Age', 'Birthdate'])
+                ->assertDontSee('Family no.')->assertDontSee('Household no.')->assertDontSee('Relationship to head')->assertDontSee('<th>Sex</th>', false);
             $report = $response->viewData('report');
             $this->assertCount($count, $report['detailGroups']->first()['members']);
             $html = view('reports.population-pdf', ['report' => $report, 'selectedSection' => $section,
@@ -105,6 +118,10 @@ class PopulationCategoryTest extends TestCase
             $this->assertStringContainsString($included.' Example', $html);
             $this->assertStringNotContainsString($excluded.' Example', $html);
             $this->assertStringNotContainsString('Population by sex', $html);
+            $this->assertStringContainsString('<th>Birthdate</th>', $html);
+            $this->assertStringNotContainsString('Family no.', $html);
+            $this->assertStringNotContainsString('Household no.', $html);
+            $this->assertStringNotContainsString('Relationship to head', $html);
             $pdf = $this->get(route('reports.population.pdf', ['section' => $section]))->assertOk()->assertHeader('content-type', 'application/pdf');
             $this->assertStringStartsWith('%PDF-', $pdf->getContent());
             $this->assertStringContainsString('population-'.$section.'-barangay-'.$area->id, $pdf->headers->get('content-disposition'));
@@ -154,8 +171,12 @@ class PopulationCategoryTest extends TestCase
             $this->assertStringContainsString('Member51 Example', view('reports.population-pdf', $data)->render());
             return true;
         }))->andReturnSelf();
-        Pdf::shouldReceive('setPaper')->with('a4')->andReturnSelf();
+        Pdf::shouldReceive('setPaper')->with('a4', 'portrait')->andReturnSelf();
         Pdf::shouldReceive('download')->once()->andReturn(response('download'));
         $this->get(route('reports.population.pdf', ['section' => 'residents', 'page' => 2]))->assertOk();
+
+        $this->get(route('reports.population', ['section' => 'residents', 'print' => 1]))->assertOk()
+            ->assertSee('Member01 Example')->assertSee('Member51 Example')->assertSee('window.print()')
+            ->assertDontSee('Available registry records across all statuses');
     }
 }

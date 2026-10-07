@@ -20,7 +20,16 @@ This removes tagged migration events and their tagged demo residents and empty d
 
 ## Optional Python model
 
-With Flask, pandas, joblib and the model's compatible scikit-learn version installed, run `python ml/predictor.py` from the project root. The model file is resolved relative to the script. Laravel uses `MIGRATION_PREDICTION_URL` (default `http://127.0.0.1:5001`). The existing model used synthetic training dates, so its output remains a prototype estimate.
+From the project root, set up an isolated Python environment once:
+
+```powershell
+python -m venv ml/.venv
+ml/.venv/Scripts/python.exe -m pip install -r ml/requirements.txt
+```
+
+The requirements pin scikit-learn to 1.6.1, the version used to save the bundled model. Start `start-rbim.bat` to launch the database, prediction service and Laravel together. The prediction service runs in the background on loopback only. To start it separately, run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-migration-prediction.ps1`. Repeating this command reuses a healthy service. Add `-CheckOnly` to check without starting it. Startup errors are written to `storage/app/migration-prediction/server.stderr.log`.
+
+The launcher uses `ml/.venv/Scripts/python.exe` when present, or the Python on PATH. Set `RBIM_PREDICTION_PYTHON` to select another compatible interpreter. For a foreground service, run `ml/.venv/Scripts/python.exe ml/predictor.py`. The model file is resolved relative to the script. Laravel uses `MIGRATION_PREDICTION_URL` (default `http://127.0.0.1:5001`); the bundled launcher starts this default local endpoint. The existing model used synthetic training dates, so its output remains a prototype estimate.
 
 ## Regression checks
 
@@ -29,3 +38,7 @@ php -d extension=pdo_sqlite -d extension=sqlite3 vendor/phpunit/phpunit/phpunit 
 ```
 
 These use the isolated in-memory SQLite test database, including demo creation/removal checks.
+
+Check the actual bundled model and API input validation with `ml/.venv/Scripts/python.exe -m unittest ml.test_predictor`.
+
+With MySQL and the prediction service running, `php scripts/check-migration-prediction.php` checks Laravel's real dashboard calculation for municipal scope and one barangay. It reads existing records without adding accounts or migration events and exits unsuccessfully if it cannot use the model. The output identifies any included demo events.

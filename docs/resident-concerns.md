@@ -5,7 +5,7 @@
 - Approved residents with an assigned barangay open **My Concerns**, submit a title, category, description, optional location and one optional PDF/JPG/PNG (5 MB maximum), then track the reference and post follow-up information.
 - Approved secretaries open **Resident Concerns** for their own barangay. They review, correct the category, change status and record an update visible to the resident. An optional separate internal note is visible only to authorized barangay staff. Every human action is retained in the timeline with its author, category/status when changed and timestamp.
 - Municipal accounts open **Concern Insights** for aggregate category/status counts over the last 30, 90 or 365 calendar days, optionally filtered by barangay. They cannot open individual concerns or download attachments. Summary dates refer to submission dates and counts use current status, not status at submission or a time-to-resolution measure. Closed and resolved are distinct.
-- Both this module and Forecast Readiness remain available. Email remains deferred.
+- Resident Concerns and Migration Trends remain available. Email remains deferred.
 
 Statuses: submitted → under review → in progress/resolved/closed. Staff can close a submitted item with a reason in the required public message. Resolved/closed items can be reopened to under review. Same-status updates are permitted. Residents cannot change status/category or edit another resident's submission; follow-ups preserve the original description. Closed items reject resident follow-ups until staff reopen them. Version checks prevent older staff edits from overwriting newer activity.
 

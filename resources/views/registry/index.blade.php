@@ -89,9 +89,9 @@
                             @include('registry._biasong_deceased')
                         @else
                         <thead>
-                            <tr class="rbi-deceased-title"><th>HH<br>NO.</th><th colspan="15">NAME OF DECEASED PERSONS</th><th>DATE OF DEATH</th><th>ACTION</th></tr>
+                            <tr class="rbi-deceased-title"><th>HH<br>NO.</th><th colspan="15">NAME OF DECEASED PERSONS</th><th>DATE OF DEATH</th></tr>
                             <tr>
-                                <th>HH No.</th><th>Last Name</th><th>First Name</th><th>Middle Name</th><th>Qualifier</th><th>Relationship</th><th>Purok / Sitio</th><th>Place of Birth</th><th>Date of Birth</th><th>Age</th><th>Sex</th><th>Civil Status</th><th>School Level</th><th>Religion</th><th>Occupation</th><th>Remarks</th><th>Date of Death</th><th>Action</th>
+                                <th>HH No.</th><th>Last Name</th><th>First Name</th><th>Middle Name</th><th>Qualifier</th><th>Relationship</th><th>Purok / Sitio</th><th>Place of Birth</th><th>Date of Birth</th><th>Age</th><th>Sex</th><th>Civil Status</th><th>School Level</th><th>Religion</th><th>Occupation</th><th>Remarks</th><th>Date of Death</th>
                             </tr>
                         </thead>
                         <tbody class="rbi-deceased-body">
@@ -115,7 +115,7 @@
                                     <td><input form="{{ $rowForm }}" name="occupation" value="{{ $record->occupation }}" aria-label="Occupation"></td>
                                     <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($record->remarks) }}" aria-label="Remarks"></td>
                                     <td><input form="{{ $rowForm }}" name="death_date" type="date" value="{{ optional($record->death_date)->format('Y-m-d') }}" aria-label="Date of death"></td>
-                                    <td class="rbi-row-save"><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.deceased.update', $record) }}">@csrf @method('PUT')<button type="submit">Save row</button></form></td>
+                                    <td class="rbi-row-save" hidden><form id="{{ $rowForm }}" data-deceased-update method="POST" action="{{ route('registry.deceased.update', $record) }}">@csrf @method('PUT')</form></td>
                                 </tr>
                             @endforeach
                         </tbody>

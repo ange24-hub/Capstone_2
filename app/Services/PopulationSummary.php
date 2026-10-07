@@ -60,8 +60,10 @@ class PopulationSummary
             $demographics[$record->barangay_id]['sex'][$sexLabel]++;
             $ageLabel = 'Unknown / invalid birth date';
             $age = null;
+            $birthDate = null;
             try {
                 $birth = $record->birth_date;
+                $birthDate = $birth?->format('M d, Y');
                 if ($birth && $birth->lte($today)) {
                     $age = (int) $birth->diffInYears($today);
                     $ageLabel = match (true) { $age < 5 => '0–4', $age < 18 => '5–17', $age < 60 => '18–59', default => '60+' };
@@ -82,7 +84,8 @@ class PopulationSummary
                     'barangay' => $areaNames[$record->barangay_id], 'family' => trim((string) $record->family_number),
                     'household' => $validHousehold ? $this->baseHouseholdNumber($household->household_number) : null,
                     'household_number' => $validHousehold ? trim((string) $household->household_number) : null,
-                    'sex' => $sexLabel, 'age' => $age, 'relationship' => $record->relationship_to_head,
+                    'sex' => $sexLabel, 'age' => $age, 'birth_date' => $birthDate,
+                    'relationship' => $record->relationship_to_head,
                     'senior' => $seniorByAge || $seniorByRemarks,
                     'pwd' => PopulationMarkers::has($record->remarks, 'pwd'),
                 ]);
@@ -173,7 +176,7 @@ class PopulationSummary
                 $key = $householdKey;
                 $title = $groups[$key]['title'];
             } else {
-                $key = 'residents';
+                $key = $member['barangay_id'].'|'.$section;
                 $title = self::SECTIONS[$section];
             }
             if (! $groups->has($key)) {

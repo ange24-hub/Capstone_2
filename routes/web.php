@@ -15,7 +15,6 @@ use App\Http\Controllers\SecretaryApprovalController;
 use App\Http\Controllers\SpatialVisualizationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use App\Services\MigrationPredictionService;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,9 +32,13 @@ Route::get('/', fn () => auth()->check()
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.store');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1')->name('register.store');
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetLink'])->middleware('throttle:3,1')->name('password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1')->name('password.update');
     Route::get('/services', fn () => view('services'))->name('services');
 });
 
@@ -55,8 +58,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->group(function () {
         Route::get('/reports/population', \App\Http\Controllers\PopulationReportController::class)->name('reports.population');
         Route::get('/reports/population/pdf', \App\Http\Controllers\PopulationReportController::class)->name('reports.population.pdf');
+        Route::get('/reports/population/excel', \App\Http\Controllers\PopulationReportController::class)->name('reports.population.excel');
         Route::get('/reports/migration', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration');
-        Route::get('/analysis/forecast-readiness', \App\Http\Controllers\ForecastReadinessController::class)->name('analysis.forecast-readiness');
+        Route::get('/analysis/forecast-readiness', fn () => redirect()->route('migration.dashboard',
+            auth()->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? request()->only('barangay_id') : []
+        ))->name('analysis.forecast-readiness');
         Route::get('/reports/migration/pdf', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration.pdf');
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -129,6 +135,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/barangay/rbi-updates/{rbiUpdate}', [BarangayRbiUpdateController::class, 'update'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.update');
+
+    Route::get('/barangay/rbi-updates/{rbiUpdate}/certification', [BarangayRbiUpdateController::class, 'certification'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.rbi-updates.certification');
 
     Route::post('/barangay/rbi-updates/{rbiUpdate}/submit', [BarangayRbiUpdateController::class, 'submit'])
         ->middleware('role:'.User::ROLE_BARANGAY)
@@ -299,6 +309,18 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('spatial.households.update');
 
+    Route::get('/resident/payment-history', [\App\Http\Controllers\DocumentPaymentHistoryController::class, 'index'])
+        ->middleware(['role:'.User::ROLE_RESIDENT, 'resident.approved'])
+        ->name('resident.document-payments.history');
+
+    Route::get('/barangay/payment-history', [\App\Http\Controllers\DocumentPaymentHistoryController::class, 'index'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.document-payments.history');
+
+    Route::get('/payment-history/{paymentHistory}/proof', [\App\Http\Controllers\DocumentPaymentHistoryController::class, 'proof'])
+        ->middleware('role:'.User::ROLE_RESIDENT.','.User::ROLE_BARANGAY)
+        ->name('document-payments.history.proof');
+
     Route::post('/resident/document-requests', [DocumentRequestController::class, 'store'])
         ->middleware('role:'.User::ROLE_RESIDENT)
         ->middleware('resident.approved')
@@ -309,6 +331,18 @@ Route::middleware('auth')->group(function () {
         ->middleware('resident.approved')
         ->name('resident.document-payments.submit');
 
+    Route::post('/resident/document-requests/{documentRequest}/in-person-payment', [DocumentPaymentController::class, 'inPerson'])
+        ->middleware(['role:'.User::ROLE_RESIDENT, 'resident.approved'])
+        ->name('resident.document-payments.in-person');
+
+    Route::post('/barangay/document-requests/{documentRequest}/fee', [DocumentPaymentController::class, 'assess'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.document-payments.assess');
+
+    Route::post('/barangay/document-requests/{documentRequest}/in-person-payment/receive', [DocumentPaymentController::class, 'receiveInPerson'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.document-payments.receive-in-person');
+
     Route::post('/barangay/document-requests/{documentRequest}/gcash-payment/verify', [DocumentPaymentController::class, 'verify'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.document-payments.verify');
@@ -317,19 +351,4 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:'.User::ROLE_RESIDENT.','.User::ROLE_BARANGAY)
         ->name('document-payments.proof');
 
-    Route::get('/test-migration-prediction', function (
-    MigrationPredictionService $service
-) {
-    $prediction = $service->predictOutMigration([
-        'out_migration_count' => 10,
-        'previous_month_out' => 9,
-        'out_3month_avg' => 9.5,
-        'year' => 2026,
-        'month' => 10,
-    ]);
-
-    return response()->json([
-        'prediction' => $prediction,
-    ]);
-});
 });

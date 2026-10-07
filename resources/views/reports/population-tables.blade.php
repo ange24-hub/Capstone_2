@@ -9,7 +9,7 @@
         <tr><td>Senior citizens (birth date or SC remarks)</td><td class="number">{{ number_format($report['totalSeniors']) }}</td></tr>
         <tr><td>Persons with disability (PWD in remarks)</td><td class="number">{{ number_format($report['totalPwd']) }}</td></tr>
     </tbody></table></div>
-    <p class="report-caption">Counts cover available registry records, including active, migrated-out and inactive records.</p>
+    @if($showReportNotes ?? true)<p class="report-caption report-note">Counts cover available registry records, including active, migrated-out and inactive records.</p>@endif
 </section>
 @endif
 @if(in_array($selectedSection, ['summary', 'sex'], true))
@@ -25,6 +25,7 @@
 </tbody></table></div></section>
 @endif
 @if($selectedSection === 'summary')
+@if($showReportNotes ?? true)
 <section class="population-report-notes"><h2>Notes and counting basis</h2>
     <ol>
         <li>Source: inhabitant and household records as of {{ $report['generatedAt']->format('d F Y') }}. {{ $report['coveredBarangays'] }} of {{ $report['totalBarangays'] }} barangays in scope have resident records. Coverage is not yet verified as complete; this is a registry summary, not an official census.</li>
@@ -35,7 +36,8 @@
     </ol>
 </section>
 @endif
-@if(($report['totalBarangays'] > 1 && $selectedSection === 'summary') || $selectedSection === 'coverage')
+@endif
+@if(($report['totalBarangays'] > 1 && in_array($selectedSection, ['summary', 'sex'], true)) || $selectedSection === 'coverage')
 <div class="{{ $selectedSection === 'summary' ? 'population-area-page' : '' }}">
 <section class="population-report-section"><h2>4. Summary by barangay</h2>
 <p class="report-caption">{{ $report['scopeLabel'] }} | As of {{ $report['generatedAt']->format('d F Y') }}</p>
@@ -47,10 +49,10 @@
     @endif</tr>@endforeach
     <tr class="total-row"><td>Total recorded</td><td class="number">{{ number_format($report['totalRecords']) }}</td><td class="number">{{ number_format($report['sex']['Male']) }}</td><td class="number">{{ number_format($report['sex']['Female']) }}</td><td class="number">{{ number_format($report['totalFamilies']) }}</td><td class="number">{{ number_format($report['totalHouseholds']) }}</td><td class="number">{{ number_format($report['totalSeniors']) }}</td><td class="number">{{ number_format($report['totalPwd']) }}</td></tr>
 </tbody></table></div>
-<p class="report-caption">SC = senior citizens identified by birth date or remarks. PWD = marked in remarks. Pending = family / household information not yet identified. Male + female may differ from the total where sex is unspecified.</p>
+@if($showReportNotes ?? true)<p class="report-caption report-note">SC = senior citizens identified by birth date or remarks. PWD = marked in remarks. Pending = family / household information not yet identified. Male + female may differ from the total where sex is unspecified.</p>@endif
 </section></div>
 @endif
-@if(($report['totalBarangays'] > 1 && $selectedSection === 'summary') || $selectedSection === 'area-ages')
+@if(($report['totalBarangays'] > 1 && in_array($selectedSection, ['summary', 'ages'], true)) || $selectedSection === 'area-ages')
 <div class="{{ $selectedSection === 'summary' ? 'population-area-page' : '' }}">
 <section class="population-report-section"><h2>5. Age groups by barangay</h2>
 <p class="report-caption">{{ $report['scopeLabel'] }} | As of {{ $report['generatedAt']->format('d F Y') }}</p>
@@ -63,6 +65,6 @@
     @endif</tr>@endforeach
     <tr class="total-row"><td>Total recorded</td>@foreach($report['ages'] as $count)<td class="number">{{ number_format($count) }}</td>@endforeach<td class="number">{{ number_format($report['sex']['Not specified / other']) }}</td></tr>
 </tbody></table></div>
-<p class="report-caption">The 60+ column uses birth dates only. The SC total may be higher because it also includes senior citizen markers in remarks.</p>
+@if($showReportNotes ?? true)<p class="report-caption report-note">The 60+ column uses birth dates only. The SC total may be higher because it also includes senior citizen markers in remarks.</p>@endif
 </section></div>
 @endif

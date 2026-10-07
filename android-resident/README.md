@@ -38,6 +38,7 @@ The production variant blocks cleartext traffic and has no server editor. A rele
 - Resident-only registration and login, pending/rejected approval screens, status refresh, logout.
 - Home summary using actual account records.
 - Document creation and paginated request history, barangay remarks and release/payment status.
+- Barangay Indigency is free. Other documents wait for the secretary to set a fee; residents can then choose GCash or in-person payment. Staff must confirm payment before release.
 - Official barangay GCash details/QR and private receipt upload for staff verification. Uploading a receipt does not transfer money or automatically mark payment paid.
 - Concern submission with optional JPG/PNG photo, paginated history, public updates and follow-up replies.
 - Profile email/password updates requiring the current password. Verified name, role, and barangay cannot be changed from the app. Account changes revoke all API sessions.

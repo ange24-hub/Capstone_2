@@ -1,0 +1,71 @@
+/* Scope the quieter profile layout to the shell's first visual layer. */
+@layer workspace-headers {
+  @media screen {
+    html.municipal-ui .app-main:has(.staff-profile) { background: #f6f7f9 !important; }
+    html.municipal-ui .app-content .staff-profile {
+      --profile-line: #e5e9ef; --profile-muted: #64748b;
+      max-width: 980px !important; margin-inline: auto !important; display: grid !important; gap: 24px !important;
+    }
+    html.municipal-ui .staff-profile .profile-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 4px 0; }
+    html.municipal-ui .staff-profile .profile-eyebrow { display: block; color: var(--profile-muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    html.municipal-ui .staff-profile .profile-heading h1 { margin: 6px 0 8px !important; font-size: 28px !important; color: var(--civic-ink) !important; line-height: 1.2 !important; }
+    html.municipal-ui .staff-profile .profile-heading p { margin: 0 !important; color: var(--profile-muted) !important; font-size: 14px !important; }
+    html.municipal-ui .staff-profile .profile-dashboard-link { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 0; color: var(--civic-text); font-size: 13px; font-weight: 500; text-decoration: none; border-radius: 6px; }
+    html.municipal-ui .staff-profile .profile-dashboard-link:hover { color: var(--civic-primary); }
+    html.municipal-ui .staff-profile .profile-dashboard-link .app-icon { width: 17px; height: 17px; }
+    html.municipal-ui .staff-profile .profile-layout { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; align-items: start; gap: 0 !important; }
+    html.municipal-ui .staff-profile :is(.profile-account-card, .profile-edit-form) { min-width: 0; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible; }
+    html.municipal-ui .staff-profile .profile-account-body { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr); align-items: center; gap: 16px 32px; padding: 22px 0 !important; border-block: 1px solid var(--profile-line) !important; }
+    html.municipal-ui .staff-profile .profile-identity { display: flex; align-items: center; gap: 12px; }
+    html.municipal-ui .staff-profile .profile-identity > div { min-width: 0; }
+    html.municipal-ui .staff-profile .profile-avatar { position: static !important; flex: 0 0 48px; width: 48px !important; height: 48px !important; margin: 0 !important; border: 0 !important; border-radius: 12px !important; background: #eef3fa !important; color: var(--civic-primary) !important; font-size: 20px !important; font-weight: 600; }
+    html.municipal-ui .staff-profile .profile-account-body h2 { margin: 0 0 5px !important; font-size: 17px !important; line-height: 1.35 !important; }
+    html.municipal-ui .staff-profile .profile-role { display: inline-block; margin: 0 !important; padding: 3px 7px !important; background: #f1f5f9 !important; color: #475569 !important; border: 0 !important; border-radius: 5px !important; font-size: 11px !important; font-weight: 500 !important; line-height: 1.5; }
+    html.municipal-ui .staff-profile .profile-email { margin: 6px 0 0 !important; color: var(--profile-muted) !important; font-size: 13px !important; overflow-wrap: anywhere; }
+    html.municipal-ui .staff-profile .profile-account-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important; gap: 20px !important; padding: 0 !important; border: 0 !important; }
+    html.municipal-ui .staff-profile .profile-account-details dt { color: var(--profile-muted) !important; font-size: 12px !important; text-transform: none !important; letter-spacing: 0 !important; }
+    html.municipal-ui .staff-profile .profile-account-details dd { margin: 4px 0 0 !important; color: var(--civic-ink) !important; font-size: 13px !important; font-weight: 500 !important; }
+    html.municipal-ui .staff-profile .profile-office-note { grid-column: 1 / -1; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; border-radius: 0 !important; }
+    html.municipal-ui .staff-profile .profile-office-note p { color: var(--profile-muted) !important; font-size: 12px !important; line-height: 1.6 !important; }
+    html.municipal-ui .staff-profile .profile-office-note .app-icon { color: var(--profile-muted) !important; }
+    html.municipal-ui .staff-profile .profile-edit-form { display: grid !important; gap: 0 !important; }
+    html.municipal-ui .staff-profile .profile-section { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 32px; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important; padding: 28px 0 !important; }
+    html.municipal-ui .staff-profile .profile-section + .profile-section { border-top: 1px solid var(--profile-line) !important; }
+    html.municipal-ui .staff-profile .profile-section-heading { display: flex; align-items: flex-start !important; gap: 10px !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
+    html.municipal-ui .staff-profile .profile-section-heading h2 { margin: 0 0 5px !important; font-size: 16px !important; line-height: 1.4 !important; }
+    html.municipal-ui .staff-profile .profile-section-heading p { margin: 0 !important; color: var(--profile-muted) !important; font-size: 13px !important; }
+    html.municipal-ui .staff-profile .profile-section-icon { width: 20px !important; height: 23px !important; flex: 0 0 20px !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: var(--civic-primary) !important; }
+    html.municipal-ui .staff-profile .profile-section-icon .app-icon { width: 19px; height: 19px; }
+    html.municipal-ui .staff-profile .profile-fields { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 20px !important; padding: 0 !important; }
+    html.municipal-ui .staff-profile .profile-field-full { grid-column: 1 / -1 !important; max-width: none !important; }
+    html.municipal-ui .staff-profile .profile-field-full input { width: 100% !important; max-width: none !important; }
+    html.municipal-ui .staff-profile .profile-field label { margin: 0 0 7px !important; color: #334155 !important; font-size: 13px !important; font-weight: 500 !important; }
+    html.municipal-ui .staff-profile .profile-field input { min-height: 44px !important; border: 1px solid #d5dce5 !important; border-radius: 8px !important; box-shadow: none !important; background: #fff !important; font-size: 14px !important; }
+    html.municipal-ui .staff-profile .profile-field input:focus { border-color: var(--civic-primary) !important; box-shadow: 0 0 0 3px #edf3fc !important; }
+    html.municipal-ui .staff-profile .profile-field input[aria-invalid="true"] { border-color: var(--civic-danger) !important; }
+    html.municipal-ui .staff-profile .profile-field small { margin-top: 7px !important; color: var(--profile-muted) !important; font-size: 12px !important; line-height: 1.5 !important; }
+    html.municipal-ui .staff-profile .profile-field .profile-field-error { color: var(--civic-danger) !important; }
+    html.municipal-ui .staff-profile .profile-optional { color: var(--profile-muted) !important; font-size: 11px !important; }
+    html.municipal-ui .staff-profile .profile-form-footer { padding: 20px 0 !important; background: transparent !important; border-top: 1px solid var(--profile-line) !important; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+    html.municipal-ui .staff-profile .profile-form-footer p { color: var(--profile-muted) !important; font-size: 12px !important; }
+    html.municipal-ui .staff-profile .profile-form-footer :is(.button, button) { min-height: 42px !important; padding: 9px 16px !important; font-size: 13px !important; border-radius: 8px !important; box-shadow: none !important; }
+    html.municipal-ui .staff-profile .profile-form-footer .secondary-button { background: #fff !important; border-color: #d5dce5 !important; color: #475569 !important; }
+    html.municipal-ui .staff-profile .profile-save-button { background: var(--civic-primary) !important; border-color: var(--civic-primary) !important; color: #fff !important; }
+    html.municipal-ui .staff-profile .profile-save-button:hover { background: var(--civic-primary-hover) !important; }
+    @media (max-width: 1000px) {
+      html.municipal-ui .staff-profile .profile-account-body { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+      html.municipal-ui .staff-profile .profile-section { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    }
+    @media (max-width: 760px) {
+      html.municipal-ui .app-content .staff-profile { gap: 20px !important; }
+      html.municipal-ui .staff-profile .profile-heading { align-items: flex-start; }
+      html.municipal-ui .staff-profile .profile-account-body { padding: 20px 0 !important; }
+      html.municipal-ui .staff-profile .profile-account-details { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 16px !important; }
+      html.municipal-ui .staff-profile .profile-section { padding: 24px 0 !important; }
+      html.municipal-ui .staff-profile .profile-fields { grid-template-columns: minmax(0, 1fr) !important; }
+      html.municipal-ui .staff-profile .profile-form-footer { padding: 18px 0 !important; align-items: stretch !important; }
+      html.municipal-ui .staff-profile .profile-form-footer > div { display: flex; justify-content: flex-end; gap: 10px; }
+      html.municipal-ui .staff-profile .profile-field input { font-size: 16px !important; }
+    }
+  }
+}

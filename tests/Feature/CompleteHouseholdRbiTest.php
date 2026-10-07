@@ -2,10 +2,12 @@
 namespace Tests\Feature;
 use App\Models\{Barangay, BarangayRbiUpdate, Household, Inhabitant, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 class CompleteHouseholdRbiTest extends TestCase {
  use RefreshDatabase;
  public function test_complete_household_fields_survive_save_exports_and_registry_addition(): void {
+  Storage::fake('local');
   $b=Barangay::where('name','San Roque')->firstOrFail();$staff=User::factory()->create(['role'=>'barangay','barangay_id'=>$b->id]);
   $house=Household::create(['barangay_id'=>$b->id,'household_number'=>'307']);
   $row=['household_id'=>$house->id,'household_head'=>'Example Parent','household_number'=>'307','last_name'=>'Example','first_name'=>'Child','middle_name'=>'Middle','suffix'=>'Jr.',
@@ -20,7 +22,8 @@ class CompleteHouseholdRbiTest extends TestCase {
    $this->assertNotFalse(simplexml_load_string($xml));foreach(['307','Purok 2, San Roque','Grade 10','Catholic','Source remark','Certified Correct','Secretary Official'] as $text)$this->assertStringContainsString($text,$xml);
   }finally{unlink($path);}
   $pdf=$this->get(route('rbi-updates.export-pdf',$report))->assertOk();$this->assertStringStartsWith('%PDF',$pdf->getContent());
-  $this->post(route('barangay.rbi-updates.add-to-registry',$report))->assertSessionHasNoErrors();
+  $signature='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+  $this->post(route('barangay.rbi-updates.add-to-registry',$report),['prepared_signature_data'=>$signature,'attested_signature_data'=>$signature])->assertSessionHasNoErrors();
   $person=Inhabitant::sole();foreach(['complete_address','education_level','religion','suffix'] as $field)$this->assertSame($row[$field],$person->$field);
   $this->assertSame(16,$person->recorded_age);$this->assertStringContainsString('Source remark',$person->remarks);$this->assertSame($house->id,$person->household_id);
  }

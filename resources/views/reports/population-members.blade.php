@@ -5,28 +5,46 @@
 @endphp
 <section class="population-report-section">
     <h2>{{ $reportTitle }} — {{ number_format($report[$countKey]) }} {{ $grouped ? strtolower($reportTitle) : 'residents' }}</h2>
-    <p class="report-caption">{{ $report['scopeLabel'] }} · As of {{ $report['generatedAt']->format('d F Y') }}. Available registry records across all statuses; completeness has not been verified.</p>
+    <p class="report-caption">{{ $report['scopeLabel'] }} · As of {{ $report['generatedAt']->format('d F Y') }}.</p>
+    @if($showReportNotes ?? true)
+    <p class="report-caption report-note">Available registry records across all statuses; completeness has not been verified.</p>
     @if($selectedSection === 'families')
-        <p class="report-caption">One row per family, showing the family head only. Decimal family numbers remain separate. A household with one resident and no family number is listed as a single-person family.</p>
+        <p class="report-caption report-note">Residents are listed under their identified family. Decimal family numbers remain separate. A household with one resident and no family number is treated as a single-person family.</p>
         @php($unassigned = $report['totalRecords'] - $report['detailGroups']->sum(fn ($group) => $group['members']->count()))
-        @if($unassigned > 0)<p class="report-caption">{{ number_format($unassigned) }} residents cannot yet be assigned to an identified family and are excluded from these family groups.</p>@endif
+        @if($unassigned > 0)<p class="report-caption report-note">{{ number_format($unassigned) }} residents cannot yet be assigned to an identified family and are excluded from these family groups.</p>@endif
     @elseif($selectedSection === 'households')
-        <p class="report-caption">One row per household, showing the household head only. Decimal household numbers share their base household. Households without an identified head remain listed.</p>
+        <p class="report-caption report-note">Residents are listed under their household number. Decimal household numbers share their base household. Households without an encoded resident remain listed.</p>
     @elseif($selectedSection === 'seniors')
-        <p class="report-caption">Includes residents aged 60 or above by birth date, or marked SC / senior citizen in remarks. Each resident is listed once.</p>
+        <p class="report-caption report-note">Includes residents aged 60 or above by birth date, or marked SC / senior citizen in remarks. Each resident is listed once.</p>
     @elseif($selectedSection === 'pwd')
-        <p class="report-caption">Includes residents with recognized PWD / person with disability markers in remarks.</p>
+        <p class="report-caption report-note">Includes residents with recognized PWD / person with disability markers in remarks.</p>
+    @endif
     @endif
 
     @if($grouped)
         <div class="table-wrap">
-            <table class="population-head-table">
-                <thead><tr><th>{{ $selectedSection === 'families' ? 'Family' : 'Household' }}</th><th>Barangay</th><th>{{ $selectedSection === 'families' ? 'Family head name' : 'Household head name' }}</th></tr></thead>
+            <table class="population-member-table population-member-table-grouped">
+                <thead><tr><th>Name</th><th>Age</th><th>Household Number</th><th>Birthdate</th></tr></thead>
                 <tbody>
+                    @php($lastBarangay = null)
                     @forelse($detailGroups as $group)
-                        <tr><td>{{ $group['title'] }}</td><td>{{ $group['barangay'] }}</td><td>{{ $group['head_name'] }}</td></tr>
+                        @if($report['totalBarangays'] > 1 && $lastBarangay !== $group['barangay'])
+                            <tr class="population-barangay-row"><th colspan="4">Barangay {{ $group['barangay'] }}</th></tr>
+                            @php($lastBarangay = $group['barangay'])
+                        @endif
+                        <tr class="population-subgroup-row"><th colspan="4">{{ $group['title'] }} · {{ $group['members']->count() }} {{ $group['members']->count() === 1 ? 'member' : 'members' }}</th></tr>
+                        @forelse($group['members'] as $member)
+                            <tr>
+                                <td>{{ $member['name'] ?: 'Name not encoded' }}</td>
+                                <td>{{ $member['age'] ?? 'Unknown' }}</td>
+                                <td>{{ $member['household'] !== null && $member['household'] !== '' ? $member['household'] : 'Not encoded' }}</td>
+                                <td>{{ $member['birth_date'] ?? 'Not encoded' }}</td>
+                            </tr>
+                        @empty
+                            <tr><td>Name not encoded</td><td>Unknown</td><td>{{ $group['household_number'] ?? 'Not encoded' }}</td><td>Not encoded</td></tr>
+                        @endforelse
                     @empty
-                        <tr><td colspan="3">No entries available for this category in the selected scope.</td></tr>
+                        <tr><td colspan="4">No entries available for this category in the selected scope.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -34,15 +52,15 @@
     @else
     @forelse($detailGroups as $group)
         <section class="population-detail-group">
-            @if($grouped)<h3>{{ $group['title'] }} · Barangay {{ $group['barangay'] }} <small>({{ $group['members']->count() }} {{ $group['members']->count() === 1 ? 'member' : 'members' }})</small></h3>@endif
+            @if($report['totalBarangays'] > 1)<h3 class="population-barangay-heading">Barangay {{ $group['barangay'] }}</h3>@endif
             <div class="table-wrap">
                 <table class="population-member-table">
-                    <thead><tr><th>Resident name</th><th>Barangay</th><th>Family no.</th><th>Household no.</th><th>Relationship to head</th><th>Sex</th><th>Age</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Age</th><th>Birthdate</th></tr></thead>
                     <tbody>
                         @forelse($group['members'] as $member)
-                            <tr><td>{{ $member['name'] ?: 'Name not encoded' }}</td><td>{{ $member['barangay'] }}</td><td>{{ $member['family'] !== '' ? $member['family'] : 'Not encoded' }}</td><td>{{ $member['household'] !== null && $member['household'] !== '' ? $member['household'] : 'Not encoded' }}</td><td>{{ $member['relationship'] ?: 'Not encoded' }}</td><td>{{ $member['sex'] }}</td><td class="number">{{ $member['age'] ?? 'Unknown' }}</td></tr>
+                            <tr><td>{{ $member['name'] ?: 'Name not encoded' }}</td><td class="number">{{ $member['age'] ?? 'Unknown' }}</td><td>{{ $member['birth_date'] ?? 'Not encoded' }}</td></tr>
                         @empty
-                            <tr><td colspan="7">No resident records linked to this household.</td></tr>
+                            <tr><td colspan="3">No residents available for this category.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

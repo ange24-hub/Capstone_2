@@ -1,0 +1,66 @@
+/* Loaded before the shared theme so this role's important colors take precedence. */
+@layer municipal-admin {
+@media screen {
+    .role-municipal-lgu .app-shell,
+    .role-municipal-lgu :is(h1,h2,h3,h4,p,a,button,input,select,textarea,strong,small,label,dt,dd,span):not(:where(.rbi-document-preview *, .rbi-word-page *, .leaflet-container *)) { font-family:'Bahnschrift','Aptos','Segoe UI Variable Text',sans-serif !important; }
+    .role-municipal-lgu #app-sidebar :is(.app-brand strong,.sidebar-account strong) { color:#294752 !important; }
+    .role-municipal-lgu #app-sidebar :is(.app-brand small,.app-brand em,.side-label,.side-section,.sidebar-account span,.sidebar-account small,.sidebar-office span,.sidebar-office strong) { color:#536c72 !important; }
+    .role-municipal-lgu #app-sidebar :is(.side-nav a,.sidebar-logout button) { color:#3c5c66 !important; border-color:transparent !important; }
+    .role-municipal-lgu #app-sidebar :is(.app-brand,.side-section,.sidebar-account,.sidebar-logout button) { border-color:#c4d1c9 !important; }
+    .role-municipal-lgu #app-sidebar .side-nav .nav-mark { background:#dce6df !important; color:#50766f !important; }
+    .role-municipal-lgu .workspace-location, .role-municipal-lgu .workspace-location :is(span,a) { color:#516973 !important; }
+    html.municipal-ui body.role-municipal-lgu {
+        --civic-canvas:#e5e9e5; --civic-surface:#f0f2ed; --civic-subtle:#e6ece7;
+        --civic-ink:#263d49; --civic-text:#435a65; --civic-muted:#586c75;
+        --civic-border:#c4ceca; --civic-primary:#3f667e; --civic-primary-soft:#dce6e6;
+        --ink:#263d49; --text:#435a65; --muted:#586c75; --line:#c4ceca;
+        --canvas:#e5e9e5; --blue-50:#e6ece7; --blue-100:#dce6e6;
+        color-scheme:light;
+        font-family:'Bahnschrift','Aptos','Segoe UI Variable Text',sans-serif !important;
+        font-size:15px !important; line-height:1.6;
+        background:#e5e9e5 !important; color:#435a65 !important;
+    }
+    .role-municipal-lgu :is(.app-main,.app-content,.app-footer) { background:#e5e9e5 !important; color:#586c75 !important; }
+    .role-municipal-lgu :is(.app-header,.app-sidebar) { background:#e8ede8 !important; border-color:#c5ceca !important; box-shadow:none !important; }
+    .role-municipal-lgu #app-sidebar { background:#e8ede8 !important; border-right-color:#c5ceca !important; border-top-color:#78938e !important; }
+    .role-municipal-lgu :is(.app-header,.app-content) :is(h1,h2,h3,h4,strong,label):not(:where(.rbi-document-preview *, .rbi-word-page *, .leaflet-container *)) { color:#263d49 !important; }
+    .role-municipal-lgu :is(h1,h2,h3,h4,button,input,select,textarea,table):not(:where(.rbi-document-preview *, .rbi-word-page *, .leaflet-container *)) { font-family:inherit !important; }
+    .role-municipal-lgu .app-content :is(p,small,dt):not(:where(.rbi-document-preview *, .rbi-word-page *, .leaflet-container *)) { color:#526872 !important; }
+    .role-municipal-lgu .app-content a:not(:where(.button,.leaflet-container *, .rbi-document-preview *, .municipal-hero-actions *)) { color:#315f77 !important; }
+    .role-municipal-lgu .app-content :is(.panel,.workflow-card,.dashboard-card,.metric-card,.municipal-directory-card,.municipal-approval-item,.decision-card,.profile-section,.profile-account-card,.population-report-section,.gis-metric,.gis-map-card,.gis-household-list,.gis-legend,.gis-physical-profile,.rbi-preview-panel) {
+        background:#f0f2ed !important; background-image:none !important; border-color:#c5d0cb !important; box-shadow:0 3px 14px #07111b1a !important;
+    }
+    .role-municipal-lgu .app-content :is(.page-head,.dashboard-page-header,.profile-page-heading,.government-page-heading,.rbi-report-header) { background:#f0f2ed !important; border-color:#c5d0cb !important; border-top-color:#6d918f !important; box-shadow:none !important; }
+    .role-municipal-lgu :is(.workspace-heading-emblem,.metric-icon,.overview-context-icon,.account-avatar,.profile-navigation-avatar) { background:#dce7e3 !important; color:#456d78 !important; }
+    .role-municipal-lgu :is(.overview-context,.overview-context-date,.header-user,.profile-navigation-trigger) { background:#e0e8e3 !important; border-color:#c5d0cb !important; color:#435e6c !important; }
+    .role-municipal-lgu :is(.profile-navigation-label,.profile-navigation-arrow,.header-date,.breadcrumb,.breadcrumb a,.overview-context-caption,.overview-context-office > span,.ph-clock-label) { color:#526b76 !important; }
+    .role-municipal-lgu :is(.desktop-sidebar-button,.mobile-menu-button) { background:#e2e9e3 !important; color:#365665 !important; border-color:#b7c9c4 !important; }
+    .role-municipal-lgu #app-sidebar .side-nav a.active { background:#cbdfe7 !important; color:#244f64 !important; box-shadow:inset 3px 0 #55869b !important; }
+    .role-municipal-lgu #app-sidebar .side-nav a:hover { background:#d7e3dd !important; }
+    .role-municipal-lgu :is(.app-content,.app-header) :is(button,.button):not(:where(.leaflet-container *, .rbi-document-preview *)) { background:#496d81 !important; color:#f5f6f1 !important; border-color:#496b7e !important; box-shadow:none !important; }
+    .role-municipal-lgu .app-content :is(.secondary-button,.outline-button) { background:#e1e9e4 !important; color:#365866 !important; border-color:#adbfba !important; }
+    .role-municipal-lgu .app-content :is(button,.button):hover:not(:disabled):not(:where(.leaflet-container *, .rbi-document-preview *)) { background:#3b5e73 !important; }
+    .role-municipal-lgu .app-content .danger-button { background:#eadcda !important; border-color:#cda8a3 !important; color:#873f39 !important; }
+    .role-municipal-lgu .app-content :is(input,select,textarea):not(:where([type=checkbox],[type=radio],[type=hidden],.leaflet-container *, .rbi-document-preview *)) { background:#f4f5ef !important; color:#2b4652 !important; border-color:#b2c4bd !important; box-shadow:none !important; }
+    .role-municipal-lgu .app-content input::placeholder, .role-municipal-lgu .app-content textarea::placeholder { color:#647a81 !important; }
+    .role-municipal-lgu .app-content .table-wrap { background:#f0f2ed !important; border-color:#c5d0cb !important; }
+    .role-municipal-lgu .app-content table:not(:where(.rbi-document-preview *, .rbi-word-page *)) :is(th,td) { border-color:#c7d1cb !important; }
+    .role-municipal-lgu .app-content table:not(:where(.rbi-document-preview *, .rbi-word-page *)) th { background:#d8e4eb !important; color:#365866 !important; }
+    .role-municipal-lgu .app-content table:not(:where(.rbi-document-preview *, .rbi-word-page *)) td { background:transparent !important; color:#3d5661 !important; }
+    .role-municipal-lgu .app-content table:not(:where(.rbi-document-preview *, .rbi-word-page *)) tbody tr { background:#f0f2ed !important; }
+    .role-municipal-lgu .app-content table:not(:where(.rbi-document-preview *, .rbi-word-page *)) tbody tr:nth-child(even) { background:#e9eee8 !important; }
+    .role-municipal-lgu .app-content table:not(:where(.rbi-document-preview *, .rbi-word-page *)) tbody tr:hover { background:#dce7df !important; }
+    .role-municipal-lgu :is(.dashboard-empty-state,.directory-summary-metrics,.municipal-latest-received,.gis-legend-group,.gis-map-footer,.gis-physical-grid section,.gis-scope-note,.gis-empty-state) { background:#e2e9e3 !important; color:#425e68 !important; border-color:#bfcec6 !important; }
+    .role-municipal-lgu .directory-summary-metrics > div { background:#edf1e9 !important; border-color:#b8c9c0 !important; }
+    .role-municipal-lgu :is(.breadcrumb span,.breadcrumb [aria-current],.dashboard-empty-state > span,.approval-identity div > span) { color:#526872 !important; }
+    .role-municipal-lgu .app-content :is(.workflow-head,.dashboard-card-header,.approval-details,.decision-card dl) { border-color:#c5d0cb !important; }
+    .role-municipal-lgu :is(.step-pill,.badge,.movement-indicator) { background:#dce7e4 !important; color:#375d6a !important; border-color:#b2c7bf !important; }
+    .role-municipal-lgu :is(.badge.pending,.badge.draft,.movement-watch,.metric-warning .metric-icon) { background:#eee4cb !important; color:#75551c !important; border-color:#cebb8c !important; }
+    .role-municipal-lgu :is(.badge.approved,.badge.submitted,.movement-stable,.metric-success .metric-icon) { background:#dbe9de !important; color:#35634d !important; border-color:#a9c6b2 !important; }
+    .role-municipal-lgu :is(.movement-high,.metric-danger .metric-icon) { background:#eedfdf !important; color:#853f4e !important; border-color:#c6a3ab !important; }
+    .role-municipal-lgu .app-content :is(.success,.status-message) { background:#deeadf !important; color:#365d46 !important; border-color:#adc6b1 !important; }
+    .role-municipal-lgu .app-content :is(.errors,[role=alert]) { background:#eddfde !important; color:#853e43 !important; border-color:#c9a4a7 !important; }
+    .role-municipal-lgu .app-content :is(.page-kicker,.dashboard-eyebrow,.government-eyebrow) { color:#486e7b !important; }
+    .role-municipal-lgu :is(a,button,input,select,textarea,summary):focus-visible { outline:3px solid #527e8e !important; outline-offset:3px !important; }
+}
+}

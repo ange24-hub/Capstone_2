@@ -6,10 +6,24 @@
     <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
+    @if(request()->routeIs('barangay.document-requests.index'))
+        <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">
+    @endif
+    @if(request()->routeIs('register'))
+        <link rel="stylesheet" href="{{ asset('css/registration.css') }}?v={{ filemtime(public_path('css/registration.css')) }}" media="screen">
+    @endif
+    @if(request()->routeIs('dashboard.barangay', 'barangay.resident-approvals.index', 'barangay.document-requests.index', 'barangay.rbi-updates.index'))
+        <link rel="stylesheet" href="{{ asset('css/barangay-dashboard-refinement.css') }}?v={{ filemtime(public_path('css/barangay-dashboard-refinement.css')) }}" media="screen">
+    @endif
+    @if(auth()->check() && auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
+        <link rel="stylesheet" href="{{ asset('css/municipal-admin-theme.css') }}?v={{ filemtime(public_path('css/municipal-admin-theme.css')) }}" media="screen">
+    @endif
     <link rel="stylesheet" href="{{ asset('css/rbim.css') }}?v={{ filemtime(public_path('css/rbim.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/portal-template.css') }}?v={{ filemtime(public_path('css/portal-template.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/workspace-headers.css') }}?v={{ filemtime(public_path('css/workspace-headers.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/workspace-sidebar.css') }}?v={{ filemtime(public_path('css/workspace-sidebar.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/profile-navigation.css') }}?v={{ filemtime(public_path('css/profile-navigation.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/print.css') }}?v={{ filemtime(public_path('css/print.css')) }}">
     @vite('resources/css/app.css')
     @stack('head')
 </head>
@@ -79,11 +93,6 @@
                     </span>
                 </a>
 
-                <div class="sidebar-office">
-                    <span>Official LGU Workspace</span>
-                    <strong>Registry of Barangay Inhabitants</strong>
-                </div>
-
                 <div class="side-label">Workspace</div>
                 <nav class="side-nav" aria-label="Primary navigation">
                     <a class="{{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
@@ -100,6 +109,7 @@
                     @elseif (auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
                         <a class="@if(request()->routeIs('barangay.resident-approvals.*')) active @endif" href="{{ route('barangay.resident-approvals.index') }}"><span class="nav-mark"><x-app-icon name="check" /></span><span>Resident Approvals</span></a>
                         <a class="@if(request()->routeIs('barangay.document-requests.*')) active @endif" href="{{ route('barangay.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Document Requests</span></a>
+                        <a class="@if(request()->routeIs('barangay.document-payments.history')) active @endif" href="{{ route('barangay.document-payments.history') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Payment History</span></a>
                         <div class="side-section">Resident records</div>
                         <a class="@if(request()->routeIs('barangay.rbi-updates.*')) active @endif" href="{{ route('barangay.rbi-updates.index') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
                         @if(request()->routeIs('barangay.rbi-updates.*'))
@@ -115,17 +125,21 @@
                         <a class="{{ request()->routeIs('barangay.residence.*') ? 'active' : '' }}" href="{{ route('barangay.residence.index') }}"><span class="nav-mark"><x-app-icon name="home" /></span><span>Living in Barangay</span></a>
 @endif
                         <a class="@if(request()->routeIs('barangay.registry.moved-out*')) active @endif" href="{{ route('barangay.registry.moved-out') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Moved Out</span></a>
-                        <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Records</span></a>
+                        <a class="@if(request()->routeIs('migration.dashboard')) active @endif" href="{{ route('migration.dashboard') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Migration Trends</span></a>
                         <a class="@if(request()->routeIs('spatial.index')) active @endif" href="{{ route('spatial.index') }}"><span class="nav-mark"><x-app-icon name="map" /></span><span>Household Map</span></a>
                     @else
                         <a class="@if(request()->routeIs('resident.document-requests.create')) active @endif" href="{{ route('resident.document-requests.create') }}"><span class="nav-mark"><x-app-icon name="form" /></span><span>Request a Document</span></a>
                         <a class="@if(request()->routeIs('resident.document-requests.index')) active @endif" href="{{ route('resident.document-requests.index') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>My Requests</span></a>
+                        <a class="@if(request()->routeIs('resident.document-payments.history')) active @endif" href="{{ route('resident.document-payments.history') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Payment History</span></a>
                     @endif
                     @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
                         <div class="side-section">Reports &amp; insights</div>
                         <a class="{{ request()->routeIs('reports.population*') ? 'active' : '' }}" href="{{ route('reports.population') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Population Reports</span></a>
                         <a class="{{ request()->routeIs('reports.migration*') ? 'active' : '' }}" href="{{ route('reports.migration') }}"><span class="nav-mark"><x-app-icon name="document" /></span><span>Migration Reports</span></a>
-                        <a class="{{ request()->routeIs('analysis.forecast-readiness') ? 'active' : '' }}" href="{{ route('analysis.forecast-readiness') }}"><span class="nav-mark"><x-app-icon name="trend" /></span><span>Forecast Readiness</span></a>
+                    @endif
+                    @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
+                        <div class="side-section">Account</div>
+                        <a class="profile-navigation-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}" @if(request()->routeIs('profile.*')) aria-current="page" @endif><span class="nav-mark"><x-app-icon name="users" /></span><span>Profile Info</span></a>
                     @endif
                 </nav>
 
@@ -159,16 +173,16 @@
                         <button class="mobile-menu-button" type="button" aria-label="Open navigation" aria-controls="app-sidebar" aria-expanded="false" data-sidebar-toggle>
                             <x-app-icon name="menu" />
                         </button>
-                        <div>
-                        <span class="app-header-kicker">Municipality of Tomas Oppus</span>
-                            <strong>{{ auth()->user()->roleLabel() }} workspace</strong>
-                        </div>
+                        <strong>{{ auth()->user()->roleLabel() }}</strong>
                     </div>
                     <div class="app-header-meta">
-                        <span class="system-status"><x-app-icon name="shield" /> Authorized workspace</span>
                         <time class="header-date" data-ph-header-date aria-label="Device local date and time"></time>
                         @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
-                            <a class="header-user" href="{{ route('profile.edit') }}" title="My Profile" aria-label="My Profile: {{ auth()->user()->name }}">{{ auth()->user()->name }}</a>
+                            <a class="header-user profile-navigation-trigger" href="{{ route('profile.edit') }}" title="Profile Info" aria-label="Profile Info: {{ auth()->user()->name }}" @if(request()->routeIs('profile.*')) aria-current="page" @endif>
+                                <span class="profile-navigation-avatar" aria-hidden="true">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
+                                <span class="profile-navigation-copy"><span class="profile-navigation-name">{{ auth()->user()->name }}</span><span class="profile-navigation-label">Profile Info</span></span>
+                                <x-app-icon name="arrow-right" class="profile-navigation-arrow" />
+                            </a>
                         @else
                             <span class="header-user">{{ auth()->user()->name }}</span>
                         @endif
@@ -187,7 +201,6 @@
                 <footer class="app-footer @hasSection('footer-reminder') app-footer-with-reminder @endif">
                     @yield('footer-reminder')
                     <span>&copy; {{ now()->year }} Municipal Government of Tomas Oppus</span>
-                    <span>RBIM &middot; Official LGU Information System</span>
                 </footer>
             </div>
         </div>

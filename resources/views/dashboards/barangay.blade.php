@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/barangay-dashboard.css') }}?v={{ filemtime(public_path('css/barangay-dashboard.css')) }}" media="screen">
+@endpush
+
 @section('content')
     @php
-        $pendingDocuments = $barangayDocumentRequests->where('status', App\Models\DocumentRequest::STATUS_PENDING)->count();
         $submittedRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count();
         $draftRbi = $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count();
         $sourceWorkbook = in_array($barangay?->name, ['Canlupao', 'Biasong', 'Cabascan', 'Camansi', 'Carnaga', 'Cawayan', 'Higosoan', 'Hinagtikan', 'Hinapo', 'Hugpa', 'Iniguihan', 'Looc', 'Luan', 'Mag-ata', 'Maslog', 'Punong', 'Rizal', 'San Agustin'], true) ? strtoupper($barangay->name).'.xlsx' : null;
@@ -13,6 +16,7 @@
 
     <section class="barangay-dashboard workspace-page workspace-page-{{ $workspacePage ?? 'overview' }}" aria-labelledby="barangay-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
+            <span class="barangay-hero-weave" aria-hidden="true"></span>
             <x-workspace-heading icon="building">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident Verification' : (($workspacePage ?? 'overview') === 'documents' ? 'Barangay E-Services' : 'Barangay Administration') }}</span>
                 <h1 id="barangay-dashboard-title">{{ ($workspacePage ?? 'overview') === 'approvals' ? 'Resident approvals' : (($workspacePage ?? 'overview') === 'documents' ? 'Document requests' : 'Barangay '.($barangay?->name ?? 'Dashboard')) }}</h1>
@@ -20,13 +24,13 @@
             </x-workspace-heading>
             @if ($barangay)
                 <div class="dashboard-header-actions">
+                    <a class="button secondary-button" href="{{ route('barangay.document-payments.history') }}">Payment history</a>
                     <a class="button" href="{{ route('barangay.registry.active') }}"><x-app-icon name="users" /> Resident registry</a>
 @if($barangay->usesResidenceRegistry())
                     <a class="button secondary-button" href="{{ route('barangay.residence.index') }}"><x-app-icon name="home" /> Living in Barangay</a>
 @endif
                 </div>
             @endif
-            <x-dashboard-context />
         </header>
 
         @if (session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif
@@ -120,17 +124,20 @@
                         @endif
                     </section>
 
-                    <section class="government-content-card workspace-documents-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="document-requests-title">
+                    <section id="document-requests" class="government-content-card workspace-documents-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="document-requests-title">
                         <header class="government-card-header">
                             <div><span class="government-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Barangay E-Services</span><h2 id="document-requests-title">Resident Document Requests</h2><p>Process requests submitted by approved Barangay {{ $barangay->name }} residents.</p></div>
                             <span class="government-count-badge {{ $pendingDocuments === 0 ? 'is-clear' : 'is-pending' }}">{{ $pendingDocuments }} pending</span>
                         </header>
-                        @if ($barangayDocumentRequests->isEmpty())
-                            <div class="government-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600"><span class="empty-state-mark">âœ“</span><div><strong>No document requests received</strong><span>Resident requests assigned to this barangay will appear here.</span></div></div>
+                        @if ($barangayDocumentRequests->total() === 0)
+                            <div class="government-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-600"><span class="empty-state-mark" aria-hidden="true">&#10003;</span><div><strong>No document requests received</strong><span>Resident requests assigned to this barangay will appear here.</span></div></div>
+                        @elseif ($barangayDocumentRequests->isEmpty())
+                            <div class="government-empty-state"><div><strong>No requests on this page</strong><a href="{{ $barangayDocumentRequests->url(1) }}">Return to the first page</a></div></div>
                         @else
+                            <p class="document-list-summary">Showing <strong>{{ $barangayDocumentRequests->firstItem() }}&ndash;{{ $barangayDocumentRequests->lastItem() }}</strong> of <strong>{{ $barangayDocumentRequests->total() }}</strong> requests &middot; {{ $barangayDocumentRequests->perPage() }} per page &middot; Newest first</p>
                             <div class="table-wrap government-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
                                 <table class="government-data-table">
-                                    <thead><tr><th>Reference</th><th>Resident</th><th>Document and Purpose</th><th>GCash Payment</th><th>Status</th><th>Process Request</th></tr></thead>
+                                    <thead><tr><th scope="col">Reference</th><th scope="col">Resident</th><th scope="col">Document and Purpose</th><th scope="col">Payment</th><th scope="col">Status</th><th scope="col">Process Request</th></tr></thead>
                                     <tbody>@foreach ($barangayDocumentRequests as $documentRequest)
                                         <tr>
                                             <td><strong>{{ $documentRequest->reference_number }}</strong><small>{{ $documentRequest->created_at->format('M d, Y') }}</small></td>
@@ -138,19 +145,40 @@
                                             <td><strong>{{ $documentRequest->typeLabel() }}</strong><small>{{ $documentRequest->purpose }}</small></td>
                                             <td class="document-payment-cell">
                                                 @if ($documentRequest->requiresPayment())
-                                                    <strong>â‚±{{ number_format((float) $documentRequest->amount_due, 2) }}</strong>
+                                                    <strong>{{ $documentRequest->amountDueLabel() }}</strong>
                                                     <span class="payment-status payment-status-{{ $documentRequest->payment_status }}">{{ $documentRequest->paymentStatusLabel() }}</span>
-                                                    @if ($documentRequest->payment_reference)
-                                                        <small>Ref: {{ $documentRequest->payment_reference }}<br>Paid: {{ optional($documentRequest->payment_transaction_at)->format('M d, Y h:i A') }}<br>{{ $documentRequest->payer_name }} Â· {{ $documentRequest->payer_mobile }}</small>
+                                                    @if ($documentRequest->payment_method === App\Models\DocumentRequest::PAYMENT_METHOD_IN_PERSON)
+                                                        <small>Payment method: In person</small>
                                                     @endif
-                                                    @if ($documentRequest->payment_proof_path)
+                                                    @if ($documentRequest->paymentIsOpen() && ! in_array($documentRequest->payment_status, [App\Models\DocumentRequest::PAYMENT_PAID, App\Models\DocumentRequest::PAYMENT_PENDING], true))
+                                                        <form class="payment-verification-form" method="POST" action="{{ route('barangay.document-payments.assess', $documentRequest) }}">
+                                                            @csrf
+                                                            <label for="amount-due-{{ $documentRequest->id }}">Set fee (PHP)</label>
+                                                            <input id="amount-due-{{ $documentRequest->id }}" name="amount_due" type="number" min="0.01" max="99999999.99" step="0.01" value="{{ $documentRequest->hasAssessedFee() ? $documentRequest->amount_due : '' }}" required>
+                                                            <label for="fee-note-{{ $documentRequest->id }}">Payment instructions (optional)</label>
+                                                            <input id="fee-note-{{ $documentRequest->id }}" name="payment_remarks" maxlength="1000" value="{{ $documentRequest->payment_remarks }}">
+                                                            <button type="submit">Set fee &amp; request payment</button>
+                                                        </form>
+                                                        @if ($documentRequest->hasAssessedFee())
+                                                            <form class="payment-verification-form" method="POST" action="{{ route('barangay.document-payments.receive-in-person', $documentRequest) }}">
+                                                                @csrf
+                                                                <label><input type="checkbox" name="confirm_received" value="1" required> I received {{ $documentRequest->amountDueLabel() }} in person.</label>
+                                                                <button type="submit">Confirm payment received</button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
+                                                    @if ($documentRequest->payment_reference && $documentRequest->payment_method === App\Models\DocumentRequest::PAYMENT_METHOD_GCASH)
+                                                        <small>Ref: {{ $documentRequest->payment_reference }}<br>Paid: {{ optional($documentRequest->payment_transaction_at)->format('M d, Y h:i A') }}<br>{{ $documentRequest->payer_name }} &middot; {{ $documentRequest->payer_mobile }}</small>
+                                                    @endif
+                                                    @if ($documentRequest->payment_proof_path && $documentRequest->payment_method === App\Models\DocumentRequest::PAYMENT_METHOD_GCASH)
                                                         <a href="{{ route('document-payments.proof', $documentRequest) }}">Open receipt proof</a>
                                                     @endif
                                                     @if ($documentRequest->payment_status === App\Models\DocumentRequest::PAYMENT_PENDING)
                                                         <small>Match the reference, amount, and time in the official GCash for Business portal before verifying.</small>
                                                         <form class="payment-verification-form" method="POST" action="{{ route('barangay.document-payments.verify', $documentRequest) }}">
                                                             @csrf
-                                                            <input name="payment_remarks" maxlength="1000" placeholder="Required reason when rejecting">
+                                                            <label for="payment-remarks-{{ $documentRequest->id }}">Payment review note</label>
+                                                            <input id="payment-remarks-{{ $documentRequest->id }}" name="payment_remarks" maxlength="1000" placeholder="Required reason when rejecting">
                                                             <div>
                                                                 <button type="submit" name="decision" value="verify">Verify Payment</button>
                                                                 <button class="danger-button" type="submit" name="decision" value="reject">Reject</button>
@@ -165,13 +193,16 @@
                                             </td>
                                             <td><span class="request-status request-status-{{ $documentRequest->status }}">{{ $documentRequest->statusLabel() }}</span></td>
                                             <td><form class="request-status-form" method="POST" action="{{ route('barangay.document-requests.update', $documentRequest) }}">@csrf @method('PUT')
-                                                <select name="status" aria-label="Status for {{ $documentRequest->reference_number }}" required>@foreach ($documentRequestStatuses as $value => $label)<option value="{{ $value }}" @selected($documentRequest->status === $value)>{{ $label }}</option>@endforeach</select>
-                                                <input name="remarks" type="text" value="{{ $documentRequest->remarks }}" placeholder="Add remarks" aria-label="Remarks for {{ $documentRequest->reference_number }}"><button type="submit">Save Update</button>
+                                                <label for="request-status-{{ $documentRequest->id }}">Request status</label>
+                                                <select id="request-status-{{ $documentRequest->id }}" name="status" aria-label="Status for {{ $documentRequest->reference_number }}" required>@foreach ($documentRequestStatuses as $value => $label)<option value="{{ $value }}" @selected($documentRequest->status === $value)>{{ $label }}</option>@endforeach</select>
+                                                <label for="request-remarks-{{ $documentRequest->id }}">Remarks</label>
+                                                <input id="request-remarks-{{ $documentRequest->id }}" name="remarks" type="text" maxlength="1000" value="{{ $documentRequest->remarks }}" placeholder="Add remarks" aria-label="Remarks for {{ $documentRequest->reference_number }}"><button type="submit">Save Update</button>
                                             </form></td>
                                         </tr>
                                     @endforeach</tbody>
                                 </table>
                             </div>
+                            {{ $barangayDocumentRequests->onEachSide(1)->links('dashboards.partials.document-pagination') }}
                         @endif
                     </section>
                 </main>

@@ -13,7 +13,6 @@
                 <span class="context-icon"><x-app-icon name="location" /></span>
                 <div><small>Your assigned barangay</small><strong>Barangay {{ auth()->user()->barangay?->name ?? 'Not assigned' }}</strong><span>Approved resident account</span></div>
             </div>
-            <x-dashboard-context />
         </header>
 
         @if (session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif
@@ -29,6 +28,7 @@
         </section>
 
         <nav class="workspace-launcher" aria-label="Resident service shortcuts">
+            <a href="{{ route('resident.document-payments.history') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><small>Payment records</small><strong>Payment history</strong><em>View GCash and in-person payments</em></span><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('resident.document-requests.create') }}"><span class="workspace-launcher-icon"><x-app-icon name="form" /></span><span><small>Start a transaction</small><strong>Request a document</strong><em>Submit a new barangay document request</em></span><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('resident.document-requests.index') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><small>Track transactions</small><strong>View my requests</strong><em>Check status, payment, and remarks</em></span><x-app-icon name="arrow-right" /></a>
         </nav>
@@ -42,7 +42,7 @@
                     </header>
 
                     @if (! auth()->user()->barangay?->gcashIsReady())
-                        <div class="payment-notice rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 ">Online payment is not yet active for your barangay. Documents with a fee will become available after the official GCash profile is approved.</div>
+                        <div class="payment-notice rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 ">GCash is not yet available. You can still submit a request and pay in person after the secretary sets the fee.</div>
                     @endif
 
                     <form method="POST" action="{{ route('resident.document-requests.store') }}" class="clean-form">
@@ -52,7 +52,7 @@
                             <select id="document_type" name="document_type" required>
                                 <option value="">Choose a document</option>
                                 @foreach ($documentTypes as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('document_type') === $value)>{{ $label }} — {{ App\Models\DocumentRequest::feeFor($value) > 0 ? '₱'.number_format(App\Models\DocumentRequest::feeFor($value), 2) : 'No fee' }}</option>
+                                    <option value="{{ $value }}" @selected(old('document_type') === $value)>{{ $label }} — {{ $value === App\Models\DocumentRequest::TYPE_INDIGENCY ? 'No fee' : 'Fee to be set by secretary' }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -69,7 +69,7 @@
                     <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">What happens next</span><h2 id="request-process-title">Request process</h2></div></header>
                     <ol class="process-list">
                         <li><span>1</span><div><strong>Submit your request</strong><small>Your barangay receives it immediately.</small></div></li>
-                        <li><span>2</span><div><strong>Complete payment, if required</strong><small>Use only the official GCash details shown here.</small></div></li>
+                        <li><span>2</span><div><strong>Wait for the fee, then pay</strong><small>Indigency is free. For other documents, the secretary sets the amount. Choose official GCash or pay in person.</small></div></li>
                         <li><span>3</span><div><strong>Wait for confirmation</strong><small>Track the status and barangay remarks below.</small></div></li>
                         <li><span>4</span><div><strong>Claim your document</strong><small>Visit the barangay when its status is Ready.</small></div></li>
                     </ol>
@@ -102,12 +102,25 @@
                             <div class="request-card-details">
                                 <div><span>Receiving office</span><strong>Barangay {{ $request->barangay?->name ?? auth()->user()->barangay?->name }}</strong></div>
                                 <div><span>Barangay remarks</span><strong>{{ $request->remarks ?: 'No remarks yet' }}</strong></div>
-                                <div><span>Amount due</span><strong>{{ $request->requiresPayment() ? '₱'.number_format((float) $request->amount_due, 2) : 'No fee' }}</strong></div>
+                                <div><span>Amount due</span><strong>{{ $request->amountDueLabel() }}</strong></div>
                             </div>
 
                             @if ($request->requiresPayment())
                                 <div class="request-payment-area">
-                                    @if (in_array($request->payment_status, [App\Models\DocumentRequest::PAYMENT_UNPAID, App\Models\DocumentRequest::PAYMENT_REJECTED], true))
+                                    @if (! $request->paymentIsOpen() && ! $request->isPaid())
+                                        <p>This request is closed. No payment can be submitted.</p>
+                                    @elseif (! $request->hasAssessedFee())
+                                        <p>The secretary will set the amount due here after reviewing your request. Please wait for the fee before paying.</p>
+                                    @elseif (in_array($request->payment_status, [App\Models\DocumentRequest::PAYMENT_UNPAID, App\Models\DocumentRequest::PAYMENT_REJECTED], true))
+                                        <div class="payment-notice rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><strong>Payment required before release: {{ $request->amountDueLabel() }}</strong><p>The secretary has set your fee. Choose GCash below or pay in person at the barangay office.</p></div>
+                                        <form method="POST" action="{{ route('resident.document-payments.in-person', $request) }}" class="mt-3 mb-3">
+                                            @csrf
+                                            @if ($request->payment_method === App\Models\DocumentRequest::PAYMENT_METHOD_IN_PERSON)
+                                                <p><strong>In-person payment selected.</strong> Bring {{ $request->amountDueLabel() }} and reference {{ $request->reference_number }} to the barangay office. Waiting for the secretary to confirm receipt.</p>
+                                            @else
+                                                <button type="submit" class="secondary-button">I will pay in person</button>
+                                            @endif
+                                        </form>
                                         @if ($request->payment_remarks)<div class="payment-feedback">Barangay note: {{ $request->payment_remarks }}</div>@endif
                                         @if ($request->barangay?->gcashIsReady())
                                             <details class="gcash-payment-details">
@@ -134,7 +147,7 @@
                                     @elseif ($request->payment_status === App\Models\DocumentRequest::PAYMENT_PENDING)
                                         <div class="payment-summary"><span>Payment submitted for verification</span><strong>Reference {{ $request->payment_reference }}</strong><small>{{ optional($request->payment_transaction_at)->format('M d, Y · h:i A') }}</small>@if ($request->payment_proof_path)<a href="{{ route('document-payments.proof', $request) }}">View submitted receipt</a>@endif</div>
                                     @elseif ($request->payment_status === App\Models\DocumentRequest::PAYMENT_PAID)
-                                        <div class="payment-summary is-paid"><span>Payment verified</span><strong>Reference {{ $request->payment_reference }}</strong><small>Verified {{ optional($request->paid_at)->format('M d, Y · h:i A') }}</small></div>
+                                        <div class="payment-summary is-paid"><span>Payment verified</span><strong>{{ $request->payment_method === App\Models\DocumentRequest::PAYMENT_METHOD_IN_PERSON ? 'Paid in person at the barangay office' : 'GCash reference '.$request->payment_reference }}</strong><small>Verified {{ optional($request->paid_at)->format('M d, Y · h:i A') }}</small></div>
                                     @endif
                                 </div>
                             @endif

@@ -1,0 +1,300 @@
+/* Loaded before the shared theme so this layer's important rules keep their contrast. */
+@layer document-requests {
+    .workspace-page-documents {
+        color: #172b4d;
+    }
+
+    .workspace-page-documents > .dashboard-page-header {
+        min-height: 0 !important;
+        padding: 24px !important;
+        border: 1px solid #b9cddf !important;
+        border-top: 4px solid #244b83 !important;
+        border-radius: 14px !important;
+        background: #edf3fc !important;
+        box-shadow: none !important;
+        color: #172b4d !important;
+    }
+
+    .workspace-page-documents > .dashboard-page-header::before,
+    .workspace-page-documents > .dashboard-page-header::after,
+    .workspace-page-documents .barangay-hero-weave {
+        display: none !important;
+    }
+
+    .workspace-page-documents .dashboard-page-header h1 {
+        color: #172b4d !important;
+        font-size: clamp(26px, 2.5vw, 34px) !important;
+    }
+
+    .workspace-page-documents .dashboard-page-header :is(p, .dashboard-eyebrow) {
+        color: #334e6f !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents .workspace-documents-panel {
+        border-color: #b9cddf !important;
+        border-top: 4px solid #244b83 !important;
+        background: #fff !important;
+        scroll-margin-top: 24px;
+    }
+
+    .workspace-page-documents .government-card-header {
+        padding: 20px !important;
+        border-bottom: 1px solid #cbd8e8 !important;
+        background: #edf3fc !important;
+    }
+
+    .workspace-page-documents .government-card-header h2 {
+        color: #172b4d !important;
+        font-size: 21px !important;
+    }
+
+    .workspace-page-documents .government-card-header :is(p, .government-eyebrow) {
+        color: #334e6f !important;
+        font-size: 13px !important;
+    }
+
+    .workspace-page-documents .government-count-badge {
+        padding: 8px 12px !important;
+        border: 1px solid #d6b55e !important;
+        background: #fff3cc !important;
+        color: #714b00 !important;
+        font-size: 13px !important;
+        white-space: nowrap;
+    }
+
+    .workspace-page-documents .government-count-badge.is-clear {
+        border-color: #a3c9b7 !important;
+        background: #e7f5ed !important;
+        color: #145435 !important;
+    }
+
+    .workspace-page-documents .document-list-summary {
+        margin: 0 !important;
+        padding: 14px 20px !important;
+        color: #334e6f !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents .government-table-wrap {
+        border-radius: 0 !important;
+        border-right: 0 !important;
+        border-left: 0 !important;
+    }
+
+    .workspace-page-documents .government-data-table {
+        min-width: 1120px !important;
+    }
+
+    .workspace-page-documents .government-data-table th {
+        padding: 14px 16px !important;
+        background: #244b83 !important;
+        color: #fff !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-bottom-color: #244b83 !important;
+        white-space: nowrap;
+    }
+
+    .workspace-page-documents .government-data-table td {
+        padding: 16px !important;
+        border-bottom-color: #d5dfec !important;
+        color: #172b4d !important;
+        font-size: 14px !important;
+        vertical-align: top !important;
+    }
+
+    .workspace-page-documents .government-data-table tbody tr {
+        background: #fff !important;
+    }
+
+    .workspace-page-documents .government-data-table tbody tr:nth-child(even) {
+        background: #f0f5fb !important;
+    }
+
+    .workspace-page-documents .government-data-table tbody tr:hover {
+        background: #e4eefb !important;
+    }
+
+    .workspace-page-documents .government-data-table td > strong {
+        color: #172b4d !important;
+        font-size: 14px !important;
+        line-height: 1.5;
+    }
+
+    .workspace-page-documents .government-data-table td:nth-child(2) {
+        min-width: 180px;
+    }
+
+    .workspace-page-documents .government-data-table small {
+        display: block;
+        margin-top: 6px;
+        color: #415570 !important;
+        font-size: 13px !important;
+        line-height: 1.55 !important;
+        overflow-wrap: anywhere;
+    }
+
+    .workspace-page-documents .document-payment-cell {
+        min-width: 220px;
+        max-width: 280px;
+    }
+
+    .workspace-page-documents .document-payment-cell a {
+        color: #1c4074 !important;
+        font-size: 13px !important;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+    .workspace-page-documents :is(.request-status, .payment-status) {
+        padding: 6px 10px !important;
+        border: 1px solid #aebfd3 !important;
+        border-radius: 8px !important;
+        background: #edf2f7 !important;
+        color: #334e6f !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        line-height: 1.4;
+        text-transform: none !important;
+        white-space: normal !important;
+    }
+
+    .workspace-page-documents :is(.request-status-pending, .payment-status-pending_verification) {
+        border-color: #d6b55e !important;
+        background: #fff3cc !important;
+        color: #714b00 !important;
+    }
+
+    .workspace-page-documents .request-status-processing {
+        border-color: #aac6ee !important;
+        background: #e6efff !important;
+        color: #1c4074 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-ready, .request-status-completed, .payment-status-paid) {
+        border-color: #a3c9b7 !important;
+        background: #e7f5ed !important;
+        color: #145435 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-rejected, .payment-status-rejected, .payment-status-unpaid) {
+        border-color: #e3b1b7 !important;
+        background: #fdecef !important;
+        color: #922435 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) {
+        display: grid;
+        min-width: 220px;
+        gap: 8px;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) label {
+        margin: 0 !important;
+        color: #334e6f !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) :is(input, select) {
+        min-height: 42px !important;
+        border-color: #94a9c4 !important;
+        background: #fff !important;
+        color: #172b4d !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents input::placeholder {
+        color: #53647b !important;
+        opacity: 1 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) button {
+        min-height: 42px !important;
+        background: #244b83 !important;
+        color: #fff !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents .payment-verification-form .danger-button {
+        border-color: #e3b1b7 !important;
+        background: #fdecef !important;
+        color: #922435 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) button:hover {
+        border-color: #172b4d !important;
+        background: #172b4d !important;
+        color: #fff !important;
+    }
+
+    .workspace-page-documents .document-pagination {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px;
+        background: #f0f5fb;
+        color: #334e6f;
+        font-size: 14px;
+    }
+
+    .workspace-page-documents .document-page-links {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .workspace-page-documents .document-page-links :is(a, span) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid #aebfd3;
+        border-radius: 7px;
+        background: #fff;
+        color: #1c4074 !important;
+        font-size: 14px !important;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .workspace-page-documents .document-page-links a:hover,
+    .workspace-page-documents .document-page-links [aria-current="page"] {
+        border-color: #244b83;
+        background: #244b83;
+        color: #fff !important;
+    }
+
+    .workspace-page-documents .document-page-links [aria-disabled="true"] {
+        background: #e6edf5;
+        color: #53647b !important;
+    }
+
+    .workspace-page-documents .document-page-links .document-page-gap {
+        min-width: 24px;
+        padding: 4px;
+        border: 0;
+        background: transparent;
+    }
+
+    @media (max-width: 640px) {
+        .workspace-page-documents .government-card-header {
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .workspace-page-documents .document-pagination {
+            padding: 16px 16px 72px;
+        }
+
+        .workspace-page-documents .document-page-links {
+            width: 100%;
+        }
+    }
+}

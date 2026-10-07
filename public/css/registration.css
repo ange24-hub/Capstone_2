@@ -1,0 +1,159 @@
+/* Registration has a compact municipal layout while retaining the shared form controls. */
+@layer registration-page {
+    @media screen {
+        .municipal-ui body:has(.registration-page) .public-nav .public-register-link {
+            color:#fff !important;
+        }
+        .municipal-ui .registration-page {
+            padding:26px 18px 40px !important;
+            background:#f1f4f5 !important;
+        }
+        .municipal-ui .registration-layout {
+            display:grid !important;
+            grid-template-columns:minmax(0,1fr) !important;
+            gap:0 !important;
+            width:min(900px,100%) !important;
+            margin:0 auto !important;
+            overflow:hidden !important;
+            border:1px solid #ccd8df !important;
+            border-top:4px solid #355d7d !important;
+            border-radius:8px !important;
+            background:#fff !important;
+            box-shadow:0 8px 24px #203f570d !important;
+        }
+        .municipal-ui .registration-guide {
+            display:grid !important;
+            grid-template-columns:48px minmax(0,1fr) auto !important;
+            align-items:center !important;
+            gap:14px !important;
+            padding:18px 26px !important;
+            min-height:0 !important;
+            overflow:visible !important;
+            background:#eaf0f3 !important;
+            color:#17364e !important;
+            border:0 !important;
+            border-bottom:1px solid #ced9df !important;
+            border-radius:0 !important;
+        }
+        .municipal-ui .registration-guide::after { display:none !important; }
+        .municipal-ui .registration-seal { display:block; width:46px; height:46px; flex:0 0 46px; }
+        .municipal-ui .registration-seal img { width:100%; height:100%; object-fit:contain; }
+        .municipal-ui .registration-eyebrow {
+            color:#4b6677 !important; font-size:10px !important;
+            font-weight:650 !important; letter-spacing:.08em !important;
+        }
+        .municipal-ui .registration-guide h1 {
+            margin:2px 0 0 !important;
+            color:#17364e !important;
+            font:650 19px/1.25 'Aptos','Segoe UI',sans-serif !important;
+            letter-spacing:-.02em !important;
+        }
+        .municipal-ui .registration-guide p {
+            margin:2px 0 0 !important;
+            color:#516c79 !important; font-size:11px !important;
+        }
+        .municipal-ui .registration-guide-tag {
+            padding:7px 10px !important;
+            border:1px solid #c5d4cd !important;
+            border-radius:4px !important;
+            background:#e4ede7 !important;
+            color:#436759 !important;
+            font-size:10px !important;
+            font-weight:700 !important;
+            text-transform:uppercase !important;
+            letter-spacing:.05em !important;
+            white-space:nowrap;
+        }
+        .municipal-ui .registration-card {
+            padding:22px 28px 24px !important;
+            border:0 !important;
+            border-radius:0 !important;
+            box-shadow:none !important;
+            background:#fff !important;
+        }
+        .municipal-ui .registration-card-head { margin-bottom:17px !important; }
+        .municipal-ui .registration-card-head .page-kicker {
+            color:#4c6d82 !important; font-size:10px !important;
+            letter-spacing:.09em !important;
+        }
+        .municipal-ui .registration-card-head h2 {
+            margin:3px 0 3px !important;
+            color:#17364e !important;
+            font-size:23px !important; font-weight:650 !important;
+            line-height:1.3 !important;
+        }
+        .municipal-ui .registration-card-head p { color:#536b79 !important; font-size:13px !important; }
+        .municipal-ui .registration-form { gap:14px !important; }
+        .municipal-ui .account-type-fieldset legend { margin-bottom:8px !important; color:#253f51 !important; font-size:12px !important; }
+        .municipal-ui .account-type-option {
+            min-height:61px !important;
+            padding:10px 12px !important;
+            border:1px solid #c9d5dd !important;
+            border-radius:6px !important;
+            background:#f7f9fa !important;
+            box-shadow:none !important;
+        }
+        .municipal-ui .account-type-option:has(input:checked) {
+            background:#e9f1f5 !important;
+            border-color:#537b98 !important;
+            box-shadow:inset 3px 0 #416d8c !important;
+        }
+        .municipal-ui .account-type-option:hover { border-color:#789bb0 !important; }
+        .municipal-ui .account-type-icon {
+            width:32px !important; height:32px !important;
+            border-radius:5px !important;
+            background:#dfe9ee !important; color:#315d77 !important;
+        }
+        .municipal-ui .account-type-option:has(input:checked) .account-type-icon { background:#d4e4ec !important; color:#244e6b !important; }
+        .municipal-ui .account-type-option small { font-size:10px !important; line-height:1.4 !important; }
+        .municipal-ui .registration-section {
+            padding:14px 16px 16px !important;
+            border:1px solid #d7e0e5 !important;
+            border-radius:6px !important;
+            background:#f8fafb !important;
+        }
+        .municipal-ui .registration-section.secretary-fields { border-color:#ddcfab !important; background:#fcfaf4 !important; }
+        .municipal-ui .registration-section-head { margin-bottom:4px !important; }
+        .municipal-ui .registration-section-head span { color:#294657 !important; font-size:12px !important; }
+        .municipal-ui .registration-section-head small { color:#667b86 !important; font-size:10px !important; }
+        .municipal-ui .registration-fields { gap:2px 16px !important; }
+        .municipal-ui .registration-fields .field-group label { margin-top:8px !important; color:#324d5d !important; font-size:12px !important; }
+        .municipal-ui .registration-fields :is(input,select) {
+            min-height:42px !important;
+            border:1px solid #c5d3dc !important;
+            border-radius:5px !important;
+            background:#fff !important;
+            color:#223c4f !important;
+            font-size:13px !important;
+        }
+        .municipal-ui .registration-fields input:focus-visible,
+        .municipal-ui .registration-fields select:focus-visible { outline:2px solid #537f9d !important; outline-offset:1px !important; }
+        .municipal-ui .registration-fields .field-group small { color:#5f7480 !important; font-size:11px !important; line-height:1.45 !important; }
+        .municipal-ui .registration-approval-note { padding:9px 12px !important; font-size:11px !important; }
+        .municipal-ui .registration-submit {
+            justify-self:start !important;
+            width:auto !important; min-width:225px !important;
+            min-height:42px !important;
+            border-radius:5px !important;
+            background:#355f7f !important;
+            border-color:#355f7f !important;
+            font-size:12px !important;
+        }
+        .municipal-ui .registration-submit:hover { background:#294e6b !important; }
+        .municipal-ui .registration-card .form-footer { margin:18px 0 0 !important; padding-top:14px !important; font-size:12px !important; }
+        @media (max-width:640px) {
+            .municipal-ui .registration-page { padding:12px 10px 24px !important; }
+            .municipal-ui .registration-guide { grid-template-columns:40px minmax(0,1fr) !important; padding:14px 16px !important; gap:10px !important; }
+            .municipal-ui .registration-seal { width:40px; height:40px; }
+            .municipal-ui .registration-guide-tag { grid-column:1 / -1; justify-self:start; }
+            .municipal-ui .registration-guide h1 { font-size:17px !important; }
+            .municipal-ui .registration-card { padding:19px 16px 22px !important; }
+            .municipal-ui .registration-fields { grid-template-columns:1fr !important; }
+            .municipal-ui .account-type-grid { grid-template-columns:1fr !important; }
+            .municipal-ui .registration-submit { width:100% !important; }
+        }
+        @media (prefers-reduced-motion:reduce) {
+            .municipal-ui .account-type-option { transition:none !important; }
+        }
+    }
+}

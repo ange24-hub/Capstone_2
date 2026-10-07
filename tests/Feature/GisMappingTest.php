@@ -18,15 +18,16 @@ class GisMappingTest extends TestCase
     {
         $area = Barangay::where('name', 'San Isidro')->firstOrFail();
         $user = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $point = $this->location($area);
         $this->actingAs($user)->post(route('spatial.households.store'), [
             'barangay_id' => $area->id, 'household_name' => 'Santos Family',
-            'latitude' => '10.2688410', 'longitude' => '125.0266880',
+            'latitude' => $point[1], 'longitude' => $point[0],
         ])->assertRedirect(route('spatial.index', ['barangay_id' => $area->id]))
             ->assertSessionHas('mapped_household_id');
         $household = Household::where('household_name', 'Santos Family')->firstOrFail();
         $this->assertStringStartsWith('GIS-', $household->household_number);
-        $this->assertEquals(10.2688410, $household->latitude);
-        $this->assertEquals(125.0266880, $household->longitude);
+        $this->assertEqualsWithDelta($point[1], (float) $household->latitude, 0.0000001);
+        $this->assertEqualsWithDelta($point[0], (float) $household->longitude, 0.0000001);
         $this->assertDatabaseCount('inhabitants', 0);
         $this->get(route('spatial.index', ['barangay_id' => $area->id]))->assertOk()
             ->assertSee('Santos Family')->assertSee('Add household')
@@ -72,12 +73,16 @@ class GisMappingTest extends TestCase
         $user = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($user)->get(route('spatial.index'))->assertOk()
             ->assertSee('GIS Mapping')->assertSee('vendor/leaflet/leaflet.js')
-            ->assertSee('gis-map-config')->assertViewHas('householdCount', 0);
+            ->assertSee('gis-map-config')->assertViewHas('householdCount', 0)
+            ->assertViewHas('barangayCount', 29)->assertViewHas('sourceBuildingCount', 4001)
+            ->assertViewHas('sourceBoundaryReviewCount', 104)
+            ->assertDontSee('source building points fall outside their assigned barangay boundary');
         $this->getJson(route('spatial.layers', 'barangay-boundaries'))->assertOk()->assertJsonCount(29, 'features');
         $points = $this->getJson(route('spatial.layers', 'building-points'))
             ->assertOk()->assertJsonCount(4001, 'features')->assertHeader('Content-Type', 'application/geo+json');
         $this->assertStringContainsString('no-store', $points->headers->get('Cache-Control'));
-        $this->assertSame(['barangay', 'barangay_code'], array_keys($points->json('features.0.properties')));
+        $this->assertSame(['barangay', 'barangay_code', 'within_barangay_boundary'], array_keys($points->json('features.0.properties')));
+        $this->assertCount(104, array_filter($points->json('features'), fn ($feature) => ! $feature['properties']['within_barangay_boundary']));
         foreach (['municipal-boundary', 'flood', 'landslide', 'storm-surge'] as $layer) {
             $response = $this->get(route('spatial.layers', $layer))->assertOk()
                 ->assertHeader('Content-Type', 'application/geo+json');
@@ -121,6 +126,56 @@ class GisMappingTest extends TestCase
         }
         $this->getJson(route('spatial.index', ['barangay_id' => 'invalid']))->assertUnprocessable();
         $this->getJson(route('spatial.layers', ['layer' => 'building-points', 'barangay_id' => 999999]))->assertUnprocessable();
+    }
+
+    public function test_municipal_staff_cannot_save_a_location_outside_the_selected_barangay(): void
+    {
+        $area = Barangay::where('name', 'San Isidro')->firstOrFail();
+        $other = Barangay::where('name', 'Canlupao')->firstOrFail();
+        $point = $this->location($other);
+        $ownPoint = $this->location($area);
+        $household = Household::create(['barangay_id' => $area->id, 'household_number' => 'MAP-KEEP',
+            'household_name' => 'Original', 'latitude' => $ownPoint[1], 'longitude' => $ownPoint[0]]);
+        $this->actingAs(User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]));
+        $payload = ['barangay_id' => $area->id, 'household_name' => 'Outside', 'latitude' => $point[1], 'longitude' => $point[0]];
+        $this->postJson(route('spatial.households.store'), $payload)->assertUnprocessable()->assertJsonValidationErrors('latitude');
+        $this->putJson(route('spatial.households.update', $household), $payload)->assertUnprocessable()->assertJsonValidationErrors('latitude');
+        $this->assertDatabaseCount('households', 1);
+        $this->assertSame('Original', $household->fresh()->household_name);
+        $this->assertEqualsWithDelta($ownPoint[1], (float) $household->fresh()->latitude, 0.0000001);
+    }
+
+    public function test_map_reports_households_missing_coordinates_in_the_selected_scope(): void
+    {
+        $area = Barangay::where('name', 'San Isidro')->firstOrFail();
+        $other = Barangay::where('name', 'Canlupao')->firstOrFail();
+        Household::create(['barangay_id' => $area->id, 'household_number' => 'MISSING']);
+        Household::create(['barangay_id' => $area->id, 'household_number' => 'PARTIAL', 'latitude' => 10.26]);
+        Household::create(['barangay_id' => $other->id, 'household_number' => 'OTHER-MISSING']);
+        $point = $this->location($area);
+        Household::create(['barangay_id' => $area->id, 'household_number' => 'MAPPED', 'latitude' => $point[1], 'longitude' => $point[0]]);
+        $this->actingAs(User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]));
+        $this->get(route('spatial.index', ['barangay_id' => $area->id]))->assertOk()
+            ->assertViewHas('unmappedHouseholdCount', 2)->assertViewHas('householdCount', 1)
+            ->assertViewHas('barangayCount', 1)->assertViewHas('sourceBuildingCount', 320)
+            ->assertDontSee('registered households still need valid coordinates')
+            ->assertSee('Map an existing household')
+            ->assertViewHas('unmappedHouseholds', fn ($households) => $households->count() === 2
+                && $households->every(fn ($household) => $household->barangay_id === $area->id));
+        $this->get(route('spatial.index'))->assertOk()->assertViewHas('unmappedHouseholdCount', 3);
+        $this->actingAs(User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]));
+        $this->get(route('spatial.index'))->assertOk()->assertViewHas('unmappedHouseholdCount', 3)
+            ->assertViewHas('unmappedHouseholds', fn ($households) => $households->count() === 2
+                && $households->every(fn ($household) => $household->barangay_id === $area->id));
+    }
+
+    public function test_barangay_boundary_vertices_are_accepted_as_locations(): void
+    {
+        $area = Barangay::where('name', 'San Isidro')->firstOrFail();
+        $layers = app(GisLayers::class);
+        $geometry = $layers->read('barangay-boundaries', $area)['features'][0]['geometry'];
+        $point = $geometry['type'] === 'Polygon' ? $geometry['coordinates'][0][0] : $geometry['coordinates'][0][0][0];
+        $this->assertTrue($layers->contains($area, $point[1], $point[0]));
     }
 
     private function location(Barangay $area): array

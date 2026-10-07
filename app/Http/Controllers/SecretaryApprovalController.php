@@ -17,7 +17,6 @@ class SecretaryApprovalController extends Controller
             'approved_at' => now(),
             'approved_by' => $request->user()->id,
         ]);
-
         return back()->with('status', $secretary->name.' has been approved as secretary of Barangay '.$secretary->barangay->name.'.');
     }
 
@@ -30,7 +29,6 @@ class SecretaryApprovalController extends Controller
             'approved_at' => null,
             'approved_by' => $request->user()->id,
         ]);
-
         return back()->with('status', $secretary->name.'\'s secretary registration has been rejected.');
     }
 

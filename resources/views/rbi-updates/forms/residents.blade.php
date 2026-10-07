@@ -2,11 +2,12 @@
                     @csrf
                     <input type="hidden" name="form_section" value="residents">
                     @if ($editingReport) @method('PUT') @endif
+                    <p class="field-help"><x-required-mark /> Required fields must be filled out.</p>
 
                     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                         <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
                         <div>
-                            <label for="reporting_month">For the month of</label>
+                            <label for="reporting_month">For the month of <x-required-mark /></label>
                             <input id="reporting_month" name="reporting_month" type="month" value="{{ old('reporting_month', $defaultReportingMonth) }}" required>
                             @if (request()->boolean('new'))
                                 <small class="field-help">Select the month for the new report. To add entries to an already submitted month, use “Update form” in the history below.</small>
@@ -28,10 +29,11 @@
 
                                 <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                     <div>
-                                        <label>Household head</label>
+                                        <label data-family-head-label>Household head <x-required-mark /></label>
                                         <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head required autocomplete="off">
                                         <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household">
                                         <small class="field-help">Choose a registry match when available. A typed name is allowed for a newly registered household.</small>
+                                        <p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p>
                                     </div>
                                 </div>
 
@@ -50,17 +52,17 @@
                                             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                                 @foreach ($memberFields as $field => $label)
                                                     <div>
-                                                        <label>{{ $label }}</label>
+                                                        <label>{{ $label }} @if(in_array($field, $requiredMemberFields, true))<x-required-mark />@endif</label>
                                                         @if (in_array($field, ['civil_status', 'education_level', 'religion'], true))
-                                                            <x-rbi-dropdown :field="$field" :name="'rows['.$currentRowIndex.']['.$field.']'" :value="$member[$field] ?? ''" />
+                                                            <x-rbi-dropdown :field="$field" :name="'rows['.$currentRowIndex.']['.$field.']'" :value="$member[$field] ?? ''" :required="in_array($field, $requiredMemberFields, true)" />
                                                         @elseif ($field === 'sex')
-                                                            <select name="rows[{{ $currentRowIndex }}][{{ $field }}]">
+                                                            <select name="rows[{{ $currentRowIndex }}][{{ $field }}]" required>
                                                                 <option value=""></option>
                                                                 <option value="Male" @selected(($member[$field] ?? '') === 'Male')>Male</option>
                                                                 <option value="Female" @selected(($member[$field] ?? '') === 'Female')>Female</option>
                                                             </select>
                                                         @else
-                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" value="{{ $member[$field] ?? '' }}">
+                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" value="{{ $member[$field] ?? '' }}" @required(in_array($field, $requiredMemberFields, true)) @if($field === 'recorded_age') min="0" max="150" @endif>
                                                         @endif
                                                     </div>
                                                 @endforeach

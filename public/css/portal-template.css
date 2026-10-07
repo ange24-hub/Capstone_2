@@ -132,6 +132,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .portal-login-form .primary-block { min-height: 42px; background: #27538f; border-color: #27538f; font-size: 13px; }
 .portal-login-form .primary-block:hover { background: #1f4477; }
 .portal-login-form .form-footer { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 20px; font-size: 12px; }
+.portal-login-form .auth-help-link { margin: -3px 0 17px; text-align: right; font-size: 12px; }
 .assistant-launcher { border-radius: 7px; background: #284c7e; border-color: #284c7e; box-shadow: 0 3px 10px #243e6020; }
 .assistant-panel { border-radius: 9px; border-color: #d6dfeb; box-shadow: 0 8px 35px #243e6030; }
 .assistant-header { background: #284c7e; }
@@ -377,7 +378,31 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .population-coverage-table { min-width: 720px; }
 .population-report-notes { padding: 20px; border-top: 1px solid #b9c9de; color: #40566c; font-size: 12px; line-height: 1.8; }
 .population-report-notes li { margin-bottom: 8px; }
+.population-report-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.population-report .population-member-table :is(th,td) { text-align: center !important; vertical-align: middle; }
 @media (max-width:680px) { .population-breakdowns { grid-template-columns: 1fr; } .population-report-filter { flex-wrap: wrap; } .population-report-section { padding: 14px; } }
+
+@media print {
+    @page { margin: 12mm; }
+    .app-sidebar,
+    .sidebar-backdrop,
+    .app-header,
+    .app-footer,
+    .workspace-location,
+    .population-report-filter,
+    .population-category-nav,
+    .population-report-actions,
+    .rbim-assistant { display: none !important; }
+    body, .app-shell, .app-main { display: block !important; background: #fff !important; }
+    .app-content { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+    .population-report { display: block !important; }
+    .population-report > * { margin-bottom: 12px !important; box-shadow: none !important; }
+    .population-report .dashboard-page-header { padding: 12px 0 !important; border: 0 !important; border-bottom: 2px solid #203b52 !important; }
+    .population-report-section { padding: 0 !important; border: 0 !important; background: #fff !important; }
+    .population-report table { page-break-inside: auto; }
+    .population-report tr { page-break-inside: avoid; page-break-after: auto; }
+    .population-report thead { display: table-header-group; }
+}
 .overview-context-date .ph-clock-label { display: block; margin-top: 12px; font-size: 11px; }
 .overview-context-date .ph-clock-time { display: block; margin-top: 4px; font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DocumentRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class BarangayDocumentRequestController extends Controller
@@ -19,25 +20,27 @@ class BarangayDocumentRequestController extends Controller
             'remarks' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $needsVerifiedPayment = in_array($validated['status'], [
-            DocumentRequest::STATUS_PROCESSING,
-            DocumentRequest::STATUS_READY,
-            DocumentRequest::STATUS_COMPLETED,
-        ], true);
+        return DB::transaction(function () use ($request, $documentRequest, $validated) {
+            $documentRequest = DocumentRequest::lockForUpdate()->findOrFail($documentRequest->id);
+            $needsVerifiedPayment = in_array($validated['status'], [
+                DocumentRequest::STATUS_READY,
+                DocumentRequest::STATUS_COMPLETED,
+            ], true);
 
-        if ($needsVerifiedPayment && ! $documentRequest->isPaid()) {
-            return back()->withErrors([
-                'status' => 'Verify the GCash payment before processing or releasing this document.',
+            if ($needsVerifiedPayment && ! $documentRequest->isPaid()) {
+                return back()->withErrors([
+                    'status' => 'Set the fee and verify the GCash or in-person payment before marking this document ready or completed.',
+                ]);
+            }
+
+            $documentRequest->update([
+                'status' => $validated['status'],
+                'remarks' => $validated['remarks'] ?? null,
+                'reviewed_by' => $request->user()->id,
+                'processed_at' => now(),
             ]);
-        }
 
-        $documentRequest->update([
-            'status' => $validated['status'],
-            'remarks' => $validated['remarks'] ?? null,
-            'reviewed_by' => $request->user()->id,
-            'processed_at' => now(),
-        ]);
-
-        return back()->with('status', 'Document request '.$documentRequest->reference_number.' was updated to '.$documentRequest->statusLabel().'.');
+            return back()->with('status', 'Document request '.$documentRequest->reference_number.' was updated to '.$documentRequest->statusLabel().'.');
+        });
     }
 }

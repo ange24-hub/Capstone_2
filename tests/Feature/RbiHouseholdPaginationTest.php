@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Barangay;
+use App\Models\BarangayRbiUpdate;
 use App\Models\NewInhabitant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,6 +12,42 @@ use Tests\TestCase;
 class RbiHouseholdPaginationTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_monthly_form_history_pages_are_scoped_and_keep_other_pagination_links(): void
+    {
+        $area = Barangay::where('name', 'Maslog')->firstOrFail();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
+        foreach (range(1, 7) as $month) {
+            BarangayRbiUpdate::create([
+                'barangay_user_id' => $staff->id, 'barangay_name' => $area->name,
+                'reporting_month' => sprintf('2026-%02d-01', $month),
+                'status' => BarangayRbiUpdate::STATUS_DRAFT,
+                'rows' => [['household_head' => 'Family '.$month, 'inhabitant_name' => 'Member '.$month]],
+            ]);
+        }
+        $other = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
+        BarangayRbiUpdate::create([
+            'barangay_user_id' => $other->id, 'barangay_name' => $area->name,
+            'reporting_month' => '2026-08-01', 'status' => BarangayRbiUpdate::STATUS_DRAFT,
+        ]);
+
+        $first = $this->actingAs($staff)->get(route('barangay.rbi-updates.history', ['household_page' => 2]))
+            ->assertOk()->assertSee('July 2026')->assertSee('March 2026')
+            ->assertDontSee('February 2026')->assertDontSee('January 2026')->assertDontSee('August 2026')
+            ->assertSee('Showing <strong>1–5</strong> of 7 reports', false);
+        $page = $first->viewData('reportHistoryPage');
+        $this->assertSame(7, $page->total());
+        $this->assertCount(5, $page->items());
+        $this->assertStringContainsString('household_page=2', $page->nextPageUrl());
+        $this->assertStringContainsString('#report-history', $page->nextPageUrl());
+
+        $this->get($page->nextPageUrl())->assertOk()
+            ->assertSee('February 2026')->assertSee('January 2026')
+            ->assertDontSee('March 2026')->assertDontSee('August 2026')
+            ->assertSee('Showing <strong>6–7</strong> of 7 reports', false);
+        $this->get(route('barangay.rbi-updates.history', ['report_page' => 999]))->assertOk()
+            ->assertViewHas('reportHistoryPage', fn ($history) => $history->currentPage() === 2);
+    }
 
     public function test_history_has_its_own_staff_subpage_and_is_not_rendered_inside_entry_forms(): void
     {

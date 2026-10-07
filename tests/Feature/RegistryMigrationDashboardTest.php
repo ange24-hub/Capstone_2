@@ -129,7 +129,7 @@ class RegistryMigrationDashboardTest extends TestCase
             ->assertSee('REMARKS')
             ->assertSee('ETHNICITY')
             ->assertSee('Cebuano')
-            ->assertSee('Save row');
+            ->assertDontSee('Save row');
 
         $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
 
@@ -175,7 +175,10 @@ class RegistryMigrationDashboardTest extends TestCase
             ->assertOk()
             ->assertSee('NAME OF DECEASED PERSONS')
             ->assertSee('Mark Gil')
-            ->assertSee('Save row');
+            ->assertDontSee('Save row')
+            ->assertSee('deceased-row-'.$record->id)
+            ->assertSee('data-deceased-update')
+            ->assertSee('js/registry-confirm.js');
 
         $this->actingAs($secretary)
             ->put(route('registry.deceased.update', $record), [

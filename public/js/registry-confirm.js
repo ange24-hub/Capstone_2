@@ -1,5 +1,5 @@
 (() => {
- const forms = [...document.forms].filter(f => (f.hasAttribute('data-residence-update') || /\/registry\/\d+$/.test(new URL(f.action).pathname)) && f.querySelector('[name="_method"]')?.value === 'PUT');
+ const forms = [...document.forms].filter(f => (f.hasAttribute('data-residence-update') || f.hasAttribute('data-deceased-update') || /\/registry\/\d+$/.test(new URL(f.action).pathname)) && f.querySelector('[name="_method"]')?.value === 'PUT');
  forms.forEach(form => {
   const fields = [...form.elements], original = new Map(fields.map(f => [f, f.value])); let submitting = false;
   const reset = () => fields.forEach(f => { f.value = original.get(f); });
@@ -7,7 +7,7 @@
    if (submitting) return;
    const remark = form.elements.namedItem('remarks')?.value || '';
    const match = !/\b(?:NOT|NO|NEVER)\s+TRANSFER/i.test(remark) && remark.match(/\bTRANSFER(?:RED|ED)\s+TO\s+([^\[\r\n]+)/i);
-   const transfer = form.elements.namedItem('residence_status')?.value === 'transferred' || match;
+   const transfer = !form.hasAttribute('data-deceased-update') && (form.elements.namedItem('residence_status')?.value === 'transferred' || match);
    let destination = match ? match[1].trim() : '';
    if (transfer && !destination) destination = window.prompt('Transferred to where? Enter the destination.');
    if (transfer && !destination?.trim()) { event.preventDefault(); reset(); return; }
@@ -18,7 +18,7 @@
    }
    submitting = true;
   });
-  if (form.id.startsWith('rbi-row-') || form.hasAttribute('data-residence-update')) fields.forEach(field => {
+  if (form.id.startsWith('rbi-row-') || form.hasAttribute('data-residence-update') || form.hasAttribute('data-deceased-update')) fields.forEach(field => {
    if (field.type !== 'hidden') field.addEventListener('change', () => { if (!submitting && field.value !== original.get(field)) form.requestSubmit(); });
   });
  });

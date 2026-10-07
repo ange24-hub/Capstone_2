@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
 from pathlib import Path
+import math
 
 app = Flask(__name__)
 
@@ -28,7 +29,10 @@ def health():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Send a JSON object with migration features"}), 400
 
     missing = [
         feature
@@ -42,15 +46,32 @@ def predict():
             "fields": missing
         }), 400
 
-    input_data = pd.DataFrame([{
-        feature: data[feature]
-        for feature in FEATURES
-    }])
+    values = {}
+    for feature in FEATURES:
+        value = data[feature]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            return jsonify({"error": "Features must be finite numbers", "field": feature}), 400
+        values[feature] = value
 
-    prediction = model.predict(input_data)[0]
+    if any(values[feature] < 0 for feature in FEATURES[:3]):
+        return jsonify({"error": "Migration counts must be non-negative"}), 400
+    if not (1900 <= values["year"] <= 9999 and values["year"] == int(values["year"])):
+        return jsonify({"error": "Year must be an integer between 1900 and 9999"}), 400
+    if not (1 <= values["month"] <= 12 and values["month"] == int(values["month"])):
+        return jsonify({"error": "Month must be an integer between 1 and 12"}), 400
+
+    input_data = pd.DataFrame([values], columns=FEATURES)
+
+    try:
+        prediction = float(model.predict(input_data)[0])
+        if not math.isfinite(prediction):
+            raise ValueError("Model returned a non-finite prediction")
+    except Exception:
+        app.logger.exception("Out-migration model could not produce an estimate")
+        return jsonify({"error": "Prediction temporarily unavailable"}), 503
 
     return jsonify({
-        "predicted_next_month_out_migration": round(float(prediction), 2)
+        "predicted_next_month_out_migration": max(0, round(prediction, 2))
     })
 
 

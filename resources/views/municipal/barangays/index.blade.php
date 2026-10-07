@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/barangay-directory.css') }}?v={{ filemtime(public_path('css/barangay-directory.css')) }}" media="screen">
+@endpush
+
 @section('content')
     @php
         $barangaysWithReports = $barangays->filter(fn ($barangay) => $rbiUpdates->where('barangay_name', $barangay->name)->isNotEmpty())->count();
@@ -33,7 +37,7 @@
                 <button type="button" aria-pressed="false" data-directory-filter="reported">With Reports</button>
                 <button type="button" aria-pressed="false" data-directory-filter="missing">Awaiting Reports</button>
             </div>
-            <span id="barangay-directory-count">Showing {{ $barangays->count() }} barangays</span>
+            <span id="barangay-directory-count" role="status" aria-live="polite">Showing {{ $barangays->count() }} barangays</span>
         </div>
 
         <div class="municipal-directory-grid grid grid-cols-1 gap-5 xl:grid-cols-2 " id="municipal-directory-grid">
@@ -118,44 +122,19 @@
             @endforeach
         </div>
 
+        <nav class="directory-pagination" id="barangay-directory-pagination" aria-label="Barangay directory pages" hidden>
+            <span id="barangay-directory-page-status"></span>
+            <div class="directory-pagination-controls">
+                <button type="button" data-directory-previous aria-controls="municipal-directory-grid">Previous</button>
+                <div class="directory-page-numbers" id="barangay-directory-page-numbers"></div>
+                <button type="button" data-directory-next aria-controls="municipal-directory-grid">Next</button>
+            </div>
+        </nav>
+
         <div class="empty-directory" id="empty-directory" hidden>No barangay matches the selected search and status filter.</div>
     </section>
 @endsection
 
 @push('scripts')
-    <script>
-        (() => {
-            const search = document.getElementById('barangay-directory-search');
-            const cards = [...document.querySelectorAll('[data-directory-card]')];
-            const filters = [...document.querySelectorAll('[data-directory-filter]')];
-            const count = document.getElementById('barangay-directory-count');
-            const empty = document.getElementById('empty-directory');
-            let activeFilter = 'all';
-
-            const refresh = () => {
-                const query = search.value.trim().toLowerCase();
-                let visible = 0;
-
-                cards.forEach((card) => {
-                    const matchesSearch = card.dataset.name.includes(query);
-                    const matchesStatus = activeFilter === 'all' || card.dataset.status === activeFilter;
-                    card.hidden = !matchesSearch || !matchesStatus;
-                    if (!card.hidden) visible++;
-                });
-
-                count.textContent = `Showing ${visible} ${visible === 1 ? 'barangay' : 'barangays'}`;
-                empty.hidden = visible !== 0;
-            };
-
-            search.addEventListener('input', refresh);
-            filters.forEach((button) => button.addEventListener('click', () => {
-                activeFilter = button.dataset.directoryFilter;
-                filters.forEach((item) => {
-                    item.classList.toggle('is-active', item === button);
-                    item.setAttribute('aria-pressed', String(item === button));
-                });
-                refresh();
-            }));
-        })();
-    </script>
+    <script src="{{ asset('js/barangay-directory.js') }}?v={{ filemtime(public_path('js/barangay-directory.js')) }}" defer></script>
 @endpush

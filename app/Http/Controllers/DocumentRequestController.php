@@ -19,16 +19,7 @@ class DocumentRequestController extends Controller
             'purpose' => ['required', 'string', 'max:255'],
         ]);
 
-        $amountDue = DocumentRequest::feeFor($validated['document_type']);
-
-        if ($amountDue > 0 && ! $request->user()->barangay?->gcashIsReady()) {
-            if ($request->routeIs('api.resident.*')) {
-                throw \Illuminate\Validation\ValidationException::withMessages(['document_type' => 'Online GCash collection is not yet active. Contact your barangay office.']);
-            }
-            return back()->withInput()->withErrors([
-                'document_type' => 'Online GCash collection is not yet active for this paid document. Please contact your Barangay office.',
-            ]);
-        }
+        $isFree = $validated['document_type'] === DocumentRequest::TYPE_INDIGENCY;
 
         $documentRequest = $request->user()->documentRequests()->create([
             'barangay_id' => $request->user()->barangay_id,
@@ -36,19 +27,19 @@ class DocumentRequestController extends Controller
             'document_type' => $validated['document_type'],
             'purpose' => $validated['purpose'],
             'status' => DocumentRequest::STATUS_PENDING,
-            'amount_due' => $amountDue,
-            'payment_method' => $amountDue > 0 ? DocumentRequest::PAYMENT_METHOD_GCASH : null,
-            'payment_status' => $amountDue > 0 ? DocumentRequest::PAYMENT_UNPAID : DocumentRequest::PAYMENT_NOT_REQUIRED,
+            'amount_due' => 0,
+            'payment_method' => null,
+            'payment_status' => $isFree ? DocumentRequest::PAYMENT_NOT_REQUIRED : DocumentRequest::PAYMENT_AWAITING_ASSESSMENT,
         ]);
 
         $message = 'Your request '.$documentRequest->reference_number.' was sent to Barangay '.$request->user()->barangay->name.'.';
-        $message .= $amountDue > 0
-            ? ' Complete the ₱'.number_format($amountDue, 2).' GCash payment shown below before processing.'
-            : ' No online payment is required for this document.';
+        $message .= $isFree ? ' Barangay Indigency is free.'
+            : ' The secretary will set the fee. You can then pay through GCash or in person before release.';
 
         if ($request->routeIs('api.resident.*')) {
             return response()->json(['message' => $message, 'id' => $documentRequest->id], 201);
         }
+
         return back()->with('status', $message);
     }
 

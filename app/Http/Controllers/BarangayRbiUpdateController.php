@@ -20,6 +20,19 @@ use ZipArchive;
 
 class BarangayRbiUpdateController extends Controller
 {
+    public function certification(Request $request, BarangayRbiUpdate $rbiUpdate): View
+    {
+        $this->authorizeBarangayReportOwner($request, $rbiUpdate);
+        abort_unless($rbiUpdate->barangay_name === $this->assignedBarangayName($request), 403);
+        $validated = $request->validate(['action' => ['required', Rule::in(['submit', 'consolidate'])]]);
+
+        return view('rbi-updates.certification', [
+            'editingReport' => $rbiUpdate,
+            'barangay' => $request->user()->barangay,
+            'certificationAction' => $validated['action'],
+        ]);
+    }
+
     public function addToRegistry(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
     {
         $this->authorizeBarangayReportOwner($request, $rbiUpdate);
@@ -28,11 +41,14 @@ class BarangayRbiUpdateController extends Controller
         $result = DB::transaction(function () use ($request, $rbiUpdate): array {
             $barangay = \App\Models\Barangay::whereKey($request->user()->barangay_id)->lockForUpdate()->firstOrFail();
             $report = BarangayRbiUpdate::whereKey($rbiUpdate->id)->lockForUpdate()->firstOrFail();
+            $this->validateReportSignatures($request, $report);
             $result = \App\Support\RbiReportRegistry::add($barangay, $report);
+            $report->update($this->reportSignatureAttributes($request, $report));
             $this->syncRelationalRecords($report, $this->cleanRows($result['rows']), $this->cleanDeceasedRows($report->deceased_rows ?? []));
             return $result;
         });
-        return back()->with('status', $result['created'].' resident(s) added to Consolidated RBI; '.$result['linked'].' already registered. Household links saved.');
+        return redirect()->route('barangay.rbi-updates.history')
+            ->with('status', $result['created'].' resident(s) added to Consolidated RBI; '.$result['linked'].' already registered. Household links saved.');
     }
 
     public function store(Request $request): RedirectResponse
@@ -80,7 +96,7 @@ class BarangayRbiUpdateController extends Controller
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
             'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $request->user()->name),
-            'certified_signature_path' => $this->storeDrawnSignature($request, 'certified_signature_data', $rbiUpdate->certified_signature_path ?? null),
+            'certified_signature_path' => $submitted ? $this->storeSignature($request, 'certified') : null,
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
             'status' => $submitted ? BarangayRbiUpdate::STATUS_SUBMITTED : BarangayRbiUpdate::STATUS_DRAFT,
@@ -151,7 +167,7 @@ class BarangayRbiUpdateController extends Controller
             $request,
             $rbiUpdate->prepared_signature_path,
             $rbiUpdate->attested_signature_path,
-            $submitted,
+            $request->boolean('submit_to_municipal'),
             $attestedBy
         );
 
@@ -163,7 +179,9 @@ class BarangayRbiUpdateController extends Controller
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
             'certified_by' => $validated['certified_by'] ?? $rbiUpdate->certified_by,
-            'certified_signature_path' => $this->storeDrawnSignature($request, 'certified_signature_data', $rbiUpdate->certified_signature_path ?? null),
+            'certified_signature_path' => $request->boolean('submit_to_municipal')
+                ? $this->storeSignature($request, 'certified', $rbiUpdate->certified_signature_path)
+                : $rbiUpdate->certified_signature_path,
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
             'families' => null,
@@ -203,11 +221,7 @@ class BarangayRbiUpdateController extends Controller
             return back()->withErrors(['rows' => 'Add at least one family member or deceased inhabitant before submitting to Municipal LGU.']);
         }
 
-        if (! $rbiUpdate->prepared_signature_path || ! $rbiUpdate->attested_signature_path || ! $rbiUpdate->attested_by) {
-            return back()->withErrors(['signatures' => 'The monthly form requires the BHW / Encoder and Punong Barangay signatures and the Punong Barangay name before submitting.']);
-        }
-
-        $rbiUpdate->update([
+        $rbiUpdate->update($this->reportSignatureAttributes($request, $rbiUpdate) + [
             'status' => BarangayRbiUpdate::STATUS_SUBMITTED,
             'submitted_at' => now(),
         ]);
@@ -331,8 +345,6 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => ['nullable', 'date'],
             'prepared_by' => ['nullable', 'string', 'max:255'],
             'attested_by' => ['nullable', 'string', 'max:255'],
-            'prepared_signature_data' => ['nullable', 'string', 'max:3000000'],
-            'attested_signature_data' => ['nullable', 'string', 'max:3000000'],
             'rows.*.household_number' => ['nullable', 'string', 'max:100'],
             'rows.*.last_name' => ['nullable', 'string', 'max:255'],
             'rows.*.first_name' => ['nullable', 'string', 'max:255'],
@@ -344,7 +356,6 @@ class BarangayRbiUpdateController extends Controller
             'rows.*.religion' => ['nullable', 'string', 'max:255'],
             'rows.*.remarks' => ['nullable', 'string', 'max:2000'],
             'certified_by' => ['nullable', 'string', 'max:255'],
-            'certified_signature_data' => ['nullable', 'string', 'max:3000000'],
             'rows' => ['nullable', 'array'],
             'rows.*.household_head' => ['nullable', 'string', 'max:255'],
             'rows.*.household_id' => ['nullable', 'integer', Rule::exists('households', 'id')->where('barangay_id', request()->user()?->barangay_id)],
@@ -365,36 +376,90 @@ class BarangayRbiUpdateController extends Controller
         ];
     }
 
-    private function hasDrawnSignature(Request $request, string $field): bool
+    private function validateReportSignatures(Request $request, ?BarangayRbiUpdate $report = null, ?string $attestedBy = null): void
     {
-        return str_starts_with((string) $request->input($field), 'data:image/png;base64,');
+        $rules = [];
+        foreach (['prepared', 'certified', 'attested'] as $type) {
+            $rules[$type.'_by'] = ['nullable', 'string', 'max:255'];
+            $rules[$type.'_signature_data'] = ['nullable', 'string', 'max:3000000'];
+            $rules[$type.'_signature_upload'] = ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'];
+        }
+        $request->validate($rules);
+
+        $errors = [];
+        foreach (['prepared', 'certified', 'attested'] as $type) {
+            $image = $this->signatureImage($request, $type);
+            $path = $report?->{$type.'_signature_path'};
+            if ($type !== 'certified' && ! $image && ! ($path && Storage::exists($path))) {
+                $errors[$type.'_signature_data'] = 'Draw or upload the '.($type === 'prepared' ? 'BHW / Encoder' : 'Punong Barangay').' signature.';
+            }
+        }
+        $attestedBy ??= (string) $request->input('attested_by', $report?->attested_by ?: $request->user()->barangay?->punong_barangay_name);
+        if (trim($attestedBy) === '') {
+            $errors['attested_by'] = 'Enter the Punong Barangay name for the monthly form.';
+        }
+        if ($errors) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
-    private function storeDrawnSignature(Request $request, string $field, ?string $currentPath = null): ?string
+    private function reportSignatureAttributes(Request $request, BarangayRbiUpdate $report): array
     {
-        $dataUrl = trim((string) $request->input($field));
-
-        if ($dataUrl === '') {
-            return $currentPath;
+        $this->validateReportSignatures($request, $report);
+        $attributes = [];
+        foreach (['prepared', 'certified', 'attested'] as $type) {
+            $attributes[$type.'_by'] = trim((string) $request->input($type.'_by', $report->{$type.'_by'}));
+            $attributes[$type.'_signature_path'] = $this->storeSignature($request, $type, $report->{$type.'_signature_path'});
         }
+        if (! $attributes['attested_by']) {
+            $attributes['attested_by'] = $request->user()->barangay?->punong_barangay_name;
+        }
+        return $attributes;
+    }
 
+    private function signatureImage(Request $request, string $type): ?array
+    {
+        $field = $type.'_signature_data';
+        $upload = $request->file($type.'_signature_upload');
+        $dataUrl = trim((string) $request->input($field));
+        if ($upload && $dataUrl !== '') {
+            throw ValidationException::withMessages([$field => 'Choose either an uploaded image or a drawn signature.']);
+        }
+        if ($upload) {
+            $bytes = file_get_contents($upload->getRealPath());
+            $info = @getimagesizefromstring($bytes);
+            if (! $info || ! in_array($info['mime'], ['image/png', 'image/jpeg'], true) || strlen($bytes) > 2 * 1024 * 1024) {
+                throw ValidationException::withMessages([$type.'_signature_upload' => 'Upload a valid PNG or JPG signature image no larger than 2 MB.']);
+            }
+            return [$bytes, $info['mime'] === 'image/png' ? 'png' : 'jpg'];
+        }
+        if ($dataUrl === '') {
+            return null;
+        }
         if (! preg_match('#^data:image/png;base64,([A-Za-z0-9+/=\r\n]+)$#', $dataUrl, $matches)) {
             throw ValidationException::withMessages([$field => 'The drawn signature could not be read. Please clear it and sign again.']);
         }
 
         $signature = base64_decode(preg_replace('/\s+/', '', $matches[1]), true);
 
-        if ($signature === false || $signature === '' || strlen($signature) > 2 * 1024 * 1024 || ! str_starts_with($signature, "\x89PNG\r\n\x1a\n")) {
+        if ($signature === false || $signature === '' || strlen($signature) > 2 * 1024 * 1024 || ! str_starts_with($signature, "\x89PNG\r\n\x1a\n") || @getimagesizefromstring($signature) === false) {
             throw ValidationException::withMessages([$field => 'The drawn signature must be a valid PNG image no larger than 2 MB.']);
         }
 
-        $path = 'rbi-signatures/'.Str::uuid().'.png';
-        Storage::put($path, $signature);
+        return [$signature, 'png'];
+    }
 
-        if ($currentPath && Storage::exists($currentPath)) {
-            Storage::delete($currentPath);
+    private function storeSignature(Request $request, string $type, ?string $currentPath = null): ?string
+    {
+        $image = $this->signatureImage($request, $type);
+        if (! $image) {
+            return $currentPath;
         }
-
+        [$bytes, $extension] = $image;
+        $path = 'rbi-signatures/'.Str::uuid().'.'.$extension;
+        if (! Storage::put($path, $bytes)) {
+            throw ValidationException::withMessages([$type.'_signature_data' => 'The signature could not be saved. Please try again.']);
+        }
         return $path;
     }
 
@@ -1150,27 +1215,17 @@ class BarangayRbiUpdateController extends Controller
         string $attestedBy
     ): array
     {
-        $errors = [];
-
-        if ($required && ! $this->hasDrawnSignature($request, 'prepared_signature_data') && ! $currentPreparedPath) {
-            $errors['prepared_signature_data'] = 'Draw the BHW / Encoder signature in the Prepared by card.';
+        if (! $required) {
+            return [$currentPreparedPath, $currentAttestedPath];
         }
-
-        if ($required && ! $this->hasDrawnSignature($request, 'attested_signature_data') && ! $currentAttestedPath) {
-            $errors['attested_signature_data'] = 'Draw the Punong Barangay signature for the monthly form.';
-        }
-
-        if ($required && $attestedBy === '') {
-            $errors['attested_by'] = 'Enter the Punong Barangay name for the monthly form.';
-        }
-
-        if ($errors !== []) {
-            throw ValidationException::withMessages($errors);
-        }
-
+        $report = new BarangayRbiUpdate([
+            'prepared_signature_path' => $currentPreparedPath,
+            'attested_signature_path' => $currentAttestedPath,
+        ]);
+        $this->validateReportSignatures($request, $report, $attestedBy);
         return [
-            $this->storeDrawnSignature($request, 'prepared_signature_data', $currentPreparedPath),
-            $this->storeDrawnSignature($request, 'attested_signature_data', $currentAttestedPath),
+            $this->storeSignature($request, 'prepared', $currentPreparedPath),
+            $this->storeSignature($request, 'attested', $currentAttestedPath),
         ];
     }
 

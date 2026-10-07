@@ -30,7 +30,7 @@ class RbimAssistant
 
         if ($this->matches($message, ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'])) {
             return $this->response(
-                "Hello, {$user->name}. I’m the RBIM Assistant. I can help with the features and records available to your {$user->roleLabel()} account.",
+                AssistantLanguage::text('Hello, :name. I’m the RBIM Assistant. I can help with the features and records available to your :role account.', ['name' => $user->name, 'role' => $user->roleLabel()]),
                 $this->suggestions($user),
                 $this->dashboardAction($user)
             );
@@ -41,17 +41,17 @@ class RbimAssistant
         }
 
         if ($this->matches($message, ['my account', 'my profile', 'who am i', 'account status', 'my barangay'])) {
-            $barangay = $user->barangay?->name ? 'Barangay '.$user->barangay->name : 'no assigned barangay';
+            $barangay = $user->barangay?->name ? 'Barangay '.$user->barangay->name : AssistantLanguage::text('no assigned barangay');
 
             return $this->response(
-                "You are signed in as {$user->name}, a {$user->roleLabel()}, with {$barangay}. Your account status is {$user->approvalStatusLabel()}.",
+                AssistantLanguage::text('You are signed in as :name, a :role, with :barangay. Your account status is :status.', ['name' => $user->name, 'role' => $user->roleLabel(), 'barangay' => $barangay, 'status' => $user->approvalStatusLabel()]),
                 $this->suggestions($user),
                 $this->dashboardAction($user)
             );
         }
 
         if ($user->hasRole(User::ROLE_BARANGAY) && ! $user->isApproved()) {
-            return $this->response('Your barangay account must be approved before staff records are available.', ['What is my account status?'], []);
+            return $this->response(AssistantLanguage::text('Your barangay account must be approved before staff records are available.'), ['What is my account status?'], []);
         }
 
         if ($this->matches($message, ['document', 'documents', 'requests', 'certificate', 'clearance', 'indigency', 'request status'])) {
@@ -79,7 +79,7 @@ class RbimAssistant
         }
 
         return $this->response(
-            'I can only help with the RBIM system—accounts, document requests, approvals, registry records, RBI forms, migration monitoring, and the features permitted for your role. I can’t answer topics outside this system.',
+            AssistantLanguage::text('I can only help with the RBIM system—accounts, document requests, approvals, registry records, RBI forms, migration monitoring, and the features permitted for your role. I can’t answer topics outside this system.'),
             $this->suggestions($user),
             $this->dashboardAction($user)
         );
@@ -88,9 +88,9 @@ class RbimAssistant
     private function capabilities(User $user): array
     {
         $reply = match ($user->role) {
-            User::ROLE_MUNICIPAL_LGU => 'I can summarize submitted RBI forms, municipality-wide registry and migration totals, pending secretary approvals, and guide you to municipal dashboards.',
-            User::ROLE_BARANGAY => 'I can summarize your barangay registry, resident approvals, document requests, RBI forms, and migration records, and guide you to the correct workspace.',
-            default => 'I can explain resident services, show the status of your own document requests, confirm your account details, and guide you around the Resident Portal.',
+            User::ROLE_MUNICIPAL_LGU => AssistantLanguage::text('I can summarize submitted RBI forms, municipality-wide registry and migration totals, pending secretary approvals, and guide you to municipal dashboards.'),
+            User::ROLE_BARANGAY => AssistantLanguage::text('I can summarize your barangay registry, resident approvals, document requests, RBI forms, and migration records, and guide you to the correct workspace.'),
+            default => AssistantLanguage::text('I can explain resident services, show the status of your own document requests, confirm your account details, and guide you around the Resident Portal.'),
         };
 
         return $this->response($reply, $this->suggestions($user), $this->dashboardAction($user));
@@ -99,7 +99,7 @@ class RbimAssistant
     private function documents(User $user, string $message): array
     {
         if ($user->hasAnyRole([User::ROLE_RESIDENT, User::ROLE_BARANGAY]) && ! $user->isApproved()) {
-            return $this->response('An approved account is required to view document and payment status records.', ['What is my account status?'], []);
+            return $this->response(AssistantLanguage::text('An approved account is required to view document and payment status records.'), ['What is my account status?'], []);
         }
         if ($user->hasRole(User::ROLE_RESIDENT)) {
             $requests = $user->documentRequests()->latest()->get();
@@ -107,13 +107,13 @@ class RbimAssistant
             $ready = $requests->where('status', DocumentRequest::STATUS_READY)->count();
             $latest = $requests->first();
             $latestText = $latest
-                ? " Your latest request is {$latest->reference_number} ({$latest->typeLabel()}), currently {$latest->statusLabel()}.".$this->residentPaymentSummary($latest)
-                : ' You have not submitted a document request yet.';
+                ? AssistantLanguage::text(' Your latest request is :reference (:type), currently :status.', ['reference' => $latest->reference_number, 'type' => $latest->typeLabel(), 'status' => $latest->statusLabel()]).$this->residentPaymentSummary($latest)
+                : AssistantLanguage::text(' You have not submitted a document request yet.');
 
             return $this->response(
-                "You have {$requests->count()} document request(s): {$pending} pending or processing and {$ready} ready for release.".$latestText.' Use the Resident Portal form to request a barangay document.',
-                ['How do I request a document?', 'What is my account status?'],
-                [['label' => 'Open Resident Portal', 'url' => route('dashboard.resident')]]
+                AssistantLanguage::text('You have :total document request(s): :pending pending or processing and :ready ready for release.', ['total' => $requests->count(), 'pending' => $pending, 'ready' => $ready]).$latestText.AssistantLanguage::text(' Use the Resident Portal form to request a barangay document.'),
+                [AssistantLanguage::text('How do I request a document?'), AssistantLanguage::text('What is my account status?')],
+                [['label' => AssistantLanguage::text('Open Resident Portal'), 'url' => route('dashboard.resident')]]
             );
         }
 
@@ -128,15 +128,15 @@ class RbimAssistant
             $ready = $requests->where('status', DocumentRequest::STATUS_READY)->count();
 
             return $this->response(
-                "Barangay {$user->barangay->name} has {$requests->count()} document request(s): {$pending} pending review, {$processing} processing, and {$ready} ready for release. Process them in the Barangay Dashboard.",
-                ['Show pending resident approvals', 'Summarize our registry'],
-                [['label' => 'Open Document Requests', 'url' => route('dashboard.barangay').'#document-requests-title']]
+                AssistantLanguage::text('Barangay :name has :total document request(s): :pending pending review, :processing processing, and :ready ready for release. Process them in the Barangay Dashboard.', ['name' => $user->barangay->name, 'total' => $requests->count(), 'pending' => $pending, 'processing' => $processing, 'ready' => $ready]),
+                [AssistantLanguage::text('Show pending resident approvals'), AssistantLanguage::text('Summarize our registry')],
+                [['label' => AssistantLanguage::text('Open Document Requests'), 'url' => route('dashboard.barangay').'#document-requests-title']]
             );
         }
 
         return $this->response(
-            'Resident document requests are processed by their assigned barangay. Municipal accounts do not open individual resident requests in this RBIM workspace.',
-            ['Summarize submitted RBI forms', 'Show pending secretary approvals'],
+            AssistantLanguage::text('Resident document requests are processed by their assigned barangay. Municipal accounts do not open individual resident requests in this RBIM workspace.'),
+            [AssistantLanguage::text('Summarize submitted RBI forms'), AssistantLanguage::text('Show pending secretary approvals')],
             $this->dashboardAction($user)
         );
     }
@@ -144,10 +144,11 @@ class RbimAssistant
     private function residentPaymentSummary(DocumentRequest $request): string
     {
         if (! $request->requiresPayment()) {
-            return ' No payment is required.';
+            return AssistantLanguage::text(' No payment is required.');
         }
 
-        return ' The GCash fee is ₱'.number_format((float) $request->amount_due, 2).' and the payment status is '.$request->paymentStatusLabel().'.';
+        if (! $request->hasAssessedFee()) return AssistantLanguage::text(' The secretary will set the fee before payment.');
+        return AssistantLanguage::text(' The amount due is ₱').number_format((float) $request->amount_due, 2).AssistantLanguage::text(' and the payment status is ').$request->paymentStatusLabel().'.';
     }
 
     private function approvals(User $user): array
@@ -158,9 +159,9 @@ class RbimAssistant
                 ->count();
 
             return $this->response(
-                "There are {$count} barangay secretary account(s) awaiting Municipal LGU verification.",
-                ['Summarize submitted RBI forms', 'Summarize the municipal registry'],
-                [['label' => 'Review Secretary Accounts', 'url' => route('dashboard.municipal').'#secretary-approvals']]
+                AssistantLanguage::text('There are :count barangay secretary account(s) awaiting Municipal LGU verification.', ['count' => $count]),
+                [AssistantLanguage::text('Summarize submitted RBI forms'), AssistantLanguage::text('Summarize the municipal registry')],
+                [['label' => AssistantLanguage::text('Review Secretary Accounts'), 'url' => route('dashboard.municipal').'#secretary-approvals']]
             );
         }
 
@@ -175,15 +176,15 @@ class RbimAssistant
                 ->count();
 
             return $this->response(
-                "Barangay {$user->barangay->name} has {$count} resident registration(s) awaiting verification.",
-                ['Summarize document requests', 'Summarize our registry'],
-                [['label' => 'Review Resident Accounts', 'url' => route('dashboard.barangay').'#resident-approvals-title']]
+                AssistantLanguage::text('Barangay :name has :count resident registration(s) awaiting verification.', ['name' => $user->barangay->name, 'count' => $count]),
+                [AssistantLanguage::text('Summarize document requests'), AssistantLanguage::text('Summarize our registry')],
+                [['label' => AssistantLanguage::text('Review Resident Accounts'), 'url' => route('dashboard.barangay').'#resident-approvals-title']]
             );
         }
 
         return $this->response(
-            "Your resident account status is {$user->approvalStatusLabel()}.".($user->isApproved() ? ' You can use the Resident Portal.' : ' Your assigned barangay must verify the account before portal access is enabled.'),
-            ['Show my document requests', 'What can you do?'],
+            AssistantLanguage::text('Your resident account status is :status.', ['status' => $user->approvalStatusLabel()]).($user->isApproved() ? AssistantLanguage::text(' You can use the Resident Portal.') : AssistantLanguage::text(' Your assigned barangay must verify the account before portal access is enabled.')),
+            [AssistantLanguage::text('Show my document requests'), AssistantLanguage::text('What can you do?')],
             $this->dashboardAction($user)
         );
     }
@@ -191,7 +192,7 @@ class RbimAssistant
     private function rbi(User $user): array
     {
         if ($user->hasRole(User::ROLE_RESIDENT)) {
-            return $this->restricted('RBI forms are staff records and are not available to Resident accounts.', $user);
+            return $this->restricted(AssistantLanguage::text('RBI forms are staff records and are not available to Resident accounts.'), $user);
         }
 
         $query = BarangayRbiUpdate::query();
@@ -206,20 +207,20 @@ class RbimAssistant
         $drafts = $forms->where('status', BarangayRbiUpdate::STATUS_DRAFT)->count();
         $latest = $forms->first();
         $latestText = $latest
-            ? ' The latest is '.($latest->barangay_name ?: 'an unassigned barangay').' for '.($latest->reporting_month?->format('F Y') ?: 'an unset month').'.'
-            : ' No RBI form is available yet.';
+            ? AssistantLanguage::text(' The latest is ').($latest->barangay_name ?: AssistantLanguage::text('an unassigned barangay')).AssistantLanguage::text(' for ').($latest->reporting_month?->format('F Y') ?: AssistantLanguage::text('an unset month')).'.'
+            : AssistantLanguage::text(' No RBI form is available yet.');
 
         $reply = $user->hasRole(User::ROLE_MUNICIPAL_LGU)
-            ? "The Municipal LGU has received {$submitted} submitted RBI form(s)."
-            : "You have {$forms->count()} RBI form(s): {$submitted} submitted and {$drafts} draft.";
+            ? AssistantLanguage::text('The Municipal LGU has received :count submitted RBI form(s).', ['count' => $submitted])
+            : AssistantLanguage::text('You have :total RBI form(s): :submitted submitted and :drafts draft.', ['total' => $forms->count(), 'submitted' => $submitted, 'drafts' => $drafts]);
 
         return $this->response(
             $reply.$latestText,
             $user->hasRole(User::ROLE_MUNICIPAL_LGU)
-                ? ['Summarize the municipal registry', 'Show migration totals']
-                : ['Summarize our registry', 'Show migration totals'],
+                ? [AssistantLanguage::text('Summarize the municipal registry'), AssistantLanguage::text('Show migration totals')]
+                : [AssistantLanguage::text('Summarize our registry'), AssistantLanguage::text('Show migration totals')],
             [[
-                'label' => $user->hasRole(User::ROLE_MUNICIPAL_LGU) ? 'Open Municipal Dashboard' : 'Open RBI Forms',
+                'label' => $user->hasRole(User::ROLE_MUNICIPAL_LGU) ? AssistantLanguage::text('Open Municipal Dashboard') : AssistantLanguage::text('Open RBI Forms'),
                 'url' => $user->hasRole(User::ROLE_MUNICIPAL_LGU) ? route('dashboard.municipal') : route('barangay.rbi-updates.index'),
             ]]
         );
@@ -228,7 +229,7 @@ class RbimAssistant
     private function registry(User $user): array
     {
         if ($user->hasRole(User::ROLE_RESIDENT)) {
-            return $this->restricted('The Central Registry contains protected barangay records and is available only to authorized staff. You can access only your own account and document requests.', $user);
+            return $this->restricted(AssistantLanguage::text('The Central Registry contains protected barangay records and is available only to authorized staff. You can access only your own account and document requests.'), $user);
         }
 
         if ($user->hasRole(User::ROLE_BARANGAY)) {
@@ -239,9 +240,9 @@ class RbimAssistant
             $barangay = Barangay::withCount(['inhabitants', 'households'])->findOrFail($user->barangay_id);
 
             return $this->response(
-                "Barangay {$barangay->name} has {$barangay->inhabitants_count} inhabitant record(s) across {$barangay->households_count} household(s) in the Central Registry.",
-                ['Show migration totals', 'Summarize our RBI forms'],
-                [['label' => 'Open Central Registry', 'url' => route('registry.index')]]
+                AssistantLanguage::text('Barangay :name has :residents inhabitant record(s) across :households household(s) in the Central Registry.', ['name' => $barangay->name, 'residents' => $barangay->inhabitants_count, 'households' => $barangay->households_count]),
+                [AssistantLanguage::text('Show migration totals'), AssistantLanguage::text('Summarize our RBI forms')],
+                [['label' => AssistantLanguage::text('Open Central Registry'), 'url' => route('registry.index')]]
             );
         }
 
@@ -250,16 +251,16 @@ class RbimAssistant
             ->get();
 
         return $this->response(
-            "The municipal registry covers {$barangays->count()} barangay(s), {$barangays->sum('inhabitants_count')} inhabitant record(s), and {$barangays->sum('households_count')} household(s).",
-            ['Show migration totals', 'Summarize submitted RBI forms'],
-            [['label' => 'Open Barangay Directory', 'url' => route('municipal.barangays.index')]]
+            AssistantLanguage::text('The municipal registry covers :areas barangay(s), :residents inhabitant record(s), and :households household(s).', ['areas' => $barangays->count(), 'residents' => $barangays->sum('inhabitants_count'), 'households' => $barangays->sum('households_count')]),
+            [AssistantLanguage::text('Show migration totals'), AssistantLanguage::text('Summarize submitted RBI forms')],
+            [['label' => AssistantLanguage::text('Open Barangay Directory'), 'url' => route('municipal.barangays.index')]]
         );
     }
 
     private function migration(User $user): array
     {
         if ($user->hasRole(User::ROLE_RESIDENT)) {
-            return $this->restricted('Migration monitoring contains aggregate staff records and is not available to Resident accounts.', $user);
+            return $this->restricted(AssistantLanguage::text('Migration monitoring contains aggregate staff records and is not available to Resident accounts.'), $user);
         }
 
         $query = MigrationRecord::query();
@@ -273,21 +274,21 @@ class RbimAssistant
         $records = $query->get();
         $incoming = $records->where('type', MigrationRecord::TYPE_IN)->count();
         $outgoing = $records->where('type', MigrationRecord::TYPE_OUT)->count();
-        $area = $user->hasRole(User::ROLE_BARANGAY) ? 'Barangay '.$user->barangay->name : 'the municipality';
+        $area = $user->hasRole(User::ROLE_BARANGAY) ? 'Barangay '.$user->barangay->name : AssistantLanguage::text('the municipality');
 
         return $this->response(
-            "{$area} has {$records->count()} recorded movement(s): {$incoming} in-migration and {$outgoing} out-migration, for a net change of ".($incoming - $outgoing).'.',
+            AssistantLanguage::text(':area has :total recorded movement(s): :incoming in-migration and :outgoing out-migration, for a net change of ', ['area' => $area, 'total' => $records->count(), 'incoming' => $incoming, 'outgoing' => $outgoing]).($incoming - $outgoing).'.',
             $user->hasRole(User::ROLE_BARANGAY)
-                ? ['Summarize our registry', 'Summarize our RBI forms']
-                : ['Summarize the municipal registry', 'Summarize submitted RBI forms'],
-            [['label' => 'Open Migration Monitoring', 'url' => route('migration.dashboard')]]
+                ? [AssistantLanguage::text('Summarize our registry'), AssistantLanguage::text('Summarize our RBI forms')]
+                : [AssistantLanguage::text('Summarize the municipal registry'), AssistantLanguage::text('Summarize submitted RBI forms')],
+            [['label' => AssistantLanguage::text('Open Migration Monitoring'), 'url' => route('migration.dashboard')]]
         );
     }
 
     private function navigation(User $user): array
     {
         return $this->response(
-            'Choose one of the RBIM workspaces available to your account below.',
+            AssistantLanguage::text('Choose one of the RBIM workspaces available to your account below.'),
             $this->suggestions($user),
             $this->roleActions($user)
         );
@@ -301,8 +302,8 @@ class RbimAssistant
     private function missingBarangay(User $user): array
     {
         return $this->response(
-            'Your staff account is not assigned to a barangay, so I cannot retrieve barangay-scoped records. Ask the Municipal LGU administrator to complete the assignment.',
-            ['What is my account status?', 'What can you do?'],
+            AssistantLanguage::text('Your staff account is not assigned to a barangay, so I cannot retrieve barangay-scoped records. Ask the Municipal LGU administrator to complete the assignment.'),
+            [AssistantLanguage::text('What is my account status?'), AssistantLanguage::text('What can you do?')],
             $this->dashboardAction($user)
         );
     }
@@ -332,7 +333,7 @@ class RbimAssistant
             'reply' => $reply,
             'suggestions' => $suggestions,
             'actions' => $actions,
-            'scope' => 'RBIM system only',
+            'scope' => AssistantLanguage::text('RBIM system only'),
         ];
     }
 
@@ -340,16 +341,16 @@ class RbimAssistant
     private function suggestions(User $user): array
     {
         return match ($user->role) {
-            User::ROLE_MUNICIPAL_LGU => ['Summarize submitted RBI forms', 'Summarize the municipal registry', 'Show migration totals'],
-            User::ROLE_BARANGAY => ['Show pending resident approvals', 'Summarize document requests', 'Summarize our registry'],
-            default => ['Show my document requests', 'What is my account status?', 'How do I request a document?'],
+            User::ROLE_MUNICIPAL_LGU => [AssistantLanguage::text('Summarize submitted RBI forms'), AssistantLanguage::text('Summarize the municipal registry'), AssistantLanguage::text('Show migration totals')],
+            User::ROLE_BARANGAY => [AssistantLanguage::text('Show pending resident approvals'), AssistantLanguage::text('Summarize document requests'), AssistantLanguage::text('Summarize our registry')],
+            default => [AssistantLanguage::text('Show my document requests'), AssistantLanguage::text('What is my account status?'), AssistantLanguage::text('How do I request a document?')],
         };
     }
 
     /** @return array<int, array{label: string, url: string}> */
     private function dashboardAction(User $user): array
     {
-        return [['label' => 'Open Dashboard', 'url' => route($this->dashboardRoute($user))]];
+        return [['label' => AssistantLanguage::text('Open Dashboard'), 'url' => route($this->dashboardRoute($user))]];
     }
 
     /** @return array<int, array{label: string, url: string}> */

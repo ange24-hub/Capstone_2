@@ -35,6 +35,7 @@ Route::prefix('resident/v1')->name('api.resident.')->group(function () {
             Route::get('documents/{id}', [$mobile, 'document'])->whereNumber('id');
             Route::post('documents', [\App\Http\Controllers\DocumentRequestController::class, 'store'])->middleware('throttle:6,1')->name('documents.store');
             Route::post('documents/{documentRequest}/payment', [\App\Http\Controllers\DocumentPaymentController::class, 'submit'])->middleware('throttle:6,1')->name('payment.submit');
+            Route::post('documents/{documentRequest}/in-person-payment', [\App\Http\Controllers\DocumentPaymentController::class, 'inPerson'])->middleware('throttle:6,1')->name('payment.in-person');
             Route::get('concerns', [$mobile, 'concerns']);
             Route::get('concerns/{id}', [$mobile, 'concern'])->whereNumber('id');
             Route::post('concerns', [\App\Http\Controllers\ResidentConcernController::class, 'store'])->middleware('throttle:6,1')->name('concerns.store');

@@ -30,6 +30,10 @@ class DocumentRequest extends Model
 
     public const PAYMENT_METHOD_GCASH = 'gcash';
 
+    public const PAYMENT_METHOD_IN_PERSON = 'in_person';
+
+    public const PAYMENT_AWAITING_ASSESSMENT = 'awaiting_assessment';
+
     public const PAYMENT_NOT_REQUIRED = 'not_required';
 
     public const PAYMENT_UNPAID = 'unpaid';
@@ -95,6 +99,10 @@ class DocumentRequest extends Model
 
     public static function feeFor(string $documentType): float
     {
+        if ($documentType === self::TYPE_INDIGENCY) {
+            return 0;
+        }
+
         return max(0, (float) config("rbim.document_fees.{$documentType}", 0));
     }
 
@@ -103,7 +111,8 @@ class DocumentRequest extends Model
     {
         return [
             self::PAYMENT_NOT_REQUIRED => 'No payment required',
-            self::PAYMENT_UNPAID => 'Awaiting GCash payment',
+            self::PAYMENT_AWAITING_ASSESSMENT => 'Awaiting fee assessment by secretary',
+            self::PAYMENT_UNPAID => 'Payment required before release',
             self::PAYMENT_PENDING => 'For payment verification',
             self::PAYMENT_PAID => 'Payment verified',
             self::PAYMENT_REJECTED => 'Payment needs correction',
@@ -112,17 +121,37 @@ class DocumentRequest extends Model
 
     public function paymentStatusLabel(): string
     {
+        if ($this->requiresPayment() && ! $this->hasAssessedFee()) {
+            return self::paymentStatusLabels()[self::PAYMENT_AWAITING_ASSESSMENT];
+        }
+
         return self::paymentStatusLabels()[$this->payment_status] ?? ucfirst(str_replace('_', ' ', $this->payment_status));
     }
 
     public function requiresPayment(): bool
     {
+        return $this->document_type !== self::TYPE_INDIGENCY;
+    }
+
+    public function hasAssessedFee(): bool
+    {
         return (float) $this->amount_due > 0;
+    }
+
+    public function amountDueLabel(): string
+    {
+        return ! $this->requiresPayment() ? 'No fee' : ($this->hasAssessedFee()
+            ? '₱'.number_format((float) $this->amount_due, 2) : 'To be set by secretary');
+    }
+
+    public function paymentIsOpen(): bool
+    {
+        return ! in_array($this->status, [self::STATUS_REJECTED, self::STATUS_COMPLETED], true);
     }
 
     public function isPaid(): bool
     {
-        return ! $this->requiresPayment() || $this->payment_status === self::PAYMENT_PAID;
+        return ! $this->requiresPayment() || ($this->hasAssessedFee() && $this->payment_status === self::PAYMENT_PAID);
     }
 
     public function typeLabel(): string

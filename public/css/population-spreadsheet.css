@@ -1,0 +1,154 @@
+/* Spreadsheet grid for the Population Report screen and paper copy. */
+.population-report-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    margin: 0;
+    min-height: 0;
+    height: auto;
+    border: 1px solid #d7dfe7;
+    border-radius: 10px;
+    background: #fff;
+    text-align: center;
+}
+.population-report-heading { flex: none; min-width: 0; }
+.population-report-eyebrow {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+.population-report-header h1 {
+    margin: 0;
+    color: #172536;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.population-report-header p { margin: 5px 0 0; color: #64748b; font-size: 13px; line-height: 1.4; }
+.population-report-header .population-report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    flex: none;
+}
+.population-report-header .population-report-actions .button {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    border-radius: 6px;
+}
+.population-report-header .button svg { width: 16px; height: 16px; }
+.population-spreadsheet .population-report-section {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 3px;
+    box-shadow: none;
+}
+.population-spreadsheet .population-report-section h2 {
+    color: #172536;
+    font-weight: 700;
+}
+.population-spreadsheet .table-wrap {
+    overflow-x: auto;
+    border: 1px solid #94a3b8;
+    border-radius: 0;
+    background: #fff;
+}
+.population-spreadsheet .table-wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background: #fff;
+    font-variant-numeric: tabular-nums;
+}
+.population-spreadsheet .table-wrap th,
+.population-spreadsheet .table-wrap td {
+    border: 1px solid #cbd5e1;
+    padding: 7px 9px;
+    vertical-align: middle;
+}
+.population-spreadsheet .table-wrap th {
+    background: #e2e8f0;
+    color: #172536;
+    font-weight: 700;
+    text-align: center;
+    white-space: normal;
+}
+.population-spreadsheet .table-wrap tbody tr:nth-child(even) td { background: #f8fafc; }
+.population-spreadsheet .table-wrap .total-row td {
+    background: #e2e8f0;
+    color: #172536;
+    font-weight: 700;
+}
+.population-spreadsheet .population-barangay-heading {
+    margin: 12px 0 6px;
+    text-align: center;
+    color: #172536;
+    font-weight: 700;
+}
+.population-spreadsheet .table-wrap .population-barangay-row th {
+    background: #e2e8f0;
+    color: #172536;
+    text-align: center !important;
+}
+.population-spreadsheet .table-wrap .population-subgroup-row th {
+    background: #f1f5f9;
+    color: #172536;
+    text-align: center !important;
+}
+.population-spreadsheet .table-wrap .number { text-align: right; }
+.population-spreadsheet .table-wrap th.number { text-align: center; }
+.population-spreadsheet .population-member-table :is(th, td) { text-align: left !important; }
+.population-spreadsheet .population-member-table :is(th, td):not(:first-child) { text-align: center !important; }
+.population-spreadsheet .population-coverage-table { min-width: 720px; }
+
+@media print {
+    .population-report-header {
+        display: block !important;
+        min-height: 0 !important;
+        padding: 0 0 10px !important;
+        margin: 0 0 16px !important;
+        border: 0 !important;
+        border-bottom: 1px solid #111 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        text-align: center !important;
+    }
+    .population-report-eyebrow { display: none !important; }
+    .population-report-header .population-report-actions { display: none !important; }
+    .population-spreadsheet .population-report-section {
+        border: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+    .population-spreadsheet .table-wrap { overflow: visible !important; border: 0 !important; }
+    .population-spreadsheet .table-wrap table { min-width: 0 !important; width: 100% !important; }
+    .population-spreadsheet .table-wrap th,
+    .population-spreadsheet .table-wrap td {
+        border: 1px solid #94a3b8 !important;
+        padding: 4px 5px !important;
+        font-size: 8pt !important;
+        color: #111 !important;
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .population-spreadsheet .table-wrap th,
+    .population-spreadsheet .table-wrap .total-row td { background: #e2e8f0 !important; font-weight: 700 !important; }
+    .population-spreadsheet .table-wrap th { text-align: center !important; }
+    .population-spreadsheet .population-barangay-heading { text-align: center !important; }
+    .population-spreadsheet .population-barangay-row,
+    .population-spreadsheet .population-subgroup-row { break-after: avoid; }
+    .population-spreadsheet .population-coverage-table { font-size: 7pt !important; }
+    .population-spreadsheet thead { display: table-header-group; }
+    .population-spreadsheet tr { break-inside: avoid; }
+}

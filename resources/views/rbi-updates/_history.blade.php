@@ -1,37 +1,69 @@
-        <div class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history">
-            <div class="history-heading"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Saved reports</div><h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2></div>
-            <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
-            @if ($rbiSection === 'history')
-                @include('rbi-updates._saved-inhabitants')
+        <section class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history" aria-labelledby="report-history-heading">
+            <div class="rbi-history-header">
+                <div>
+                    <span class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Saved reports</span>
+                    <h2 id="report-history-heading" class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2>
+                    <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
+                </div>
+                @if($reportHistoryPage->total() > 0)
+                    <span class="rbi-history-total">{{ number_format($reportHistoryPage->total()) }} {{ Str::plural('report', $reportHistoryPage->total()) }}</span>
+                @endif
+            </div>
+
+            @include('rbi-updates._saved-inhabitants')
+            @include('rbi-updates._consolidated-inhabitants')
+
+            @if ($reportHistoryPage->total() === 0 && $newInhabitantRecords->isEmpty())
+                <div class="rbi-history-empty"><span aria-hidden="true"><x-app-icon name="calendar" /></span><strong>No monthly RBI forms created yet</strong><p>Saved forms will appear here by reporting month.</p></div>
             @endif
-            @if ($rbiUpdates->isEmpty() && $newInhabitantRecords->isEmpty())
-                <p>No monthly RBI forms created yet.</p>
-            @endif
-            @if ($rbiUpdates->isNotEmpty())
-                <div class="table-wrap official-report-history w-full overflow-x-auto rounded-xl border border-slate-200">
-                    <table>
-                        <thead><tr><th>Month</th><th>Families</th><th>Inhabitants</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            @foreach ($rbiUpdates as $report)
-                                @php($familyCount = collect($report->rows ?? [])->pluck('household_head')->filter()->unique()->count())
-                                <tr>
-                                    <td>{{ optional($report->reporting_month)->format('F Y') ?: 'Not set' }}</td>
-                                    <td>{{ $familyCount }}</td>
-                                    <td>{{ count($report->rows ?? []) }}</td>
-                                    <td><x-status-badge :status="$report->status">{{ $report->statusLabel() }}</x-status-badge></td>
-                                    <td>{{ $report->submitted_at?->copy()->timezone('Asia/Manila')->format('M d, Y h:i A') ?: 'Not submitted' }}</td>
-                                    <td><div class="rbi-history-actions">
-                                        <a href="{{ route('rbi-updates.show', $report) }}">View form</a>
-                                        <a href="{{ route($rbiFormRoute, ['edit' => $report->id]) }}">{{ $report->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue draft' : 'Update form' }}</a>
-                                        <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
-                                        <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
+
+            @if ($reportHistoryPage->total() > 0)
+                <div class="rbi-history-list" aria-label="Monthly RBI forms">
+                    @foreach ($reportHistoryPage as $report)
+                        @php($familyCount = collect($report->rows ?? [])->pluck('household_head')->filter()->unique()->count())
+                        <article class="rbi-history-card">
+                            <div class="rbi-history-card-main">
+                                <div class="rbi-history-month">
+                                    <span class="rbi-history-month-icon" aria-hidden="true"><x-app-icon name="calendar" /></span>
+                                    <div><h3>{{ optional($report->reporting_month)->format('F Y') ?: 'Month not set' }}</h3><span>Monthly RBI form</span></div>
+                                </div>
+                                <x-status-badge :status="$report->status">{{ $report->statusLabel() }}</x-status-badge>
+                            </div>
+                            <div class="rbi-history-card-meta">
+                                <span><strong>{{ $familyCount }}</strong> {{ Str::plural('family', $familyCount) }}</span>
+                                <span><strong>{{ count($report->rows ?? []) }}</strong> {{ Str::plural('inhabitant', count($report->rows ?? [])) }}</span>
+                                <span class="rbi-history-submitted"><x-app-icon name="clock" />{{ $report->submitted_at?->copy()->timezone('Asia/Manila')->format('M d, Y h:i A') ?: 'Not submitted' }}</span>
+                            </div>
+                            <div class="rbi-history-card-actions">
+                                <div class="rbi-history-main-actions">
+                                    <a class="rbi-history-view" href="{{ route('rbi-updates.show', $report) }}">View form</a>
+                                    <a class="rbi-history-edit" href="{{ route($rbiFormRoute, ['edit' => $report->id]) }}">{{ $report->status === App\Models\BarangayRbiUpdate::STATUS_DRAFT ? 'Continue draft' : 'Update form' }}</a>
+                                    <div class="rbi-history-workflow">
                                         @include('rbi-updates._registry-action', ['report' => $report])
                                         @include('rbi-updates._submit-action', ['report' => $report])
-                                    </div></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    </div>
+                                </div>
+                                <div class="rbi-history-downloads" aria-label="Download {{ optional($report->reporting_month)->format('F Y') ?: 'monthly' }} form">
+                                    <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
+                                    <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
                 </div>
+                <nav class="rbi-history-pagination" aria-label="Monthly RBI form pages">
+                    <span>Showing <strong>{{ $reportHistoryPage->firstItem() }}–{{ $reportHistoryPage->lastItem() }}</strong> of {{ $reportHistoryPage->total() }} reports</span>
+                    @if($reportHistoryPage->hasPages())
+                        <div class="rbi-history-page-links">
+                            @if($reportHistoryPage->onFirstPage())<span aria-disabled="true">Previous</span>@else<a href="{{ $reportHistoryPage->previousPageUrl() }}" rel="prev">Previous</a>@endif
+                            @php($historyPageNumbers = collect([1, ...range(max(1, $reportHistoryPage->currentPage() - 1), min($reportHistoryPage->lastPage(), $reportHistoryPage->currentPage() + 1)), $reportHistoryPage->lastPage()])->unique()->sort()->values())
+                            @foreach($historyPageNumbers as $number)
+                                @if($loop->index > 0 && $number > $historyPageNumbers[$loop->index - 1] + 1)<span class="rbi-history-ellipsis" aria-hidden="true">…</span>@endif
+                                @if($number === $reportHistoryPage->currentPage())<span aria-current="page" aria-label="Page {{ $number }}">{{ $number }}</span>@else<a href="{{ $reportHistoryPage->url($number) }}" aria-label="Page {{ $number }}">{{ $number }}</a>@endif
+                            @endforeach
+                            @if($reportHistoryPage->hasMorePages())<a href="{{ $reportHistoryPage->nextPageUrl() }}" rel="next">Next</a>@else<span aria-disabled="true">Next</span>@endif
+                        </div>
+                    @endif
+                </nav>
             @endif
-        </div>
+        </section>

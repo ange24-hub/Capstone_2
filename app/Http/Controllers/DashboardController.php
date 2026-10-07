@@ -179,16 +179,31 @@ class DashboardController extends Controller
             ]);
         }
 
+        $documentRequestQuery = DocumentRequest::where('barangay_id', $barangay?->id);
+        $pendingDocuments = $barangay
+            ? (clone $documentRequestQuery)->where('status', DocumentRequest::STATUS_PENDING)->count()
+            : 0;
         $barangayDocumentRequests = $barangay
-            ? DocumentRequest::with(['user', 'barangay'])
-                ->where('barangay_id', $barangay->id)
-                ->latest()
-                ->get()
+            ? $documentRequestQuery->with(['user', 'barangay'])
+                ->latest()->orderByDesc('id')
+                ->paginate(5, ['*'], 'document_page')
+                ->withQueryString()->fragment('document-requests')
             : collect();
 
         $rbiUpdates = BarangayRbiUpdate::where('barangay_user_id', auth()->id())
             ->latest()
             ->get();
+        $reportHistoryPage = null;
+        if ($request->routeIs('barangay.rbi-updates.history')) {
+            $perPage = 5;
+            $page = min(max(1, $request->integer('report_page', 1)), max(1, (int) ceil($rbiUpdates->count() / $perPage)));
+            $reportHistoryPage = BarangayRbiUpdate::where('barangay_user_id', auth()->id())
+                ->orderByDesc('reporting_month')
+                ->orderByDesc('id')
+                ->paginate($perPage, ['*'], 'report_page', $page)
+                ->withQueryString()
+                ->fragment('report-history');
+        }
         $draftRbiUpdate = $request->integer('edit')
             ? $rbiUpdates->first(fn (BarangayRbiUpdate $update): bool => $update->id === $request->integer('edit'))
             : ($request->routeIs('barangay.rbi-updates.deceased') && ! $request->boolean('new')
@@ -220,20 +235,28 @@ class DashboardController extends Controller
         $newInhabitantRecords = $barangay && $request->routeIs('barangay.rbi-updates.history')
             ? \App\Models\NewInhabitant::where('barangay_id', $barangay->id)->orderByDesc('reporting_month')->orderBy('source_position')->orderBy('id')->get()
             : collect();
-        $savedReportMonths = $newInhabitantRecords->groupBy(fn ($record) => optional($record->reporting_month)->format('F Y') ?: ($record->month_submitted ?: 'Month not set'));
-        $savedHouseholds = collect();
-        foreach ($savedReportMonths as $month => $records) {
-            foreach ($records->groupBy('household_number') as $household => $members) {
-                $savedHouseholds->push(['month' => $month, 'household' => $household, 'members' => $members]);
+        $reportMonth = fn ($record) => optional($record->reporting_month)->format('F Y') ?: ($record->month_submitted ?: 'Month not set');
+        $completeReportMonths = $newInhabitantRecords->groupBy($reportMonth);
+        $savedReportMonths = $newInhabitantRecords->whereNull('active_inhabitant_id')->groupBy($reportMonth);
+        $consolidatedReportMonths = $newInhabitantRecords->whereNotNull('active_inhabitant_id')->groupBy($reportMonth);
+        $paginateHouseholds = function ($months, string $pageName, string $fragment) use ($request) {
+            $households = collect();
+            foreach ($months as $month => $records) {
+                foreach ($records->groupBy('household_number') as $household => $members) {
+                    $households->push(['month' => $month, 'household' => $household, 'members' => $members]);
+                }
             }
-        }
-        $perPage = 1;
-        $page = min(max(1, $request->integer('household_page', 1)), max(1, (int) ceil($savedHouseholds->count() / $perPage)));
-        $savedHouseholdPage = new \Illuminate\Pagination\LengthAwarePaginator(
-            $savedHouseholds->forPage($page, $perPage)->values(), $savedHouseholds->count(), $perPage, $page,
-            ['path' => $request->url(), 'pageName' => 'household_page']
-        );
-        $savedHouseholdPage->appends($request->except('household_page'))->fragment('saved-inhabitant-records');
+            $perPage = 1;
+            $page = min(max(1, $request->integer($pageName, 1)), max(1, $households->count()));
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                $households->forPage($page, $perPage)->values(), $households->count(), $perPage, $page,
+                ['path' => $request->url(), 'pageName' => $pageName]
+            );
+
+            return $paginator->appends($request->except($pageName))->fragment($fragment);
+        };
+        $savedHouseholdPage = $paginateHouseholds($savedReportMonths, 'household_page', 'saved-inhabitant-records');
+        $consolidatedHouseholdPage = $paginateHouseholds($consolidatedReportMonths, 'consolidated_page', 'consolidated-inhabitant-history');
 
         return view($request->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased', 'barangay.rbi-updates.history') ? 'rbi-updates.index' : 'dashboards.barangay', [
             'populationCounts' => $barangay && $request->routeIs('dashboard.barangay')
@@ -242,12 +265,17 @@ class DashboardController extends Controller
             'newInhabitantRecords' => $newInhabitantRecords,
             'savedReportMonths' => $savedReportMonths,
             'savedHouseholdPage' => $savedHouseholdPage,
+            'completeReportMonths' => $completeReportMonths,
+            'consolidatedReportMonths' => $consolidatedReportMonths,
+            'consolidatedHouseholdPage' => $consolidatedHouseholdPage,
             'registryActivities' => $barangay ? \App\Models\RegistryActivity::with('user')->where('barangay_id', $barangay->id)->latest('id')->paginate(15, ['*'], 'activity_page') : collect(),
             'rbiUpdates' => $rbiUpdates,
+            'reportHistoryPage' => $reportHistoryPage,
             'barangay' => $barangay,
             'residentApprovalRequests' => $residentApprovalRequests,
             'residentRbiChecks' => $residentRbiChecks,
             'barangayDocumentRequests' => $barangayDocumentRequests,
+            'pendingDocuments' => $pendingDocuments,
             'documentRequestStatuses' => DocumentRequest::statusLabels(),
             'rbiSection' => $request->routeIs('barangay.rbi-updates.history') ? 'history' : ($request->routeIs('barangay.rbi-updates.deceased') ? 'deceased' : 'residents'),
             'draftRbiUpdate' => $draftRbiUpdate,

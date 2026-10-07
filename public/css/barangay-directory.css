@@ -1,0 +1,64 @@
+/* Match the municipal workspace's soft palette, with distinct report states. */
+@layer municipal-admin {
+    @media screen {
+        .role-municipal-lgu .municipal-directory-page .government-page-heading { background:linear-gradient(115deg,#dce8f1,#dce9e1 75%,#e9e5d8) !important; border-color:#b6cbd0 !important; border-top-color:#6a91ad !important; }
+        .role-municipal-lgu .municipal-directory-page .workspace-heading-emblem { background:#cddfe9 !important; color:#3f6980 !important; }
+        .role-municipal-lgu .municipal-directory-summary-grid > article { background:#e4edf4 !important; border:1px solid #bdcedc !important; border-top:3px solid #7297b7 !important; box-shadow:0 3px 12px #3656680b !important; }
+        .role-municipal-lgu .municipal-directory-summary-grid > article.has-reports { background:#e0ece4 !important; border-color:#bfd2c5 !important; border-top-color:#739c84 !important; }
+        .role-municipal-lgu .municipal-directory-summary-grid > article.needs-report { background:#f0e9d9 !important; border-color:#d9ceb4 !important; border-top-color:#b29b64 !important; }
+        .role-municipal-lgu .municipal-directory-summary-grid > article:last-child { background:#e9e5f0 !important; border-color:#cec5dc !important; border-top-color:#9381ad !important; }
+        .role-municipal-lgu .municipal-directory-summary-grid > article > span { color:#48616d !important; }
+        .role-municipal-lgu .municipal-directory-page .municipal-directory-toolbar { background:#e8ede8 !important; border-color:#c6d2ca !important; gap:16px !important; }
+        .role-municipal-lgu .municipal-directory-toolbar .directory-search-field { flex:1 1 280px; min-width:0; max-width:440px; }
+        .role-municipal-lgu .municipal-directory-toolbar .directory-search-field input { width:100% !important; }
+        .role-municipal-lgu .municipal-directory-toolbar .directory-filter-group { display:flex; flex-wrap:wrap; gap:7px; }
+        .role-municipal-lgu .municipal-directory-page :is(.directory-filter-group,.directory-pagination) button { background:#e8edf0 !important; color:#3b5c70 !important; border:1px solid #bacbd5 !important; box-shadow:none !important; }
+        .role-municipal-lgu .municipal-directory-page :is(.directory-filter-group,.directory-pagination) button:hover:not(:disabled) { background:#d5e3ec !important; color:#284b62 !important; border-color:#89a8bc !important; }
+        .role-municipal-lgu .municipal-directory-page :is(.directory-filter-group,.directory-pagination) button:is(.is-active,[aria-current="page"]) { background:#466e89 !important; color:#f5f6f1 !important; border-color:#466e89 !important; box-shadow:inset 0 -3px 0 #294e69 !important; }
+        .role-municipal-lgu .municipal-directory-page .directory-pagination button:disabled { background:#e4e8e3 !important; color:#61716f !important; opacity:.6; }
+        .role-municipal-lgu .municipal-directory-page .municipal-directory-card { border-top:3px solid #b9a477 !important; }
+        .role-municipal-lgu .municipal-directory-page .municipal-directory-card.has-reports { border-top-color:#729c85 !important; }
+        .role-municipal-lgu .municipal-directory-card > header { background:#e4ebee !important; border-color:#c5d1d6 !important; }
+        .role-municipal-lgu .municipal-directory-card.has-reports > header { background:#e0eae2 !important; }
+        .role-municipal-lgu .municipal-directory-card .barangay-number { background:#d0e0ec !important; color:#355e7b !important; }
+        .role-municipal-lgu .municipal-directory-card .account-status.is-pending { background:#eee4cb !important; color:#73551d !important; }
+        .role-municipal-lgu .municipal-directory-card .account-status.is-active { background:#d4e6d9 !important; color:#356249 !important; }
+        .role-municipal-lgu .municipal-directory-card .status-dot { background:currentColor !important; }
+        .role-municipal-lgu .municipal-directory-card :is(.directory-card-metrics,.directory-card-office,.directory-gcash-settings,.directory-report-history) { background:#edf0e9 !important; border-color:#cbd4cc !important; }
+        .role-municipal-lgu .municipal-directory-card .directory-card-metrics > div { background:transparent !important; border-color:#cbd4cc !important; }
+        .role-municipal-lgu .municipal-directory-card .directory-missing-report { background:#f0eadc !important; color:#665b41 !important; border-color:#d9ceb8 !important; }
+        .role-municipal-lgu .municipal-directory-card .directory-latest-report { background:#e0ece5 !important; border-color:#bbd0c2 !important; }
+        .role-municipal-lgu .municipal-directory-page .directory-pagination { border-color:#c1d0ca !important; }
+        @media (max-width:640px) {
+            .role-municipal-lgu .municipal-directory-toolbar .directory-search-field { flex-basis:100%; max-width:none; }
+            .role-municipal-lgu .municipal-directory-toolbar .directory-filter-group { width:100%; }
+            .role-municipal-lgu .municipal-directory-toolbar .directory-filter-group button { flex:1 1 125px; }
+        }
+    }
+}
+@layer workspace-headers {
+    .municipal-directory-page .directory-pagination {
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+        gap: 14px; padding: 18px 0 56px; border-top: 1px solid #dce5ee;
+    }
+    .municipal-directory-page .directory-pagination[hidden] { display: none !important; }
+    #barangay-directory-page-status { color: #526b83; font-size: 13px; }
+    .directory-pagination-controls, .directory-page-numbers { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .municipal-directory-page .directory-pagination button {
+        min-width: 38px; min-height: 38px; padding: 7px 11px !important;
+        border: 1px solid #c7d6e5 !important; border-radius: 7px !important;
+        background: #fff !important; color: #285d92 !important; font-size: 13px !important;
+        font-weight: 600; box-shadow: none !important;
+    }
+    .municipal-directory-page .directory-pagination button:hover:not(:disabled) { background: #edf3fa !important; border-color: #8ba8c4 !important; }
+    .municipal-directory-page .directory-pagination button[aria-current="page"] { background: #285d92 !important; border-color: #285d92 !important; color: #fff !important; }
+    .municipal-directory-page .directory-pagination button:disabled { opacity: .45; cursor: default; }
+    .municipal-directory-page .directory-pagination button:focus-visible { outline: 3px solid #6997c3; outline-offset: 3px; }
+    .municipal-directory-toolbar { scroll-margin-top: 20px; }
+    @media (max-width: 640px) {
+        .municipal-directory-page .directory-pagination { justify-content: center; }
+        .directory-pagination-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .directory-pagination-controls > button { grid-row: 1; }
+        .directory-page-numbers { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(4, 38px); justify-content: center; }
+    }
+}

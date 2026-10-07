@@ -20,6 +20,7 @@ class RbiDocumentPreviewTest extends TestCase
             'reporting_month' => '2026-09-01', 'status' => 'draft', 'prepared_by' => 'Prepared Official', 'certified_by' => 'Certified Official', 'attested_by' => 'Noted Official',
             'rows' => [['household_head' => 'Household Head', 'inhabitant_name' => 'Example, Child', 'sex' => 'Female']]]);
         $this->actingAs($staff)->get(route('rbi-updates.show', $report))->assertOk()
+            ->assertSee('Print Report')
             ->assertSee('rbi-word-page')->assertSee('Example, Child')->assertSee('Prepared Official')
             ->assertSee('Certified Official')->assertSee('BHW / Encoder')->assertSee('Barangay Captain / Punong Barangay')->assertDontSee('Brgy. Secretary')
             ->assertDontSee('contenteditable')->assertDontSee('Update Form')

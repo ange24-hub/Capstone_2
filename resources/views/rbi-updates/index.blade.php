@@ -13,6 +13,7 @@
         $sectionParameters = $editingReport ? ['edit' => $editingReport->id] : (request()->boolean('new') ? ['new' => 1] : []);
         $formRows = array_map([\App\Support\HouseholdRbi::class, 'normalize'], old('rows', $editingReport?->rows ?: [['household_head' => '']]));
         $memberFields = collect($rbiRowFields)->except('household_head')->all();
+        $requiredMemberFields = ['last_name', 'first_name', 'sex', 'recorded_age', 'civil_status', 'birth_place', 'religion', 'birth_date'];
         $formFamilies = [];
 
         foreach ($formRows as $row) {
@@ -116,7 +117,7 @@
                     <div>
                         <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
                         <h2 class="section-title text-lg font-semibold text-slate-900">{{ $rbiSection === 'deceased' ? 'Deceased Inhabitants Form' : 'Add Residents Form' }}</h2>
-                        <p>Choose a month, {{ $rbiSection === 'deceased' ? 'record deceased inhabitants' : 'add the families' }}, and complete the certification before saving.</p>
+                        <p>Choose a month, {{ $rbiSection === 'deceased' ? 'record deceased inhabitants' : 'add the families' }}, and save. Add signatures from Report history when submitting or adding to Consolidated RBI.</p>
                     </div>
                     @if ($editingReport)<x-status-badge :status="$editingReport->status">{{ $editingReport->statusLabel() }}</x-status-badge>@endif
                 </div>
@@ -153,13 +154,13 @@
             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                 @foreach ($memberFields as $field => $label)
                     <div>
-                        <label>{{ $label }}</label>
+                        <label>{{ $label }} @if(in_array($field, $requiredMemberFields, true))<x-required-mark />@endif</label>
                         @if (in_array($field, ['civil_status', 'education_level', 'religion'], true))
-                            <x-rbi-dropdown :field="$field" :row-field="true" />
+                            <x-rbi-dropdown :field="$field" :row-field="true" :required="in_array($field, $requiredMemberFields, true)" />
                         @elseif ($field === 'sex')
-                            <select data-row-field="{{ $field }}"><option value=""></option><option value="Male">Male</option><option value="Female">Female</option></select>
+                            <select data-row-field="{{ $field }}" required><option value=""></option><option value="Male">Male</option><option value="Female">Female</option></select>
                         @else
-                            <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}">
+                            <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" @required(in_array($field, $requiredMemberFields, true)) @if($field === 'recorded_age') min="0" max="150" @endif>
                         @endif
                     </div>
                 @endforeach
@@ -173,7 +174,7 @@
                 <div><span class="step-pill" data-family-number></span><h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4></div>
                 <button class="secondary-button" type="button" data-remove-family>Remove Family</button>
             </div>
-            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label>Household head</label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small></div></div>
+            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <x-required-mark /></label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
             <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
             <div class=" grid gap-6" data-family-members></div>
             <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
@@ -181,6 +182,7 @@
     </template>
 
     @endif
+    <script src="{{ asset('js/rbi-households.js') }}?v={{ filemtime(public_path('js/rbi-households.js')) }}"></script>
     <script>
         (() => {
             const monthlyForm = document.getElementById('rbi-monthly-form');
@@ -189,7 +191,6 @@
             monthlyForm?.addEventListener('input', () => unsaved = true);
             monthlyForm?.addEventListener('change', () => unsaved = true);
             monthlyForm?.addEventListener('click', event => { if (event.target.closest('[data-remove-family], [data-remove-member], [data-add-member], #add-family-form, #add-rbi-deceased-row, [data-clear-signature]')) unsaved = true; });
-            monthlyForm?.addEventListener('submit', () => unsaved = false);
             monthlyForm?.addEventListener('pointerdown', event => { if (event.target.closest('canvas')) unsaved = true; });
             window.addEventListener('beforeunload', event => { if (unsaved) { event.preventDefault(); event.returnValue = ''; } });
             const familyForms = document.getElementById('family-forms');
@@ -197,19 +198,28 @@
             const memberTemplate = document.getElementById('member-entry-template');
             const existingHouseholds = @json($rbiHouseholds);
             let nextRowIndex = {{ count($formRows) }};
+            let nextFamilyId = 0;
 
             const syncHouseholdHead = (familyCard) => {
                 const headInput = familyCard.querySelector('[data-family-head]');
                 const enteredHead = headInput.value.trim();
                 const currentId = familyCard.querySelector('[data-family-household-id]').value;
-                const matches = existingHouseholds.filter((household) =>
-                    household.label.toLocaleLowerCase() === enteredHead.toLocaleLowerCase()
-                    || `${household.label} [Household ${household.household_number}]`.toLocaleLowerCase() === enteredHead.toLocaleLowerCase());
-                const selectedHousehold = matches.length === 1 ? matches[0] : matches.find((household) => String(household.id) === currentId);
                 const originalId = familyCard.querySelector('[data-family-household-id]').defaultValue;
-                const retainedHousehold = enteredHead === headInput.defaultValue.trim()
-                    ? existingHouseholds.find((household) => String(household.id) === originalId) : null;
-                const matchedHousehold = selectedHousehold || retainedHousehold;
+                const match = window.RbiHouseholds.resolve(existingHouseholds, enteredHead, currentId, headInput.defaultValue, originalId);
+                const selectedHousehold = match.selected;
+                const matchedHousehold = match.household;
+                familyCard.dataset.householdMatch = match.status;
+                if (!headInput.id) headInput.id = `rbi-household-head-${nextFamilyId++}`;
+                familyCard.querySelector('[data-family-head-label]').htmlFor = headInput.id;
+                const notice = familyCard.querySelector('[data-household-match-notice]');
+                notice.id = `${headInput.id}-notice`;
+                headInput.setAttribute('aria-describedby', notice.id);
+                headInput.setCustomValidity(match.status === 'ambiguous' ? 'Several households match this name. Select the entry with the correct household number.' : '');
+                const noticeText = match.status === 'unmatched'
+                    ? 'No matching household head was found in this barangay’s registry. Check the spelling or choose an existing household. You will be asked to confirm before saving.'
+                    : match.status === 'ambiguous' ? 'Several households match this name. Select the entry with the correct household number.' : '';
+                if (notice.textContent !== noticeText) notice.textContent = noticeText;
+                notice.hidden = !noticeText;
                 const householdHead = selectedHousehold ? selectedHousehold.label : enteredHead;
                 if (selectedHousehold) headInput.value = `${selectedHousehold.label} [Household ${selectedHousehold.household_number}]`;
                 const householdId = matchedHousehold ? matchedHousehold.id : '';
@@ -307,8 +317,19 @@
                 }
             });
 
-            document.getElementById('rbi-monthly-form')?.addEventListener('submit', () => {
+            monthlyForm.addEventListener('submit', event => {
                 familyForms?.querySelectorAll('[data-family-card]').forEach(syncHouseholdHead);
+                if (!monthlyForm.reportValidity()) { event.preventDefault(); unsaved = true; return; }
+                const unmatched = [...(familyForms?.querySelectorAll('[data-family-card]') || [])]
+                    .filter(family => family.dataset.householdMatch === 'unmatched')
+                    .map(family => family.querySelector('[data-family-head]').value);
+                if (!window.RbiHouseholds.confirmUnmatched(unmatched, message => window.confirm(message))) {
+                    event.preventDefault();
+                    unsaved = true;
+                    familyForms.querySelector('[data-household-match="unmatched"] [data-family-head]')?.focus();
+                    return;
+                }
+                unsaved = false;
             });
 
             refreshFamilyNumbers();
@@ -327,32 +348,6 @@
                 row.querySelector('input:not([type="hidden"])')?.focus();
             });
 
-            const initializeSignaturePad = (pad) => {
-                const canvas = pad.querySelector('canvas');
-                const input = pad.querySelector('input[type="hidden"]');
-                const context = canvas.getContext('2d');
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                let drawing = false;
-                let signed = false;
-                const bounds = canvas.getBoundingClientRect();
-                canvas.width = Math.max(Math.round(bounds.width * ratio), 1);
-                canvas.height = Math.max(Math.round(bounds.height * ratio), 1);
-                context.setTransform(ratio, 0, 0, ratio, 0, 0);
-                context.strokeStyle = '#073353';
-                context.lineWidth = 2.25;
-                context.lineCap = 'round';
-                context.lineJoin = 'round';
-                const point = (event) => { const rect = canvas.getBoundingClientRect(); return { x: event.clientX - rect.left, y: event.clientY - rect.top }; };
-                canvas.addEventListener('pointerdown', (event) => { event.preventDefault(); drawing = true; const p = point(event); context.beginPath(); context.moveTo(p.x, p.y); context.lineTo(p.x + .01, p.y + .01); context.stroke(); });
-                canvas.addEventListener('pointermove', (event) => { if (!drawing) return; event.preventDefault(); const p = point(event); context.lineTo(p.x, p.y); context.stroke(); });
-                const finish = () => { if (!drawing) return; drawing = false; signed = true; input.value = canvas.toDataURL('image/png'); };
-                canvas.addEventListener('pointerup', finish);
-                canvas.addEventListener('pointercancel', finish);
-                pad.querySelector('[data-clear-signature]').addEventListener('click', () => { context.clearRect(0, 0, canvas.width / ratio, canvas.height / ratio); input.value = ''; drawing = false; signed = false; });
-                pad.closest('form').addEventListener('submit', () => { if (signed) input.value = canvas.toDataURL('image/png'); });
-            };
-
-            document.querySelectorAll('[data-signature-pad]').forEach(initializeSignaturePad);
         })();
     </script>
     <script src="{{ asset('js/rbi-duplicates.js') }}?v={{ filemtime(public_path('js/rbi-duplicates.js')) }}" defer></script>

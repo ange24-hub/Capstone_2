@@ -53,7 +53,7 @@ class AssistantFollowUp
     {
         if ($previous) return null;
         if (! preg_match('/^(?:(?:ug|and|unya|how about|what about)\s+|(?:last month|this month|last year|download pdf|pdf)\s*[?!.]*$)/iu', trim($question))) return null;
-        return ['reply' => 'Please start with a complete question, such as “Show Looc migration this month” or “Pila ka pamilya sa Looc?”. Then you can ask a follow-up or request its PDF.',
-            'scope' => 'RBIM system only', 'actions' => [], 'suggestions' => ['Show population summary', 'Show migration this month', 'What can I ask?']];
+        return ['reply' => AssistantLanguage::text('Please start with a complete question, such as “Show Looc migration this month” or “Pila ka pamilya sa Looc?”. Then you can ask a follow-up or request its PDF.'),
+            'scope' => AssistantLanguage::text('RBIM system only'), 'actions' => [], 'suggestions' => [AssistantLanguage::text('Show population summary'), AssistantLanguage::text('Show migration this month'), AssistantLanguage::text('What can I ask?')]];
     }
 }

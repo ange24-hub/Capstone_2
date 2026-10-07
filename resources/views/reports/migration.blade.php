@@ -2,8 +2,11 @@
 @section('content')
 <section class="dashboard-page population-report grid gap-6" aria-labelledby="migration-report-title">
 <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
-            <x-workspace-heading icon="trend"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="migration-report-title">Monthly Migration Report</h1><p>{{ $report['scopeLabel'] }} &middot; {{ $selectedYear }}</p></x-workspace-heading>
-<a class="button" href="{{ route('reports.migration.pdf', array_filter(['barangay_id' => $selectedBarangayId, 'year' => $selectedYear])) }}"><x-app-icon name="document" /> Download PDF</a>
+            <x-workspace-heading icon="trend"><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Registry reports</span><h1 id="migration-report-title">Monthly Migration Report</h1><p>{{ $report['scopeLabel'] }} &middot; {{ $selectedYear }}</p><p class="report-print-meta">As of {{ $report['generatedAt']->format('d F Y') }} | Generated {{ $report['generatedAt']->format('h:i A T') }}</p></x-workspace-heading>
+<div class="population-report-actions">
+    <button class="button secondary-button population-print-button" type="button" onclick="window.print()"><x-app-icon name="document" /> Print Report</button>
+    <a class="button" href="{{ route('reports.migration.pdf', array_filter(['barangay_id' => $selectedBarangayId, 'year' => $selectedYear])) }}"><x-app-icon name="document" /> Download PDF</a>
+</div>
 </header>
 <form class="population-report-filter flex flex-wrap items-end gap-3" method="GET" action="{{ route('reports.migration') }}">
 @unless($isSecretary)<div><label for="migration-report-barangay">Barangay</label><select id="migration-report-barangay" name="barangay_id"><option value="">All barangays</option>@foreach($barangays as $barangay)<option value="{{ $barangay->id }}" @selected($selectedBarangayId === $barangay->id)>{{ $barangay->name }}</option>@endforeach</select></div>@endunless

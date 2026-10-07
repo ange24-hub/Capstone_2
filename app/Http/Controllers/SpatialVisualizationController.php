@@ -21,12 +21,14 @@ class SpatialVisualizationController extends Controller
             abort_unless($editingHousehold->barangay_id === $request->user()->barangay_id, 403);
         }
 
-        $households = Household::with(['barangay', 'inhabitants'])
+        $registryQuery = Household::query()
+            ->when($scope, fn ($query) => $query->where('barangay_id', $scope->id));
+        $registeredHouseholdCount = (clone $registryQuery)->count();
+        $households = (clone $registryQuery)->with(['barangay', 'inhabitants'])
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->whereBetween('latitude', [-90, 90])
             ->whereBetween('longitude', [-180, 180])
-            ->when($scope, fn ($query) => $query->where('barangay_id', $scope->id))
             ->orderBy('household_number')
             ->get();
 
@@ -47,6 +49,13 @@ class SpatialVisualizationController extends Controller
                 ->values()
                 ->all(),
         ])->values();
+        $sourcePoints = $layers->read('building-points', $scope)['features'];
+        $unmappedHouseholds = (clone $registryQuery)->with('barangay:id,name')
+            ->where(fn ($query) => $query->whereNull('latitude')->orWhereNull('longitude')
+                ->orWhereNotBetween('latitude', [-90, 90])->orWhereNotBetween('longitude', [-180, 180]))
+            ->when($isBarangaySecretary, fn ($query) => $query->where('barangay_id', $request->user()->barangay_id))
+            ->orderBy('barangay_id')->orderBy('household_number')
+            ->get(['id', 'barangay_id', 'household_name', 'household_number']);
 
         return view('spatial.index', [
             'editingHousehold' => $editingHousehold,
@@ -63,7 +72,11 @@ class SpatialVisualizationController extends Controller
             'markers' => $markers,
             'householdCount' => $households->count(),
             'populationCount' => $households->sum(fn (Household $household): int => $household->inhabitants->count()),
-            'barangayCount' => $households->pluck('barangay_id')->unique()->count(),
+            'barangayCount' => count($layers->read('barangay-boundaries', $scope)['features']),
+            'sourceBuildingCount' => count($sourcePoints),
+            'sourceBoundaryReviewCount' => count(array_filter($sourcePoints, fn ($feature) => ! $feature['properties']['within_barangay_boundary'])),
+            'unmappedHouseholdCount' => $registeredHouseholdCount - $households->count(),
+            'unmappedHouseholds' => $unmappedHouseholds,
         ]);
     }
 }

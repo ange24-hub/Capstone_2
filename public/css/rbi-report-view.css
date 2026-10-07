@@ -16,7 +16,8 @@
     .rbi-report-view .rbi-report-pdf:hover { background: #1d466f; border-color: #1d466f; box-shadow: 0 3px 9px #285d9226; }
     .rbi-report-view .rbi-report-word { background: #f0f7f3; color: #27664b; border-color: #bed7c8; }
     .rbi-report-view .rbi-report-word:hover { background: #e2f0e7; border-color: #83af96; }
-    .rbi-report-view a:focus-visible { outline: 3px solid #6997c3; outline-offset: 3px; }
+    .rbi-report-view a:focus-visible, .rbi-report-button:focus-visible { outline: 3px solid #6997c3; outline-offset: 3px; }
+    .rbi-report-view .rbi-report-button:not(.rbi-report-pdf):not(.rbi-report-word):hover { background: #edf3fa; border-color: #8ba8c4; }
     .rbi-report-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(180px, 1.2fr); gap: 10px; }
     .rbi-workspace-overview .rbi-report-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     html.municipal-ui .rbi-forms-workspace:has(.rbi-workspace-overview) { gap: 18px; }
@@ -69,4 +70,24 @@
         .rbi-report-view .rbi-preview-panel > p { margin-left: 14px; margin-right: 14px; }
     }
     @media (prefers-reduced-motion: reduce) { .rbi-report-view *, .rbi-report-view *::before, .rbi-report-view *::after, .rbi-forms-workspace .rbi-subpages > a, .rbi-forms-workspace .rbi-section-nav a { animation: none !important; transition: none !important; } }
+}
+
+@media print {
+    @page rbi-report { size: A4 landscape; margin: 8mm; }
+    .rbi-report-header, .rbi-report-metrics, .rbi-preview-heading,
+    .rbi-preview-panel > p { display: none !important; }
+    .rbi-report-view, .rbi-preview-panel, .rbi-report-view .rbi-document-preview {
+        display: block !important; width: 100% !important; max-width: none !important;
+        margin: 0 !important; padding: 0 !important; overflow: visible !important;
+        border: 0 !important; border-radius: 0 !important;
+        background: #fff !important; box-shadow: none !important;
+    }
+    .rbi-report-view .rbi-word-page {
+        page: rbi-report; width: 100% !important; min-height: 0 !important;
+        margin: 0 !important; padding: 0 0 8mm !important; box-shadow: none !important;
+        break-after: page;
+    }
+    .rbi-report-view .rbi-word-page:last-child { break-after: auto; }
+    .rbi-report-view .rbi-word-page-number { bottom: 0; right: 0; }
+    .rbi-report-view .rbi-word-table tr { break-inside: avoid; }
 }

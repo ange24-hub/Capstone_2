@@ -48,10 +48,10 @@ class MapHouseholdController extends Controller
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
         ]);
-        if ($request->user()->hasRole(User::ROLE_BARANGAY) && ! app(GisLayers::class)->contains(
+        if (! app(GisLayers::class)->contains(
             Barangay::findOrFail($validated['barangay_id']), (float) $validated['latitude'], (float) $validated['longitude']
         )) {
-            throw ValidationException::withMessages(['latitude' => 'Choose a location inside your assigned barangay boundary.']);
+            throw ValidationException::withMessages(['latitude' => 'Choose a location inside the selected barangay boundary.']);
         }
         $validated['household_number'] ??= $household?->household_number ?? 'GIS-'.Str::ulid();
         if ($household) {

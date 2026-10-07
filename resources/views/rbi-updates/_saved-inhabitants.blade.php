@@ -1,5 +1,6 @@
-@if ($newInhabitantRecords->isNotEmpty())
-<section class="saved-report-list" id="saved-inhabitant-records" aria-label="Saved new-inhabitant reports">
+@if ($savedHouseholdPage->total() > 0)
+<section class="saved-report-list" id="saved-inhabitant-records" aria-label="Pending consolidation">
+    <div class="rbi-history-header"><div><h3>Pending consolidation</h3><p>Add these members to Consolidated / All Registered. Completed members move to Consolidation history below.</p></div></div>
     @include('rbi-updates._household-pagination')
     @foreach ($savedHouseholdPage->getCollection()->groupBy('month') as $month => $pageFamilies)
         @php($monthlyRecords = $savedReportMonths->get($month))
@@ -13,14 +14,7 @@
             </summary>
             <div class="saved-report-content">
                 @if($reportMonth)
-                    <div class="saved-report-toolbar"><span>Report actions</span><div>
-                        <a class="button secondary-button rbi-download-action" href="{{ route('registry.new-inhabitant-monthly-reports.pdf', $reportMonth) }}">Download PDF</a>
-                        @if($monthlyRecords->every(fn($member) => filled($member->submitted_rbi_update_id)))
-                            <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">Submitted to Municipal DILG</span>
-                        @else
-                            <form method="POST" action="{{ route('registry.new-inhabitant-monthly-reports.submit', $reportMonth) }}" onsubmit="return confirm('Submit this saved report to Municipal DILG?')">@csrf<button type="submit" class="rbi-submit-action">Submit to Municipal DILG</button></form>
-                        @endif
-                    </div></div>
+                    @include('rbi-updates._saved-report-actions', ['monthlyRecords' => $completeReportMonths->get($month)])
                 @endif
                 <p class="field-help">Showing {{ $pageFamilies->count() }} of {{ $families->count() }} households for {{ $month }}. Report actions apply to the complete month.</p>
                 @foreach ($pageFamilies as $pageFamily)
@@ -35,20 +29,13 @@
                                     <div class="saved-member-actions">
                                         <a class="member-edit" href="{{ route('registry.new-inhabitants.edit', $member) }}">Edit</a>
                                         <form method="POST" action="{{ route('registry.new-inhabitants.destroy', $member) }}" onsubmit="return confirm('Delete this member?')">@csrf @method('DELETE')<button type="submit" class="member-delete">Delete</button></form>
-                                        @if($member->active_inhabitant_id)
-                                            <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">Added to Consolidated</span>
-                                        @else
-                                            <form method="POST" action="{{ route('registry.new-inhabitants.add-to-active', $member) }}" onsubmit="return confirm('Add this member to their household in Consolidated / All Registered?')">@csrf<button type="submit" class="rbi-add-member-action">Add to Consolidated / All Registered</button></form>
-                                        @endif
+                                        <form method="POST" action="{{ route('registry.new-inhabitants.add-to-active', $member) }}" onsubmit="return confirm('Add this member to their household in Consolidated / All Registered?')">@csrf<button type="submit" class="rbi-add-member-action">Add to Consolidated / All Registered</button></form>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
                         <div class="saved-household-footer">
-                            @if($members->every(fn($member) => filled($member->active_inhabitant_id)))
-                                <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">Added to Active Household</span>
-                                <form method="POST" action="{{ route('registry.new-inhabitant-families.remove-from-active') }}" onsubmit="return confirm('Remove this family from Active Household?')">@csrf @method('DELETE')<input type="hidden" name="household_number" value="{{ $household }}"><input type="hidden" name="reporting_month" value="{{ optional($members->first()->reporting_month)->format('Y-m') }}"><button type="submit" class="member-delete">Remove from Active</button></form>
-                            @elseif($familyMonth = optional($members->first()->reporting_month)->format('Y-m'))
+                            @if($familyMonth = optional($members->first()->reporting_month)->format('Y-m'))
                                 <span>Add every member of this household together.</span>
                                 <form method="POST" action="{{ route('registry.new-inhabitant-families.add-to-active') }}" onsubmit="return confirm('Add this family to Active Household?')">@csrf<input type="hidden" name="household_number" value="{{ $household }}"><input type="hidden" name="reporting_month" value="{{ $familyMonth }}"><button type="submit" class="rbi-add-household-action">Add to Active Household</button></form>
                             @endif
