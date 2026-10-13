@@ -1,0 +1,136 @@
+@layer professional-workspace {
+    @media screen {
+        .professional-content #main-content .moved-out-workspace {
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+
+        .professional-content #main-content .moved-out-workspace > .moved-out-page-head {
+            padding: 24px 28px !important;
+            border: 1px solid #1e5479 !important;
+            border-radius: 12px !important;
+            background: linear-gradient(110deg, #173c59, #256789) !important;
+            box-shadow: 0 12px 26px rgba(22, 61, 89, .13) !important;
+        }
+
+        .professional-content #main-content .moved-out-page-head h1,
+        .professional-content #main-content .moved-out-page-head p {
+            color: #fff !important;
+        }
+
+        .professional-content #main-content .moved-out-page-head p {
+            color: #d9eaf2 !important;
+        }
+
+        .professional-content #main-content .moved-out-page-head .dashboard-eyebrow {
+            display: inline-block !important;
+            margin-bottom: 7px;
+            color: #f9ce83 !important;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .professional-content #main-content .moved-out-page-head .secondary-button {
+            border-color: rgba(255, 255, 255, .7) !important;
+            background: #fff !important;
+            color: #174363 !important;
+        }
+
+        .professional-content #main-content .moved-out-page-head .secondary-button:hover {
+            background: #eaf4fa !important;
+        }
+
+        .professional-content #main-content .moved-out-workspace > .moved-out-form-card {
+            border-color: #c9dee6 !important;
+            border-top: 4px solid #258397 !important;
+            background: #fdfefe !important;
+            box-shadow: 0 8px 22px rgba(30, 85, 110, .06) !important;
+        }
+
+        .moved-out-card-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #dcebef;
+        }
+
+        .moved-out-card-icon {
+            display: inline-flex;
+            flex: 0 0 42px;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #e4f2f3;
+            color: #167184;
+        }
+
+        .moved-out-card-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .professional-content #main-content .moved-out-card-heading h2 {
+            margin: 0 0 4px;
+            color: #174f69 !important;
+        }
+
+        .moved-out-card-heading p {
+            margin: 0;
+        }
+
+        .moved-out-form-card .form-grid {
+            margin-top: 22px;
+        }
+
+        .professional-content #main-content .moved-out-form-card label {
+            color: #28526b;
+            font-weight: 600;
+        }
+
+        .professional-content #main-content .moved-out-form-card :is(input, select):focus {
+            border-color: #26869a !important;
+            outline: 3px solid rgba(38, 134, 154, .15);
+        }
+
+        .professional-content #main-content .moved-out-form-card .moved-out-save-button {
+            border-color: #12637e !important;
+            background: #12637e !important;
+        }
+
+        .professional-content #main-content .moved-out-form-card .moved-out-save-button:hover:not(:disabled) {
+            background: #0f526a !important;
+        }
+
+        .professional-content #main-content .moved-out-workspace > .moved-out-list-card {
+            border-color: #d6e4e8 !important;
+            background: #fff !important;
+        }
+
+        .professional-content #main-content .moved-out-list-card .workflow-head h2 {
+            color: #174f69 !important;
+        }
+
+        .professional-content #main-content .moved-out-list-card table th {
+            border-color: #c9dce3 !important;
+            background: #eaf3f6 !important;
+            color: #244a61 !important;
+        }
+
+        @media (max-width: 680px) {
+            .professional-content #main-content .moved-out-workspace > .moved-out-page-head {
+                padding: 20px !important;
+            }
+
+            .moved-out-card-heading {
+                gap: 10px;
+            }
+        }
+    }
+}

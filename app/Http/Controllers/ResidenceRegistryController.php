@@ -69,13 +69,27 @@ class ResidenceRegistryController extends Controller
         $query = Inhabitant::with('household')->where('barangay_id', $barangay->id)->where('status', Inhabitant::STATUS_ACTIVE)
             ->when($scope !== 'registered', fn ($q) => $q->where('residence_status', $scope))
             ->orderBy('household_id')->orderBy('id');
-        return response()->streamDownload(function () use ($query, $barangay) {
+        return response()->streamDownload(function () use ($query) {
             $file = fopen('php://output', 'w');
             fwrite($file, "\xEF\xBB\xBF");
-            fputcsv($file, ['Barangay','Household','Last name','First name','Middle name','Qualifier','Sex','Birth date','Current residence','Remarks'], ',', '"', '');
+            // Match the columns and order of the printable consolidated registry.
+            fputcsv($file, [
+                'HH NO.', 'FAMILY NO.', 'LAST NAME', 'FIRST NAME', 'MIDDLE NAME', 'QUALIFIER',
+                'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH',
+                'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION',
+                'REMARKS', 'ETHNICITY',
+            ], ',', '"', '');
             foreach ($query->lazy(250) as $resident) {
-                $values = [$barangay->name, $resident->household->household_number, $resident->last_name, $resident->first_name,
-                    $resident->middle_name, $resident->suffix, $resident->sex, $resident->birth_date?->format('Y-m-d'), $resident->residenceLabel(), \App\Support\RegistryRemarks::display($resident->remarks)];
+                $values = [
+                    $resident->household?->household_number, $resident->family_number,
+                    $resident->last_name, $resident->first_name, $resident->middle_name, $resident->suffix,
+                    $resident->relationship_to_head, $resident->household?->purok, $resident->birth_place,
+                    $resident->birth_date?->format('m-d-y'), $resident->recorded_age,
+                    ['Male' => 'M', 'Female' => 'F'][$resident->sex] ?? $resident->sex,
+                    $resident->civil_status, $resident->education_level, $resident->religion,
+                    $resident->occupation, \App\Support\RegistryRemarks::display($resident->remarks),
+                    $resident->ethnicity,
+                ];
                 // Keep spreadsheet formulas from being executed when users open the CSV.
                 $values = array_map(fn ($value) => preg_match('/^[=+@\-\t\r]/', (string) $value) ? "'".$value : $value, $values);
                 fputcsv($file, $values, ',', '"', '');

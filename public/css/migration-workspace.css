@@ -1,49 +1,232 @@
-/* Use the shared header layer so legacy important theme rules cannot override this page. */
-@layer workspace-headers {
+@layer professional-workspace {
 @media screen {
-    .municipal-ui .migration-dashboard { display: grid !important; gap: 18px !important; min-width: 0; }
-    .municipal-ui .migration-dashboard .migration-filters { display: flex !important; flex-wrap: wrap; align-items: end; gap: 14px; padding: 16px 20px; border: 1px solid #d7e1ec; border-radius: 10px; background: #fff; }
+    .professional-content #main-content .migration-dashboard {
+        --migration-in: var(--to-chart-teal);
+        --migration-out: var(--to-chart-gold);
+        display: grid !important;
+        gap: 16px !important;
+        width: 100%;
+        max-width: 1360px;
+        min-width: 0;
+        margin-inline: auto !important;
+    }
+    .professional-content #main-content .migration-dashboard > .dashboard-page-header { padding-bottom: 12px !important; }
+    .professional-content #main-content .migration-dashboard > .dashboard-page-header h1 { font-size: 26px !important; }
+    .migration-section-nav {
+        display: flex;
+        align-items: stretch;
+        gap: 26px;
+        min-width: 0;
+        margin-top: -1px;
+        border-bottom: 1px solid var(--to-line);
+    }
+    .professional-content #main-content .migration-section-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 0 1px 10px;
+        border-bottom: 3px solid transparent;
+        color: var(--to-muted) !important;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .professional-content #main-content .migration-section-nav a:hover { color: var(--to-primary) !important; }
+    .professional-content #main-content .migration-section-nav a[aria-current="page"] {
+        border-bottom-color: var(--to-accent);
+        color: var(--to-ink) !important;
+        font-weight: 700;
+    }
+    .professional-content #main-content .migration-filters {
+        display: flex !important;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 12px;
+        min-width: 0;
+        padding: 14px 16px !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 8px !important;
+        background: var(--to-surface) !important;
+    }
     .migration-filter-field { flex: 0 1 160px; min-width: 0; }
     .migration-area-field { flex: 1 1 230px; max-width: 360px; }
-    .municipal-ui .migration-filters label, .migration-filter-scope > span { display: block; margin: 0 0 6px !important; font-size: 13px !important; color: #536d83 !important; }
-    .municipal-ui .migration-filters :is(input, select) { width: 100% !important; min-height: 40px !important; margin: 0 !important; padding: 8px 11px !important; border: 1px solid #bfd0e1 !important; border-radius: 7px !important; background: #fff !important; color: #203b52 !important; font-size: 14px !important; }
+    .professional-content #main-content .migration-filters label,
+    .professional-content #main-content .migration-filter-scope > span {
+        display: block;
+        margin: 0 0 6px !important;
+        color: var(--to-muted) !important;
+        font-size: 12px !important;
+    }
+    .professional-content #main-content .migration-filters :is(input:not([type="hidden"]),select) {
+        width: 100% !important;
+        min-height: 40px !important;
+        margin: 0 !important;
+        padding: 8px 10px !important;
+        border: 1px solid #b7bfc5 !important;
+        border-radius: 6px !important;
+        background: var(--to-surface) !important;
+        color: var(--to-ink) !important;
+        font-size: 13px !important;
+    }
     .migration-filter-scope { margin-right: auto; padding-bottom: 8px; }
-    .municipal-ui .migration-filters button { display: inline-flex !important; align-items: center; justify-content: center; gap: 7px; min-height: 40px !important; padding: 9px 16px !important; border-radius: 7px !important; border: 1px solid #285d92 !important; background: #285d92 !important; color: #fff !important; font-size: 13px !important; }
+    .professional-content #main-content .migration-filters button {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 40px !important;
+        padding: 9px 15px !important;
+        border: 1px solid var(--to-primary) !important;
+        border-radius: 6px !important;
+        background: var(--to-primary) !important;
+        color: #fff !important;
+        font-size: 13px !important;
+    }
+    .professional-content #main-content .migration-filters button:hover { background: var(--to-primary-hover) !important; }
     .migration-filters button svg { width: 17px; height: 17px; }
-    .municipal-ui .migration-filters button:hover { background: #1d466f !important; }
-    .municipal-ui .migration-dashboard .dashboard-metrics { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 12px !important; }
-    .municipal-ui .migration-dashboard .metric-card { --migration-accent: #285d92; --migration-tint: #e8f1fc; display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 12px !important; min-height: 0 !important; padding: 16px !important; border: 1px solid #d7e1ec !important; border-bottom: 3px solid var(--migration-accent) !important; border-radius: 10px !important; background: #fff !important; box-shadow: none !important; }
-    .municipal-ui .migration-dashboard .metric-success { --migration-accent: #2d7858; --migration-tint: #e5f3ea; }
-    .municipal-ui .migration-dashboard .metric-warning { --migration-accent: #ac7928; --migration-tint: #fff3da; }
-    .municipal-ui .migration-dashboard .metric-info { --migration-accent: #755e91; --migration-tint: #f0eaf7; }
-    .municipal-ui .migration-dashboard .metric-danger { --migration-accent: #a64545; --migration-tint: #fbeaea; }
-    .municipal-ui .migration-dashboard .metric-icon { width: 36px !important; height: 38px !important; flex-shrink: 0; border-radius: 8px !important; background: var(--migration-tint) !important; color: var(--migration-accent) !important; }
-    .municipal-ui .migration-dashboard .metric-card strong { margin: 5px 0 !important; font-size: 26px !important; line-height: 1.15 !important; color: #203b52 !important; }
-    .municipal-ui .migration-dashboard .metric-card small { font-size: 12px !important; color: #63788a !important; }
-    .municipal-ui .migration-dashboard .dashboard-card { min-width: 0 !important; padding: 20px !important; border: 1px solid #d7e1ec !important; border-radius: 12px !important; background: #fff !important; box-shadow: 0 3px 12px #19395606 !important; }
-    .municipal-ui .migration-dashboard .dashboard-card-header { padding: 0 0 14px !important; margin-bottom: 16px !important; background: transparent !important; border-bottom: 1px solid #e1e8ef !important; }
-    .municipal-ui .migration-dashboard h2 { margin: 5px 0 !important; font-size: 19px !important; color: #193c5e !important; }
-    .municipal-ui .migration-dashboard .dashboard-card-header p { margin: 0 !important; font-size: 14px !important; color: #536d83 !important; }
-    .migration-forecast-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .municipal-ui .migration-forecast-stats article { padding: 14px !important; border: 1px solid #dce5ee !important; border-radius: 9px !important; background: #f5f8fc !important; }
-    .municipal-ui .migration-dashboard .migration-estimate { background: #eef7f1 !important; border-color: #bed7c8 !important; border-left: 4px solid #2d7858 !important; padding: 18px !important; }
-    .municipal-ui .migration-dashboard .migration-analysis { display: grid !important; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important; gap: 18px !important; align-items: start !important; }
+    .professional-content #main-content .migration-dashboard .active-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+        margin: 0 !important;
+        padding: 9px 12px !important;
+        border: 1px solid var(--to-line);
+        border-radius: 6px;
+        background: var(--to-tint) !important;
+        color: var(--to-text) !important;
+        font-size: 12px;
+    }
+    .professional-content #main-content .migration-dashboard .dashboard-metrics {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+    }
+    .professional-content #main-content .migration-dashboard .metric-card {
+        --migration-accent: var(--to-primary);
+        --migration-tint: var(--to-tint);
+        min-height: 118px !important;
+        border-top: 3px solid var(--migration-accent) !important;
+    }
+    .professional-content #main-content .migration-dashboard .metric-success { --migration-accent: var(--migration-in); --migration-tint: #edf2ef; }
+    .professional-content #main-content .migration-dashboard .metric-warning { --migration-accent: var(--migration-out); --migration-tint: var(--to-gold-tint); }
+    .professional-content #main-content .migration-dashboard .metric-info { --migration-accent: var(--to-chart-blue); }
+    .professional-content #main-content .migration-dashboard .metric-danger { --migration-accent: #9a5d62; --migration-tint: #f3e8e8; }
+    .professional-content #main-content .migration-dashboard .metric-icon {
+        background: var(--migration-tint) !important;
+        color: var(--migration-accent) !important;
+    }
+    .professional-content #main-content .migration-dashboard .dashboard-card {
+        min-width: 0 !important;
+        padding: 18px !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 8px !important;
+        background: var(--to-surface) !important;
+        box-shadow: none !important;
+    }
+    .professional-content #main-content .migration-dashboard .dashboard-card-header {
+        padding: 0 0 14px !important;
+        margin-bottom: 14px !important;
+        border-bottom: 1px solid var(--to-line) !important;
+        background: transparent !important;
+    }
+    .professional-content #main-content .migration-dashboard h2 { margin: 0 !important; color: var(--to-ink) !important; font-size: 17px !important; }
+    .professional-content #main-content .migration-dashboard .dashboard-card-header p { margin: 5px 0 0 !important; color: var(--to-muted) !important; font-size: 12px !important; }
+    .professional-content #main-content .migration-dashboard .dashboard-eyebrow { display: none !important; }
+    .professional-content #main-content .migration-dashboard .section-icon { background: var(--to-tint) !important; color: var(--to-primary) !important; }
+    .professional-content #main-content .migration-dashboard .count-chip {
+        border: 1px solid var(--to-line) !important;
+        background: var(--to-subtle) !important;
+        color: var(--to-text) !important;
+    }
+    .professional-content #main-content .migration-analysis {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) !important;
+        align-items: start !important;
+        gap: 16px !important;
+    }
     #migration-monthly-panel { order: -1; }
-    .municipal-ui #migration-area-panel .movement-list { max-height: 430px; overflow-y: auto; padding-right: 8px; }
-    .municipal-ui .migration-dashboard .migration-chart-wrap { padding: 6px 0 16px !important; }
-    .migration-monthly-details > summary { cursor: pointer; padding: 12px; border: 1px solid #d7e1ec; border-radius: 7px; background: #f3f7fb; color: #285d92; font-weight: 600; font-size: 13px; }
-    .migration-monthly-details[open] > summary { margin-bottom: 10px; }
-    .municipal-ui .migration-dashboard :is(button, summary, input, select):focus-visible { outline: 3px solid #6997c3 !important; outline-offset: 3px !important; }
-    @media (max-width: 1050px) {
-        .municipal-ui .migration-dashboard .dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-        .municipal-ui .migration-dashboard .migration-analysis { grid-template-columns: minmax(0, 1fr) !important; }
+    .professional-content #main-content #migration-area-panel .movement-list { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+    .professional-content #main-content .migration-chart-wrap { padding: 6px 0 12px !important; overflow-x: auto; }
+    .professional-content #main-content .migration-chart-legend { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 12px; }
+    .migration-legend-item { display: inline-flex; align-items: center; gap: 7px; color: var(--to-text); font-size: 12px; }
+    .migration-legend-swatch { display: inline-block; width: 16px; border-top: 3px solid; }
+    .migration-legend-in { border-color: var(--migration-in); }
+    .migration-legend-out { border-color: var(--migration-out); border-top-style: dashed; }
+    .professional-content #main-content .migration-monthly-chart { min-width: 420px; }
+    .professional-content #main-content .migration-monthly-chart text { fill: var(--to-muted); }
+    .professional-content #main-content .migration-monthly-chart line { stroke: var(--to-line); }
+    .professional-content #main-content .migration-chart-empty {
+        display: grid;
+        place-items: center;
+        min-height: 195px;
+        margin: 0 !important;
+        padding: 18px;
+        border: 1px dashed var(--to-line);
+        border-radius: 6px;
+        background: var(--to-subtle);
+        color: var(--to-muted);
+        font-size: 13px;
+        text-align: center;
+    }
+    .professional-content #main-content .migration-monthly-details > summary {
+        padding: 11px 12px !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 6px !important;
+        background: var(--to-subtle) !important;
+        color: var(--to-primary) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        cursor: pointer;
+    }
+    .migration-monthly-details[open] > summary { margin-bottom: 10px !important; }
+    .professional-content #main-content .migration-dashboard .movement-bar { background: var(--to-subtle) !important; }
+    .professional-content #main-content .migration-dashboard .movement-bar i { background: var(--to-chart-blue) !important; }
+    .professional-content #main-content .migration-dashboard :is(.value-in,.positive) { color: #3f7169 !important; }
+    .professional-content #main-content .migration-dashboard :is(.value-out,.negative) { color: #876d40 !important; }
+    .migration-forecast-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        border: 1px solid var(--to-line);
+        border-radius: 6px;
+        background: var(--to-subtle);
+    }
+    .professional-content #main-content .migration-forecast-stats article {
+        padding: 16px !important;
+        border: 0 !important;
+        border-right: 1px solid var(--to-line) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+    }
+    .professional-content #main-content .migration-forecast-stats article:last-child { border-right: 0 !important; }
+    .professional-content #main-content .migration-dashboard .migration-estimate {
+        padding: 18px !important;
+        border: 1px solid #cfddd7 !important;
+        border-left: 4px solid var(--migration-in) !important;
+        border-radius: 6px !important;
+        background: #f2f6f3 !important;
+    }
+    .professional-content #main-content .migration-estimate :is(.text-emerald-700,.text-emerald-900,.text-emerald-800) { color: #315f59 !important; }
+    .professional-content #main-content .migration-forecast-note { max-width: 850px; color: var(--to-muted) !important; line-height: 1.55 !important; }
+    .professional-content #main-content .migration-dashboard :is(button,summary,input,select,a):focus-visible {
+        outline: 2px solid var(--to-primary) !important;
+        outline-offset: 3px !important;
+    }
+    @media (max-width: 1100px) {
+        .professional-content #main-content .migration-analysis { grid-template-columns: minmax(0, 1fr) !important; }
+        .professional-content #main-content .migration-dashboard .dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     }
     @media (max-width: 640px) {
-        .migration-forecast-stats { grid-template-columns: minmax(0, 1fr); }
-        .municipal-ui .migration-dashboard .dashboard-card { padding: 16px !important; }
-        .municipal-ui .migration-dashboard .metric-card { padding: 12px !important; flex-wrap: wrap; }
+        .migration-section-nav { gap: 14px; }
+        .professional-content #main-content .migration-section-nav a { font-size: 12px; }
         .migration-filter-field, .migration-area-field { flex: 1 1 100%; max-width: none; }
-        .migration-filters button { width: 100%; }
+        .professional-content #main-content .migration-filters button { width: 100%; }
+        .migration-forecast-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .professional-content #main-content .migration-forecast-stats article:nth-child(2) { border-right: 0 !important; }
+        .professional-content #main-content .migration-forecast-stats article:last-child { grid-column: 1 / -1; border-top: 1px solid var(--to-line) !important; }
+        .professional-content #main-content .migration-dashboard .dashboard-card { padding: 16px !important; }
+        .professional-content #main-content .migration-dashboard .metric-card { padding: 12px !important; }
     }
 }
 }

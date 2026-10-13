@@ -5,8 +5,7 @@
         <div class="population-report-heading">
             <span class="population-report-eyebrow">Registry reports</span>
             <h1 id="population-report-title">{{ $reportTitle }}</h1>
-            <p>{{ $report['scopeLabel'] }}</p>
-            <p class="report-print-meta">As of {{ $report['generatedAt']->format('d F Y') }} | Generated {{ $report['generatedAt']->format('h:i A T') }}</p>
+            @include('reports._jurisdiction')
         </div>
         <div class="population-report-actions">
             <a class="button secondary-button population-print-button" href="{{ route('reports.population', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $selectedSection, 'print' => 1])) }}" target="_blank" rel="noopener"><x-app-icon name="document" /> Print Report</a>

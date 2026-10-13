@@ -27,6 +27,10 @@ class ProfileController extends Controller
         $user->email = $data['email'];
         if (! empty($data['password'])) $user->password = $data['password'];
         $user->save();
+        if (! empty($data['password'])) {
+            $user->tokens()->delete();
+            $request->session()->regenerate();
+        }
         return redirect()->route('profile.edit')->with('status', 'Your profile has been updated.');
     }
 }

@@ -27,7 +27,10 @@ class MigrationReportTest extends TestCase
         $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $params = ['barangay_id' => $area->id, 'year' => 2026];
         $response = $this->actingAs($staff)->get(route('reports.migration', $params))->assertOk()
-            ->assertSee('Print Report')->assertSee('Download PDF')->assertSee('No recorded events');
+            ->assertSee('Print Report')->assertSee('Download PDF')->assertSee('No recorded events')
+            ->assertSee('aria-label="Recorded movement totals"', false)
+            ->assertSee('class="migration-report-print-jurisdiction"', false)
+            ->assertSee('<details class="population-report-notes migration-report-notes">', false);
         $report = $response->viewData('report');
         $this->assertCount(12, $report['months']);
         $this->assertSame([1, 2, -1, 3], [$report['in'], $report['out'], $report['net'], $report['total']]);

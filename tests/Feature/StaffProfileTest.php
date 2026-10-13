@@ -38,6 +38,7 @@ class StaffProfileTest extends TestCase
     public function test_sensitive_changes_require_password_and_unique_email(): void
     {
         $user = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU, 'password' => Hash::make('current-password')]);
+        $user->createToken('previous-device');
         $other = User::factory()->create();
         $this->actingAs($user)->put(route('profile.update'), ['name' => $user->name, 'email' => 'new@example.test'])
             ->assertSessionHasErrors('current_password');
@@ -47,5 +48,6 @@ class StaffProfileTest extends TestCase
             'password' => 'new-password', 'password_confirmation' => 'new-password'])->assertSessionHasNoErrors();
         $this->assertSame('new@example.test', $user->fresh()->email);
         $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+        $this->assertSame(0, $user->tokens()->count());
     }
 }

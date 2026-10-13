@@ -11,7 +11,7 @@
             </x-workspace-heading>
             <div class="dashboard-context-card rounded-xl border border-slate-200 bg-white p-4 text-slate-700 ">
                 <span class="context-icon"><x-app-icon name="location" /></span>
-                <div><small>Your assigned barangay</small><strong>Barangay {{ auth()->user()->barangay?->name ?? 'Not assigned' }}</strong><span>Approved resident account</span></div>
+                <div><small>Your assigned barangay</small><strong>Barangay {{ auth()->user()->barangay?->name ?? 'Not assigned' }}</strong></div>
             </div>
         </header>
 
@@ -20,6 +20,7 @@
             <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert"><strong>Please check the following:</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
         @endif
 
+        @if (($workspacePage ?? 'overview') === 'overview')
         <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Request summary">
             <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="document" /></span><div><span>All requests</span><strong>{{ number_format($documentRequests->total()) }}</strong><small>Your complete request history</small></div></article>
             <article class="metric-card metric-warning rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="clock" /></span><div><span>Awaiting review</span><strong>{{ number_format($pendingRequests) }}</strong><small>Submitted to your barangay</small></div></article>
@@ -28,21 +29,22 @@
         </section>
 
         <nav class="workspace-launcher" aria-label="Resident service shortcuts">
-            <a href="{{ route('resident.document-payments.history') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><small>Payment records</small><strong>Payment history</strong><em>View GCash and in-person payments</em></span><x-app-icon name="arrow-right" /></a>
-            <a href="{{ route('resident.document-requests.create') }}"><span class="workspace-launcher-icon"><x-app-icon name="form" /></span><span><small>Start a transaction</small><strong>Request a document</strong><em>Submit a new barangay document request</em></span><x-app-icon name="arrow-right" /></a>
-            <a href="{{ route('resident.document-requests.index') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><small>Track transactions</small><strong>View my requests</strong><em>Check status, payment, and remarks</em></span><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('resident.document-requests.create') }}"><span class="workspace-launcher-icon"><x-app-icon name="form" /></span><span><strong>Request a document</strong><em>Choose a document and submit its purpose</em></span><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('resident.document-requests.index') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><strong>My requests</strong><em>Check status and payment</em></span><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('resident.document-payments.history') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><strong>Payment history</strong><em>View previous payments</em></span><x-app-icon name="arrow-right" /></a>
         </nav>
 
-        @if (auth()->user()->hasRole(App\Models\User::ROLE_RESIDENT))
+        @endif
+
+        @if (($workspacePage ?? 'overview') === 'create')
             <div class="resident-action-layout">
                 <section class="dashboard-card request-form-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-form-title">
                     <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                        <div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Start a transaction</span><h2 id="request-form-title">Request a document</h2><p>Choose a form and tell the barangay how you will use it.</p></div>
-                        <span class="section-number">01</span>
+                        <div><h2 id="request-form-title">Document details</h2></div>
                     </header>
 
                     @if (! auth()->user()->barangay?->gcashIsReady())
-                        <div class="payment-notice rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 ">GCash is not yet available. You can still submit a request and pay in person after the secretary sets the fee.</div>
+                        <div class="payment-notice rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 ">GCash is unavailable. Submit your request, then pay in person once the fee is set.</div>
                     @endif
 
                     <form method="POST" action="{{ route('resident.document-requests.store') }}" class="clean-form">
@@ -66,21 +68,21 @@
                 </section>
 
                 <aside class="dashboard-card process-guide-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-process-title">
-                    <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">What happens next</span><h2 id="request-process-title">Request process</h2></div></header>
+                    <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><h2 id="request-process-title">What happens next</h2></div></header>
                     <ol class="process-list">
-                        <li><span>1</span><div><strong>Submit your request</strong><small>Your barangay receives it immediately.</small></div></li>
-                        <li><span>2</span><div><strong>Wait for the fee, then pay</strong><small>Indigency is free. For other documents, the secretary sets the amount. Choose official GCash or pay in person.</small></div></li>
-                        <li><span>3</span><div><strong>Wait for confirmation</strong><small>Track the status and barangay remarks below.</small></div></li>
-                        <li><span>4</span><div><strong>Claim your document</strong><small>Visit the barangay when its status is Ready.</small></div></li>
+                        <li><span>1</span><div><strong>Barangay reviews your request</strong><small>Check updates in <a href="{{ route('resident.document-requests.index') }}">My requests</a>.</small></div></li>
+                        <li><span>2</span><div><strong>Pay once the fee is set</strong><small>Use official GCash or pay in person. Indigency is free.</small></div></li>
+                        <li><span>3</span><div><strong>Collect when marked Ready</strong><small>Visit your barangay office to claim the document.</small></div></li>
                     </ol>
                     <div class="privacy-note"><x-app-icon name="shield" /><span><strong>Your information is protected</strong><small>Only authorized barangay personnel can process your request.</small></span></div>
                 </aside>
             </div>
         @endif
 
+        @if (($workspacePage ?? 'overview') === 'history')
         <section id="request-history" class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="request-history-title" style="scroll-margin-top: 100px">
             <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                <div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Transaction history</span><h2 id="request-history-title">My document requests</h2><p>Latest requests appear first. Open payment details only when action is required.</p></div>
+                <div><h2 id="request-history-title">Request history</h2><p>Newest first. Check each request for payment or collection instructions.</p></div>
                 <span class="count-chip">{{ $documentRequests->total() }} total</span>
             </header>
 
@@ -157,5 +159,6 @@
                 <div class="mt-5">{{ $documentRequests->onEachSide(1)->links() }}</div>
             @endif
         </section>
+        @endif
     </section>
 @endsection

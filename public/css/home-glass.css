@@ -12,9 +12,6 @@
         box-shadow: 0 4px 24px #102e4510 !important;
     }
     html.municipal-ui .civic-home #about { scroll-margin-top: calc(var(--home-header-height, 150px) + 20px) !important; }
-    html.municipal-ui .home-motion-toggle { border: 1px solid #ffffff40 !important; border-radius: 6px !important; padding: 5px 9px !important; color: #e1eef6 !important; background: #ffffff0a !important; font-size: 11px !important; cursor: pointer; }
-    html.municipal-ui .home-motion-toggle[hidden] { display: none !important; }
-    html.municipal-ui .home-motion-toggle:focus-visible { outline: 2px solid #e9cb7f !important; outline-offset: 3px; }
     html.municipal-ui .civic-home-hero {
         background: radial-gradient(ellipse at 85% 25%, #32677970, transparent 55%), linear-gradient(120deg, #102e40, #173e53 60%, #164c53) !important;
     }
@@ -39,7 +36,39 @@
     html.municipal-ui .civic-home-identity::before, html.municipal-ui .civic-home-identity::after { display: none !important; }
     html.municipal-ui .civic-home > section:not(.civic-home-hero) { max-width: 1180px !important; margin-inline: auto !important; }
     html.municipal-ui .civic-home > section[aria-label="Online service shortcuts"] { margin-top: 20px !important; padding-inline: 28px !important; }
-    html.municipal-ui .civic-home #about { padding: 40px 28px !important; }
+    html.municipal-ui .civic-home #about { padding: 36px 28px 24px !important; background: transparent !important; }
+    html.municipal-ui .home-registration-card {
+        display: grid;
+        grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+        align-items: center;
+        gap: 44px;
+        padding: 36px !important;
+        border: 1px solid #dce6ef !important;
+        border-radius: 20px;
+        background: linear-gradient(120deg, #fff 35%, #f3f7fc);
+        box-shadow: 0 8px 28px #173e5307;
+    }
+    html.municipal-ui .home-section-eyebrow { display: block; color: #315f92; font-size: 11px; font-weight: 700; letter-spacing: .14em; line-height: 1.6; text-transform: uppercase; }
+    html.municipal-ui .civic-home #home-registration-title { margin: 14px 0 0 !important; max-width: 420px; color: #17344e !important; font-size: clamp(26px, 2.4vw, 32px) !important; font-weight: 700 !important; line-height: 1.25 !important; letter-spacing: -.03em !important; }
+    html.municipal-ui .home-registration-description { margin: 16px 0 0 !important; max-width: 430px; color: #587087 !important; font-size: 14px; line-height: 1.8 !important; }
+    html.municipal-ui .home-verification-note { display: flex; align-items: flex-start; gap: 12px; margin-top: 24px; padding: 16px !important; border: 1px solid #dae6f0 !important; border-radius: 12px; background: #eef4fa; }
+    html.municipal-ui .home-verification-icon { display: flex; flex: 0 0 36px; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: #fff; color: #315f92; }
+    html.municipal-ui .home-verification-note strong { display: block; color: #234865; font-size: 12px; font-weight: 700; }
+    html.municipal-ui .home-verification-note p { margin: 4px 0 0 !important; color: #587087 !important; font-size: 12px; line-height: 1.7 !important; }
+    html.municipal-ui .home-registration-steps { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+    html.municipal-ui .home-registration-step { position: relative; display: flex; align-items: flex-start; gap: 16px; padding: 20px !important; border: 1px solid #dfe8f1 !important; border-radius: 14px; background: #fff; box-shadow: 0 3px 12px #173e5304; }
+    html.municipal-ui .home-registration-step:not(:last-child)::after { content: ''; position: absolute; left: 41px; bottom: -15px; width: 2px; height: 14px; background: #cbdbea; }
+    html.municipal-ui .home-step-number { display: flex; flex: 0 0 42px; align-items: center; justify-content: center; width: 42px; height: 42px; border: 1px solid #d8e6f3; border-radius: 12px; color: #315f92; background: #eef4fa; font-size: 13px; font-weight: 700; }
+    html.municipal-ui .home-registration-step > div { min-width: 0; }
+    html.municipal-ui .civic-home .home-registration-step h3 { margin: 1px 0 0 !important; color: #17344e !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.5; }
+    html.municipal-ui .home-registration-step p { margin: 6px 0 0 !important; color: #587087 !important; font-size: 13px; line-height: 1.7 !important; }
+    html.municipal-ui .civic-home .home-register { padding: 0 28px 48px !important; }
+    html.municipal-ui .home-register-card { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 28px 36px !important; border: 1px solid #244a65 !important; border-radius: 18px; background: linear-gradient(115deg, #17344e, #244d68); box-shadow: 0 8px 24px #173e5310; }
+    html.municipal-ui .home-register-card .home-section-eyebrow { color: #e7cc86; }
+    html.municipal-ui .civic-home #home-register-title { margin: 8px 0 0 !important; color: #fff !important; font-size: clamp(22px, 2vw, 27px) !important; font-weight: 700 !important; line-height: 1.3 !important; letter-spacing: -.025em !important; }
+    html.municipal-ui .home-register-card p { margin: 8px 0 0 !important; color: #d7e5ef !important; font-size: 13px; line-height: 1.7 !important; }
+    html.municipal-ui .civic-home .home-register-button { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 14px; min-height: 46px; padding: 12px 20px !important; border: 1px solid #fff !important; border-radius: 10px; color: #17344e !important; background: #fff; font-size: 13px; font-weight: 700; text-decoration: none; transition: background-color 180ms ease, border-color 180ms ease; }
+    html.municipal-ui .civic-home .home-register-button:hover { background: #eaf2fa; border-color: #eaf2fa; }
     html.municipal-ui .civic-home-identity {
         padding: 24px 20px !important;
         border: 1px solid rgb(221 240 247 / 20%) !important;
@@ -73,14 +102,12 @@
     html.municipal-ui .civic-home-service:hover { transform: translateY(-4px) !important; border-color: #80b3bc !important; box-shadow: 0 14px 30px #133f561c !important; }
     html.municipal-ui .civic-home a:focus-visible { outline: 3px solid #d6b965 !important; outline-offset: 4px !important; }
     @media (prefers-reduced-motion: no-preference) {
-        .civic-home[data-motion] .home-running-lights i { animation: home-light-travel 9s linear infinite !important; }
-        .civic-home[data-motion] .home-running-lights i:nth-child(2) { animation-duration: 12s !important; animation-delay: -5s !important; }
-        .civic-home[data-motion] .home-running-lights i:nth-child(3) { animation-duration: 11s !important; animation-delay: -8s !important; }
-        .civic-home[data-motion="paused"] .home-running-lights i { animation-play-state: paused !important; }
+        .civic-home .home-running-lights i { animation: home-light-travel 9s linear infinite !important; }
+        .civic-home .home-running-lights i:nth-child(2) { animation-duration: 12s !important; animation-delay: -5s !important; }
+        .civic-home .home-running-lights i:nth-child(3) { animation-duration: 11s !important; animation-delay: -8s !important; }
         html:has(.civic-home) { scroll-behavior: smooth !important; }
-        .civic-home[data-motion] .civic-home-pattern { animation: home-ambient-drift 12s ease-in-out infinite alternate !important; }
-        .civic-home[data-motion] .civic-home-seal { animation: home-seal-float 6s ease-in-out infinite !important; }
-        .civic-home[data-motion="paused"] :is(.civic-home-pattern, .civic-home-seal) { animation-play-state: paused !important; }
+        .civic-home .civic-home-pattern { animation: home-ambient-drift 12s ease-in-out infinite alternate !important; }
+        .civic-home .civic-home-seal { animation: home-seal-float 6s ease-in-out infinite !important; }
         .home-hero-copy { animation: home-glass-enter 650ms ease-out both !important; }
         .civic-home-identity { animation: home-glass-enter 750ms 100ms ease-out both !important; }
         .civic-home-pattern { animation: home-light-settle 4s ease-out both !important; }
@@ -94,11 +121,21 @@
     @keyframes home-glass-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes home-light-settle { from { opacity: .2; transform: translateX(12px) scale(1.03); } to { opacity: .55; transform: translateX(0) scale(1); } }
     @media (max-width: 800px) {
+        html.municipal-ui .home-registration-card { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 28px !important; }
+        html.municipal-ui .civic-home #home-registration-title, html.municipal-ui .home-registration-description { max-width: 560px; }
+        html.municipal-ui .home-register-card { align-items: flex-start; flex-direction: column; gap: 22px; padding: 28px !important; }
         html.municipal-ui .home-hero-layout { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; padding: 28px 20px !important; }
         html.municipal-ui .civic-home-identity { flex-direction: row !important; justify-content: flex-start !important; text-align: left !important; }
         html.municipal-ui .civic-home-seal { width: 76px !important; height: 76px !important; flex-basis: 76px !important; }
     }
     @media (max-width: 640px) {
+        html.municipal-ui .civic-home #about { padding: 28px 20px 20px !important; }
+        html.municipal-ui .home-registration-card { padding: 24px 20px !important; border-radius: 16px; }
+        html.municipal-ui .home-registration-step { gap: 12px; padding: 16px !important; }
+        html.municipal-ui .home-registration-step:not(:last-child)::after { left: 37px; }
+        html.municipal-ui .civic-home .home-register { padding: 0 20px 32px !important; }
+        html.municipal-ui .home-register-card { padding: 24px 20px !important; border-radius: 16px; }
+        html.municipal-ui .civic-home .home-register-button { width: 100%; }
         html.municipal-ui .civic-home-identity { padding: 20px 16px !important; border-radius: 18px !important; }
         html.municipal-ui .home-hero-trust { padding: 14px !important; }
     }

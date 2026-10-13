@@ -1,0 +1,1576 @@
+[
+  {
+    "name": "architecture",
+    "width": 1400,
+    "height": 1120,
+    "nodes": [
+      {
+        "id": "web",
+        "x": 60,
+        "y": 35,
+        "w": 560,
+        "h": 110,
+        "text": "Staff and resident web browsers",
+        "shape": "box"
+      },
+      {
+        "id": "phone",
+        "x": 780,
+        "y": 35,
+        "w": 560,
+        "h": 110,
+        "text": "Resident Android client",
+        "shape": "box"
+      },
+      {
+        "id": "app",
+        "x": 250,
+        "y": 310,
+        "w": 900,
+        "h": 170,
+        "text": "Laravel application\nSessions / resident API / approval / role and scope checks",
+        "shape": "box"
+      },
+      {
+        "id": "db",
+        "x": 60,
+        "y": 700,
+        "w": 410,
+        "h": 130,
+        "text": "Relational database\nMySQL operational records",
+        "shape": "store"
+      },
+      {
+        "id": "files",
+        "x": 520,
+        "y": 700,
+        "w": 360,
+        "h": 130,
+        "text": "Private uploads\nReceipts / signatures / photos",
+        "shape": "box"
+      },
+      {
+        "id": "ai",
+        "x": 980,
+        "y": 610,
+        "w": 360,
+        "h": 130,
+        "text": "Optional local Ollama\nNarrative / category suggestion",
+        "shape": "box"
+      },
+      {
+        "id": "ml",
+        "x": 980,
+        "y": 880,
+        "w": 360,
+        "h": 130,
+        "text": "Optional local Python API\nMigration prototype",
+        "shape": "box"
+      }
+    ],
+    "lines": [
+      {
+        "points": [
+          [
+            340,
+            145
+          ],
+          [
+            340,
+            310
+          ]
+        ],
+        "label": "HTTPS / sessions",
+        "x": 370,
+        "y": 200,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1060,
+            145
+          ],
+          [
+            1060,
+            310
+          ]
+        ],
+        "label": "HTTPS / resident API",
+        "x": 780,
+        "y": 200,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            420,
+            480
+          ],
+          [
+            265,
+            700
+          ]
+        ],
+        "label": "Scoped queries",
+        "x": 80,
+        "y": 540,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            700,
+            480
+          ],
+          [
+            700,
+            700
+          ]
+        ],
+        "label": "Authorized file access",
+        "x": 460,
+        "y": 570,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1150,
+            380
+          ],
+          [
+            1260,
+            380
+          ],
+          [
+            1260,
+            610
+          ]
+        ],
+        "label": "Loopback HTTP",
+        "x": 1080,
+        "y": 490,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1150,
+            430
+          ],
+          [
+            1390,
+            430
+          ],
+          [
+            1390,
+            945
+          ],
+          [
+            1340,
+            945
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      }
+    ],
+    "notes": [
+      "GCash transfer occurs outside the application; residents submit proof for staff review.",
+      "Shared hosting disables optional local runtimes unless a suitable private host is provided."
+    ]
+  },
+  {
+    "name": "context",
+    "width": 1400,
+    "height": 920,
+    "nodes": [
+      {
+        "id": "res",
+        "x": 50,
+        "y": 70,
+        "w": 300,
+        "h": 120,
+        "text": "Resident",
+        "shape": "box"
+      },
+      {
+        "id": "sec",
+        "x": 50,
+        "y": 650,
+        "w": 300,
+        "h": 120,
+        "text": "Barangay secretary",
+        "shape": "box"
+      },
+      {
+        "id": "mun",
+        "x": 1050,
+        "y": 350,
+        "w": 300,
+        "h": 140,
+        "text": "Municipal LGU user",
+        "shape": "box"
+      },
+      {
+        "id": "sys",
+        "x": 460,
+        "y": 285,
+        "w": 480,
+        "h": 260,
+        "text": "0\nSmart Barangay\nInformation System",
+        "shape": "ellipse"
+      }
+    ],
+    "lines": [
+      {
+        "points": [
+          [
+            350,
+            105
+          ],
+          [
+            540,
+            285
+          ]
+        ],
+        "label": "Registration / requests /\nproof / concerns",
+        "x": 380,
+        "y": 105,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            480,
+            360
+          ],
+          [
+            200,
+            360
+          ],
+          [
+            200,
+            190
+          ]
+        ],
+        "label": "Approval / own status /\npublic replies",
+        "x": 30,
+        "y": 280,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            350,
+            680
+          ],
+          [
+            540,
+            545
+          ]
+        ],
+        "label": "Registry / RBI /\nservice decisions",
+        "x": 370,
+        "y": 650,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            480,
+            500
+          ],
+          [
+            180,
+            500
+          ],
+          [
+            180,
+            650
+          ]
+        ],
+        "label": "Assigned records / reports",
+        "x": 20,
+        "y": 530,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1050,
+            380
+          ],
+          [
+            940,
+            380
+          ]
+        ],
+        "label": "Selections /\napprovals",
+        "x": 960,
+        "y": 220,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            940,
+            480
+          ],
+          [
+            1050,
+            480
+          ]
+        ],
+        "label": "Consolidated outputs",
+        "x": 970,
+        "y": 530,
+        "arrow": true,
+        "dashed": false
+      }
+    ],
+    "notes": [
+      "All arrows identify data exchanged across the application boundary.",
+      "Payment proof comes from the resident; no direct payment-gateway callback is implemented."
+    ]
+  },
+  {
+    "name": "data-flow",
+    "width": 1400,
+    "height": 1190,
+    "nodes": [
+      {
+        "id": "res",
+        "x": 45,
+        "y": 35,
+        "w": 400,
+        "h": 95,
+        "text": "Resident",
+        "shape": "box"
+      },
+      {
+        "id": "sec",
+        "x": 955,
+        "y": 35,
+        "w": 400,
+        "h": 95,
+        "text": "Barangay secretary",
+        "shape": "box"
+      },
+      {
+        "id": "auth",
+        "x": 480,
+        "y": 195,
+        "w": 440,
+        "h": 125,
+        "text": "1.0\nAuthorize service access",
+        "shape": "ellipse"
+      },
+      {
+        "id": "docs",
+        "x": 100,
+        "y": 485,
+        "w": 490,
+        "h": 150,
+        "text": "2.0\nProcess documents and\npayment review",
+        "shape": "ellipse"
+      },
+      {
+        "id": "conc",
+        "x": 810,
+        "y": 485,
+        "w": 490,
+        "h": 150,
+        "text": "3.0\nProcess concerns and updates",
+        "shape": "ellipse"
+      },
+      {
+        "id": "users",
+        "x": 30,
+        "y": 235,
+        "w": 345,
+        "h": 95,
+        "text": "D1 Users / assignment",
+        "shape": "store"
+      },
+      {
+        "id": "dstore",
+        "x": 100,
+        "y": 835,
+        "w": 490,
+        "h": 120,
+        "text": "D2 Document requests /\npayment histories",
+        "shape": "store"
+      },
+      {
+        "id": "cstore",
+        "x": 810,
+        "y": 835,
+        "w": 490,
+        "h": 120,
+        "text": "D3 Concerns / updates",
+        "shape": "store"
+      }
+    ],
+    "lines": [
+      {
+        "points": [
+          [
+            445,
+            80
+          ],
+          [
+            530,
+            195
+          ]
+        ],
+        "label": "Account details",
+        "x": 420,
+        "y": 100,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            955,
+            80
+          ],
+          [
+            870,
+            195
+          ]
+        ],
+        "label": "Staff identity",
+        "x": 830,
+        "y": 100,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            480,
+            255
+          ],
+          [
+            375,
+            255
+          ]
+        ],
+        "label": "Account lookup",
+        "x": 330,
+        "y": 190,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            375,
+            305
+          ],
+          [
+            480,
+            305
+          ]
+        ],
+        "label": "Account record",
+        "x": 325,
+        "y": 325,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            550,
+            320
+          ],
+          [
+            345,
+            485
+          ]
+        ],
+        "label": "Authorized request / proof",
+        "x": 90,
+        "y": 370,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            850,
+            320
+          ],
+          [
+            1055,
+            485
+          ]
+        ],
+        "label": "Authorized concern / reply",
+        "x": 850,
+        "y": 370,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            345,
+            635
+          ],
+          [
+            345,
+            835
+          ]
+        ],
+        "label": "Request / review record",
+        "x": 80,
+        "y": 720,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1055,
+            635
+          ],
+          [
+            1055,
+            835
+          ]
+        ],
+        "label": "Concern / public or internal update",
+        "x": 770,
+        "y": 720,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            100,
+            560
+          ],
+          [
+            25,
+            560
+          ],
+          [
+            25,
+            82
+          ],
+          [
+            45,
+            82
+          ]
+        ],
+        "label": "Own request status",
+        "x": 35,
+        "y": 165,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1300,
+            560
+          ],
+          [
+            1380,
+            560
+          ],
+          [
+            1380,
+            82
+          ],
+          [
+            1355,
+            82
+          ]
+        ],
+        "label": "Assigned case / request data",
+        "x": 990,
+        "y": 445,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            955,
+            105
+          ],
+          [
+            750,
+            105
+          ],
+          [
+            750,
+            370
+          ],
+          [
+            610,
+            370
+          ],
+          [
+            610,
+            560
+          ],
+          [
+            590,
+            560
+          ]
+        ],
+        "label": "Document decision",
+        "x": 590,
+        "y": 450,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1220,
+            130
+          ],
+          [
+            1220,
+            485
+          ]
+        ],
+        "label": "Concern action",
+        "x": 1120,
+        "y": 335,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            810,
+            595
+          ],
+          [
+            665,
+            595
+          ],
+          [
+            665,
+            400
+          ],
+          [
+            445,
+            400
+          ],
+          [
+            445,
+            110
+          ]
+        ],
+        "label": "Public concern updates",
+        "x": 620,
+        "y": 660,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            485,
+            835
+          ],
+          [
+            485,
+            635
+          ]
+        ],
+        "label": "Stored request data",
+        "x": 360,
+        "y": 770,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1195,
+            835
+          ],
+          [
+            1195,
+            635
+          ]
+        ],
+        "label": "Stored concern data",
+        "x": 1080,
+        "y": 770,
+        "arrow": true,
+        "dashed": false
+      }
+    ],
+    "notes": [
+      "Selected resident-service decomposition; registry and RBI flows are described separately.",
+      "Arrows name information flows. D1-D3 identify logical record stores."
+    ]
+  },
+  {
+    "name": "workflow",
+    "width": 1400,
+    "height": 1700,
+    "nodes": [
+      {
+        "id": "start",
+        "x": 520,
+        "y": 20,
+        "w": 360,
+        "h": 75,
+        "text": "Start: approved resident",
+        "shape": "ellipse"
+      },
+      {
+        "id": "input",
+        "x": 420,
+        "y": 155,
+        "w": 560,
+        "h": 95,
+        "text": "Submit document request",
+        "shape": "io"
+      },
+      {
+        "id": "review",
+        "x": 440,
+        "y": 310,
+        "w": 520,
+        "h": 95,
+        "text": "Secretary reviews request",
+        "shape": "box"
+      },
+      {
+        "id": "accepted",
+        "x": 480,
+        "y": 480,
+        "w": 440,
+        "h": 130,
+        "text": "Request accepted?",
+        "shape": "diamond"
+      },
+      {
+        "id": "reject",
+        "x": 1010,
+        "y": 490,
+        "w": 350,
+        "h": 110,
+        "text": "Rejected: resident feedback",
+        "shape": "ellipse"
+      },
+      {
+        "id": "free",
+        "x": 480,
+        "y": 720,
+        "w": 440,
+        "h": 140,
+        "text": "Indigency / free path?",
+        "shape": "diamond"
+      },
+      {
+        "id": "fee",
+        "x": 80,
+        "y": 985,
+        "w": 470,
+        "h": 100,
+        "text": "Assess fee; receive payment proof",
+        "shape": "box"
+      },
+      {
+        "id": "paid",
+        "x": 80,
+        "y": 1190,
+        "w": 470,
+        "h": 145,
+        "text": "Staff verifies payment?",
+        "shape": "diamond"
+      },
+      {
+        "id": "fix",
+        "x": 870,
+        "y": 1190,
+        "w": 470,
+        "h": 100,
+        "text": "Return proof for correction",
+        "shape": "box"
+      },
+      {
+        "id": "ready",
+        "x": 810,
+        "y": 965,
+        "w": 490,
+        "h": 115,
+        "text": "Process and mark ready",
+        "shape": "box"
+      },
+      {
+        "id": "release",
+        "x": 790,
+        "y": 1450,
+        "w": 510,
+        "h": 100,
+        "text": "Authorized release / completion",
+        "shape": "box"
+      },
+      {
+        "id": "end",
+        "x": 845,
+        "y": 1590,
+        "w": 400,
+        "h": 75,
+        "text": "End: status available",
+        "shape": "ellipse"
+      }
+    ],
+    "lines": [
+      {
+        "points": [
+          [
+            700,
+            95
+          ],
+          [
+            700,
+            155
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            700,
+            250
+          ],
+          [
+            700,
+            310
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            700,
+            405
+          ],
+          [
+            700,
+            480
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            920,
+            545
+          ],
+          [
+            1010,
+            545
+          ]
+        ],
+        "label": "No",
+        "x": 940,
+        "y": 490,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            700,
+            610
+          ],
+          [
+            700,
+            720
+          ]
+        ],
+        "label": "Yes",
+        "x": 725,
+        "y": 650,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            920,
+            790
+          ],
+          [
+            1055,
+            790
+          ],
+          [
+            1055,
+            965
+          ]
+        ],
+        "label": "Yes",
+        "x": 980,
+        "y": 820,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            480,
+            790
+          ],
+          [
+            315,
+            790
+          ],
+          [
+            315,
+            985
+          ]
+        ],
+        "label": "No",
+        "x": 300,
+        "y": 825,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            315,
+            1085
+          ],
+          [
+            315,
+            1190
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            550,
+            1262
+          ],
+          [
+            870,
+            1262
+          ]
+        ],
+        "label": "No",
+        "x": 675,
+        "y": 1200,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1105,
+            1190
+          ],
+          [
+            1105,
+            1120
+          ],
+          [
+            550,
+            1120
+          ],
+          [
+            550,
+            1035
+          ]
+        ],
+        "label": "Corrected proof",
+        "x": 720,
+        "y": 1070,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            315,
+            1335
+          ],
+          [
+            650,
+            1335
+          ],
+          [
+            650,
+            1020
+          ],
+          [
+            810,
+            1020
+          ]
+        ],
+        "label": "Yes",
+        "x": 330,
+        "y": 1370,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1055,
+            1080
+          ],
+          [
+            1380,
+            1080
+          ],
+          [
+            1380,
+            1500
+          ],
+          [
+            1300,
+            1500
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1045,
+            1550
+          ],
+          [
+            1045,
+            1590
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": true,
+        "dashed": false
+      }
+    ],
+    "notes": []
+  },
+  {
+    "name": "use-cases",
+    "width": 1400,
+    "height": 1220,
+    "nodes": [
+      {
+        "id": "boundary",
+        "x": 420,
+        "y": 20,
+        "w": 900,
+        "h": 1070,
+        "text": "Smart Barangay Information System",
+        "shape": "boundary"
+      },
+      {
+        "id": "resident",
+        "x": 25,
+        "y": 55,
+        "w": 350,
+        "h": 145,
+        "text": "Resident",
+        "shape": "actor"
+      },
+      {
+        "id": "secretary",
+        "x": 25,
+        "y": 410,
+        "w": 350,
+        "h": 145,
+        "text": "Barangay secretary",
+        "shape": "actor"
+      },
+      {
+        "id": "municipal",
+        "x": 25,
+        "y": 855,
+        "w": 350,
+        "h": 145,
+        "text": "Municipal LGU user",
+        "shape": "actor"
+      },
+      {
+        "id": "r1",
+        "x": 500,
+        "y": 100,
+        "w": 740,
+        "h": 110,
+        "text": "Request documents and submit payment proof",
+        "shape": "ellipse"
+      },
+      {
+        "id": "r2",
+        "x": 500,
+        "y": 255,
+        "w": 740,
+        "h": 110,
+        "text": "Submit concerns and follow public replies",
+        "shape": "ellipse"
+      },
+      {
+        "id": "s1",
+        "x": 500,
+        "y": 435,
+        "w": 740,
+        "h": 110,
+        "text": "Maintain assigned registry and prepare RBI",
+        "shape": "ellipse"
+      },
+      {
+        "id": "s2",
+        "x": 500,
+        "y": 590,
+        "w": 740,
+        "h": 110,
+        "text": "Approve residents and review services",
+        "shape": "ellipse"
+      },
+      {
+        "id": "shared",
+        "x": 500,
+        "y": 745,
+        "w": 740,
+        "h": 110,
+        "text": "View permitted reports and spatial information",
+        "shape": "ellipse"
+      },
+      {
+        "id": "m1",
+        "x": 500,
+        "y": 930,
+        "w": 740,
+        "h": 110,
+        "text": "Approve secretaries and configure payment profiles",
+        "shape": "ellipse"
+      }
+    ],
+    "lines": [
+      {
+        "points": [
+          [
+            210,
+            120
+          ],
+          [
+            500,
+            155
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            210,
+            120
+          ],
+          [
+            500,
+            310
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            210,
+            475
+          ],
+          [
+            500,
+            490
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            210,
+            475
+          ],
+          [
+            390,
+            475
+          ],
+          [
+            390,
+            645
+          ],
+          [
+            500,
+            645
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            210,
+            475
+          ],
+          [
+            390,
+            475
+          ],
+          [
+            390,
+            800
+          ],
+          [
+            500,
+            800
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            210,
+            920
+          ],
+          [
+            500,
+            800
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            210,
+            920
+          ],
+          [
+            500,
+            985
+          ]
+        ],
+        "label": "",
+        "x": 0,
+        "y": 0,
+        "arrow": false,
+        "dashed": false
+      }
+    ],
+    "notes": [
+      "Actor associations indicate role responsibility; access also requires assignment or ownership.",
+      "Minor account/profile actions are omitted to keep the selected diagram readable."
+    ]
+  },
+  {
+    "name": "entities",
+    "width": 1400,
+    "height": 1140,
+    "nodes": [
+      {
+        "id": "bar",
+        "x": 70,
+        "y": 30,
+        "w": 450,
+        "h": 130,
+        "text": "Barangay\nid (PK) / name",
+        "shape": "box"
+      },
+      {
+        "id": "hh",
+        "x": 880,
+        "y": 30,
+        "w": 450,
+        "h": 130,
+        "text": "Household\nid (PK) / barangay_id (FK)",
+        "shape": "box"
+      },
+      {
+        "id": "inh",
+        "x": 880,
+        "y": 325,
+        "w": 450,
+        "h": 140,
+        "text": "Inhabitant\nid (PK) / household_id (FK)\nbarangay_id (FK)",
+        "shape": "box"
+      },
+      {
+        "id": "report",
+        "x": 70,
+        "y": 325,
+        "w": 490,
+        "h": 140,
+        "text": "BarangayRbiUpdate\nid (PK) / barangay_user_id (FK)\nreporting_month",
+        "shape": "box"
+      },
+      {
+        "id": "family",
+        "x": 70,
+        "y": 640,
+        "w": 490,
+        "h": 140,
+        "text": "BarangayRbiFamily\nid (PK) / report_id* (FK)\nhousehold_id (FK)",
+        "shape": "box"
+      },
+      {
+        "id": "member",
+        "x": 880,
+        "y": 640,
+        "w": 450,
+        "h": 140,
+        "text": "BarangayRbiMember\nfamily_id* (FK)\ninhabitant_id (optional FK)",
+        "shape": "box"
+      },
+      {
+        "id": "death",
+        "x": 410,
+        "y": 940,
+        "w": 650,
+        "h": 140,
+        "text": "BarangayRbiDeceasedRecord\nreport_id* / family_id* / inhabitant_id (FKs)\ndeceased_name / death_date",
+        "shape": "box"
+      }
+    ],
+    "lines": [
+      {
+        "points": [
+          [
+            520,
+            95
+          ],
+          [
+            880,
+            95
+          ]
+        ],
+        "label": "1 : many",
+        "x": 640,
+        "y": 45,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1105,
+            160
+          ],
+          [
+            1105,
+            325
+          ]
+        ],
+        "label": "1 : many",
+        "x": 1130,
+        "y": 230,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            315,
+            465
+          ],
+          [
+            315,
+            640
+          ]
+        ],
+        "label": "1 : many",
+        "x": 340,
+        "y": 540,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            560,
+            710
+          ],
+          [
+            880,
+            710
+          ]
+        ],
+        "label": "1 : many",
+        "x": 650,
+        "y": 655,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1105,
+            465
+          ],
+          [
+            1105,
+            640
+          ]
+        ],
+        "label": "Optional link",
+        "x": 1130,
+        "y": 530,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            315,
+            780
+          ],
+          [
+            315,
+            1010
+          ],
+          [
+            410,
+            1010
+          ]
+        ],
+        "label": "1 : many",
+        "x": 90,
+        "y": 855,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            70,
+            395
+          ],
+          [
+            25,
+            395
+          ],
+          [
+            25,
+            1070
+          ],
+          [
+            410,
+            1070
+          ]
+        ],
+        "label": "Report link",
+        "x": 40,
+        "y": 1090,
+        "arrow": false,
+        "dashed": false
+      },
+      {
+        "points": [
+          [
+            1330,
+            400
+          ],
+          [
+            1370,
+            400
+          ],
+          [
+            1370,
+            1010
+          ],
+          [
+            1060,
+            1010
+          ]
+        ],
+        "label": "Inhabitant link",
+        "x": 1130,
+        "y": 850,
+        "arrow": false,
+        "dashed": false
+      }
+    ],
+    "notes": [
+      "* Short diagram labels: report_id = barangay_rbi_update_id; family_id = barangay_rbi_family_id.",
+      "Selected relationships only. Optional links depend on record provenance and migration rules."
+    ]
+  }
+]

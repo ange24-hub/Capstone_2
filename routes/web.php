@@ -15,6 +15,8 @@ use App\Http\Controllers\SecretaryApprovalController;
 use App\Http\Controllers\SpatialVisualizationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OfflineHouseholdController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,6 +32,9 @@ Route::get('/', fn () => auth()->check()
     ? redirect()->route('dashboard')
     : view('welcome'))->name('home');
 
+Route::get('/offline', fn () => view('offline'))->name('offline');
+Route::get('/offline-household', [OfflineHouseholdController::class, 'index'])->name('offline.household');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.store');
@@ -42,7 +47,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/services', fn () => view('services'))->name('services');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/concerns/summary', [\App\Http\Controllers\ResidentConcernController::class, 'summary'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('concerns.summary');
     Route::middleware('role:'.User::ROLE_RESIDENT.','.User::ROLE_BARANGAY)->group(function () {
@@ -212,6 +217,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/barangay/resident-registry', [RegistryController::class, 'activeRegistry'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.registry.active');
+
+    Route::get('/barangay/resident-registry/print', \App\Http\Controllers\RegistryPrintController::class)
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.registry.print');
+
+    Route::get('/barangay/resident-registry/download', [\App\Http\Controllers\RegistryPrintController::class, 'download'])
+        ->middleware('role:'.User::ROLE_BARANGAY)
+        ->name('barangay.registry.download');
 
     Route::get('/barangay/living-in-barangay', [\App\Http\Controllers\ResidenceRegistryController::class, 'index'])
         ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.residence.index');

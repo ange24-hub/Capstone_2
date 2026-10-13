@@ -9,9 +9,19 @@ class MigrationPredictionService
 {
     public function predictOutMigration(array $data): ?float
     {
+        if (! config('services.migration_prediction.enabled', true)) {
+            return null;
+        }
+
+        $url = rtrim((string) config('services.migration_prediction.url'), '/');
+        if (! preg_match('~^http://127\.0\.0\.1:[0-9]{1,5}$~D', $url)) {
+            return null;
+        }
+
         try {
             $response = Http::connectTimeout(1)->timeout(3)
-                ->post(rtrim(config('services.migration_prediction.url'), '/').'/predict', [
+                ->withOptions(['allow_redirects' => false, 'proxy' => ''])
+                ->post($url.'/predict', [
                     'out_migration_count' => $data['out_migration_count'],
                     'previous_month_out' => $data['previous_month_out'],
                     'out_3month_avg' => $data['out_3month_avg'],

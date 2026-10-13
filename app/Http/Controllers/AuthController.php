@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -127,7 +128,7 @@ class AuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'user_id' => ['nullable', 'required_if:role,'.User::ROLE_BARANGAY, 'string', 'max:100', 'alpha_dash', 'unique:users,staff_id'],
             'role' => ['required', 'in:resident,barangay'],
-            'barangay_id' => ['required', 'exists:barangays,id'],
+            'barangay_id' => ['required', Rule::exists('barangays', 'id')->where('municipality', Barangay::MUNICIPALITY)],
             'access_code' => ['nullable', 'string', 'max:100'],
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);

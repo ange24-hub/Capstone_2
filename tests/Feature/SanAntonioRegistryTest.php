@@ -39,6 +39,7 @@ class SanAntonioRegistryTest extends TestCase
             ->assertViewHas('residents', fn ($rows) => $rows->total() === 1 && $rows->first()->first_name === 'TransferredPerson');
         $this->get(route('barangay.registry.active'))->assertOk()
             ->assertSee('ElsewherePerson')->assertDontSee('TransferredPerson');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()->assertSee('Save Monthly Report');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.residents'))->assertOk()->assertSee('Save Residents');
     }
 }

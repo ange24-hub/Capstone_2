@@ -48,8 +48,8 @@ class RegistryRemarksDisplayTest extends TestCase
         }
         $this->get(route('barangay.registry.moved-out'))->assertOk()->assertDontSee('[Source:')->assertViewHas('residents', fn ($rows) => $rows->total() === 0);
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertSee('HistoricalPerson');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.index'));
-        $this->get(route('barangay.rbi-updates.index'))->assertOk()->assertSee('Save Monthly Draft');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.index'))->assertOk()->assertSee('Save Residents');
         $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
             'reporting_month' => '2026-09', 'families' => [['household_number' => '2',
                 'members' => [['last_name' => 'Example', 'first_name' => 'NewPerson', 'sex' => 'Male']]]],
@@ -59,7 +59,7 @@ class RegistryRemarksDisplayTest extends TestCase
             'barangay_id' => Barangay::where('name', 'San Antonio')->firstOrFail()->id]);
         $this->actingAs($otherStaff)->get(route('barangay.registry.active'))->assertOk()->assertDontSee('HerePerson')->assertDontSee('OverseasPerson');
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertDontSee('HistoricalPerson');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.index'));
-        $this->get(route('barangay.rbi-updates.index'))->assertOk()->assertDontSee('NewPerson');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertDontSee('NewPerson');
     }
 }

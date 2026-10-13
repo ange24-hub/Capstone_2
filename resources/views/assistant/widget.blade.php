@@ -1,5 +1,5 @@
 <div class="rbim-assistant" data-assistant data-endpoint="{{ route('assistant.chat') }}">
-    <button class="assistant-launcher" type="button" data-assistant-toggle aria-expanded="false" aria-controls="rbim-assistant-panel">
+    <button class="assistant-launcher" type="button" data-assistant-toggle aria-label="Open RBIM assistant" aria-expanded="false" aria-controls="rbim-assistant-panel">
         <span class="assistant-launcher-icon" aria-hidden="true">AI</span>
         <span>Ask RBIM</span>
         <span class="assistant-online-dot" aria-hidden="true"></span>

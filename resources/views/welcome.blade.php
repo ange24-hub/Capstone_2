@@ -34,7 +34,6 @@
                     <span><strong class="mr-1 text-base font-semibold text-white">29</strong> Barangays</span>
                     <span class="inline-flex items-center gap-2"><x-app-icon name="shield" /> Secure resident records</span>
                     <span class="inline-flex items-center gap-2"><x-app-icon name="document" /> Online public services</span>
-                    <button class="home-motion-toggle" type="button" data-home-motion aria-pressed="false" hidden>Pause motion</button>
                 </div>
             </div>
             <div class="civic-home-identity relative flex items-center justify-center gap-5 text-left lg:flex-col lg:gap-0 lg:text-center">
@@ -70,38 +69,45 @@
         </div>
     </section>
 
-    <section id="about" class="scroll-mt-8 px-6 py-16 sm:px-8 sm:py-20">
-        <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-20">
-            <div>
-                <span class="text-xs font-semibold uppercase tracking-[.16em] text-blue-700">How Registration Works</span>
-                <h2 class="mb-0 mt-4 max-w-lg text-3xl font-bold leading-tight tracking-tight text-blue-950 sm:text-4xl">Simple, secure, and verified by your barangay</h2>
-                <p class="mb-0 mt-5 max-w-lg text-base leading-7 text-slate-600">RBIM connects residents with their local barangay while protecting access to municipal records and services.</p>
-                <div class="mt-7 flex max-w-lg items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
-                    <span class="mt-1 shrink-0"><x-app-icon name="shield" /></span>
-                    <p class="m-0">Your barangay secretary verifies your registration before you can access resident services.</p>
+    <section id="about" class="home-registration" aria-labelledby="home-registration-title">
+        <div class="home-registration-card">
+            <div class="home-registration-copy">
+                <span class="home-section-eyebrow">How Registration Works</span>
+                <h2 id="home-registration-title">Simple, secure, and verified by your barangay.</h2>
+                <p class="home-registration-description">RBIM connects residents with their local barangay while protecting access to municipal records and services.</p>
+                <div class="home-verification-note">
+                    <span class="home-verification-icon" aria-hidden="true"><x-app-icon name="shield" /></span>
+                    <div>
+                        <strong>Verified by your barangay</strong>
+                        <p>Your barangay secretary confirms your registration before you can access resident services.</p>
+                    </div>
                 </div>
             </div>
-            <ol class="m-0 grid list-none gap-0 p-0">
-                <li class="flex gap-5 border-b border-slate-200 pb-6">
-                    <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-sm font-bold text-blue-800">01</span>
-                    <div><h3 class="m-0 text-lg font-semibold text-blue-950">Create an account</h3><p class="mb-0 mt-2 text-sm leading-6 text-slate-600">Enter your personal account details and select your barangay.</p></div>
+            <ol class="home-registration-steps">
+                <li class="home-registration-step">
+                    <span class="home-step-number" aria-hidden="true">01</span>
+                    <div><h3>Create an account</h3><p>Enter your personal account details and select your barangay.</p></div>
                 </li>
-                <li class="flex gap-5 border-b border-slate-200 py-6">
-                    <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-sm font-bold text-blue-800">02</span>
-                    <div><h3 class="m-0 text-lg font-semibold text-blue-950">Wait for verification</h3><p class="mb-0 mt-2 text-sm leading-6 text-slate-600">Your barangay secretary reviews and confirms your registration.</p></div>
+                <li class="home-registration-step">
+                    <span class="home-step-number" aria-hidden="true">02</span>
+                    <div><h3>Wait for verification</h3><p>Your barangay secretary reviews and confirms your registration.</p></div>
                 </li>
-                <li class="flex gap-5 pt-6">
-                    <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-sm font-bold text-blue-800">03</span>
-                    <div><h3 class="m-0 text-lg font-semibold text-blue-950">Access resident services</h3><p class="mb-0 mt-2 text-sm leading-6 text-slate-600">Once approved, sign in and submit or track barangay requests.</p></div>
+                <li class="home-registration-step">
+                    <span class="home-step-number" aria-hidden="true">03</span>
+                    <div><h3>Access resident services</h3><p>Once approved, sign in and submit or track barangay requests.</p></div>
                 </li>
             </ol>
         </div>
     </section>
 
-    <section class="px-6 pb-16 sm:px-8 sm:pb-20" aria-labelledby="home-register-title">
-        <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 rounded-2xl border border-blue-200 bg-white p-7 shadow-sm md:flex-row md:items-center sm:p-10">
-            <div><span class="text-xs font-semibold uppercase tracking-[.16em] text-blue-700">Resident of Tomas Oppus?</span><h2 id="home-register-title" class="mb-0 mt-3 text-2xl font-bold tracking-tight text-blue-950 sm:text-3xl">Register with your barangay today.</h2></div>
-            <a href="{{ route('register') }}" class="inline-flex min-h-12 shrink-0 items-center justify-center gap-3 rounded-lg bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-800">Create an Account <x-app-icon name="arrow-right" /></a>
+    <section class="home-register" aria-labelledby="home-register-title">
+        <div class="home-register-card">
+            <div>
+                <span class="home-section-eyebrow">Resident of Tomas Oppus?</span>
+                <h2 id="home-register-title">Register with your barangay today.</h2>
+                <p>Create your account to get started with local services.</p>
+            </div>
+            <a href="{{ route('register') }}" class="home-register-button">Create an Account <x-app-icon name="arrow-right" /></a>
         </div>
     </section>
 </div>

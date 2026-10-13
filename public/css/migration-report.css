@@ -1,0 +1,235 @@
+@layer professional-workspace {
+@media screen {
+    .professional-content #main-content .migration-report-page {
+        display: grid !important;
+        gap: 16px !important;
+        width: 100%;
+        max-width: 1360px;
+        min-width: 0;
+        margin-inline: auto !important;
+    }
+    .professional-content #main-content .migration-report-header {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 20px !important;
+        min-height: 0 !important;
+        padding: 0 0 18px !important;
+        margin: 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--to-line) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        text-align: left !important;
+    }
+    .professional-content #main-content .migration-report-header .population-report-heading { flex: 1 1 0 !important; width: auto !important; min-width: 0 !important; }
+    .professional-content #main-content .migration-report-header .population-report-eyebrow {
+        margin-bottom: 7px !important;
+        color: var(--to-muted) !important;
+        font-size: 11px !important;
+        letter-spacing: .07em;
+    }
+    .professional-content #main-content .migration-report-header h1 {
+        margin: 0 !important;
+        color: var(--to-ink) !important;
+        font-size: clamp(24px, 2.2vw, 30px) !important;
+        font-weight: 650 !important;
+        letter-spacing: -.025em;
+        line-height: 1.2;
+    }
+    .professional-content #main-content .migration-report-year { color: var(--to-primary) !important; }
+    .professional-content #main-content .migration-report-scope {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        margin: 9px 0 0 !important;
+        color: var(--to-muted) !important;
+        font-size: 12px !important;
+    }
+    .professional-content #main-content .migration-report-scope span { color: var(--to-accent) !important; }
+    .migration-report-print-jurisdiction { display: none !important; }
+    .professional-content #main-content .migration-report-header .population-report-actions {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        justify-content: flex-end;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+    .professional-content #main-content .migration-report-header .population-report-actions .button {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 40px !important;
+        padding: 9px 13px !important;
+        font-size: 12px !important;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .professional-content #main-content .migration-report-header .population-report-actions .secondary-button {
+        border-color: var(--to-line) !important;
+        background: var(--to-surface) !important;
+        color: var(--to-primary) !important;
+    }
+    .professional-content #main-content .migration-report-overview {
+        min-width: 0;
+        padding: 16px 18px !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 8px !important;
+        background: var(--to-surface) !important;
+    }
+    .professional-content #main-content .migration-report-filter {
+        display: flex !important;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 12px;
+        padding: 0 0 16px !important;
+        margin: 0 0 16px !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--to-line) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    .professional-content #main-content .migration-report-filter > div { flex: 0 1 auto !important; min-width: 0; }
+    .professional-content #main-content .migration-report-filter .migration-report-area-field { flex-basis: 260px !important; }
+    .professional-content #main-content .migration-report-filter .migration-report-year-field { flex-basis: 150px !important; }
+    .professional-content #main-content .migration-report-filter label {
+        display: block;
+        margin: 0 0 6px !important;
+        color: var(--to-muted) !important;
+        font-size: 12px !important;
+    }
+    .professional-content #main-content .migration-report-filter :is(select,input) {
+        width: 100% !important;
+        min-height: 40px !important;
+        margin: 0 !important;
+        padding: 8px 10px !important;
+        border: 1px solid #b7bfc5 !important;
+        border-radius: 6px !important;
+        background: var(--to-surface) !important;
+        color: var(--to-ink) !important;
+        font-size: 13px !important;
+    }
+    .professional-content #main-content .migration-report-filter button {
+        min-height: 40px !important;
+        padding: 9px 16px !important;
+        border: 1px solid var(--to-primary) !important;
+        border-radius: 6px !important;
+        background: var(--to-primary) !important;
+        color: #fff !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+    }
+    .professional-content #main-content .migration-report-filter button:hover { background: var(--to-primary-hover) !important; }
+    .migration-report-highlights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+    .migration-report-highlights > div { min-width: 0; padding: 0 18px; border-left: 1px solid var(--to-line); }
+    .migration-report-highlights > div:first-child { padding-left: 0; border-left: 0; }
+    .migration-report-highlights span { display: block; color: var(--to-muted) !important; font-size: 11px; }
+    .migration-report-highlights strong {
+        display: block;
+        margin-top: 4px;
+        color: var(--to-ink) !important;
+        font-size: 23px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+    }
+    .professional-content #main-content .migration-report-caveat {
+        margin: 14px 0 0 !important;
+        padding-top: 10px;
+        border-top: 1px solid var(--to-line);
+        color: var(--to-muted) !important;
+        font-size: 11px !important;
+    }
+    .professional-content #main-content .migration-report-page .population-report-section {
+        min-width: 0;
+        padding: 18px !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 8px !important;
+        background: var(--to-surface) !important;
+        box-shadow: none !important;
+    }
+    .professional-content #main-content .migration-report-page .population-report-section h2 {
+        margin: 0 0 14px !important;
+        color: var(--to-ink) !important;
+        font-size: 17px !important;
+        font-weight: 650 !important;
+    }
+    .professional-content #main-content .migration-report-page .table-wrap {
+        overflow-x: auto !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 6px !important;
+        background: var(--to-surface) !important;
+    }
+    .professional-content #main-content .migration-report-page .table-wrap table {
+        width: 100% !important;
+        min-width: 650px;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+    }
+    .professional-content #main-content .migration-report-page .table-wrap :is(th,td) {
+        padding: 10px 12px !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--to-line) !important;
+        font-size: 12px !important;
+    }
+    .professional-content #main-content .migration-report-page .table-wrap th {
+        background: var(--to-subtle) !important;
+        color: var(--to-text) !important;
+        font-size: 10px !important;
+        font-weight: 650 !important;
+        letter-spacing: .03em;
+        text-align: left;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .professional-content #main-content .migration-report-page .table-wrap :is(th,td).number { text-align: right !important; }
+    .professional-content #main-content .migration-report-page .table-wrap td { color: var(--to-text) !important; }
+    .professional-content #main-content .migration-report-page .table-wrap tbody tr:nth-child(even) td { background: var(--to-subtle) !important; }
+    .professional-content #main-content .migration-report-page .table-wrap .total-row td {
+        background: var(--to-tint) !important;
+        color: var(--to-ink) !important;
+        font-weight: 700 !important;
+    }
+    .professional-content #main-content .migration-report-page .report-caption { margin: 0 0 12px !important; color: var(--to-muted) !important; }
+    .professional-content #main-content .migration-report-notes {
+        padding: 0 !important;
+        border: 1px solid var(--to-line) !important;
+        border-radius: 8px !important;
+        background: var(--to-surface) !important;
+        color: var(--to-text) !important;
+    }
+    .professional-content #main-content .migration-report-notes summary {
+        padding: 15px 18px !important;
+        color: var(--to-primary) !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        cursor: pointer;
+    }
+    .professional-content #main-content .migration-report-notes ol { max-width: 950px; margin: 0 !important; padding: 0 20px 16px 36px !important; }
+    .professional-content #main-content .migration-report-notes li { margin-bottom: 8px; line-height: 1.6; }
+    @media (max-width: 840px) {
+        .professional-content #main-content .migration-report-header { align-items: flex-start !important; flex-direction: column !important; }
+        .professional-content #main-content .migration-report-header .population-report-actions { width: 100%; justify-content: flex-start; }
+    }
+    @media (max-width: 600px) {
+        .professional-content #main-content .migration-report-header h1 { font-size: 25px !important; }
+        .professional-content #main-content .migration-report-header .population-report-actions .button { flex: 1 1 130px; }
+        .professional-content #main-content .migration-report-overview { padding: 14px !important; }
+        .professional-content #main-content .migration-report-filter > div { flex: 1 1 100% !important; }
+        .professional-content #main-content .migration-report-filter button { width: 100%; }
+        .migration-report-highlights { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 0; }
+        .migration-report-highlights > div:nth-child(odd) { padding-left: 0; border-left: 0; }
+        .migration-report-highlights > div:nth-child(even) { padding-right: 0; }
+        .professional-content #main-content .migration-report-page .population-report-section { padding: 14px !important; }
+    }
+}
+}
+
+@media print {
+    .migration-report-page .migration-report-scope,
+    .migration-report-page .migration-report-overview { display: none !important; }
+    .migration-report-page .migration-report-print-jurisdiction { display: block !important; }
+}

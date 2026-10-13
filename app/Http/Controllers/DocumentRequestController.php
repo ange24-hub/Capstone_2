@@ -40,7 +40,7 @@ class DocumentRequestController extends Controller
             return response()->json(['message' => $message, 'id' => $documentRequest->id], 201);
         }
 
-        return back()->with('status', $message);
+        return redirect()->route('resident.document-requests.index')->with('status', $message);
     }
 
     private function makeReferenceNumber(): string

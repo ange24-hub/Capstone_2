@@ -29,7 +29,6 @@ class ConsolidatedRegistryTest extends TestCase
         $this->actingAs($secretary);
         foreach ([route('barangay.registry.active'), route('registry.index', ['source' => 'CANLUPAO.xlsx'])] as $url) {
             $this->get($url)->assertOk()
-                ->assertSee('CONSOLIDATED HOUSEHOLD RECORD')
                 ->assertSee('ConsolidatedResident')->assertDontSee('ArchivedResident')->assertDontSee('DepartedResident')
                 ->assertViewHas('registryHouseholdCount', 2)
                 ->assertViewHas('inhabitants', fn ($records) => $records->total() === 1);
@@ -38,7 +37,7 @@ class ConsolidatedRegistryTest extends TestCase
         $this->get(route('registry.index'))->assertOk()->assertSee('ArchivedResident')->assertSee('DepartedResident');
     }
 
-    public function test_resident_numbers_continue_on_the_next_page(): void
+    public function test_registry_page_keeps_pagination_without_a_resident_number_column(): void
     {
         $barangay = Barangay::where('name', 'Canlupao')->firstOrFail();
         $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
@@ -51,7 +50,8 @@ class ConsolidatedRegistryTest extends TestCase
             ]);
         }
         $this->actingAs($secretary)->get(route('barangay.registry.active', ['page' => 2]))
-            ->assertOk()->assertSee('Resident No.')->assertSee('Residents: 26')
-            ->assertSee('<td class="resident-row-number">26</td>', false);
+            ->assertOk()->assertDontSee('Resident No.')
+            ->assertViewHas('inhabitants', fn ($records) => $records->total() === 26)
+            ->assertSee('Resident26');
     }
 }

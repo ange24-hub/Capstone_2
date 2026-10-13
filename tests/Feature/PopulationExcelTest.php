@@ -32,7 +32,9 @@ class PopulationExcelTest extends TestCase
         $this->actingAs($staff)->get(route('reports.population', ['barangay_id' => $area->id, 'section' => 'residents']))
             ->assertOk()->assertSee('Resident 1')->assertDontSee('Resident 9 Example')
             ->assertSee(route('reports.population.excel', ['barangay_id' => $area->id, 'section' => 'residents']))
-            ->assertSee('population-spreadsheet.css');
+            ->assertSee('population-spreadsheet.css')
+            ->assertSee('REGION: VIII')->assertSee('PROVINCE: SOUTHERN LEYTE')
+            ->assertSee('CITY/MUNICIPALITY: TOMAS OPPUS')->assertSee('BARANGAY: <strong>Looc</strong>', false);
         $response = $this->get(route('reports.population.excel', ['barangay_id' => $area->id, 'section' => 'residents']))
             ->assertOk()->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $this->assertStringContainsString('.xlsx', $response->headers->get('content-disposition'));
@@ -43,15 +45,20 @@ class PopulationExcelTest extends TestCase
             $this->assertStringContainsString('Registered residents', $workbook);
             $this->assertStringContainsString('Resident 1 Example', $sheet);
             $this->assertStringContainsString('Resident 51 Example', $sheet);
-            $this->assertStringContainsString('Barangay Looc', $sheet);
+            $this->assertStringContainsString('BARANGAY: Looc', $sheet);
             $this->assertStringNotContainsString('ForeignResident', $sheet);
             $this->assertStringContainsString('topLeftCell="A6"', $sheet);
+            $this->assertStringNotContainsString('Registry coverage', $sheet);
+            $this->assertStringNotContainsString('completeness not verified', $sheet);
+            $this->assertStringContainsString('BARANGAY: Looc', $sheet);
+            $this->assertStringContainsString('mergeCell ref="D2:F4"', $sheet);
             $this->assertStringContainsString('autoFilter', $sheet);
             $this->assertNotFalse($zip->getFromName('xl/styles.xml'));
         });
 
         $print = $this->get(route('reports.population', ['barangay_id' => $area->id, 'section' => 'residents', 'print' => 1]))
-            ->assertOk()->assertSee('Resident 9 Example')->assertSee('population-spreadsheet.css');
+            ->assertOk()->assertSee('Resident 9 Example')->assertSee('population-spreadsheet.css')
+            ->assertSee('BARANGAY: <strong>Looc</strong>', false);
         $this->assertNull($print->viewData('detailPagination'));
     }
 
@@ -154,6 +161,11 @@ class PopulationExcelTest extends TestCase
                     if (str_ends_with($name, '.xml') || str_ends_with($name, '.rels')) {
                         $xml = new DOMDocument;
                         $this->assertTrue($xml->loadXML($zip->getFromIndex($index)), $name.' must be valid XML');
+                    }
+                    if (str_starts_with($name, 'xl/worksheets/')) {
+                        foreach (['REGION: VIII', 'PROVINCE: SOUTHERN LEYTE', 'CITY/MUNICIPALITY: TOMAS OPPUS', 'BARANGAY: '] as $label) {
+                            $this->assertStringContainsString($label, $zip->getFromIndex($index));
+                        }
                     }
                 }
                 $inspect($zip);

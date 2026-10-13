@@ -82,6 +82,17 @@ html.municipal-ui .app-content .overview-context-date {
     color: #203b52 !important;
 }
 html.municipal-ui .app-content .overview-context-date .ph-clock-label { color: #536d83 !important; overflow-wrap: anywhere !important; }
+/* Keep task headings compact and put the selected work first. */
+@media screen {
+    html.municipal-ui .app-content .barangay-dashboard > .dashboard-page-header::before,
+    html.municipal-ui .app-content .barangay-dashboard > .dashboard-page-header::after,
+    html.municipal-ui .app-content .barangay-hero-weave { display: none !important; }
+    html.municipal-ui body.focused-workspace .app-content :is(.barangay-dashboard, .resident-dashboard) .dashboard-page-header { padding: 18px 22px !important; }
+    html.municipal-ui body.focused-workspace .app-content :is(.barangay-dashboard, .resident-dashboard) .dashboard-page-header .dashboard-eyebrow { display: none !important; }
+}
+@media screen and (max-width: 960px) {
+    html.municipal-ui .app-content .resident-dashboard.workspace-page-create .resident-action-layout { grid-template-columns: minmax(0, 1fr) !important; }
+}
 @media (max-width: 640px) {
     html.municipal-ui .app-content .workspace-heading { gap: 10px !important; flex-basis: 100% !important; }
     html.municipal-ui .app-content .workspace-heading-emblem { flex-basis: 36px !important; width: 36px !important; height: 42px !important; }

@@ -134,7 +134,7 @@ class RegistryMigrationDashboardTest extends TestCase
         $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
 
         $this->actingAs($municipal)
-            ->get(route('migration.dashboard'))
+            ->get(route('migration.dashboard', ['section' => 'events']))
             ->assertOk()
             ->assertSee('San Isidro')
             ->assertSee('In-migration')
@@ -143,7 +143,7 @@ class RegistryMigrationDashboardTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('spatial.index'))
             ->assertOk()
-            ->assertSee('Household Population Map')
+            ->assertSee('GIS Mapping')
             ->assertSee('HH-001')
             ->assertSee('14.1234567');
     }
@@ -212,12 +212,11 @@ class RegistryMigrationDashboardTest extends TestCase
         ]);
 
         $this->actingAs($secretary)
-            ->get(route('registry.index', ['source' => 'CANLUPAO.xlsx', 'sheet' => 'new-inhabitants']))
+            ->get(route('barangay.rbi-updates.history'))
             ->assertOk()
-            ->assertSee('NEW INHABITANT')
+            ->assertSee('Report history')
             ->assertSee('Andrew')
-            ->assertSee('MONTH')
-            ->assertSee('Save Monthly Report')
+            ->assertSee('SEPTEMBER 10, 2024')
             ->assertSee(route('registry.new-inhabitants.edit', $record));
 
         $this->actingAs($secretary)
@@ -264,14 +263,13 @@ class RegistryMigrationDashboardTest extends TestCase
             ->assertDontSee('Sheet3');
 
         $this->actingAs($secretary)
-            ->get(route('registry.index', ['source' => 'BIASONG.xlsx', 'sheet' => 'new-inhabitants']))
+            ->get(route('barangay.rbi-updates.residents'))
             ->assertOk()
-            ->assertSee('HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)')
-            ->assertSee('COMPLETE')
-            ->assertSee('Active household head')
+            ->assertSee('Add residents')
+            ->assertSee('Household')
             ->assertSee('Layo')
-            ->assertSee('Save Monthly Report')
-            ->assertSee('NENA E. GONZAGA')
+            ->assertSee('Save Residents')
+            ->assertViewHas('barangay', fn ($area) => $area->id === $barangay->id)
             ->assertDontSee('Sheet3');
 
         $this->actingAs($secretary)
@@ -402,7 +400,7 @@ class RegistryMigrationDashboardTest extends TestCase
             ->get(route('dashboard.barangay'))
             ->assertOk()
             ->assertSee('Resident registry')
-            ->assertSee('New Inhabitants');
+            ->assertSee(route('barangay.rbi-updates.index'));
 
         $this->actingAs($secretary)
             ->get(route('registry.index', ['source' => 'CABASCAN.xlsx']))
@@ -411,10 +409,10 @@ class RegistryMigrationDashboardTest extends TestCase
             ->assertSee('Luciana');
 
         $this->actingAs($secretary)
-            ->get(route('registry.index', ['source' => 'CABASCAN.xlsx', 'sheet' => 'new-inhabitants']))
+            ->get(route('barangay.rbi-updates.residents'))
             ->assertOk()
-            ->assertSee('HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)')
-            ->assertSee('Save Monthly Report')
-            ->assertSee('CABASCAN');
+            ->assertSee('Add residents')
+            ->assertSee('Save Residents')
+            ->assertSee('Cabascan');
     }
 }

@@ -2,6 +2,8 @@
 
 ## Running RBIM locally
 
+For deployment, follow [the cPanel installation guide](docs/cpanel-deployment.md). Use `.env.production.example` for the server configuration and `php artisan sbispgm:deployment-check` to check release prerequisites without exposing credentials. Run `powershell.exe -NoProfile -File scripts/test-system.ps1` for isolated PHP, offline JavaScript, local prediction tests, and a production frontend build.
+
 On the Laragon development machine, run `start-rbim.bat` (or `composer dev`)
 instead of running `php artisan serve` directly. The launcher checks MySQL,
 starts Laragon's MySQL instance when necessary, waits for it to accept

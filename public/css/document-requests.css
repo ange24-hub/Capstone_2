@@ -298,3 +298,41 @@
         }
     }
 }
+
+@layer professional-workspace {
+    @media screen {
+        .professional-content #main-content .workspace-page-documents .workspace-documents-panel { border: 1px solid var(--to-line) !important; border-radius: 8px !important; background: var(--to-surface) !important; }
+        .professional-content #main-content .workspace-page-documents .government-card-header { padding: 18px 20px !important; border-bottom: 1px solid var(--to-line) !important; background: var(--to-surface) !important; }
+        .professional-content #main-content .workspace-page-documents .government-count-badge { border-color: #dfcfaf !important; background: var(--to-gold-tint) !important; color: #755b32 !important; }
+        .professional-content #main-content .workspace-page-documents .government-count-badge.is-clear { border-color: #c8dbcf !important; background: #edf4ef !important; color: #3d6b50 !important; }
+        .professional-content #main-content .workspace-page-documents .document-list-summary { padding: 11px 20px !important; color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents .government-table-wrap { border-top: 1px solid var(--to-line) !important; border-bottom: 1px solid var(--to-line) !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table { width: 100% !important; min-width: 0 !important; table-layout: fixed; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(1) { width: 11%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(2) { width: 15%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(3) { width: 18%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(4) { width: 22%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(5) { width: 10%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(6) { width: 24%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th { padding: 11px 12px !important; border-color: var(--to-line) !important; background: var(--to-tint) !important; color: var(--to-ink) !important; font-size: 11px !important; letter-spacing: .035em; }
+        .professional-content #main-content .workspace-page-documents .government-data-table td { min-width: 0 !important; padding: 15px 12px !important; border-color: var(--to-line) !important; color: var(--to-text) !important; font-size: 13px !important; overflow-wrap: anywhere; }
+        .professional-content #main-content .workspace-page-documents .government-data-table td > strong { color: var(--to-ink) !important; font-weight: 650; }
+        .professional-content #main-content .workspace-page-documents .government-data-table tbody tr:nth-child(even) { background: #fbfaf7 !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table tbody tr:hover { background: var(--to-subtle) !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table small { color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table .document-payment-cell { max-width: none; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) { min-width: 0 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) :is(input,select,button) { width: 100% !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status, .payment-status) { border-color: #d4dce2 !important; border-radius: 5px !important; background: #eff2f4 !important; color: #52677a !important; font-size: 11px !important; font-weight: 650 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-pending, .payment-status-pending_verification) { border-color: #dfcfaf !important; background: var(--to-gold-tint) !important; color: #755b32 !important; }
+        .professional-content #main-content .workspace-page-documents .request-status-processing { border-color: #cbd9e4 !important; background: #edf2f7 !important; color: #41617e !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-ready, .request-status-completed, .payment-status-paid) { border-color: #c8dbcf !important; background: #edf4ef !important; color: #3d6b50 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-rejected, .payment-status-rejected, .payment-status-unpaid) { border-color: #e4ced1 !important; background: #f6edee !important; color: #864850 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) :is(input,select) { min-height: 38px !important; border-color: var(--to-line) !important; background: var(--to-surface) !important; color: var(--to-ink) !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) button:not(.danger-button) { min-height: 38px !important; border-color: var(--to-primary) !important; background: var(--to-primary) !important; color: #fff !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents .document-pagination { border-top: 1px solid var(--to-line); background: var(--to-subtle) !important; color: var(--to-text) !important; }
+        .professional-content #main-content .workspace-page-documents .document-page-links :is(a,span) { border-color: var(--to-line) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .workspace-page-documents .document-page-links [aria-current="page"] { border-color: var(--to-primary) !important; background: var(--to-primary) !important; color: #fff !important; }
+        @media (max-width: 1020px) { .professional-content #main-content .workspace-page-documents .government-data-table { min-width: 960px !important; } }
+    }
+}

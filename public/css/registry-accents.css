@@ -1,0 +1,68 @@
+/* Restrained color for the resident registry, residence lists, and edit forms. */
+@layer professional-workspace {
+    @media screen {
+        .professional-content #main-content .registry-color-workspace {
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace > .page-head {
+            padding: 22px 26px !important;
+            border: 1px solid #cddfe8 !important;
+            border-left: 4px solid #2a7890 !important;
+            border-radius: 10px !important;
+            background: #f4f9fb !important;
+            box-shadow: none !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace .workspace-heading-emblem {
+            display: grid !important;
+            place-items: center !important;
+            flex: 0 0 44px !important;
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 9px !important;
+            background: #e2f0f3 !important;
+            color: #246b83 !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace > .page-head h1 {
+            color: #1e4d68 !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace > .page-head :is(.page-kicker, .dashboard-eyebrow) {
+            display: block !important;
+            color: #2a7188 !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace > .workflow-card {
+            border: 1px solid #d7e4e9 !important;
+            border-top: 3px solid #8bbbc7 !important;
+            background: #fffefc !important;
+            box-shadow: none !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace > .workflow-card :is(h2, .section-title) {
+            color: #255870 !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace .table-wrap table th {
+            border-color: #c9dfe6 !important;
+            background: #eaf3f6 !important;
+            color: #28576d !important;
+        }
+
+        .professional-content #main-content .registry-color-workspace .registry-print-options {
+            border-color: #d4e4e9 !important;
+            background: #f6fafb !important;
+        }
+
+        @media (max-width: 640px) {
+            .professional-content #main-content .registry-color-workspace > .page-head {
+                padding: 18px !important;
+            }
+        }
+    }
+}

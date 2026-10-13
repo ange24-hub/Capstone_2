@@ -55,9 +55,10 @@ class LuanRegistryTest extends TestCase
             ->assertSee('LUAN')->assertSee('LuanResident')->assertSee('Not provided');
         $this->get(route('barangay.registry.deceased'))->assertOk()
             ->assertSee('HistoricalResident');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()
-            ->assertSee('LUAN')->assertSee('Save Monthly Report')
-            ->assertSee('Luan Secretary')->assertSee('Luan Chair')
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.residents'))->assertOk()
+            ->assertSee($barangay->name)->assertSee('Save Residents')
+            ->assertViewHas('barangay', fn ($area) => $area->secretary_name === 'Luan Secretary' && $area->punong_barangay_name === 'Luan Chair')
             ->assertDontSee('NENA E. GONZAGA')->assertDontSee('MARY GRACE M. POLISTICO')->assertDontSee('MARCOS L. MAQUILANG');
 
         $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
@@ -78,6 +79,7 @@ class LuanRegistryTest extends TestCase
         $this->actingAs($otherSecretary)->get(route('barangay.registry.active'))
             ->assertOk()->assertDontSee('LuanResident');
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertDontSee('HistoricalResident');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()->assertDontSee('NewResident');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertDontSee('NewResident');
     }
 }

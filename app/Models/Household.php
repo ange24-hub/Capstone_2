@@ -19,6 +19,16 @@ class Household extends Model
         'address',
         'latitude',
         'longitude',
+        'offline_uuid',
+        'gps_accuracy',
+        'location_captured_at',
+    ];
+
+    protected $casts = [
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+        'gps_accuracy' => 'decimal:2',
+        'location_captured_at' => 'datetime',
     ];
 
     public function barangay(): BelongsTo
@@ -37,6 +47,6 @@ class Household extends Model
             return 'Not set';
         }
 
-        return $this->latitude.', '.$this->longitude;
+        return $this->latitude . ', ' . $this->longitude;
     }
 }

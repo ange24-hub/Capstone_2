@@ -19,9 +19,9 @@ class RegistryTransferConfirmationTest extends TestCase {
   $this->assertDatabaseHas('registry_activities',['inhabitant_id'=>$r->id,'user_id'=>$u->id]);
   $this->get(route('barangay.registry.active'))->assertDontSee('Example');
   $this->get(route('barangay.registry.moved-out'))->assertSee('Example')->assertSee('Cebu');
-  $this->get(route('dashboard.barangay'))->assertOk()->assertSee('Transferred resident to Cebu');
+  $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee('Transferred resident to Cebu');
   $other = User::factory()->create(['role'=>'barangay','barangay_id'=>Barangay::where('name','San Isidro')->firstOrFail()->id]);
-  $this->actingAs($other)->get(route('dashboard.barangay'))->assertDontSee('Transferred resident to Cebu');
+  $this->actingAs($other)->get(route('barangay.rbi-updates.history'))->assertDontSee('Transferred resident to Cebu');
   $this->put(route('registry.update',$r),$data+['transfer_confirmed'=>'1'])->assertForbidden();
  }
  public function test_remark_transfer_is_detected_but_negated_transfer_remains_active(): void {

@@ -3,6 +3,9 @@
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/rbi-workspace.css') }}?v={{ filemtime(public_path('css/rbi-workspace.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/rbi-report-view.css') }}?v={{ filemtime(public_path('css/rbi-report-view.css')) }}">
+    @if(request()->routeIs('barangay.rbi-updates.history'))
+        <link rel="stylesheet" href="{{ asset('css/rbi-history.css') }}?v={{ filemtime(public_path('css/rbi-history.css')) }}">
+    @endif
 @endpush
 
 @section('content')
@@ -39,7 +42,7 @@
             : (optional($editingReport?->reporting_month)->format('Y-m') ?: now()->format('Y-m'));
     @endphp
 
-    <section class="panel rbi-forms-workspace">
+    <section class="panel rbi-forms-workspace {{ $rbiSection === 'history' ? 'rbi-history-workspace' : '' }}">
         <div class="rbi-report-view rbi-workspace-overview">
             <header class="rbi-report-header">
                 <div class="rbi-report-heading">
@@ -57,6 +60,7 @@
                     @endif
                 </div>
             </header>
+            @if($rbiSection !== 'history')
             <div class="rbi-report-metrics" aria-label="Monthly reports summary">
                 <article class="rbi-report-metric rbi-metric-residents">
                     <span class="rbi-metric-icon" aria-hidden="true"><x-app-icon name="check" /></span>
@@ -67,6 +71,7 @@
                     <div><span class="rbi-metric-label">Draft reports</span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong></div>
                 </article>
             </div>
+            @endif
         </div>
 
         <nav class="rbi-subpages" aria-label="RBI Forms subpages">
@@ -132,6 +137,7 @@
 
         @if($rbiSection === 'history')
             @include('rbi-updates._history')
+            @include('rbi-updates._registry-activity')
         @endif
     </section>
 

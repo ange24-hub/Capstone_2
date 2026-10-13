@@ -1,0 +1,552 @@
+/* Load this layer first: existing themes use important declarations.
+   The shared shell applies to signed-in pages. Content opts in separately
+   so the existing RBI forms and all print layouts retain their presentation. */
+@layer professional-workspace {
+    @media screen {
+        :root {
+            --to-navy: #293e55;
+            --to-primary: #3e5975;
+            --to-primary-hover: #314a64;
+            --to-accent: #ad9061;
+            --to-tint: #edf1f4;
+            --to-canvas: #f7f5f0;
+            --to-surface: #fffefb;
+            --to-subtle: #f4f2ed;
+            --to-line: #e4e0d8;
+            --to-ink: #293b50;
+            --to-text: #4d5b68;
+            --to-muted: #6c747a;
+            --to-chart-blue: #4d6b89;
+            --to-chart-teal: #60817d;
+            --to-chart-gold: #9a8155;
+            --to-gold-tint: #f4eee3;
+        }
+        .professional-shell,
+        .professional-public {
+            --navy-950: var(--to-navy) !important;
+            --navy-900: var(--to-primary) !important;
+            --navy-800: var(--to-primary-hover) !important;
+            --navy-700: var(--to-primary) !important;
+            --blue-50: var(--to-canvas) !important;
+            --blue-100: var(--to-tint) !important;
+            --civic-primary: var(--to-primary) !important;
+            --civic-primary-soft: var(--to-tint) !important;
+            accent-color: var(--to-primary);
+        }
+        .professional-shell :is(#app-sidebar, .app-header) {
+            font-family: 'Segoe UI', system-ui, sans-serif !important;
+        }
+        .professional-shell :is(#app-sidebar, .app-header) :is(a, button, span, strong, small, em) { font-family: 'Segoe UI', system-ui, sans-serif !important; }
+
+        .professional-shell #app-sidebar {
+            background: var(--to-navy) !important;
+            border-right: 1px solid #354b62 !important;
+            border-top: 0 !important;
+            box-shadow: none !important;
+            scrollbar-color: #526781 transparent !important;
+        }
+        .professional-shell #app-sidebar .app-brand {
+            gap: 12px !important;
+            border-color: #ffffff1a !important;
+        }
+        .professional-shell #app-sidebar .app-brand strong {
+            color: #fff !important;
+            font-size: 20px !important;
+            letter-spacing: -.02em !important;
+        }
+        .professional-shell #app-sidebar :is(.app-brand small, .app-brand em) {
+            color: #b1c2d5 !important;
+            letter-spacing: .04em !important;
+        }
+        .professional-shell #app-sidebar .app-brand em { color: #d5c29f !important; }
+        .professional-shell #app-sidebar .side-section {
+            color: #a6b9cd !important;
+            font-size: 11px !important;
+            letter-spacing: .04em !important;
+            border: 0 !important;
+            margin: 20px 10px 6px !important;
+            padding: 0 !important;
+        }
+        .professional-shell #app-sidebar .side-nav > a {
+            min-height: 42px !important;
+            border: 0 !important;
+            border-radius: 6px !important;
+            color: #d5dfeb !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            font-size: 13px !important;
+            font-weight: 400 !important;
+            transform: none !important;
+        }
+        .professional-shell #app-sidebar .side-nav > a:hover {
+            color: #fff !important;
+            background: #354b62 !important;
+        }
+        .professional-shell #app-sidebar .side-nav > a.active {
+            color: #fff !important;
+            background: #40556b !important;
+            box-shadow: inset 3px 0 var(--to-accent) !important;
+            font-weight: 600 !important;
+        }
+        .professional-shell #app-sidebar .nav-mark {
+            background: transparent !important;
+            color: inherit !important;
+        }
+        .professional-shell #app-sidebar .rbi-sidebar-subpages {
+            border-color: #526781 !important;
+        }
+        .professional-shell #app-sidebar .rbi-sidebar-subpages a {
+            color: #b9cadd !important;
+        }
+        .professional-shell #app-sidebar .rbi-sidebar-subpages a[aria-current="page"] {
+            color: #fff !important;
+            background: #354b62 !important;
+        }
+        .professional-shell #app-sidebar .sidebar-account {
+            border-color: #ffffff1a !important;
+        }
+        .professional-shell #app-sidebar .sidebar-account strong { color: #fff !important; }
+        .professional-shell #app-sidebar .sidebar-account :is(span:not(.account-avatar), small) { color: #b1c2d5 !important; }
+        .professional-shell #app-sidebar .account-avatar {
+            color: #f0e5d2 !important;
+            background: #40556b !important;
+            border-radius: 6px !important;
+        }
+        .professional-shell #app-sidebar .sidebar-logout button {
+            color: #d5dfeb !important;
+            border-color: #ffffff24 !important;
+            background: transparent !important;
+        }
+        .professional-shell #app-sidebar .sidebar-logout button:hover { background: #354b62 !important; }
+        .professional-shell #app-sidebar :is(a, button):focus-visible {
+            outline: 2px solid #d5c29f !important;
+            outline-offset: 3px !important;
+        }
+
+        .professional-shell .app-header {
+            background: var(--to-surface) !important;
+            border-color: var(--to-line) !important;
+            box-shadow: none !important;
+        }
+        .professional-shell .app-header strong { color: #24364b !important; }
+        .professional-shell .header-date { color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-shell :is(.desktop-sidebar-button, .mobile-menu-button, .profile-navigation-trigger) {
+            color: var(--to-text) !important;
+            background: var(--to-surface) !important;
+            border-color: var(--to-line) !important;
+            box-shadow: none !important;
+            border-radius: 6px !important;
+        }
+        .professional-shell .profile-navigation-avatar { color: var(--to-primary) !important; background: var(--to-tint) !important; }
+        .professional-shell :is(.profile-navigation-label, .profile-navigation-arrow) { color: var(--to-muted) !important; }
+        .professional-shell .assistant-launcher {
+            color: #fff !important;
+            background: var(--to-primary) !important;
+            border: 1px solid var(--to-primary) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px #172b431a !important;
+            transform: none !important;
+        }
+        .professional-shell .assistant-online-dot { display: none !important; }
+
+        /* Everything below applies only outside RBI form routes. */
+        .professional-content :is(.app-main, #main-content, .app-footer) { background: var(--to-canvas) !important; }
+        .professional-content #main-content {
+            --ink: var(--to-ink);
+            --text: var(--to-text);
+            --muted: var(--to-muted);
+            --line: var(--to-line);
+            --civic-ink: var(--to-ink);
+            --civic-text: var(--to-text);
+            --civic-muted: var(--to-muted);
+            --civic-border: var(--to-line);
+            --civic-primary: var(--to-primary);
+            --civic-primary-soft: var(--to-tint);
+            --civic-surface: var(--to-surface);
+            --civic-subtle: var(--to-subtle);
+            color: var(--to-text) !important;
+            font-size: 14px !important;
+        }
+        .professional-content #main-content :is(h1,h2,h3,h4,p,a,button,input,select,textarea,strong,small,label,dt,dd,span,table):not(:where(.rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .leaflet-container *)) {
+            font-family: 'Segoe UI', system-ui, sans-serif !important;
+        }
+        .professional-content #main-content :is(h1,h2,h3,h4) { color: var(--to-ink) !important; }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 18px !important;
+            min-height: 0 !important;
+            padding: 0 0 22px !important;
+            margin-bottom: 0 !important;
+            border: 0 !important;
+            border-bottom: 1px solid var(--to-line) !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            color: var(--to-ink) !important;
+        }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero)::before,
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero)::after,
+        .professional-content #main-content :is(.barangay-hero-weave, .workspace-heading-emblem, .municipal-hero-emblem) { display: none !important; }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) h1 {
+            color: var(--to-ink) !important;
+            margin: 0 0 8px !important;
+            font-size: clamp(24px, 2vw, 30px) !important;
+            font-weight: 650 !important;
+            letter-spacing: -.025em !important;
+            line-height: 1.25 !important;
+        }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) p {
+            color: var(--to-muted) !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            margin: 0 !important;
+        }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .municipal-hero) :is(.dashboard-eyebrow, .page-kicker, .municipal-eyebrow) { display: none !important; }
+        .professional-content #main-content :is(.dashboard-page, .barangay-dashboard, .registry-workspace) { gap: 24px !important; }
+        .professional-content #main-content :is(.dashboard-card, .workflow-card, .government-content-card, .government-side-card, .government-stat-card, .metric-card, .brgy-work-card, .brgy-quick-links, .community-analytics, .population-chart, .population-report-section, .profile-section, .profile-account-card, .municipal-directory-card, .municipal-approval-item, .decision-card, .gis-metric, .gis-map-card, .gis-household-list, .gis-legend, .gis-physical-profile) {
+            background: var(--to-surface) !important;
+            background-image: none !important;
+            border: 1px solid var(--to-line) !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content :is(.metric-card, .dashboard-card, .workflow-card, .government-content-card, .government-stat-card, .profile-section, .brgy-work-card)::before,
+        .professional-content #main-content :is(.metric-card, .dashboard-card, .workflow-card, .government-content-card, .government-stat-card, .profile-section, .brgy-work-card)::after { display: none !important; }
+        .professional-content #main-content :is(.metric-card, .dashboard-card, .workflow-card, .government-content-card, .government-stat-card, .profile-section, .brgy-work-card, .dashboard-page-header, .page-head, .profile-page-heading) { animation: none !important; transform: none !important; }
+        .professional-content #main-content .metric-card { min-height: 128px !important; padding: 20px !important; }
+        .professional-content #main-content .metric-card strong { color: var(--to-ink) !important; font-size: 30px !important; font-weight: 650 !important; }
+        .professional-content #main-content .metric-card div > span { color: var(--to-text) !important; font-weight: 500 !important; }
+        .professional-content #main-content .metric-card small { color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-content #main-content :is(.metric-icon, .brgy-tool-icon, .workspace-launcher-icon, .context-icon, .content-panel-heading > span) {
+            background: var(--to-tint) !important;
+            color: var(--to-primary) !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content :is(.dashboard-card-header, .workflow-head, .government-card-header, .profile-section-heading, .brgy-work-card > header) { border-color: var(--to-line) !important; background: transparent !important; }
+        .professional-content #main-content :is(.dashboard-card-header, .workflow-head, .government-card-header, .dashboard-section-heading, .brgy-work-card > header) h2 { font-size: 18px !important; font-weight: 600 !important; }
+        .professional-content #main-content :is(.dashboard-card-header, .workflow-head, .government-card-header) p { color: var(--to-muted) !important; font-size: 13px !important; }
+        .professional-content #main-content .dashboard-section-heading { border-left: 0 !important; padding-left: 0 !important; }
+        .professional-content #main-content :is(.data-freshness, .step-pill) { color: var(--to-muted) !important; background: var(--to-subtle) !important; border-color: var(--to-line) !important; }
+        .professional-content #main-content .directory-summary-metrics > div { background: var(--to-surface) !important; border-color: var(--to-line) !important; }
+        .professional-content #main-content .brgy-quick-links > a { background: transparent !important; border-radius: 0 !important; }
+        .professional-content #main-content .brgy-quick-links > a:hover { background: var(--to-subtle) !important; }
+        .professional-content #main-content .brgy-quick-links .brgy-link-arrow { color: var(--to-muted) !important; }
+        .professional-content #main-content :is(.brgy-report-counts, .brgy-latest-report, .brgy-task-list > a, .population-operations, .population-footer, .municipal-latest-received, .directory-summary-metrics, .dashboard-context-card, .overview-context, .overview-context-date, .municipal-hero-context, .dashboard-empty-state, .government-empty-state, .dashboard-filter) {
+            background: var(--to-subtle) !important;
+            border-color: var(--to-line) !important;
+            color: var(--to-text) !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content .municipal-hero-context { display: block !important; padding: 14px 18px !important; border-radius: 6px !important; }
+        .professional-content #main-content .municipal-hero-context small { display: none !important; }
+        .professional-content #main-content .municipal-hero-actions { margin-top: 16px !important; }
+        .professional-content #main-content :is(.workspace-launcher, .municipal-shortcuts) > a {
+            color: var(--to-text) !important;
+            background: var(--to-surface) !important;
+            border: 1px solid var(--to-line) !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+            transform: none !important;
+            animation: none !important;
+        }
+        .professional-content #main-content :is(.workspace-launcher, .municipal-shortcuts) > a:hover { background: var(--to-subtle) !important; border-color: #aebbc6 !important; }
+        .professional-content #main-content .municipal-shortcuts > a > span { background: var(--to-tint) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content :is(.brgy-report-counts strong, .brgy-task-count) { color: var(--to-ink) !important; }
+        .professional-content #main-content :is(.brgy-report-counts span, .brgy-task-copy small, .workspace-launcher em, .municipal-shortcuts small) { color: var(--to-muted) !important; }
+
+        /* Primary, secondary and destructive actions keep distinct meanings. */
+        .professional-content #main-content :is(.button, button[type="submit"], button[type="button"], .municipal-hero-actions a):not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *)) {
+            min-height: 40px !important;
+            border: 1px solid var(--to-primary) !important;
+            border-radius: 6px !important;
+            background: var(--to-primary) !important;
+            color: #fff !important;
+            box-shadow: none !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            transform: none !important;
+        }
+        .professional-content #main-content :is(.button, button[type="submit"], button[type="button"], .municipal-hero-actions a):hover:not(:disabled):not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *)) { background: var(--to-primary-hover) !important; }
+        .professional-content #main-content :is(.secondary-button, .outline-button, .profile-back-link, .municipal-hero-actions a:not(:first-child)) {
+            color: var(--to-text) !important;
+            background: var(--to-surface) !important;
+            border-color: #ccc7be !important;
+        }
+        .professional-content #main-content :is(.secondary-button, .outline-button, .profile-back-link, .municipal-hero-actions a:not(:first-child)):hover { color: var(--to-ink) !important; background: var(--to-subtle) !important; }
+        .professional-content #main-content :is(button,a).danger-button { color: #a12b35 !important; background: var(--to-surface) !important; border-color: #e5b8be !important; }
+        .professional-content #main-content :is(button,a).danger-button:hover:not(:disabled) { color: #a12b35 !important; background: #fff1f2 !important; }
+        .professional-content #main-content button:disabled { opacity: .5 !important; cursor: not-allowed !important; }
+        .professional-content #main-content :is(input,select,textarea):not(:where([type="checkbox"], [type="radio"], [type="hidden"], [type="file"], .leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .rbi-source-table *)) {
+            color: var(--to-text) !important;
+            background: var(--to-surface) !important;
+            border: 1px solid #b7bfc5 !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content :is(input,textarea)::placeholder { color: var(--to-muted) !important; }
+        .professional-content #main-content :is(input,textarea):read-only { background: var(--to-subtle) !important; }
+        .professional-content #main-content :is(input,select,textarea):disabled { background: var(--to-subtle) !important; color: var(--to-muted) !important; }
+        .professional-content #main-content [aria-invalid="true"] { border-color: #b8323a !important; }
+        .professional-content #main-content :is(a,button,input,select,textarea,summary):focus-visible { outline: 2px solid var(--to-primary) !important; outline-offset: 3px !important; }
+        .professional-content #main-content :is(.table-wrap, .clean-table-wrap):not(:where(.rbi-source-table, .rbi-document-preview *, .rbi-word-page *)) { background: var(--to-surface) !important; border-color: var(--to-line) !important; border-radius: 6px !important; }
+        .professional-content #main-content table:not(:where(.rbi-source-table, .rbi-source-table *, .rbi-document-preview *, .rbi-word-page *)) :is(th,td) { border-color: var(--to-line) !important; }
+        .professional-content #main-content table:not(:where(.rbi-source-table, .rbi-source-table *, .rbi-document-preview *, .rbi-word-page *)) th { color: var(--to-text) !important; background: var(--to-subtle) !important; font-weight: 600 !important; }
+        .professional-content #main-content table:not(:where(.rbi-source-table, .rbi-source-table *, .rbi-document-preview *, .rbi-word-page *)) tbody tr { background: var(--to-surface) !important; }
+        .professional-content #main-content table:not(:where(.rbi-source-table, .rbi-source-table *, .rbi-document-preview *, .rbi-word-page *)) tbody tr:hover { background: var(--to-subtle) !important; }
+        .professional-content #main-content table:not(:where(.rbi-source-table, .rbi-source-table *, .rbi-document-preview *, .rbi-word-page *)) td { color: var(--to-text) !important; background: transparent !important; }
+        .professional-content #main-content table tr.residence-elsewhere > td { background: #dcfce7 !important; }
+        .professional-content #main-content table .total-row > td { background: var(--to-subtle) !important; font-weight: 700 !important; }
+        .professional-content #main-content .workspace-location { color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-content #main-content :is(.workspace-location a, .brgy-text-link, .brgy-quick-links a) { color: var(--to-primary) !important; }
+        .professional-content .app-footer { color: var(--to-muted) !important; border-color: var(--to-line) !important; }
+
+        /* Every dashboard and navigation destination uses the same navy theme. */
+        .professional-content #main-content :is(.municipal-dashboard, .resident-dashboard) { gap: 16px !important; max-width: 1360px !important; margin-inline: auto !important; }
+        .professional-content #main-content :is(.municipal-dashboard, .resident-dashboard) > :is(.municipal-hero, .dashboard-page-header) { padding-bottom: 12px !important; }
+        .professional-content #main-content :is(.municipal-dashboard, .resident-dashboard) h1 { font-size: 26px !important; }
+        .professional-content #main-content .municipal-hero-actions { margin-top: 0 !important; }
+        .professional-content #main-content .municipal-hero-actions a:hover { filter: none !important; }
+        .professional-content #main-content .dashboard-metrics { gap: 16px !important; margin: 0 !important; }
+        .professional-content #main-content .metric-card {
+            display: flex !important; flex-direction: row-reverse !important; align-items: flex-start !important;
+            min-height: 116px !important; gap: 12px !important; padding: 16px 18px !important;
+            border: 1px solid var(--to-line) !important; border-top: 3px solid var(--to-primary) !important;
+            border-radius: 8px !important; background: var(--to-surface) !important; box-shadow: none !important;
+        }
+        .professional-content #main-content .metric-card .metric-icon { width: 28px !important; height: 28px !important; flex: 0 0 28px !important; background: var(--to-tint) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .metric-icon svg { width: 17px !important; height: 17px !important; }
+        .professional-content #main-content .metric-card strong { font-size: 28px !important; margin: 6px 0 !important; line-height: 1.2 !important; }
+        .professional-content #main-content .metric-card div > span { font-size: 12px !important; }
+        .professional-content #main-content .metric-card small { font-size: 11px !important; }
+        .professional-content #main-content :is(.municipal-shortcuts, .workspace-launcher) { gap: 16px !important; margin: 0 !important; }
+        .professional-content #main-content .resident-dashboard .workspace-launcher { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+        .professional-content #main-content :is(.municipal-shortcuts, .workspace-launcher) > a { min-width: 0; padding: 16px !important; min-height: 76px !important; }
+        .professional-content #main-content .municipal-work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; align-items: stretch !important; gap: 16px !important; }
+        .professional-content #main-content .municipal-panel { border: 1px solid var(--to-line) !important; border-radius: 8px !important; padding: 18px !important; }
+        .professional-content #main-content .municipal-panel .section-title { font-size: 16px !important; }
+        .professional-content #main-content .municipal-panel .step-pill { display: none !important; }
+        .professional-content #main-content .municipal-directory-summary { gap: 12px !important; }
+        .professional-content #main-content .directory-summary-metrics { background: var(--to-tint) !important; border-radius: 6px !important; padding: 12px !important; gap: 12px !important; }
+        .professional-content #main-content .directory-summary-metrics > div { border: 0 !important; background: transparent !important; padding: 0 !important; }
+        .professional-content #main-content .municipal-report-coverage progress { background: var(--to-line) !important; }
+        .professional-content #main-content .municipal-report-coverage progress::-webkit-progress-bar { background: var(--to-line) !important; }
+        .professional-content #main-content .municipal-report-coverage progress::-webkit-progress-value { background: var(--to-primary) !important; }
+        .professional-content #main-content .municipal-report-coverage progress::-moz-progress-bar { background: var(--to-primary) !important; }
+        .professional-content #main-content :is(.municipal-empty-icon, .empty-icon, .empty-state-mark) { background: var(--to-tint) !important; color: var(--to-primary) !important; border-color: var(--to-line) !important; }
+        .professional-content #main-content .municipal-approval-item { box-shadow: none !important; border-radius: 6px !important; }
+        .professional-content #main-content .municipal-directory-summary-grid > article { background: var(--to-surface) !important; border: 1px solid var(--to-line) !important; border-top: 3px solid var(--to-primary) !important; border-radius: 8px !important; box-shadow: none !important; }
+        .professional-content #main-content .municipal-directory-card > header { background: var(--to-tint) !important; border-color: var(--to-line) !important; }
+        .professional-content #main-content :is(.concern-status-card, .resident-request-card) { background: var(--to-surface) !important; border: 1px solid var(--to-line) !important; border-radius: 8px !important; box-shadow: none !important; transform: none !important; }
+        .professional-content #main-content .concern-status-card { padding: 16px !important; border-top: 3px solid var(--to-primary) !important; }
+        .professional-content #main-content .concern-status-symbol { background: var(--to-tint) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content :is(.concern-status-card, .concern-status)[data-status="submitted"] { --concern-color: #466585; --concern-wash: #edf2f7; --concern-line: #cbd8e5; }
+        .professional-content #main-content :is(.concern-status-card, .concern-status)[data-status="under_review"] { --concern-color: #806439; --concern-wash: #f6f0e5; --concern-line: #e6d6b8; }
+        .professional-content #main-content :is(.concern-status-card, .concern-status)[data-status="in_progress"] { --concern-color: #3e7078; --concern-wash: #eaf3f2; --concern-line: #c6ddda; }
+        .professional-content #main-content :is(.concern-status-card, .concern-status)[data-status="resolved"] { --concern-color: #397257; --concern-wash: #ebf4ee; --concern-line: #c5ddcc; }
+        .professional-content #main-content :is(.concern-status-card, .concern-status)[data-status="closed"] { --concern-color: #596775; --concern-wash: #eff1f2; --concern-line: #d5dce0; }
+        .professional-content #main-content .concern-status-card[data-status] { background: linear-gradient(180deg, var(--concern-wash), var(--to-surface) 78%) !important; border-color: var(--concern-line) !important; border-top-color: var(--concern-color) !important; }
+        .professional-content #main-content .concern-status-card[data-status] .concern-status-symbol { background: var(--concern-wash) !important; color: var(--concern-color) !important; }
+        .professional-content #main-content .concern-status-card[data-status] strong { color: var(--concern-color) !important; }
+        .professional-content #main-content .concern-status[data-status] { background: var(--concern-wash) !important; border-color: var(--concern-line) !important; color: var(--concern-color) !important; }
+        .professional-content #main-content :is(.gis-metric-icon, .gis-tool-icon, .gis-map-title-icon, .gis-scope-icon) { background: var(--to-tint) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .gis-scope-note { background: var(--to-tint) !important; border-color: var(--to-line) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .gis-metric { border-top: 3px solid var(--to-primary) !important; }
+        .professional-content #main-content :is(.process-list > li > span, .privacy-note, .dashboard-context-card) { color: var(--to-primary) !important; background: var(--to-tint) !important; border-color: var(--to-line) !important; }
+        .professional-content #main-content .decision-card { border: 1px solid var(--to-line) !important; border-top: 3px solid var(--to-accent) !important; }
+        .professional-content #main-content .table-wrap a:not(.button) { color: var(--to-primary) !important; }
+        .professional-content #main-content a:not(:where(.button, .active, [aria-current="page"], [aria-selected="true"], .municipal-hero-actions a, .leaflet-container *, .rbi-document-preview *, .rbi-word-page *)) { color: var(--to-primary) !important; }
+        .professional-content #main-content .badge { background: var(--to-tint) !important; border-color: var(--to-line) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .badge:is(.pending, .draft) { color: #80622c !important; background: #f5efe3 !important; border-color: #e5d8bd !important; }
+        .professional-content #main-content .badge:is(.approved, .submitted, .completed, .resolved) { color: #426852 !important; background: #e8efe9 !important; border-color: #cbdccf !important; }
+        .professional-content #main-content .badge:is(.rejected, .cancelled) { color: #8a424a !important; background: #f4e8e9 !important; border-color: #e5c9cd !important; }
+        .professional-shell .assistant-header { background: var(--to-primary) !important; background-image: none !important; }
+
+        /* The public portal shares the same brand colors. */
+        .professional-public {
+            --ink: var(--to-ink) !important;
+            --text: var(--to-text) !important;
+            --muted: var(--to-muted) !important;
+            --line: var(--to-line) !important;
+            background: var(--to-canvas) !important;
+            color: var(--to-text) !important;
+        }
+        .professional-public #main-content { background: var(--to-canvas) !important; }
+        .professional-public :is(.ph-government-bar, .public-footer) { background: var(--to-navy) !important; background-image: none !important; }
+        .professional-public .ph-government-bar { border-bottom-color: var(--to-accent) !important; }
+        .professional-public .public-footer { border-top-color: var(--to-accent) !important; }
+        .professional-public .public-footer-bottom { background: var(--to-navy) !important; }
+        .professional-public .portal-login-layout { background: var(--to-surface) !important; border-color: var(--to-line) !important; }
+        .professional-public .portal-login-intro { background: var(--to-navy) !important; border-top-color: var(--to-accent) !important; }
+        .professional-public .public-site-header { background: var(--to-surface) !important; border-color: var(--to-line) !important; box-shadow: none !important; }
+        .professional-public .public-brand strong { color: var(--to-primary) !important; }
+        .professional-public .public-nav a { color: var(--to-primary) !important; }
+        .professional-public .public-nav a[aria-current="page"] { background: var(--to-tint) !important; color: var(--to-primary) !important; }
+        .professional-public :is(.public-register-link, .public-login-link, .button, button[type="submit"]) { background: var(--to-primary) !important; border-color: var(--to-primary) !important; color: #fff !important; box-shadow: none !important; }
+        .professional-public :is(.public-register-link, .public-login-link, .button, button[type="submit"]):hover { background: var(--to-primary-hover) !important; }
+        .professional-public .public-nav a:is(.public-register-link, .public-login-link) { background: var(--to-primary) !important; color: #fff !important; border-color: var(--to-primary) !important; }
+        .professional-public :is(.secondary-button, .outline-button) { background: var(--to-surface) !important; border-color: var(--to-line) !important; color: var(--to-primary) !important; }
+        .professional-public :is(.auth-panel, .service-card, .registration-guide) { background: var(--to-surface) !important; border-color: var(--to-line) !important; box-shadow: none !important; }
+        .professional-public .auth-panel :is(h1,h2,h3,label) { color: var(--to-ink) !important; }
+        .professional-public .auth-panel :is(.auth-copy, .form-footer) { color: var(--to-muted) !important; border-color: var(--to-line) !important; }
+        .professional-public .auth-panel :is(a, .auth-eyebrow) { color: var(--to-primary) !important; }
+        .professional-public .auth-panel :is(input,select,textarea):not([type="checkbox"]) { background: var(--to-surface) !important; color: var(--to-text) !important; border-color: #b7bfc5 !important; }
+        .professional-public :is(a, button, input, select, textarea):focus-visible { outline: 2px solid var(--to-primary) !important; outline-offset: 3px !important; }
+        @media (max-width: 1100px) {
+            .professional-content #main-content .municipal-work-grid { grid-template-columns: minmax(0, 1fr) !important; }
+        }
+        @media (max-width: 760px) {
+            .professional-content #main-content .resident-dashboard .workspace-launcher { grid-template-columns: minmax(0, 1fr) !important; }
+            .professional-content #main-content :is(.municipal-dashboard, .resident-dashboard) .dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; }
+            .professional-content #main-content :is(.municipal-dashboard, .resident-dashboard) .metric-card { min-height: 116px !important; padding: 14px !important; }
+            .professional-content #main-content :is(.municipal-dashboard, .resident-dashboard) .metric-icon { display: none !important; }
+        }
+
+        /* Compact, aligned dashboard panels share one consistent grid. */
+        .professional-content #main-content .barangay-dashboard.workspace-page-overview { gap: 16px !important; max-width: 1360px !important; margin-inline: auto !important; }
+        .professional-content #main-content .workspace-page-overview > .dashboard-page-header { padding-bottom: 12px !important; }
+        .professional-content #main-content .workspace-page-overview > .dashboard-page-header h1 { font-size: 26px !important; }
+        .barangay-overview-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+        .barangay-overview-layout > .overview-community { min-width: 0; container-type: inline-size; }
+        .overview-work-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+        .professional-content #main-content .workspace-page-overview .brgy-workspace { grid-column: span 2; gap: 0 !important; min-width: 0; }
+        .professional-content #main-content .workspace-page-overview .brgy-workspace-panels { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 16px !important; height: 100%; }
+        .professional-content #main-content .workspace-page-overview .brgy-reporting-card { border: 1px solid var(--to-line) !important; border-radius: 8px !important; padding: 18px !important; background: var(--to-surface) !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-work-card > header { margin-bottom: 12px !important; gap: 8px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-work-card > header h2 { font-size: 15px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-text-link { font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-reporting-card > header h2 { color: var(--to-primary) !important; }
+        .professional-content #main-content .workspace-page-overview :is(.brgy-report-counts, .brgy-latest-report) { background: transparent !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-report-counts { padding: 0 0 12px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-report-counts strong { font-size: 24px !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-report-counts > div + div { border-color: var(--to-line) !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-latest-report { border-color: var(--to-line) !important; padding-top: 12px !important; font-size: 12px !important; gap: 6px 8px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-latest-report > strong { font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-pending-card { border: 1px solid var(--to-line) !important; border-radius: 8px !important; background: var(--to-surface) !important; padding: 18px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-task-list > a { grid-template-columns: minmax(0, 1fr) auto auto !important; background: transparent !important; border-color: var(--to-line) !important; min-height: 45px !important; gap: 16px !important; padding-block: 10px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-task-copy strong { font-size: 12px !important; font-weight: 500 !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-task-copy small { font-size: 11px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-task-count { font-size: 20px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-status-pill { font-size: 11px !important; padding: 4px 7px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-task-list > a:hover { background: var(--to-tint) !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-pending-card .brgy-status-pill.is-clear { color: #247559 !important; background: #e2f2e9 !important; }
+        .professional-content #main-content .workspace-page-overview .overview-tools { min-width: 0; background: var(--to-surface) !important; border: 1px solid var(--to-line) !important; border-radius: 8px !important; padding: 18px !important; }
+        .overview-tools > h2 { margin: 0 0 8px !important; font-size: 15px !important; font-weight: 600 !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 2px !important; background: transparent !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links > a { border: 0 !important; padding: 5px 0 !important; gap: 10px !important; box-shadow: none !important; transform: none !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links > a strong { font-size: 12px !important; font-weight: 500 !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links .brgy-tool-icon { width: 28px !important; height: 28px !important; border-radius: 6px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links .brgy-tool-icon svg { width: 17px !important; height: 17px !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links .brgy-link-arrow { display: block !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links > a:nth-child(1) .brgy-tool-icon { background: var(--to-tint) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links > a:nth-child(3) .brgy-tool-icon { background: var(--to-gold-tint) !important; color: var(--to-chart-gold) !important; }
+        .professional-content #main-content .workspace-page-overview .population-overview { border: 0 !important; border-radius: 0 !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
+        .population-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px !important; }
+        .population-metric { min-width: 0; padding: 16px 18px !important; background: var(--to-surface) !important; border: 1px solid var(--to-line) !important; border-top: 3px solid var(--metric-color) !important; border-radius: 8px !important; }
+        .population-metric-blue { --metric-color: var(--to-primary); --metric-tint: var(--to-tint); }
+        .population-metric-teal { --metric-color: var(--to-chart-teal); --metric-tint: #edf2ef; }
+        .population-metric-gold { --metric-color: var(--to-chart-gold); --metric-tint: var(--to-gold-tint); }
+        .population-metric-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .population-metric-label h3 { margin: 0 !important; color: var(--to-muted) !important; font-size: 13px !important; font-weight: 500 !important; }
+        .population-metric-label > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; color: var(--metric-color); background: var(--metric-tint); }
+        .population-metric-label svg { width: 17px; height: 17px; }
+        .population-metric > strong { display: block; margin-top: 6px !important; color: var(--to-ink) !important; font-size: 30px !important; line-height: 1.15 !important; font-weight: 650 !important; font-variant-numeric: tabular-nums; }
+        .population-overview-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+        .population-resident-summary { min-width: 0; padding: 18px !important; background: var(--to-surface) !important; border: 1px solid var(--to-line) !important; border-radius: 8px !important; }
+        .population-resident-summary header h3 { margin: 0 !important; font-size: 15px !important; font-weight: 600 !important; }
+        .population-resident-summary header p { margin: 6px 0 0; color: var(--to-muted); font-size: 13px; }
+        .population-resident-visual { display: grid; grid-template-columns: 128px minmax(0, 1fr); align-items: center; gap: 16px; margin-top: 16px !important; }
+        .population-pie-figure { width: 128px; margin: 0; text-align: center; }
+        .population-pie {
+            width: 128px; aspect-ratio: 1; border-radius: 50%;
+            background: conic-gradient(var(--to-chart-blue) 0 var(--living-percent), var(--to-chart-gold) var(--living-percent) 100%);
+            border: 3px solid var(--to-surface);
+            outline: 1px solid var(--to-line);
+        }
+        .population-pie-empty { background: var(--to-line); }
+        .population-pie-figure figcaption { margin-top: 10px; color: var(--to-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+        .population-resident-legend { flex: 1 1 145px; margin: 0; min-width: 0; }
+        .population-resident-legend > div { padding: 10px 0 !important; }
+        .population-resident-legend > div + div { border-top: 1px solid var(--to-subtle) !important; }
+        .population-resident-legend dt { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--to-muted); }
+        .population-resident-legend dd { display: flex !important; align-items: baseline !important; gap: 12px !important; margin: 6px 0 0 18px !important; font-size: 22px !important; font-weight: 650 !important; color: var(--to-ink) !important; font-variant-numeric: tabular-nums; }
+        .population-resident-legend dd small { margin: 0 !important; color: var(--to-muted) !important; font-size: 12px !important; font-weight: 400 !important; }
+        .population-key { width: 10px; height: 10px; flex: 0 0 10px; background: var(--to-chart-blue); border-radius: 50%; }
+        .population-key-other { background: var(--to-chart-gold); }
+        .population-sector-summary { min-width: 0; padding: 18px !important; background: var(--to-surface) !important; border: 1px solid var(--to-line) !important; border-radius: 8px !important; }
+        .population-groups-heading { margin-bottom: 6px !important; }
+        .population-groups-heading h3 { margin: 0 !important; font-size: 15px !important; font-weight: 600 !important; }
+        .population-groups-heading > span { display: block; margin-top: 4px !important; font-size: 12px !important; color: var(--to-muted) !important; }
+        .population-sector-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 16px; padding: 6px 0 !important; }
+        .population-sector-copy { min-width: 0; }
+        .population-sector-copy h4 { margin: 0 !important; font-size: 13px !important; font-weight: 500 !important; }
+        .population-sector-count { display: flex; align-items: baseline; gap: 12px; text-align: right; }
+        .population-sector-count strong { color: var(--to-ink); font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+        .population-sector-count span { min-width: 42px; color: var(--to-muted); font-size: 12px; }
+        .population-sector-track { grid-column: 1 / -1; height: 5px; background: var(--to-subtle); border-radius: 3px; overflow: hidden; }
+        .population-sector-track > span { display: block; height: 100%; background: var(--sector-color); border-radius: inherit; }
+        .population-sector-note { margin: 8px 0 0 !important; color: var(--to-muted) !important; font-size: 11px !important; }
+        .population-no-data { color: var(--to-muted); font-size: 13px; }
+        @container (min-width: 640px) {
+            .population-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @container (min-width: 900px) {
+            .population-overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .population-sector-summary { grid-column: span 2; }
+        }
+        @media (min-width: 761px) and (max-width: 1150px) {
+            .overview-work-row { grid-template-columns: minmax(0, 1fr); }
+            .professional-content #main-content .workspace-page-overview .brgy-workspace { grid-column: auto; }
+            .professional-content #main-content .workspace-page-overview .brgy-quick-links { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+        }
+        @media (max-width: 760px) {
+            .overview-work-row { grid-template-columns: minmax(0, 1fr); }
+            .professional-content #main-content .workspace-page-overview .brgy-workspace { grid-column: auto; }
+            .professional-content #main-content .workspace-page-overview .brgy-workspace-panels { grid-template-columns: minmax(0, 1fr) !important; gap: 12px !important; }
+            .professional-content #main-content .workspace-page-overview .brgy-quick-links { grid-template-columns: minmax(0, 1fr) !important; gap: 4px !important; }
+            .population-metrics { gap: 10px; }
+            .population-metric { padding: 12px !important; }
+            .population-metric-label h3 { font-size: 11px !important; }
+            .population-metric-label > span { display: none; }
+            .population-metric > strong { font-size: 26px !important; }
+            .population-resident-visual { display: grid !important; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr) !important; gap: 16px !important; }
+            .population-pie-figure { width: min(140px, 100%); }
+            .population-pie { width: 100%; }
+            .population-resident-legend { flex-basis: 140px; }
+        }
+
+        @media (min-width: 1280px) {
+            .professional-content #main-content .workspace-page-documents .government-data-table { min-width: 0 !important; width: 100% !important; table-layout: fixed !important; }
+            .professional-content #main-content .workspace-page-documents .government-data-table :is(th,td) { min-width: 0 !important; padding-inline: 12px !important; overflow-wrap: anywhere !important; white-space: normal !important; }
+            .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(1) { width: 12%; }
+            .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(2) { width: 15%; }
+            .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(3) { width: 18%; }
+            .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(4) { width: 20%; }
+            .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(5) { width: 12%; }
+            .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(6) { width: 23%; }
+            .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form, .document-payment-cell) { min-width: 0 !important; max-width: 100% !important; }
+        }
+        @media (min-width: 961px) {
+            .professional-shell.sidebar-collapsed #app-sidebar .side-section { font-size: 0 !important; height: 1px !important; margin: 12px 6px 4px !important; background: #ffffff1a !important; }
+        }
+        @media (max-width: 680px) {
+            .professional-shell .app-header { flex-direction: row !important; flex-wrap: nowrap !important; gap: 12px !important; min-height: 64px !important; }
+            .professional-shell .app-header-primary { flex: 1 1 auto !important; min-width: 0 !important; }
+            .professional-shell .app-header-primary strong { font-size: 13px !important; }
+            .professional-shell .app-header-meta { display: flex !important; width: auto !important; flex: 0 0 auto !important; margin: 0 !important; }
+            .professional-shell :is(.profile-navigation-copy, .profile-navigation-arrow) { display: none !important; }
+            .professional-shell .profile-navigation-trigger { padding: 5px !important; }
+            .professional-shell .assistant-launcher { width: 44px !important; min-height: 44px !important; justify-content: center !important; padding: 5px !important; }
+            .professional-shell .assistant-launcher > span:not(.assistant-launcher-icon) { display: none !important; }
+            .professional-content #main-content { padding-inline: 16px !important; }
+            .professional-content #main-content .metric-card { min-height: 128px !important; padding: 16px !important; }
+            .professional-content #main-content .dashboard-header-actions { width: 100% !important; }
+            .professional-content #main-content .dashboard-header-actions .button { flex: 1 1 140px !important; }
+            .professional-content #main-content :is(.workspace-launcher, .municipal-shortcuts) { grid-template-columns: minmax(0, 1fr) !important; }
+            .professional-content #main-content .municipal-hero-context { display: none !important; }
+        }
+    }
+}

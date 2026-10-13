@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en" class="municipal-ui">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#142d4e">
+    <meta name="csrf-token" content="HcuZHU2LzcRFdTyazjKipTuH7RDKnEkJBeHumpIE">
+    <title>Laravel | Municipality of Tomas Oppus</title>
+    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/professional-workspace.css?v=1791761986" media="screen">
+                <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/document-requests.css?v=1791763286" media="screen">
+                    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/barangay-dashboard-refinement.css?v=1790961362" media="screen">
+            <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/rbim.css?v=1788880760">
+    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/portal-template.css?v=1790252673" media="screen">
+    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/workspace-headers.css?v=1791743854" media="screen">
+    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/workspace-sidebar.css?v=1790189421" media="screen">
+    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/profile-navigation.css?v=1790879587" media="screen">
+    <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/print.css?v=1790881033">
+    <link rel="preload" as="style" href="file:///C:/laragon/www/Capstone_2/public/build/assets/app-D3ONz5Ki.css" /><link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/build/assets/app-D3ONz5Ki.css" />        <link rel="stylesheet" href="file:///C:/laragon/www/Capstone_2/public/css/barangay-dashboard.css?v=1790246530" media="screen">
+</head>
+<body  class="professional-shell professional-content role-barangay  wide-workspace focused-workspace" >
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+            <div class="app-shell">
+            <aside class="app-sidebar bg-blue-950 text-white" id="app-sidebar">
+                <a class="app-brand" href="file:///C:/laragon/www/Capstone_2/public/dashboard">
+                    <span class="seal-crop app-brand-seal">
+                        <img src="file:///C:/laragon/www/Capstone_2/public/images/tomas-oppus-seal.png" alt="Municipality of Tomas Oppus seal">
+                    </span>
+                    <span>
+                        <small>Municipality of</small>
+                        <strong>Tomas Oppus</strong>
+                        <em>RBIM System</em>
+                    </span>
+                </a>
+                <nav class="side-nav" aria-label="Primary navigation">
+    <a class="" href="file:///C:/laragon/www/Capstone_2/public/dashboard" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/>
+</svg>
+</span><span>Overview</span></a>
+            <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/rbi-updates" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 11h6M9 15h6"/>
+</svg>
+</span><span>RBI Forms</span></a>
+                        <div class="side-section">Services</div>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/resident-approvals" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="m5 12 4 4L19 6"/>
+</svg>
+</span><span>Resident approvals</span></a>
+                                <a class="active" href="file:///C:/laragon/www/Capstone_2/public/barangay/document-requests"  aria-current="page" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h4M10 12h5M10 16h5"/>
+</svg>
+</span><span>Document requests</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/payment-history" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h4M10 12h5M10 16h5"/>
+</svg>
+</span><span>Payment history</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/concerns" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+</svg>
+</span><span>Resident concerns</span></a>
+                    <div class="side-section">Resident records</div>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/resident-registry" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+</svg>
+</span><span>Resident registry</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/new-inhabitants" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 11h6M9 15h6"/>
+</svg>
+</span><span>New inhabitants</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/living-in-barangay" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/>
+</svg>
+</span><span>Living in barangay</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/moved-out" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/>
+</svg>
+</span><span>Moved out</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/barangay/deceased-records" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h4M10 12h5M10 16h5"/>
+</svg>
+</span><span>Deceased records</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/spatial-visualization" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/>
+</svg>
+</span><span>Household map</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/offline-household" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>
+</svg>
+</span><span>Offline household survey</span></a>
+                    <div class="side-section">Reports</div>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/reports/population" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h4M10 12h5M10 16h5"/>
+</svg>
+</span><span>Population reports</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/reports/migration" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h4M10 12h5M10 16h5"/>
+</svg>
+</span><span>Migration reports</span></a>
+                                <a class="" href="file:///C:/laragon/www/Capstone_2/public/migration-monitoring" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/>
+</svg>
+</span><span>Migration trends</span></a>
+                        <div class="side-section">Account</div>
+        <a class="profile-navigation-link " href="file:///C:/laragon/www/Capstone_2/public/profile" ><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+</svg>
+</span><span>Profile Info</span></a>
+    </nav>
+                <div class="sidebar-spacer"></div>
+                <div class="sidebar-account">
+                    <span class="account-avatar">C</span>
+                    <div>
+                        <strong>Carlotta Beier III</strong>
+                        <span>Barangay Secretary</span>
+                                                    <small>Barangay Punong</small>
+                                            </div>
+                </div>
+                <form class="sidebar-logout" method="POST" action="file:///C:/laragon/www/Capstone_2/public/logout">
+                    <input type="hidden" name="_token" value="HcuZHU2LzcRFdTyazjKipTuH7RDKnEkJBeHumpIE" autocomplete="off">                    <button type="submit"><span class="nav-mark"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M10 17l5-5-5-5M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/>
+</svg>
+</span><span>Sign out</span></button>
+                </form>
+            </aside>
+            <button class="sidebar-backdrop" type="button" aria-label="Close navigation" data-sidebar-close></button>
+            <div class="app-main min-w-0 bg-slate-50">
+                <header class="app-header border-b border-slate-200 bg-white">
+                    <div class="app-header-primary">
+                        <button class="desktop-sidebar-button" type="button" aria-label="Collapse navigation" aria-controls="app-sidebar" aria-expanded="true" data-sidebar-collapse>
+                            <svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 7h16M4 12h16M4 17h16"/>
+</svg>
+                        </button>
+                        <button class="mobile-menu-button" type="button" aria-label="Open navigation" aria-controls="app-sidebar" aria-expanded="false" data-sidebar-toggle>
+                            <svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 7h16M4 12h16M4 17h16"/>
+</svg>
+                        </button>
+                        <strong>Barangay Secretary</strong>
+                    </div>
+                    <div class="app-header-meta">
+                        <time class="header-date" data-ph-header-date aria-label="Device local date and time"></time>
+                                                    <a class="header-user profile-navigation-trigger" href="file:///C:/laragon/www/Capstone_2/public/profile" title="Profile Info" aria-label="Profile Info: Carlotta Beier III" >
+                                <span class="profile-navigation-avatar" aria-hidden="true">C</span>
+                                <span class="profile-navigation-copy"><span class="profile-navigation-name">Carlotta Beier III</span><span class="profile-navigation-label">Profile Info</span></span>
+                                <svg class="app-icon profile-navigation-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M5 12h14M13 6l6 6-6 6"/>
+</svg>
+                            </a>
+                                            </div>
+                </header>
+                <main class="app-content min-w-0" id="main-content">
+                    <nav class="workspace-location" aria-label="Page location" hidden data-page-location>
+                        <a href="file:///C:/laragon/www/Capstone_2/public/dashboard">Workspace</a>
+                        <span aria-hidden="true">/</span>
+                        <span aria-current="page" data-page-location-title></span>
+                    </nav>
+                        
+    <section class="barangay-dashboard workspace-page workspace-page-documents" aria-labelledby="barangay-dashboard-title">
+        <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
+            <span class="barangay-hero-weave" aria-hidden="true"></span>
+            <div class="workspace-heading">
+    <span class="workspace-heading-emblem" aria-hidden="true"><svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 21h16"/><path d="M6 21V7l6-3 6 3v14"/><path d="M9 10h.01M12 10h.01M15 10h.01M9 14h.01M12 14h.01M15 14h.01"/>
+</svg>
+</span>
+    <div class="workspace-heading-copy">
+                <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Barangay E-Services</span>
+                <h1 id="barangay-dashboard-title">Document requests</h1>
+                <p>Review requests, confirm payments, and update their status.</p>
+    </div>
+</div>
+                    </header>
+
+                
+                                <div class="barangay-dashboard-columns">
+                <div class="barangay-dashboard-main">
+                                                            <section id="document-requests" class="government-content-card workspace-documents-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 overflow-hidden" aria-labelledby="document-requests-title">
+                        <header class="government-card-header">
+                            <div><h2 id="document-requests-title">Requests to process</h2></div>
+                            <span class="government-count-badge is-pending">1 pending</span>
+                        </header>
+                                                    <p class="document-list-summary">Showing <strong>1&ndash;2</strong> of <strong>2</strong> requests</p>
+                            <div class="table-wrap government-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
+                                <table class="government-data-table">
+                                    <thead><tr><th scope="col">Reference</th><th scope="col">Resident</th><th scope="col">Document and Purpose</th><th scope="col">Payment</th><th scope="col">Status</th><th scope="col">Process Request</th></tr></thead>
+                                    <tbody>                                        <tr>
+                                            <td><strong>DOC-2</strong><small>Oct 12, 2026</small></td>
+                                            <td><strong>Aniya Stiedemann Jr.</strong><small>qhill@example.net</small></td>
+                                            <td><strong>Barangay Indigency</strong><small>Employment requirement</small></td>
+                                            <td class="document-payment-cell">
+                                                                                                    <span class="payment-status payment-status-not_required">No payment required</span>
+                                                                                            </td>
+                                            <td><span class="request-status request-status-ready">Ready for release</span></td>
+                                            <td><form class="request-status-form" method="POST" action="file:///C:/laragon/www/Capstone_2/public/barangay/document-requests/2"><input type="hidden" name="_token" value="HcuZHU2LzcRFdTyazjKipTuH7RDKnEkJBeHumpIE" autocomplete="off"> <input type="hidden" name="_method" value="PUT">                                                <label for="request-status-2">Request status</label>
+                                                <select id="request-status-2" name="status" aria-label="Status for DOC-2" required><option value="pending" >Pending review</option><option value="processing" >Processing</option><option value="ready" selected>Ready for release</option><option value="completed" >Completed</option><option value="rejected" >Rejected</option></select>
+                                                <label for="request-remarks-2">Remarks</label>
+                                                <input id="request-remarks-2" name="remarks" type="text" maxlength="1000" value="" placeholder="Add remarks" aria-label="Remarks for DOC-2"><button type="submit">Save Update</button>
+                                            </form></td>
+                                        </tr>
+                                                                            <tr>
+                                            <td><strong>DOC-1</strong><small>Oct 12, 2026</small></td>
+                                            <td><strong>Aniya Stiedemann Jr.</strong><small>qhill@example.net</small></td>
+                                            <td><strong>Barangay Indigency</strong><small>Employment requirement</small></td>
+                                            <td class="document-payment-cell">
+                                                                                                    <span class="payment-status payment-status-not_required">No payment required</span>
+                                                                                            </td>
+                                            <td><span class="request-status request-status-pending">Pending review</span></td>
+                                            <td><form class="request-status-form" method="POST" action="file:///C:/laragon/www/Capstone_2/public/barangay/document-requests/1"><input type="hidden" name="_token" value="HcuZHU2LzcRFdTyazjKipTuH7RDKnEkJBeHumpIE" autocomplete="off"> <input type="hidden" name="_method" value="PUT">                                                <label for="request-status-1">Request status</label>
+                                                <select id="request-status-1" name="status" aria-label="Status for DOC-1" required><option value="pending" selected>Pending review</option><option value="processing" >Processing</option><option value="ready" >Ready for release</option><option value="completed" >Completed</option><option value="rejected" >Rejected</option></select>
+                                                <label for="request-remarks-1">Remarks</label>
+                                                <input id="request-remarks-1" name="remarks" type="text" maxlength="1000" value="" placeholder="Add remarks" aria-label="Remarks for DOC-1"><button type="submit">Save Update</button>
+                                            </form></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                                            </section>
+                                    </div>
+
+            </div>
+                        </section>
+                </main>
+                <footer class="app-footer  app-footer-with-reminder ">
+                        <div class="footer-privacy-reminder">
+        <span class="footer-privacy-mark" aria-hidden="true">DPA</span>
+        <div><strong>Data Privacy Reminder</strong><p>Access resident information only for authorized barangay functions. Keep account credentials confidential.</p></div>
+    </div>
+                    <span>© 2026 Municipal Government of Tomas Oppus</span>
+                </footer>
+            </div>
+        </div>
+        <div class="rbim-assistant" data-assistant data-endpoint="file:///C:/laragon/www/Capstone_2/public/assistant/chat">
+    <button class="assistant-launcher" type="button" data-assistant-toggle aria-label="Open RBIM assistant" aria-expanded="false" aria-controls="rbim-assistant-panel">
+        <span class="assistant-launcher-icon" aria-hidden="true">AI</span>
+        <span>Ask RBIM</span>
+        <span class="assistant-online-dot" aria-hidden="true"></span>
+    </button>
+
+    <section class="assistant-panel flex max-h-[calc(100dvh-100px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl " id="rbim-assistant-panel" data-assistant-panel aria-label="RBIM Assistant" hidden>
+        <header class="assistant-header">
+            <div class="assistant-avatar" aria-hidden="true">AI</div>
+            <div>
+                <strong>RBIM Assistant</strong>
+                <span><i></i> System information only</span>
+            </div>
+            <button class="assistant-close" type="button" data-assistant-close aria-label="Close assistant">×</button>
+        </header>
+
+        <div class="assistant-messages min-h-16 shrink" data-assistant-messages role="log" aria-live="polite">
+            <div class="assistant-message assistant-message-bot">
+                <div class="assistant-bubble">
+                                            Hello, Carlotta Beier III. I can help with RBIM features and the information allowed for your Barangay Secretary account.
+                                    </div>
+            </div>
+        </div>
+
+        <div class="assistant-suggestions" data-assistant-suggestions>
+                            <button type="button" data-assistant-suggestion>Pila ka families sa among barangay?</button>
+                            <button type="button" data-assistant-suggestion>Show migration totals</button>
+                            <button type="button" data-assistant-suggestion>Show pending resident approvals</button>
+                    </div>
+
+        <details class="border-t border-slate-200 bg-slate-50 px-4 py-2 text-sm" data-assistant-catalog>
+            <summary class="cursor-pointer font-semibold text-blue-900">Explore questions / Mga mapangutana</summary>
+            <div class="mt-2 flex max-h-40 flex-wrap gap-2 overflow-y-auto pb-2">
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ka tawo sa among barangay?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ka pamilya ug household?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ka lalaki ug babaye?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ka senior citizen ug PWD?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ka bata?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Show migration this month</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Show migration last month</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Which month has the most migration?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Show population coverage</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Summarize submitted RBI forms</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Show pending approvals</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ang pending document requests?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Show ready document requests</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Show payment status counts</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>What can I ask?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Open resident concerns</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Unsaon pag request ug certificate?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Unsaon pagbayad sa GCash?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Pila ang document fees?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>What do request statuses mean?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Unsaon pag change sa password?</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>Open migration trends</button>
+                            </div>
+        </details>
+
+        <label class="flex items-center gap-2 border-t border-slate-200 px-4 py-2 text-sm text-slate-700">
+            Tubag / Reply
+            <select data-assistant-language class="rounded border border-slate-300 bg-white px-2 py-1">
+                <option value="en" selected>English</option>
+                <option value="ceb" >Bisaya</option>
+            </select>
+        </label>
+
+        <form class="assistant-form" data-assistant-form>
+            <label class="sr-only" for="assistant-message">Ask about the RBIM system</label>
+            <textarea id="assistant-message" data-assistant-input rows="1" maxlength="500" placeholder="Ask about RBIM…" required></textarea>
+            <button type="submit" data-assistant-send aria-label="Send message">➤</button>
+        </form>
+        <p class="assistant-privacy">Follow-ups: “ug senior?”, “ug last month?” or “download PDF”. Account permissions always apply.</p>
+        <button type="button" class="mb-2 text-xs font-semibold text-blue-900" data-assistant-reset>New conversation</button>
+    </section>
+</div>
+
+<script>
+(() => {
+    const root = document.querySelector('[data-assistant]');
+    if (!root) return;
+
+    const toggle = root.querySelector('[data-assistant-toggle]');
+    const close = root.querySelector('[data-assistant-close]');
+    const panel = root.querySelector('[data-assistant-panel]');
+    const form = root.querySelector('[data-assistant-form]');
+    const input = root.querySelector('[data-assistant-input]');
+    const send = root.querySelector('[data-assistant-send]');
+    const messages = root.querySelector('[data-assistant-messages]');
+    const suggestions = root.querySelector('[data-assistant-suggestions]');
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+    const language = root.querySelector('[data-assistant-language]');
+    const wording = (english, bisaya) => language.value === 'ceb' ? bisaya : english;
+    let previousQuestion = null;
+    const reset = root.querySelector('[data-assistant-reset]');
+
+    const setOpen = (open) => {
+        panel.hidden = !open;
+        toggle.setAttribute('aria-expanded', String(open));
+        root.classList.toggle('is-open', open);
+        if (open) setTimeout(() => input.focus(), 50);
+    };
+
+    const addMessage = (text, kind, actions = [], mode = null) => {
+        const row = document.createElement('div');
+        row.className = `assistant-message assistant-message-${kind}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'assistant-bubble';
+        bubble.textContent = text;
+        if (kind === 'bot' && mode) {
+            const source = document.createElement('div');
+            source.className = 'mb-2 text-xs font-semibold text-slate-600';
+            source.textContent = mode === 'local_ai'
+                ? wording('Database summary with local AI explanation', 'Summary sa database uban sa local AI nga pagpasabot')
+                : wording('Database summary', 'Summary sa database');
+            bubble.prepend(source);
+        }
+        row.appendChild(bubble);
+
+        if (actions.length) {
+            const links = document.createElement('div');
+            links.className = 'assistant-actions';
+            actions.forEach((action) => {
+                const link = document.createElement('a');
+                link.href = action.url;
+                link.textContent = action.label;
+                links.appendChild(link);
+            });
+            bubble.appendChild(links);
+        }
+
+        messages.appendChild(row);
+        messages.scrollTop = messages.scrollHeight;
+        return row;
+    };
+
+    const showSuggestions = (items = []) => {
+        suggestions.replaceChildren();
+        items.slice(0, 3).forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.assistantSuggestion = '';
+            button.textContent = item;
+            suggestions.appendChild(button);
+        });
+    };
+
+    const ask = async (message) => {
+        const clean = message.trim();
+        if (!clean || send.disabled) return;
+
+        addMessage(clean, 'user');
+        input.value = '';
+        input.style.height = '';
+        send.disabled = true;
+        reset.disabled = true;
+        language.disabled = true;
+        panel.setAttribute('aria-busy', 'true');
+        suggestions.hidden = true;
+        const typing = addMessage(wording('Checking RBIM…', 'Gitan-aw ang RBIM…'), 'bot');
+        typing.classList.add('is-typing');
+
+        const abort = new AbortController();
+        const timeout = setTimeout(() => abort.abort(), 35000);
+        try {
+            const response = await fetch(root.dataset.endpoint, {
+                method: 'POST',
+                signal: abort.signal,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrf,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ message: clean, previous_question: previousQuestion, language: language.value }),
+            });
+
+            if (!response.ok) {
+                const problem = new Error('Request failed');
+                problem.status = response.status;
+                throw problem;
+            }
+            const data = await response.json();
+            if (['en', 'ceb'].includes(data.language)) language.value = data.language;
+            previousQuestion = data.previous_question || null;
+            typing.remove();
+            if (data.interpreted_question) addMessage(wording('Using: ', 'Gigamit nga pangutana: ') + data.interpreted_question, 'bot');
+            addMessage(data.reply, 'bot', data.actions || [], data.facts ? data.mode : null);
+            showSuggestions(data.suggestions || []);
+        } catch (error) {
+            previousQuestion = null;
+            typing.remove();
+            const message = error.status === 429
+                ? wording('Too many questions in a short time. Please wait a minute and try again.', 'Daghan ra kaayong pangutana sa mubo nga panahon. Paghulat og usa ka minuto ug sulayi pag-usab.')
+                : [401, 419].includes(error.status)
+                    ? wording('Your session has expired. Refresh the page and sign in again.', 'Na-expire ang imong session. I-refresh ang page ug pag-sign in pag-usab.')
+                    : wording('I could not reach RBIM right now. Please try again with a complete question.', 'Dili nako makontak ang RBIM karon. Palihog sulayi pag-usab gamit ang kompleto nga pangutana.');
+            addMessage(message, 'bot');
+        } finally {
+            clearTimeout(timeout);
+            send.disabled = false;
+            reset.disabled = false;
+            language.disabled = false;
+            panel.removeAttribute('aria-busy');
+            suggestions.hidden = false;
+            input.focus();
+        }
+    };
+
+    toggle.addEventListener('click', () => setOpen(panel.hidden));
+    reset.addEventListener('click', () => {
+        if (send.disabled) return;
+        previousQuestion = null;
+        messages.replaceChildren();
+        addMessage(wording('New conversation. Ask a complete question to start a new topic.', 'Bag-ong panag-istorya. Pangutana og kompleto aron magsugod og bag-ong hilisgutan.'), 'bot');
+        input.value = '';
+        input.style.height = '';
+        root.querySelector('[data-assistant-catalog]').open = false;
+        input.focus();
+    });
+    close.addEventListener('click', () => setOpen(false));
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        ask(input.value);
+    });
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            form.requestSubmit();
+        }
+    });
+    input.addEventListener('input', () => {
+        input.style.height = '';
+        input.style.height = `${Math.min(input.scrollHeight, 92)}px`;
+    });
+    suggestions.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-assistant-suggestion]');
+        if (button) ask(button.textContent);
+    });
+    root.querySelector('[data-assistant-catalog]').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-assistant-question]');
+        if (button && !send.disabled) {
+            root.querySelector('[data-assistant-catalog]').open = false;
+            ask(button.textContent);
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !panel.hidden) setOpen(false);
+    });
+})();
+</script>
+                    <script src="file:///C:/laragon/www/Capstone_2/public/js/philippine-clock.js?v=1790187458" defer></script>
+        <script>
+            (() => {
+                const body = document.body;
+                const toggle = document.querySelector('[data-sidebar-toggle]');
+                const close = document.querySelector('[data-sidebar-close]');
+                const collapse = document.querySelector('[data-sidebar-collapse]');
+                const sidebar = document.getElementById('app-sidebar');
+                const workspace = document.querySelector('.app-main');
+                const syncCollapse = () => {
+                    const collapsed = body.classList.contains('sidebar-collapsed');
+                    collapse?.setAttribute('aria-expanded', String(!collapsed));
+                    collapse?.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
+                };
+                try {
+                    const saved = localStorage.getItem('rbim.sidebar.collapsed');
+                    if (saved !== null) body.classList.toggle('sidebar-collapsed', saved === 'true');
+                } catch (_) {}
+                syncCollapse();
+                const pageTitle = document.querySelector('#main-content h1')?.textContent.trim();
+                if (pageTitle) {
+                    document.querySelector('[data-page-location-title]').textContent = pageTitle;
+                    document.querySelector('[data-page-location]').hidden = false;
+                    document.title = `${pageTitle} | RBIM · Tomas Oppus`;
+                }
+                document.querySelectorAll('.side-nav a').forEach((link) => {
+                    link.setAttribute('aria-label', link.textContent.trim());
+                    link.title = link.textContent.trim();
+                    if (link.classList.contains('active')) link.setAttribute('aria-current', 'page');
+                });
+                const setOpen = (open) => {
+                    const wasOpen = body.classList.contains('sidebar-is-open');
+                    body.classList.toggle('sidebar-is-open', open);
+                    toggle?.setAttribute('aria-expanded', String(open));
+                    sidebar.inert = window.innerWidth <= 960 && !open;
+                    workspace.inert = open && window.innerWidth <= 960;
+                    if (open) sidebar.querySelector('a')?.focus();
+                    else if (wasOpen) toggle?.focus();
+                };
+                toggle?.addEventListener('click', () => setOpen(!body.classList.contains('sidebar-is-open')));
+                collapse?.addEventListener('click', () => {
+                    const isCollapsed = body.classList.toggle('sidebar-collapsed');
+                    syncCollapse();
+                    try { localStorage.setItem('rbim.sidebar.collapsed', String(isCollapsed)); } catch (_) {}
+                });
+                close?.addEventListener('click', () => setOpen(false));
+                document.addEventListener('keydown', (event) => event.key === 'Escape' && setOpen(false));
+                document.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Tab' || !body.classList.contains('sidebar-is-open')) return;
+                    const items = [...sidebar.querySelectorAll('a,button')].filter(el => el.getClientRects().length && !el.disabled);
+                    const first = items[0], last = items[items.length - 1];
+                    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+                    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+                });
+                const syncViewport = () => {
+                    if (window.innerWidth > 960) setOpen(false);
+                    else sidebar.inert = !body.classList.contains('sidebar-is-open');
+                };
+                window.addEventListener('resize', syncViewport);
+                syncViewport();
+            })();
+        </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker
+                .register('/service-worker.js')
+                .then(function (registration) {
+                    console.log(
+                        'Service Worker registered:',
+                        registration.scope
+                    );
+                })
+                .catch(function (error) {
+                    console.error(
+                        'Service Worker registration failed:',
+                        error
+                    );
+                });
+        });
+    }
+</script>
+</body>
+</html>

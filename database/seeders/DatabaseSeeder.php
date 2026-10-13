@@ -22,6 +22,10 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        if (app()->environment('production')) {
+            return;
+        }
+
         $barangay = Barangay::where('name', 'San Isidro')->firstOrFail();
 
         User::updateOrCreate(

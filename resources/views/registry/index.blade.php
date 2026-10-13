@@ -1,12 +1,16 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/registry-accents.css') }}?v={{ filemtime(public_path('css/registry-accents.css')) }}" media="screen">
+@endpush
+
 @section('content')
     @php($isBiasong = $registryBarangay?->name === 'Biasong')
     @php($usesFamilyNewInhabitants = $registryBarangay !== null)
     @php($isDedicatedRegistryPage = request()->routeIs('barangay.registry.*'))
     @php($editThroughRbi = auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY) && request('source') && !in_array(request('sheet'), ['deceased', 'new-inhabitants'], true))
     @php($registryFilterRoute = request()->routeIs('barangay.registry.new-inhabitants') ? 'barangay.registry.new-inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'barangay.registry.deceased' : (request()->routeIs('barangay.registry.active') ? 'barangay.registry.active' : 'registry.index')))
-    <section class="panel  registry-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6 {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
+    <section class="panel registry-workspace registry-color-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6 {{ $isDedicatedRegistryPage ? 'registry-workspace-dedicated' : '' }}">
         <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <x-workspace-heading icon="users"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
                 <h1>{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'New Inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'Deceased Records' : (request()->routeIs('barangay.registry.active') ? ($isBiasong ? 'Resident Registry' : 'Consolidated / All Registered') : ($registryBarangay ? 'Barangay '.$registryBarangay->name.' RBI Data' : 'Multi-Barangay Registry'))) }}</h1>
@@ -31,13 +35,31 @@
         @endif
 
         @if(request()->routeIs('barangay.registry.active') && ! $isBiasong)
-            <div class="toolbar flex flex-wrap items-end gap-3">
+            <div class="toolbar registry-scope-actions flex flex-wrap items-end gap-3">
                 <a class="button" href="{{ route('barangay.residence.index') }}">Living in Barangay</a>
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'living_elsewhere']) }}">Registered, Living Elsewhere</a>
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'unconfirmed']) }}">Residence Needs Confirmation</a>
-                <a class="button secondary-button" href="{{ route('barangay.residence.download', ['scope'=>'registered']) }}">Download All Registered CSV</a>
+                <a class="button secondary-button" href="{{ route('barangay.registry.download', ['scope' => 'consolidated']) }}">Download Consolidated Excel</a>
             </div>
-            <p>Green rows are registered residents living elsewhere. The Living in Barangay file excludes them.</p>
+            <p class="registry-residence-note">Living elsewhere rows are shaded in muted gold.</p>
+        @endif
+
+        @if(request()->routeIs('barangay.registry.active'))
+            <details class="registry-print-options">
+                <summary>Print or download registry</summary>
+                <div class="toolbar flex flex-wrap items-end gap-3">
+                    <a class="button secondary-button" href="{{ route('barangay.registry.print', ['scope' => 'consolidated']) }}" target="_blank" rel="noopener">Print Consolidated</a>
+                    @if($isBiasong)
+                        <a class="button secondary-button" href="{{ route('barangay.registry.download', ['scope' => 'consolidated']) }}">Download Consolidated Excel</a>
+                    @endif
+                    @unless($isBiasong)
+                        <a class="button secondary-button" href="{{ route('barangay.registry.print', ['scope' => 'registered']) }}" target="_blank" rel="noopener">Print Living in Barangay</a>
+                        <a class="button secondary-button" href="{{ route('barangay.registry.download', ['scope' => 'registered']) }}">Download Living in Barangay Excel</a>
+                        <a class="button secondary-button" href="{{ route('barangay.registry.print', ['scope' => 'living_elsewhere']) }}" target="_blank" rel="noopener">Print Living Elsewhere</a>
+                        <a class="button secondary-button" href="{{ route('barangay.registry.download', ['scope' => 'living_elsewhere']) }}">Download Living Elsewhere Excel</a>
+                    @endunless
+                </div>
+            </details>
         @endif
 
         @unless(request('source'))
@@ -77,11 +99,31 @@
             @if ((request('sheet') === 'deceased' && $deceasedRecords->isEmpty()) || (request('sheet') === 'new-inhabitants' && !$usesFamilyNewInhabitants && $newInhabitantRecords->isEmpty()) || (!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && $inhabitants->isEmpty()))
                 <p>No records found.</p>
             @else
-                <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200 {{ request('source') ? 'rbi-source-table' : '' }}">
+                @if(request()->routeIs('barangay.registry.active') && ! $isBiasong)
+                    <div class="registry-table-summary">
+                        <h3>Consolidated household record of barangay inhabitants (RBI)</h3>
+                        <dl>
+                            <div><dt>Region</dt><dd>VIII</dd></div>
+                            <div><dt>Province</dt><dd>Southern Leyte</dd></div>
+                            <div><dt>Municipality</dt><dd>Tomas Oppus</dd></div>
+                            <div><dt>Barangay</dt><dd>{{ $registryBarangay?->name }}</dd></div>
+                            <div><dt>Households</dt><dd>{{ number_format($registryHouseholdCount) }}</dd></div>
+                            <div><dt>Residents</dt><dd>{{ number_format($inhabitants->total()) }}</dd></div>
+                        </dl>
+                    </div>
+                @endif
+                <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200 {{ request('source') ? 'rbi-source-table' : '' }} {{ request()->routeIs('barangay.registry.active') && ! $isBiasong ? 'rbi-active-registry-table' : '' }}">
                     <fieldset @disabled($editThroughRbi) class="min-w-0 border-0 p-0">
                     <table @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong) class="rbi-compact-household-columns" @endif>
                         @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong)
-                            <colgroup><col style="width: 56px"><col style="width: 56px"><col span="17"></colgroup>
+                            <colgroup>
+                                <col style="width: 56px"><col style="width: 72px">
+                                <col style="width: 160px"><col style="width: 160px"><col style="width: 150px"><col style="width: 90px">
+                                <col style="width: 160px"><col style="width: 140px"><col style="width: 175px"><col style="width: 135px">
+                                <col style="width: 65px"><col style="width: 65px"><col style="width: 130px"><col style="width: 160px">
+                                <col style="width: 140px"><col style="width: 170px"><col style="width: 190px"><col style="width: 140px">
+                                @if($editThroughRbi)<col style="width: 80px">@endif
+                            </colgroup>
                         @endif
                         @if (request('source'))
                         @if (request('sheet') === 'deceased')
@@ -157,22 +199,25 @@
                         @if ($isBiasong)
                             @include('registry._biasong_active')
                         @else
+                        @php($activeColumns = $editThroughRbi ? 19 : 18)
                         <thead>
-                            <tr class="rbi-title-row"><th colspan="19">CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</th></tr>
-                            <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
+                            @unless(request()->routeIs('barangay.registry.active'))
+                            <tr class="rbi-title-row"><th colspan="{{ $activeColumns }}">CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</th></tr>
+                            <tr class="rbi-spacer-row"><th colspan="{{ $activeColumns }}"></th></tr>
                             <tr class="rbi-meta-row">
-                                <th colspan="2">A. REGION:</th><th colspan="4">VIII</th><th colspan="3"></th><th colspan="2">D. BARANGAY:</th><th colspan="9">{{ strtoupper($registryBarangay?->name ?? '') }}</th>
+                                <th colspan="2">A. REGION:</th><th colspan="4">VIII</th><th colspan="3"></th><th colspan="2">D. BARANGAY:</th><th colspan="{{ $activeColumns - 11 }}">{{ strtoupper($registryBarangay?->name ?? '') }}</th>
                             </tr>
                             <tr class="rbi-meta-row">
-                                <th colspan="2">B. PROVINCE:</th><th colspan="4">SOUTHERN LEYTE</th><th colspan="3"></th><th colspan="2">E. HOUSEHOLD:</th><th colspan="9">{{ number_format($registryHouseholdCount) }} HOUSEHOLDS</th>
+                                <th colspan="2">B. PROVINCE:</th><th colspan="4">SOUTHERN LEYTE</th><th colspan="3"></th><th colspan="2">E. HOUSEHOLD:</th><th colspan="{{ $activeColumns - 11 }}">{{ number_format($registryHouseholdCount) }} HOUSEHOLDS</th>
                             </tr>
                             <tr class="rbi-meta-row">
-                                <th colspan="2">C. MUNICIPALITY:</th><th colspan="4">TOMAS OPPUS</th><th colspan="13"></th>
+                                <th colspan="2">C. MUNICIPALITY:</th><th colspan="4">TOMAS OPPUS</th><th colspan="{{ $activeColumns - 6 }}"></th>
                             </tr>
-                            <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
-                            <tr class="rbi-meta-row"><th colspan="19">Residents: {{ number_format($inhabitants->total()) }}</th></tr>
+                            <tr class="rbi-spacer-row"><th colspan="{{ $activeColumns }}"></th></tr>
+                            <tr class="rbi-meta-row"><th colspan="{{ $activeColumns }}">Residents: {{ number_format($inhabitants->total()) }}</th></tr>
+                            @endunless
                             <tr class="rbi-group-row">
-                                <th rowspan="2">HH<br>No.</th><th rowspan="2">HH</th><th colspan="4">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2">ETHNICITY</th><th rowspan="2" scope="col">Resident No.</th>@if($editThroughRbi)<th rowspan="2" scope="col">Action</th>@endif
+                                <th rowspan="2">HH<br>No.</th><th rowspan="2">Family<br>No.</th><th colspan="4">NAME</th><th>RELATIONSHIP</th><th rowspan="2">PUROK / SITIO</th><th rowspan="2">PLACE OF<br>BIRTH</th><th>DATE OF</th><th rowspan="2">AGE</th><th rowspan="2">SEX<br>(M/F)</th><th rowspan="2">CIVIL<br>STATUS</th><th>School</th><th rowspan="2">RELIGION</th><th rowspan="2">OCCUPATION</th><th>REMARKS</th><th rowspan="2">ETHNICITY</th>@if($editThroughRbi)<th rowspan="2" scope="col">Action</th>@endif
                             </tr>
                             <tr>
                                 <th>Last Name</th>
@@ -193,8 +238,8 @@
                                 @php($householdStart = $householdNumber !== 'Not recorded' && $householdNumber !== $previousHousehold)
                                 @php($previousHousehold = $householdNumber)
                                 <tr class="{{ $householdStart ? 'rbi-household-start' : '' }} {{ $householdStart ? 'punong-household-start' : '' }} {{ $inhabitant->residence_status === 'living_elsewhere' ? 'residence-elsewhere' : '' }}">
-                                    <td><input value="{{ $inhabitant->household->household_number === 'Not recorded' ? '' : $inhabitant->household->household_number }}" readonly aria-label="Household number"><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
-                                    <td><input form="{{ $rowForm }}" name="household_number" value="{{ $inhabitant->household->household_number }}" required aria-label="Household number"></td>
+                                    <td><input form="{{ $rowForm }}" name="household_number" value="{{ $inhabitant->household->household_number }}" required aria-label="Household number"><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
+                                    <td><input form="{{ $rowForm }}" name="family_number" value="{{ $inhabitant->family_number }}" aria-label="Family number"></td>
                                     <td><input form="{{ $rowForm }}" name="last_name" value="{{ $inhabitant->last_name }}" required aria-label="Last name"></td>
                                     <td><input form="{{ $rowForm }}" name="first_name" value="{{ $inhabitant->first_name }}" required aria-label="First name"></td>
                                     <td><input form="{{ $rowForm }}" name="middle_name" value="{{ $inhabitant->middle_name }}" aria-label="Middle name"></td>
@@ -211,7 +256,6 @@
                                     <td><input form="{{ $rowForm }}" name="occupation" value="{{ $inhabitant->occupation }}" aria-label="Occupation"></td>
                                     <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($inhabitant->remarks) }}" aria-label="Remarks"></td>
                                     <td><input form="{{ $rowForm }}" name="ethnicity" value="{{ $inhabitant->ethnicity }}" aria-label="Ethnicity"></td>
-                                    <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
                                     @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
                                     <td class="rbi-row-save" hidden>
                                         <form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">
@@ -260,4 +304,7 @@
         </div>
     </section>
 @push('scripts')<script src="{{ asset('js/registry-confirm.js') }}?v={{ filemtime(public_path('js/registry-confirm.js')) }}" defer></script>@endpush
+@if(request()->routeIs('barangay.registry.active'))
+    @push('head')<link rel="stylesheet" href="{{ asset('css/resident-registry-table.css') }}?v={{ filemtime(public_path('css/resident-registry-table.css')) }}" media="screen">@endpush
+@endif
 @endsection

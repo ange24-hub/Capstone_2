@@ -45,6 +45,7 @@ footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt sol
 .page-number { float: right; } .page-number:after { content: counter(page); }
 </style></head><body>
 <footer>RBIM | {{ $reportTitle ?? 'Population Summary' }} | {{ $report['generatedAt']->format('d M Y') }} <span class="page-number">Page </span></footer>
-<header class="report-header"><p>Republic of the Philippines</p><p>Province of Southern Leyte</p><p class="office">Municipality of Tomas Oppus</p><h1>{{ strtoupper($reportTitle ?? 'Population Summary') }} REPORT</h1><p class="office">{{ $report['scopeLabel'] }}</p><p class="report-meta">As of {{ $report['generatedAt']->format('d F Y') }} &nbsp; | &nbsp; Generated {{ $report['generatedAt']->format('h:i A T') }}</p></header>
+<header class="report-header"><p>Republic of the Philippines</p><h1>{{ strtoupper($reportTitle ?? 'Population Summary') }} REPORT</h1></header>
+@include('reports._jurisdiction')
 @include('reports.population-content', ['showReportNotes' => false])
 </body></html>

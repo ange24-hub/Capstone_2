@@ -1,6 +1,6 @@
 @if ($savedHouseholdPage->total() > 0)
 <section class="saved-report-list" id="saved-inhabitant-records" aria-label="Pending consolidation">
-    <div class="rbi-history-header"><div><h3>Pending consolidation</h3><p>Add these members to Consolidated / All Registered. Completed members move to Consolidation history below.</p></div></div>
+    <div class="rbi-history-header"><div><h3>Pending consolidation</h3><p>Residents waiting to be added to Consolidated / All Registered.</p></div></div>
     @include('rbi-updates._household-pagination')
     @foreach ($savedHouseholdPage->getCollection()->groupBy('month') as $month => $pageFamilies)
         @php($monthlyRecords = $savedReportMonths->get($month))
@@ -8,7 +8,7 @@
         @php($families = $monthlyRecords->groupBy('household_number'))
         <details class="saved-report" @if($loop->first) open @endif>
             <summary>
-                <span class="report-month"><span class="report-month-icon" aria-hidden="true"><x-app-icon name="form" /></span><span><strong>{{ $month }}</strong><small>Saved new-inhabitant report</small></span></span>
+                <span class="report-month"><span class="report-month-icon" aria-hidden="true"><x-app-icon name="form" /></span><span><strong>{{ $month }}</strong><small>Saved residents</small></span></span>
                 <span class="report-counts">{{ $families->count() }} {{ Str::plural('family', $families->count()) }} <span>&middot;</span> {{ $monthlyRecords->count() }} {{ Str::plural('member', $monthlyRecords->count()) }}</span>
                 <span class="report-expand" aria-hidden="true">&#8964;</span>
             </summary>

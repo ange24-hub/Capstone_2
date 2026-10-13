@@ -3,6 +3,7 @@
 return [
 
     'migration_prediction' => [
+        'enabled' => (bool) env('MIGRATION_PREDICTION_ENABLED', true),
         'url' => env('MIGRATION_PREDICTION_URL', 'http://127.0.0.1:5001'),
     ],
 

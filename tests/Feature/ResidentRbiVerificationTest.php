@@ -46,7 +46,7 @@ class ResidentRbiVerificationTest extends TestCase
         [$staff, $resident] = $this->applicants();
         $other = User::factory()->create(['barangay_id' => Barangay::where('name', 'Luan')->value('id')]);
         $this->record($other);
-        $this->actingAs($staff)->get(route('dashboard.barangay'))->assertOk()->assertSee('No RBI match found');
+        $this->actingAs($staff)->get(route('barangay.resident-approvals.index'))->assertOk()->assertSee('No RBI match found');
         $this->post(route('barangay.residents.approve', $resident), ['residency_confirmed' => '1'])
             ->assertSessionHasErrors('resident_verification');
         $this->assertSame(User::APPROVAL_PENDING, $resident->fresh()->approval_status);
@@ -72,7 +72,7 @@ class ResidentRbiVerificationTest extends TestCase
         }
         $record->update(['resident_user_id' => null]);
         $this->record($resident);
-        $this->get(route('dashboard.barangay'))->assertOk()->assertSee('Multiple matching records');
+        $this->get(route('barangay.resident-approvals.index'))->assertOk()->assertSee('Multiple matching records');
         $this->post(route('barangay.residents.approve', $resident), ['residency_confirmed' => '1'])
             ->assertSessionHasErrors('resident_verification');
     }
@@ -81,7 +81,7 @@ class ResidentRbiVerificationTest extends TestCase
     {
         [$staff, $resident] = $this->applicants();
         $record = $this->record($resident);
-        $this->actingAs($staff)->get(route('dashboard.barangay'))->assertOk()->assertSee('Resident record found');
+        $this->actingAs($staff)->get(route('barangay.resident-approvals.index'))->assertOk()->assertSee('Resident record found');
         $record->update(['residence_status' => Inhabitant::RESIDENCE_ELSEWHERE]);
         $this->post(route('barangay.residents.approve', $resident), ['residency_confirmed' => '1'])
             ->assertSessionHasErrors('resident_verification');

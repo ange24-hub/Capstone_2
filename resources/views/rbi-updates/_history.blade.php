@@ -1,19 +1,26 @@
+        <nav class="rbi-history-sections" aria-label="Report history sections">
+            <a href="#report-history">Monthly forms <span>{{ $reportHistoryPage->total() }}</span></a>
+            @if($savedHouseholdPage->total() > 0)
+                <a href="#saved-inhabitant-records">Pending consolidation <span>{{ $savedHouseholdPage->total() }}</span></a>
+            @endif
+            @if($consolidatedHouseholdPage->total() > 0)
+                <a href="#consolidated-inhabitant-history">Consolidation history</a>
+            @endif
+            <a href="#registry-activity-title">Registry activity</a>
+        </nav>
+
         <section class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history" aria-labelledby="report-history-heading">
             <div class="rbi-history-header">
                 <div>
-                    <span class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Saved reports</span>
                     <h2 id="report-history-heading" class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2>
-                    <p>Review saved reports, add members to Consolidated RBI, or submit a completed monthly form.</p>
+                    <p>Open, update, or submit each month's RBI form.</p>
                 </div>
                 @if($reportHistoryPage->total() > 0)
                     <span class="rbi-history-total">{{ number_format($reportHistoryPage->total()) }} {{ Str::plural('report', $reportHistoryPage->total()) }}</span>
                 @endif
             </div>
 
-            @include('rbi-updates._saved-inhabitants')
-            @include('rbi-updates._consolidated-inhabitants')
-
-            @if ($reportHistoryPage->total() === 0 && $newInhabitantRecords->isEmpty())
+            @if ($reportHistoryPage->total() === 0)
                 <div class="rbi-history-empty"><span aria-hidden="true"><x-app-icon name="calendar" /></span><strong>No monthly RBI forms created yet</strong><p>Saved forms will appear here by reporting month.</p></div>
             @endif
 
@@ -25,14 +32,16 @@
                             <div class="rbi-history-card-main">
                                 <div class="rbi-history-month">
                                     <span class="rbi-history-month-icon" aria-hidden="true"><x-app-icon name="calendar" /></span>
-                                    <div><h3>{{ optional($report->reporting_month)->format('F Y') ?: 'Month not set' }}</h3><span>Monthly RBI form</span></div>
+                                    <div><h3>{{ optional($report->reporting_month)->format('F Y') ?: 'Month not set' }}</h3></div>
                                 </div>
                                 <x-status-badge :status="$report->status">{{ $report->statusLabel() }}</x-status-badge>
                             </div>
                             <div class="rbi-history-card-meta">
                                 <span><strong>{{ $familyCount }}</strong> {{ Str::plural('family', $familyCount) }}</span>
                                 <span><strong>{{ count($report->rows ?? []) }}</strong> {{ Str::plural('inhabitant', count($report->rows ?? [])) }}</span>
-                                <span class="rbi-history-submitted"><x-app-icon name="clock" />{{ $report->submitted_at?->copy()->timezone('Asia/Manila')->format('M d, Y h:i A') ?: 'Not submitted' }}</span>
+                                @if($report->submitted_at)
+                                    <span class="rbi-history-submitted"><x-app-icon name="clock" />Submitted {{ $report->submitted_at->copy()->timezone('Asia/Manila')->format('M d, Y') }}</span>
+                                @endif
                             </div>
                             <div class="rbi-history-card-actions">
                                 <div class="rbi-history-main-actions">
@@ -43,10 +52,13 @@
                                         @include('rbi-updates._submit-action', ['report' => $report])
                                     </div>
                                 </div>
-                                <div class="rbi-history-downloads" aria-label="Download {{ optional($report->reporting_month)->format('F Y') ?: 'monthly' }} form">
-                                    <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
-                                    <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
-                                </div>
+                                <details class="rbi-history-more">
+                                    <summary>Downloads</summary>
+                                    <div class="rbi-history-downloads" aria-label="Download {{ optional($report->reporting_month)->format('F Y') ?: 'monthly' }} form">
+                                        <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
+                                        <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
+                                    </div>
+                                </details>
                             </div>
                         </article>
                     @endforeach
@@ -67,3 +79,6 @@
                 </nav>
             @endif
         </section>
+
+        @include('rbi-updates._saved-inhabitants')
+        @include('rbi-updates._consolidated-inhabitants')

@@ -79,4 +79,47 @@ class ResidenceRegistryTest extends TestCase
         $this->get(route('barangay.residence.download'))->assertForbidden();
         $this->assertSame(Inhabitant::RESIDENCE_ELSEWHERE, $other->fresh()->residence_status);
     }
+
+    public function test_registered_csv_uses_the_print_registry_columns_and_values(): void
+    {
+        $barangay = Barangay::where('name', 'Hugpa')->firstOrFail();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
+        $resident = $this->resident($barangay, 'Concordio', Inhabitant::RESIDENCE_HERE);
+        $resident->household->update(['purok' => 'P-2']);
+        $resident->update([
+            'family_number' => '7', 'last_name' => 'Aves', 'relationship_to_head' => 'Head',
+            'birth_place' => 'Hugpa', 'birth_date' => '1946-01-01', 'recorded_age' => 80,
+            'sex' => 'Male', 'civil_status' => 'Married', 'education_level' => 'Elementary',
+            'religion' => 'Catholic', 'occupation' => 'Farmer', 'remarks' => 'SC', 'ethnicity' => 'Waray',
+        ]);
+
+        $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk()
+            ->assertSee('Family<br>No.', false)
+            ->assertSee('name="family_number" value="7"', false)
+            ->assertDontSee('Resident No.');
+
+        $this->actingAs($staff)->get(route('barangay.registry.print', ['scope' => 'consolidated']))
+            ->assertOk()->assertSee('Concordio')->assertSee('P-2')->assertSee('01-01-46');
+
+        $csv = $this->get(route('barangay.residence.download', ['scope' => 'registered']))
+            ->assertOk()->streamedContent();
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $csv);
+        rewind($stream);
+        $this->assertSame("\xEF\xBB\xBF", fread($stream, 3));
+        $headers = fgetcsv($stream);
+        $row = fgetcsv($stream);
+        fclose($stream);
+
+        $this->assertCount(18, $headers);
+        $this->assertNotContains('RESIDENT NO.', $headers);
+        $this->assertSame(['HH NO.', 'FAMILY NO.', 'LAST NAME', 'FIRST NAME'], array_slice($headers, 0, 4));
+        $this->assertSame(['1', '7', 'Aves', 'Concordio'], array_slice($row, 0, 4));
+        $this->assertSame('P-2', $row[7]);
+        $this->assertSame('01-01-46', $row[9]);
+        $this->assertSame('M', $row[11]);
+        $this->assertSame('SC', $row[16]);
+        $this->assertSame('Waray', $row[17]);
+        $this->assertCount(18, $row);
+    }
 }

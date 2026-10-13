@@ -1,0 +1,312 @@
+/* Quiet, consistent accents for resident approvals, document requests, and payment history. */
+@media screen {
+    .workspace-page-approvals,
+    .workspace-page-documents,
+    .payment-history-page {
+        --service-navy: #293e55;
+        --service-blue: #3e5975;
+        --service-gold: #ad9061;
+        --service-ink: #293b50;
+        --service-text: #586673;
+        --service-line: #e4e0d8;
+        --service-surface: #fffefb;
+        --service-warm: #f7f5f0;
+    }
+
+    .workspace-page-approvals .workspace-approvals-panel {
+        overflow: hidden;
+    }
+    .workspace-page-approvals .government-record-list {
+        display: block;
+    }
+    .workspace-page-approvals .government-record-row {
+        grid-template-columns: 42px minmax(160px, 1fr) minmax(0, 2fr);
+        align-items: start;
+        gap: 14px;
+        border: 0;
+        border-radius: 0;
+        padding: 18px 20px;
+        box-shadow: none;
+    }
+    .workspace-page-approvals .government-record-row + .government-record-row {
+        border-top: 1px solid var(--service-line);
+    }
+    .workspace-page-approvals .record-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        background: #edf1f4;
+        color: var(--service-blue);
+        font-size: 16px;
+    }
+    .workspace-page-approvals .record-identity {
+        padding-top: 2px;
+    }
+    .workspace-page-approvals .record-identity :is(strong, span, small) {
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+    .workspace-page-approvals .record-identity strong {
+        color: var(--service-navy);
+        font-size: 15px;
+    }
+    .workspace-page-approvals .record-identity span,
+    .workspace-page-approvals .record-identity small {
+        margin-top: 4px;
+        color: var(--service-text);
+        font-size: 12px;
+    }
+    .workspace-page-approvals .record-actions {
+        justify-content: flex-start;
+        min-width: 0;
+    }
+    .workspace-page-approvals .resident-rbi-note {
+        flex-basis: 100%;
+        max-width: none !important;
+        border-radius: 7px;
+        padding: 12px 14px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .workspace-page-approvals .resident-rbi-note strong {
+        display: block;
+        font-size: 13px;
+    }
+    .workspace-page-approvals .resident-rbi-note p {
+        margin: 3px 0 0;
+    }
+    .workspace-page-approvals .resident-rbi-note a {
+        color: inherit;
+        font-weight: 650;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .workspace-page-approvals .record-actions form {
+        margin: 0;
+    }
+
+    .payment-history-page {
+        width: 100%;
+        max-width: 1450px;
+        margin: 0 auto;
+    }
+    .payment-history-page .payment-history-header {
+        margin-bottom: 18px;
+    }
+    .payment-history-page .payment-history-header h1 {
+        margin: 0 0 7px;
+        color: var(--service-navy);
+        font-size: clamp(24px, 2.3vw, 31px);
+        line-height: 1.2;
+    }
+    .payment-history-page .payment-history-header p {
+        max-width: 800px;
+        margin: 0;
+        color: var(--service-text);
+        font-size: 14px;
+        line-height: 1.55;
+    }
+    .payment-history-page .payment-history-table-wrap {
+        border: 1px solid var(--service-line);
+        border-radius: 7px;
+    }
+    .payment-history-page .payment-history-table {
+        min-width: 880px;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .payment-history-page .payment-history-table th,
+    .payment-history-page .payment-history-table td {
+        padding: 13px 15px;
+        border-bottom: 1px solid var(--service-line);
+        font-size: 13px;
+        line-height: 1.5;
+        vertical-align: top;
+    }
+    .payment-history-page .payment-history-table th {
+        color: var(--service-blue);
+        background: #edf1f4;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .payment-history-page .payment-history-table td {
+        color: var(--service-ink);
+        overflow-wrap: anywhere;
+    }
+    .payment-history-page .payment-history-table tbody tr:nth-child(even) {
+        background: #faf9f6;
+    }
+    .payment-history-page .payment-history-table tbody tr:hover {
+        background: #f4f2ed;
+    }
+    .payment-history-page .payment-history-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    .payment-history-page .payment-history-table a {
+        color: var(--service-blue);
+        font-weight: 650;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .payment-history-page .payment-history-status {
+        display: inline-block;
+        max-width: 180px;
+        margin-top: 5px;
+        padding: 4px 8px;
+        border: 1px solid #d7dde0;
+        border-radius: 5px;
+        background: #f1f3f4;
+        color: #526473;
+        font-size: 12px;
+        font-weight: 650;
+        line-height: 1.35;
+    }
+    .payment-history-page .payment-history-status[data-status="paid"] {
+        border-color: #c7dccd;
+        background: #edf5ee;
+        color: #356448;
+    }
+    .payment-history-page .payment-history-status:is([data-status="pending_verification"], [data-status="awaiting_assessment"]) {
+        border-color: #e1d2b8;
+        background: #f6f0e5;
+        color: #765d36;
+    }
+    .payment-history-page .payment-history-status:is([data-status="rejected"], [data-status="unpaid"]) {
+        border-color: #e8cdcc;
+        background: #fbf0ef;
+        color: #935151;
+    }
+
+    @media (max-width: 800px) {
+        .workspace-page-approvals .government-record-row {
+            grid-template-columns: 40px minmax(0, 1fr);
+        }
+        .workspace-page-approvals .record-actions {
+            grid-column: 1 / -1;
+        }
+        .payment-history-page .payment-history-header,
+        .payment-history-page .payment-history-card {
+            padding: 17px;
+        }
+    }
+}
+
+@layer professional-workspace {
+    @media screen {
+        .professional-content #main-content .workspace-page-approvals > .dashboard-page-header,
+        .professional-content #main-content .workspace-page-documents > .dashboard-page-header {
+            padding: 20px 24px !important;
+            border: 1px solid #e4e0d8 !important;
+            border-left: 4px solid #ad9061 !important;
+            border-radius: 8px !important;
+            background: #fffefb !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .workspace-approvals-panel,
+        .professional-content #main-content .workspace-page-documents .workspace-documents-panel,
+        .professional-content #main-content .payment-history-page :is(.payment-history-header, .payment-history-card) {
+            border: 1px solid #e4e0d8 !important;
+            border-radius: 8px !important;
+            background: #fffefb !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content .payment-history-page .payment-history-header {
+            border-left: 4px solid #ad9061 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .government-card-header,
+        .professional-content #main-content .workspace-page-documents .government-card-header {
+            border-bottom: 1px solid #e4e0d8 !important;
+            background: #f7f5f0 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .government-card-header h2,
+        .professional-content #main-content .workspace-page-documents .government-card-header h2 {
+            color: #293e55 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .government-count-badge.is-pending,
+        .professional-content #main-content .workspace-page-documents .government-count-badge.is-pending {
+            border-color: #dfcfaf !important;
+            background: #f4eee3 !important;
+            color: #765d36 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .government-count-badge.is-clear,
+        .professional-content #main-content .workspace-page-documents .government-count-badge.is-clear {
+            border-color: #c7dccd !important;
+            background: #edf5ee !important;
+            color: #356448 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .government-record-row {
+            border-color: #e4e0d8 !important;
+            background: #fffefb !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .government-record-row:nth-child(even) {
+            background: #faf9f6 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .resident-rbi-note[data-verification="matched"] {
+            border-color: #c7dccd !important;
+            background: #edf5ee !important;
+            color: #356448 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .resident-rbi-note[data-verification="review"] {
+            border-color: #e8cdcc !important;
+            background: #fbf0ef !important;
+            color: #935151 !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .record-actions button:not(.danger-button),
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) button:not(.danger-button) {
+            border-color: #3e5975 !important;
+            background: #3e5975 !important;
+            color: #fff !important;
+        }
+        .professional-content #main-content .workspace-page-approvals .record-actions .danger-button,
+        .professional-content #main-content .workspace-page-documents .payment-verification-form .danger-button {
+            border-color: #e8cdcc !important;
+            background: #fffafa !important;
+            color: #935151 !important;
+        }
+        .professional-content #main-content .workspace-page-documents .government-data-table th {
+            border-color: #dce4e9 !important;
+            background: #edf1f4 !important;
+            color: #293e55 !important;
+        }
+        .professional-content #main-content .workspace-page-documents .government-data-table td {
+            border-color: #e4e0d8 !important;
+            color: #293b50 !important;
+        }
+        .professional-content #main-content .workspace-page-documents .government-data-table tbody tr:nth-child(even) {
+            background: #faf9f6 !important;
+        }
+        .professional-content #main-content .workspace-page-documents .government-data-table tbody tr:hover {
+            background: #f4f2ed !important;
+        }
+        .professional-content #main-content .workspace-page-documents :is(.request-status, .payment-status) {
+            border-color: #d7dde0 !important;
+            background: #f1f3f4 !important;
+            color: #526473 !important;
+        }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-pending, .payment-status-pending_verification) {
+            border-color: #e1d2b8 !important;
+            background: #f6f0e5 !important;
+            color: #765d36 !important;
+        }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-ready, .request-status-completed, .payment-status-paid) {
+            border-color: #c7dccd !important;
+            background: #edf5ee !important;
+            color: #356448 !important;
+        }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-rejected, .payment-status-rejected, .payment-status-unpaid) {
+            border-color: #e8cdcc !important;
+            background: #fbf0ef !important;
+            color: #935151 !important;
+        }
+        .professional-content #main-content .workspace-page-documents .document-pagination {
+            background: #f7f5f0 !important;
+            color: #586673 !important;
+        }
+        .professional-content #main-content .workspace-page-documents .document-page-links [aria-current="page"] {
+            border-color: #3e5975 !important;
+            background: #3e5975 !important;
+            color: #fff !important;
+        }
+    }
+}

@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/registry-accents.css') }}?v={{ filemtime(public_path('css/registry-accents.css')) }}" media="screen">
+@endpush
+
 @section('content')
-    <section class="panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
+    <section class="panel registry-color-workspace rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
         <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <x-workspace-heading icon="users"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">Central Registry</div>
                 <h1>Edit {{ $inhabitant->fullName() }}</h1>

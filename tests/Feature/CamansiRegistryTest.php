@@ -37,8 +37,9 @@ class CamansiRegistryTest extends TestCase
             ->assertSee('CAMANSI')->assertSee('CamansiResident');
         $this->get(route('barangay.registry.deceased'))->assertOk()
             ->assertSee('HistoricalResident');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()
-            ->assertSee('CAMANSI')->assertSee('Save Monthly Report');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.residents'))->assertOk()
+            ->assertSee($barangay->name)->assertSee('Save Residents');
 
         $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
             'reporting_month' => '2026-09',
@@ -58,6 +59,7 @@ class CamansiRegistryTest extends TestCase
         $this->actingAs($otherSecretary)->get(route('barangay.registry.active'))
             ->assertOk()->assertDontSee('CamansiResident');
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertDontSee('HistoricalResident');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()->assertDontSee('NewResident');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertDontSee('NewResident');
     }
 }

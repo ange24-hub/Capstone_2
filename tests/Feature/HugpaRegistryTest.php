@@ -32,15 +32,16 @@ class HugpaRegistryTest extends TestCase
 
         $this->actingAs($secretary)->get(route('dashboard.barangay'))
             ->assertOk()
-            ->assertSee(route('barangay.registry.new-inhabitants'))
+            ->assertDontSee(route('barangay.registry.new-inhabitants'))
             ->assertSee(route('barangay.registry.deceased'));
         $this->get(route('barangay.registry.active'))->assertOk()
             ->assertSee('HUGPA')->assertSee('HugpaResident')->assertSee('Not provided');
         $this->get(route('barangay.registry.deceased'))->assertOk()
             ->assertSee('HistoricalResident');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()
-            ->assertSee('HUGPA')->assertSee('Save Monthly Report')
-            ->assertSee('Hugpa Secretary')->assertSee('Hugpa Chair')
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.residents'))->assertOk()
+            ->assertSee($barangay->name)->assertSee('Save Residents')
+            ->assertViewHas('barangay', fn ($area) => $area->secretary_name === 'Hugpa Secretary' && $area->punong_barangay_name === 'Hugpa Chair')
             ->assertDontSee('NENA E. GONZAGA')->assertDontSee('MARY GRACE M. POLISTICO')->assertDontSee('MARCOS L. MAQUILANG');
 
         $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
@@ -61,6 +62,7 @@ class HugpaRegistryTest extends TestCase
         $this->actingAs($otherSecretary)->get(route('barangay.registry.active'))
             ->assertOk()->assertDontSee('HugpaResident');
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertDontSee('HistoricalResident');
-        $this->get(route('barangay.registry.new-inhabitants'))->assertOk()->assertDontSee('NewResident');
+        $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertDontSee('NewResident');
     }
 }

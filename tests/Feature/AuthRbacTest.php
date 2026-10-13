@@ -84,7 +84,7 @@ class AuthRbacTest extends TestCase
             ->get(route('barangay.resident-approvals.index'))
             ->assertOk()
             ->assertSee($resident->name)
-            ->assertSee('Pending Resident Registrations');
+            ->assertSee('Pending registrations');
 
         $this->actingAs($secretary)
             ->post(route('barangay.residents.approve', $resident))
@@ -326,7 +326,7 @@ class AuthRbacTest extends TestCase
             ->assertOk();
     }
 
-    public function test_resident_can_request_a_document_from_dashboard(): void
+    public function test_resident_can_request_a_document_and_track_it_in_my_requests(): void
     {
         $barangay = Barangay::where('name', 'San Isidro')->firstOrFail();
         $resident = User::factory()->create([
@@ -339,7 +339,7 @@ class AuthRbacTest extends TestCase
                 'document_type' => DocumentRequest::TYPE_INDIGENCY,
                 'purpose' => 'Scholarship requirement',
             ])
-            ->assertRedirect();
+            ->assertRedirect(route('resident.document-requests.index'));
 
         $this->assertDatabaseHas('document_requests', [
             'resident_id' => $resident->id,
@@ -376,7 +376,7 @@ class AuthRbacTest extends TestCase
         ]);
 
         $this->actingAs($resident->refresh())
-            ->get(route('dashboard.resident'))
+            ->get(route('resident.document-requests.index'))
             ->assertOk()
             ->assertSee('Barangay Indigency')
             ->assertSee('Scholarship requirement')

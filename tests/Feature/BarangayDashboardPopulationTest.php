@@ -37,7 +37,7 @@ class BarangayDashboardPopulationTest extends TestCase
             $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
             $this->actingAs($secretary)->get(route('dashboard.barangay', ['barangay_id' => $other->id]))
                 ->assertOk()->assertViewHas('populationCounts', $counts)
-                ->assertSee('Resident sectors')->assertSee('Philippine Standard Time (UTC+8)');
+                ->assertSee('Resident sectors')->assertSee('Device local date and time');
         }
     }
 
@@ -47,6 +47,31 @@ class BarangayDashboardPopulationTest extends TestCase
         $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
         $this->actingAs($secretary)->get(route('dashboard.barangay'))->assertOk()
             ->assertViewHas('populationCounts', ['residents' => 0, 'pwd' => 0, 'seniors' => 0, 'indigent' => 0])
-            ->assertSee('No resident records yet');
+            ->assertSee('No resident records yet')
+            ->assertSee('Senior citizens: 0 of 0 registered residents, 0.0 percent.')
+            ->assertSee('population-pie-empty', false);
+    }
+
+    public function test_chart_legends_distinguish_residence_from_overlapping_resident_groups(): void
+    {
+        $area = Barangay::where('name', 'Maslog')->firstOrFail();
+        $house = Household::create(['barangay_id' => $area->id, 'household_number' => 'CHART-1']);
+        foreach (['living_here' => 'PWD / INDIGENT', 'living_elsewhere' => null] as $residence => $remarks) {
+            Inhabitant::create([
+                'barangay_id' => $area->id, 'household_id' => $house->id,
+                'first_name' => 'Chart', 'last_name' => 'Resident', 'sex' => 'Female',
+                'birth_date' => '1950-01-01', 'status' => 'active',
+                'residence_status' => $residence, 'remarks' => $remarks,
+            ]);
+        }
+        $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
+        $this->actingAs($secretary)->get(route('dashboard.barangay'))->assertOk()
+            ->assertSee('2 registered residents. 1 living in barangay; 1 elsewhere or unconfirmed.')
+            ->assertSee('Senior citizens: 2 of 2 registered residents, 100.0 percent.')
+            ->assertSee('Persons with disabilities: 1 of 2 registered residents, 50.0 percent.')
+            ->assertSee('Indigent residents: 1 of 2 registered residents, 50.0 percent.')
+            ->assertSee('style="--living-percent: 50%"', false)
+            ->assertSee('style="width: 100%"', false)
+            ->assertSee('A resident may belong to more than one group.');
     }
 }

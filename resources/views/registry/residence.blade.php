@@ -1,10 +1,18 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/registry-accents.css') }}?v={{ filemtime(public_path('css/registry-accents.css')) }}" media="screen">
+@endpush
+
 @section('content')
-<section class="panel  registry-workspace residence-list rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
+<section class="panel registry-workspace registry-color-workspace residence-list rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
     <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <x-workspace-heading icon="home" label="Resident registry"><h1>{{ App\Models\Inhabitant::residenceLabels()[$scope] }}</h1><p>Barangay {{ $barangay->name }} — current residence of registered residents.</p></x-workspace-heading>
-        <a class="button" href="{{ route('barangay.residence.download', ['scope'=>$scope]) }}">Download CSV</a>
+        <div class="toolbar flex flex-wrap items-center gap-3">
+            @php($reportScope = $scope === App\Models\Inhabitant::RESIDENCE_HERE ? 'registered' : $scope)
+            <a class="button secondary-button" href="{{ route('barangay.registry.print', ['scope' => $reportScope]) }}" target="_blank" rel="noopener">Print this list</a>
+            <a class="button" href="{{ route('barangay.registry.download', ['scope' => $reportScope]) }}">Download Excel</a>
+        </div>
     </div>
     @if(session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>@endif
     @if($errors->any())<div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">{{ $errors->first() }}</div>@endif

@@ -46,8 +46,8 @@ class AssistantChatTest extends TestCase
             ->postJson(route('assistant.chat'), ['message' => 'Show my document requests'])
             ->assertOk()
             ->assertJsonPath('scope', 'RBIM system only')
-            ->assertJsonFragment(['reply' => 'You have 1 document request(s): 0 pending or processing and 1 ready for release. Your latest request is RBIM-OWN-001 (Barangay Clearance), currently Ready for release. No payment is required. Use the Resident Portal form to request a barangay document.'])
-            ->assertJsonMissing(['reply' => 'RBIM-OTHER-002']);
+            ->assertJsonFragment(['reply' => 'You have 1 document request(s): 0 pending or processing and 1 ready for release. Your latest request is RBIM-OWN-001 (Barangay Clearance), currently Ready for release. The secretary will set the fee before payment. Use the Resident Portal form to request a barangay document.'])
+            ->assertDontSee('RBIM-OTHER-002');
     }
 
     public function test_barangay_approval_summary_is_limited_to_the_assigned_barangay(): void
