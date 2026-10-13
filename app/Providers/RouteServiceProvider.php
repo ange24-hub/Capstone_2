@@ -29,6 +29,9 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         $this->routes(function () {
+            // Health probes do not start browser sessions or require authentication.
+            Route::get('/up', \App\Http\Controllers\HealthController::class)->name('health');
+
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));

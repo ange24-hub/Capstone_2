@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Middleware\TrustProxies as Middleware;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,16 @@ class TrustProxies extends Middleware
      * @var array<int, string>|string|null
      */
     protected $proxies;
+
+    public function handle(Request $request, Closure $next)
+    {
+        $configured = config('app.trusted_proxies');
+        $this->proxies = $configured === '*'
+            ? '*'
+            : ($configured ? array_filter(array_map('trim', explode(',', $configured))) : null);
+
+        return parent::handle($request, $next);
+    }
 
     /**
      * The headers that should be used to detect proxies.

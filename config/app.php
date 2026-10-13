@@ -59,6 +59,8 @@ return [
 
     'public_path' => env('APP_PUBLIC_PATH'),
 
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
