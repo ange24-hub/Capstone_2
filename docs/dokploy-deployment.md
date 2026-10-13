@@ -113,6 +113,7 @@ Before live use, check:
 - Login, registration, password reset email links, and logout work on the actual domain.
 - RBI/PDF/Excel exports, signatures, private receipt downloads, and approved document fees work.
 - `.env`, `/vendor`, `/database`, and `/storage/*.php` cannot be downloaded or executed.
+- `/vendor/leaflet/leaflet.js`, `/vendor/leaflet/leaflet.css`, and the Leaflet images return HTTP 200. Open Household map as an approved staff user and confirm the map and GIS layers load. Apache permits these bundled browser assets while blocking other vendor URLs. Changes to `docker/apache.conf` require rebuilding and redeploying the app image.
 - Phone GPS, service-worker updates, and offline synchronization work over HTTPS.
 - A redeployment preserves users and uploaded files.
 
