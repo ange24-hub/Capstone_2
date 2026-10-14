@@ -81,7 +81,17 @@ The application currently uses synchronous queues and has no scheduled jobs, so 
 
 For existing records, transfer a reviewed MySQL dump and the matching contents of `storage/app` privately. Keep the source `APP_KEY` and approved document fee values. Put the application in maintenance mode while migrating data and files; do not run the fresh-install seed/admin workflow over an imported installation without reviewing its existing accounts.
 
-Use the **database** container terminal to import a dump staged privately inside that container:
+A full phpMyAdmin export with `CREATE TABLE` statements requires an empty target database. Importing it into the already migrated/seeded database fails with "table already exists". Back up the hosted database first. Prefer restoring into a separate staging database, checking record counts, granting the application user access, and then switching `DB_DATABASE` in Dokploy and redeploying. Retain the previous database for rollback. Do not delete the database volume to make room for an import.
+
+To prepare a private transfer package from a local phpMyAdmin export:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-hosting-transfer.ps1 -SourceDump "C:\path\to\backup.sql"
+```
+
+The package is created under ignored `storage/app/hosting-transfer`. It includes the unchanged SQL export, a checksum/count manifest, and available files from the application's upload directories. It excludes local browser/tooling profiles and environment files. This is a static review, not a tested MySQL restore or a live upload. Preserve the package privately and verify the actual target database and files before switching the application.
+
+After selecting an empty target database, use the **database** container terminal to import a dump staged privately inside that container (the command below targets `MYSQL_DATABASE`; choose the staging database name explicitly if restoring there):
 
 ```sh
 MYSQL_PWD="$MYSQL_PASSWORD" mysql -u "$MYSQL_USER" "$MYSQL_DATABASE" < /tmp/reviewed-backup.sql
@@ -117,7 +127,55 @@ Before live use, check:
 - Phone GPS, service-worker updates, and offline synchronization work over HTTPS.
 - A redeployment preserves users and uploaded files.
 
-Local Ollama and Python prediction services are disabled in this stack. The existing database assistant and moving-average migration fallback remain available. Those model clients currently require loopback endpoints; simply entering another container's hostname will not enable them. They need a separately designed runtime deployment if required.
+The optional chatbot question interpreter can now use the private Ollama service below. The older report narrator/concern classifier (`LOCAL_AI_ENABLED`) and Python prediction service remain disabled in this stack. Their settings are separate from the chatbot interpreter. The database assistant and moving-average migration fallback remain available without AI.
+
+## Enable the Ollama chatbot on your VPS
+
+The Compose path stays **`docker-compose.yml`**. The `ai` profile adds a CPU Ollama container on a shared network with `app`, with a persistent `ollama_models` volume. It has no published port and needs no domain or external API key. Cloud features are disabled. The default container budget is 2 CPUs and 3 GiB RAM; leave additional capacity for MySQL, PHP, Dokploy and Docker builds. Actual response time and memory use must be checked on your VPS before enabling for users.
+
+1. Push this change, then add these values in your existing **Dokploy Compose service → Environment** (keep your existing application/database/mail settings):
+
+   ```dotenv
+   COMPOSE_PROFILES=ai
+   ASSISTANT_AI_ENABLED=true
+   ASSISTANT_AI_MODEL=qwen2.5:1.5b
+   ASSISTANT_AI_TIMEOUT=20
+   OLLAMA_CPUS=2
+   OLLAMA_MEMORY_LIMIT=3g
+   ```
+
+   The Compose file supplies `ASSISTANT_AI_URL=http://ollama:11434` to `app`. Do not use `127.0.0.1` for another container. `LOCAL_AI_ENABLED=true` alone does not enable this chatbot. The Ollama image is pinned to `ollama/ollama:0.40.3`; `OLLAMA_IMAGE` can override it for a reviewed upgrade.
+
+2. Deploy and verify that `app`, `database`, and `ollama` are running. Dokploy writes Environment values to the Compose `.env`; Compose activates the profile through `COMPOSE_PROFILES`. If a customized deployment command overrides profiles, retain its existing project/file arguments and add `--profile ai` before `up`.
+
+3. Open the **`ollama` container terminal** and run the one-time download:
+
+   ```sh
+   ollama pull qwen2.5:1.5b
+   ollama list
+   ```
+
+   The model name must exactly match `ASSISTANT_AI_MODEL`. The first download needs network access and disk space. It is preserved across redeployments in `ollama_models`. No model download happens during web requests or application startup.
+
+4. Open the **`app` container terminal** and check the integration:
+
+   ```sh
+   php artisan assistant:check --probe
+   ```
+
+   This checks connectivity, the local model, and a synthetic question without reading resident records. If using a host terminal instead, run `docker compose --env-file .env.dokploy --profile ai exec ollama ollama pull qwen2.5:1.5b` and `docker compose --env-file .env.dokploy exec app php artisan assistant:check --probe` from your own checkout. On Dokploy's server, prefer its container terminal so you use the correct deployed project.
+
+5. Test as an approved barangay user: “Pila kabuok mga hamtong sa among barangay?”, then “ug babaye?”. Test a resident with “Nahuman na ba ang akong gi-request?” and “Unsay buhaton para makakuha ug sertipiko?”. Check the displayed interpretation and the actual database answer. Try a different barangay as barangay staff and confirm access is denied.
+
+The AI chooses from supported read operations; Laravel validates that selection, retains explicitly named barangays and dates, applies the existing role checks, and supplies the final answer. Explicit population metrics and document-status filters take priority over conflicting model choices. No SQL, counts, URLs, or free-form model answers are executed/displayed. The model receives the question (which may contain text the user typed), not fetched resident records, credentials, or database access. A low-confidence result asks for clarification. Scope checks protect both AI and offline chat: outside topics and rule overrides are declined, while unsupported filters ask for clarification instead of returning broader counts. An offline, missing, or malformed model response falls back to the built-in assistant with a visible notice and a short retry backoff. Chat always uses application templates for final report wording and does not call the older report narrator, even when `LOCAL_AI_ENABLED=true`.
+
+This is a constrained system assistant, not unrestricted general conversation. The small default model may still misunderstand a phrase. Test your users' real wording; a successful connection check does not establish answer quality for every question. Follow-up scope/month is supported for population and migration reports, not arbitrary chat history.
+
+To disable AI, set `ASSISTANT_AI_ENABLED=false` and redeploy. To stop its container as well, stop `ollama` in Dokploy and clear `COMPOSE_PROFILES`; preserve the model volume. Do not remove database or application volumes.
+
+For local Laragon use, install/start Ollama locally, pull the same model, and set `ASSISTANT_AI_ENABLED=true`, `ASSISTANT_AI_URL=http://127.0.0.1:11434`, and `ASSISTANT_AI_MODEL=qwen2.5:1.5b` in your local `.env`. Then run `php artisan config:clear` and `php artisan assistant:check --probe`.
+
+References: [Ollama structured output](https://docs.ollama.com/capabilities/structured-outputs), [Ollama Docker](https://docs.ollama.com/docker), [Ollama local-only mode](https://docs.ollama.com/faq#how-do-i-disable-ollama-cloud-features), [Compose profiles](https://docs.docker.com/compose/how-tos/profiles/), and [Dokploy environment handling](https://docs.dokploy.com/docs/core/docker-compose).
 
 ## Optional local Docker check
 

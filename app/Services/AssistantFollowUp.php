@@ -6,7 +6,7 @@ use App\Models\Barangay;
 
 class AssistantFollowUp
 {
-    private const METRICS = 'families|family|pamilya|households?|panimalay|balay|seniors?|senior citizens?|sc|pwd|male|female|lalaki|lalake|babaye|bata|children|adults?|age groups|edad';
+    private const METRICS = 'population|residents?|families|family|pamilya|households?|panimalay|balay|seniors?|senior citizens?|sc|pwd|male|female|lalaki|lalake|babaye|bata|children|adults?|ages?|age groups|edad';
 
     public function resolve(string $question, ?string $previous): string
     {
@@ -16,6 +16,7 @@ class AssistantFollowUp
         if (! preg_match('/^Show (population(?: [a-z, ]+)?|migration) (Barangay [\pL .\x{2019}\x{0027}-]+|municipal)(?: ((?:19|20)\d{2}(?:-\d{2})?))?$/u', $previous, $context)) return $question;
         $scope = $context[2];
         if (preg_match('/^(?:(?:pila|how many)\s+)?(?:(?:pud|ka|ang|kabook|kabouk)\s+)*(?:'.self::METRICS.')(?:\s+(?:ug|and|or|o)\s+(?:'.self::METRICS.'))*$/iu', $short)) {
+            $short = preg_replace('/\b(population|residents?)\b/iu', 'total', $short);
             return 'Show population '.$short.' '.$scope;
         }
         if (preg_match('/^(?:full report|full summary|population summary)$/iu', $short)) {
@@ -41,6 +42,7 @@ class AssistantFollowUp
 
     public function context(array $answer): ?string
     {
+        if (($answer['mode'] ?? null) === 'database_list') return null;
         $facts = $answer['facts'] ?? null;
         if (! $facts) return null;
         $scope = str_starts_with($facts['scope'], 'Barangay ') ? $facts['scope'] : 'municipal';

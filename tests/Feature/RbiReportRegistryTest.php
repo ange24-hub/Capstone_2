@@ -55,8 +55,13 @@ class RbiReportRegistryTest extends TestCase
         $household = Household::create(['barangay_id' => $barangay->id, 'household_number' => '15']);
         Inhabitant::create(['barangay_id' => $barangay->id, 'household_id' => $household->id,
             'first_name' => 'Parent', 'last_name' => 'Example', 'sex' => 'Male', 'status' => 'active', 'relationship_to_head' => 'Head']);
-        $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee('Add to Consolidated RBI');
-        $this->get(route('dashboard.barangay'))->assertOk()->assertSee('Add to Consolidated RBI');
+        $this->get(route('dashboard.barangay'))->assertOk()
+            ->assertSee('href="'.route('barangay.rbi-updates.index').'"', false);
+        $this->get(route('barangay.rbi-updates.index'))->assertOk()
+            ->assertSee('href="'.route('barangay.rbi-updates.history').'"', false);
+        $this->get(route('barangay.rbi-updates.history'))->assertOk()
+            ->assertSee('Add to Consolidated RBI')
+            ->assertSee(route('barangay.rbi-updates.certification', ['rbiUpdate' => $report, 'action' => 'consolidate']));
         $this->add($report)->assertSessionHasNoErrors();
         $this->add($report)->assertSessionHasNoErrors();
         $this->assertSame(1, Household::where('barangay_id', $barangay->id)->count());

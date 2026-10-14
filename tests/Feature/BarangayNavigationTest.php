@@ -19,12 +19,12 @@ class BarangayNavigationTest extends TestCase
             $html = $response->getContent();
             preg_match('/<nav class="side-nav".*?<\/nav>/s', $html, $match);
             $this->assertNotEmpty($match, $barangay->name);
-            foreach (['RBI Forms' => 'barangay.rbi-updates.index', 'Deceased Records' => 'barangay.registry.deceased'] as $label => $route) {
+            foreach (['RBI Forms' => 'barangay.rbi-updates.index', 'Deceased records' => 'barangay.registry.deceased'] as $label => $route) {
                 $this->assertStringContainsString('<span>'.$label.'</span>', $match[0], $barangay->name);
                 $this->assertStringContainsString('href="'.route($route).'"', $match[0], $barangay->name);
             }
             $this->assertStringNotContainsString('<span>New Inhabitants</span>', $match[0]);
-            $response->assertSee('href="'.route('barangay.rbi-updates.index').'">Open RBI Forms', false);
+            $response->assertSee('href="'.route('barangay.rbi-updates.index').'">Open forms', false);
         }
     }
 }

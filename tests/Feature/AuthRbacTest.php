@@ -207,8 +207,13 @@ class AuthRbacTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('dashboard.municipal'))
             ->assertOk()
+            ->assertSee('href="'.route('municipal.approvals.index').'"', false);
+
+        $this->get(route('municipal.approvals.index'))
+            ->assertOk()
             ->assertSee($secretary->name)
-            ->assertSee('Pending Barangay Secretary Accounts');
+            ->assertSee('Barangay secretary approvals')
+            ->assertSee('action="'.route('municipal.secretaries.approve', $secretary).'"', false);
 
         $this->actingAs($municipal)
             ->post(route('municipal.secretaries.approve', $secretary))

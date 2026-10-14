@@ -35,7 +35,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('dashboard.barangay'))
             ->assertOk()
-            ->assertSee('Open RBI Forms')
+            ->assertSee('href="'.route('barangay.rbi-updates.index').'">Open forms', false)
             ->assertDontSee('Complete RBI Form and Submit as Word Document');
 
         $this->actingAs($secretary)
@@ -119,7 +119,8 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('dashboard.municipal'))
             ->assertOk()
-            ->assertSee('Monthly RBI Reports by Barangay')
+            ->assertSee('aria-label="Latest RBI report received"', false)
+            ->assertSee('href="'.route('rbi-updates.show', $update).'"', false)
             ->assertSee('Carnaga')
             ->assertSee('August 2026')
             ->assertSee('AI-assisted Decision Support');
@@ -353,8 +354,17 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('dashboard.barangay'))
             ->assertOk()
+            ->assertSee('href="'.route('barangay.rbi-updates.index').'"', false);
+
+        $this->get(route('barangay.rbi-updates.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('barangay.rbi-updates.history').'"', false);
+
+        $this->get(route('barangay.rbi-updates.history'))
+            ->assertOk()
             ->assertSee('Monthly RBI Form History')
-            ->assertSee('Update form');
+            ->assertSee('Update form')
+            ->assertSee('href="'.route('barangay.rbi-updates.residents', ['edit' => $report->id]).'"', false);
 
         $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($municipal)

@@ -17,6 +17,15 @@ class RbimAssistant
      */
     public function respond(User $user, string $message): array
     {
+        $boundary = app(AssistantScopeGuard::class)->respond($user, $message);
+        if ($boundary !== null) return $boundary;
+
+        $names = app(AssistantPopulationNames::class)->respond($user, $message);
+        if ($names !== null) return $names;
+
+        $knowledge = app(AssistantKnowledgeBase::class)->respond($user, $message);
+        if ($knowledge !== null) return $knowledge;
+
         $documentStatus = app(AssistantDocumentStatus::class)->respond($user, $message);
         if ($documentStatus !== null) return $documentStatus;
 
@@ -82,7 +91,7 @@ class RbimAssistant
             AssistantLanguage::text('I can only help with the RBIM system—accounts, document requests, approvals, registry records, RBI forms, migration monitoring, and the features permitted for your role. I can’t answer topics outside this system.'),
             $this->suggestions($user),
             $this->dashboardAction($user)
-        );
+        ) + ['needs_clarification' => true];
     }
 
     private function capabilities(User $user): array

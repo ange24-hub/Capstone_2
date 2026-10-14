@@ -1,240 +1,78 @@
+@php
+    $assistantBisaya = session('assistant.language.'.auth()->id(), 'en') === 'ceb';
+    $assistantGroups = App\Services\AssistantGuide::questionGroups(auth()->user());
+@endphp
 <div class="rbim-assistant" data-assistant data-endpoint="{{ route('assistant.chat') }}">
     <button class="assistant-launcher" type="button" data-assistant-toggle aria-label="Open RBIM assistant" aria-expanded="false" aria-controls="rbim-assistant-panel">
-        <span class="assistant-launcher-icon" aria-hidden="true">AI</span>
-        <span>Ask RBIM</span>
-        <span class="assistant-online-dot" aria-hidden="true"></span>
+        <span class="assistant-launcher-icon" aria-hidden="true"><x-app-icon name="inbox" /></span><span>Ask RBIM</span>
     </button>
-
-    <section class="assistant-panel flex max-h-[calc(100dvh-100px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl " id="rbim-assistant-panel" data-assistant-panel aria-label="RBIM Assistant" hidden>
+    <section class="assistant-panel" id="rbim-assistant-panel" data-assistant-panel role="dialog" aria-modal="false" aria-labelledby="assistant-title" hidden>
         <header class="assistant-header">
-            <div class="assistant-avatar" aria-hidden="true">AI</div>
-            <div>
-                <strong>RBIM Assistant</strong>
-                <span><i></i> System information only</span>
-            </div>
-            <button class="assistant-close" type="button" data-assistant-close aria-label="Close assistant">×</button>
+            <div class="assistant-avatar" aria-hidden="true"><x-app-icon name="inbox" /></div>
+            <div class="assistant-header-copy"><strong id="assistant-title">RBIM Assistant</strong><span>Records, services &amp; guidance</span></div>
+            <button class="assistant-close" type="button" data-assistant-close aria-label="Close assistant"><x-app-icon name="close" /></button>
         </header>
-
-        <div class="assistant-messages min-h-16 shrink" data-assistant-messages role="log" aria-live="polite">
+        <div class="assistant-toolbar">
+            <button class="assistant-reset" type="button" data-assistant-reset><span data-assistant-reset-label>New conversation</span></button>
+            <label for="assistant-language">Reply in
+                <select id="assistant-language" data-assistant-language>
+                    <option value="en" @selected(!$assistantBisaya)>English</option>
+                    <option value="ceb" @selected($assistantBisaya)>Bisaya</option>
+                </select>
+            </label>
+        </div>
+        <div class="assistant-messages" data-assistant-messages role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation">
             <div class="assistant-message assistant-message-bot">
                 <div class="assistant-bubble">
-                    @if (session('assistant.language.'.auth()->id(), 'en') === 'ceb')
-                        Maayong adlaw, {{ auth()->user()->name }}. Makatabang ko bahin sa RBIM ug sa impormasyon nga gitugotan sa imong {{ auth()->user()->roleLabel() }} account.
-                    @else
-                        Hello, {{ auth()->user()->name }}. I can help with RBIM features and the information allowed for your {{ auth()->user()->roleLabel() }} account.
-                    @endif
+                    <span class="assistant-source">RBIM Assistant</span>
+                    <div class="assistant-response-content">
+                        <p>{{ $assistantBisaya ? 'Maayong adlaw, '.auth()->user()->name.'.' : 'Hello, '.auth()->user()->name.'.' }}</p>
+                        <p>{{ $assistantBisaya ? 'Pangutana bahin sa imong gitugotang records ug serbisyo, o pilia ang usa ka hilisgutan sa Explore questions.' : 'Ask about your permitted records and services, or choose a topic in Explore questions.' }}</p>
+                    </div>
+                    <div class="assistant-account-scope"><x-app-icon name="shield" /><span>{{ auth()->user()->roleLabel() }}</span></div>
                 </div>
             </div>
         </div>
-
-        <div class="assistant-suggestions" data-assistant-suggestions>
-            @foreach (match(auth()->user()->role) {
-                App\Models\User::ROLE_MUNICIPAL_LGU => ['Show population summary', 'Show migration totals', 'Summarize submitted RBI forms'],
-                App\Models\User::ROLE_BARANGAY => ['Pila ka families sa among barangay?', 'Show migration totals', 'Show pending resident approvals'],
-                default => ['Show my document requests', 'What is my account status?'],
-            } as $suggestion)
-                <button type="button" data-assistant-suggestion>{{ $suggestion }}</button>
-            @endforeach
-        </div>
-
-        <details class="border-t border-slate-200 bg-slate-50 px-4 py-2 text-sm" data-assistant-catalog>
-            <summary class="cursor-pointer font-semibold text-blue-900">Explore questions / Mga mapangutana</summary>
-            <div class="mt-2 flex max-h-40 flex-wrap gap-2 overflow-y-auto pb-2">
-                @foreach (App\Services\AssistantGuide::questions(auth()->user()) as $question)
-                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700" data-assistant-question>{{ $question }}</button>
+        <div class="assistant-suggestions-wrap" data-assistant-suggestions-wrap>
+            <span class="assistant-section-label" data-assistant-suggestions-label>Try a question</span>
+            <div class="assistant-suggestions" data-assistant-suggestions>
+                @foreach (match(auth()->user()->role) {
+                    App\Models\User::ROLE_MUNICIPAL_LGU => ['Show population summary', 'Show migration totals', 'Summarize submitted RBI forms'],
+                    App\Models\User::ROLE_BARANGAY => ['Pila ka families sa among barangay?', 'Show PWD names', 'Show senior citizen names'],
+                    default => ['Show my document requests', 'What is my account status?'],
+                } as $suggestion)
+                    <button type="button" data-assistant-suggestion>{{ $suggestion }}</button>
                 @endforeach
             </div>
+        </div>
+        <details class="assistant-catalog" data-assistant-catalog>
+            <summary><x-app-icon name="directory" /><span data-assistant-catalog-label>Explore questions</span><span class="assistant-catalog-count">{{ count(App\Services\AssistantGuide::questions(auth()->user())) }}</span></summary>
+            <div class="assistant-catalog-body">
+                <label class="assistant-search-label" for="assistant-question-search">Search questions</label>
+                <input id="assistant-question-search" type="search" data-assistant-search placeholder="Search a topic or question" autocomplete="off">
+                <p class="assistant-search-status" data-assistant-search-status role="status" hidden></p>
+                <div class="assistant-catalog-groups">
+                    @foreach ($assistantGroups as $group)
+                        <details class="assistant-catalog-group" data-assistant-question-group>
+                            <summary><span>{{ $group['label'] }}</span><span data-assistant-group-count>{{ count($group['questions']) }}</span></summary>
+                            <div class="assistant-question-list">
+                                @foreach ($group['questions'] as $question)
+                                    <button type="button" data-assistant-question>{{ $question }}</button>
+                                @endforeach
+                            </div>
+                        </details>
+                    @endforeach
+                </div>
+            </div>
         </details>
-
-        <label class="flex items-center gap-2 border-t border-slate-200 px-4 py-2 text-sm text-slate-700">
-            Tubag / Reply
-            <select data-assistant-language class="rounded border border-slate-300 bg-white px-2 py-1">
-                <option value="en" @selected(session('assistant.language.'.auth()->id(), 'en') === 'en')>English</option>
-                <option value="ceb" @selected(session('assistant.language.'.auth()->id(), 'en') === 'ceb')>Bisaya</option>
-            </select>
-        </label>
-
-        <form class="assistant-form" data-assistant-form>
-            <label class="sr-only" for="assistant-message">Ask about the RBIM system</label>
-            <textarea id="assistant-message" data-assistant-input rows="1" maxlength="500" placeholder="Ask about RBIM…" required></textarea>
-            <button type="submit" data-assistant-send aria-label="Send message">➤</button>
-        </form>
-        <p class="assistant-privacy">Follow-ups: “ug senior?”, “ug last month?” or “download PDF”. Account permissions always apply.</p>
-        <button type="button" class="mb-2 text-xs font-semibold text-blue-900" data-assistant-reset>New conversation</button>
+        <div class="assistant-composer">
+            <form class="assistant-form" data-assistant-form>
+                <label class="sr-only" for="assistant-message">Ask about the RBIM system</label>
+                <textarea id="assistant-message" data-assistant-input rows="1" maxlength="500" placeholder="Ask about RBIM…" required></textarea>
+                <button type="submit" data-assistant-send aria-label="Send message"><x-app-icon name="arrow-right" /></button>
+            </form>
+            <p class="assistant-privacy"><x-app-icon name="shield" /><span data-assistant-privacy>Your account permissions always apply.</span></p>
+        </div>
     </section>
 </div>
-
-<script>
-(() => {
-    const root = document.querySelector('[data-assistant]');
-    if (!root) return;
-
-    const toggle = root.querySelector('[data-assistant-toggle]');
-    const close = root.querySelector('[data-assistant-close]');
-    const panel = root.querySelector('[data-assistant-panel]');
-    const form = root.querySelector('[data-assistant-form]');
-    const input = root.querySelector('[data-assistant-input]');
-    const send = root.querySelector('[data-assistant-send]');
-    const messages = root.querySelector('[data-assistant-messages]');
-    const suggestions = root.querySelector('[data-assistant-suggestions]');
-    const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-    const language = root.querySelector('[data-assistant-language]');
-    const wording = (english, bisaya) => language.value === 'ceb' ? bisaya : english;
-    let previousQuestion = null;
-    const reset = root.querySelector('[data-assistant-reset]');
-
-    const setOpen = (open) => {
-        panel.hidden = !open;
-        toggle.setAttribute('aria-expanded', String(open));
-        root.classList.toggle('is-open', open);
-        if (open) setTimeout(() => input.focus(), 50);
-    };
-
-    const addMessage = (text, kind, actions = [], mode = null) => {
-        const row = document.createElement('div');
-        row.className = `assistant-message assistant-message-${kind}`;
-        const bubble = document.createElement('div');
-        bubble.className = 'assistant-bubble';
-        bubble.textContent = text;
-        if (kind === 'bot' && mode) {
-            const source = document.createElement('div');
-            source.className = 'mb-2 text-xs font-semibold text-slate-600';
-            source.textContent = mode === 'local_ai'
-                ? wording('Database summary with local AI explanation', 'Summary sa database uban sa local AI nga pagpasabot')
-                : wording('Database summary', 'Summary sa database');
-            bubble.prepend(source);
-        }
-        row.appendChild(bubble);
-
-        if (actions.length) {
-            const links = document.createElement('div');
-            links.className = 'assistant-actions';
-            actions.forEach((action) => {
-                const link = document.createElement('a');
-                link.href = action.url;
-                link.textContent = action.label;
-                links.appendChild(link);
-            });
-            bubble.appendChild(links);
-        }
-
-        messages.appendChild(row);
-        messages.scrollTop = messages.scrollHeight;
-        return row;
-    };
-
-    const showSuggestions = (items = []) => {
-        suggestions.replaceChildren();
-        items.slice(0, 3).forEach((item) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.dataset.assistantSuggestion = '';
-            button.textContent = item;
-            suggestions.appendChild(button);
-        });
-    };
-
-    const ask = async (message) => {
-        const clean = message.trim();
-        if (!clean || send.disabled) return;
-
-        addMessage(clean, 'user');
-        input.value = '';
-        input.style.height = '';
-        send.disabled = true;
-        reset.disabled = true;
-        language.disabled = true;
-        panel.setAttribute('aria-busy', 'true');
-        suggestions.hidden = true;
-        const typing = addMessage(wording('Checking RBIM…', 'Gitan-aw ang RBIM…'), 'bot');
-        typing.classList.add('is-typing');
-
-        const abort = new AbortController();
-        const timeout = setTimeout(() => abort.abort(), 35000);
-        try {
-            const response = await fetch(root.dataset.endpoint, {
-                method: 'POST',
-                signal: abort.signal,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ message: clean, previous_question: previousQuestion, language: language.value }),
-            });
-
-            if (!response.ok) {
-                const problem = new Error('Request failed');
-                problem.status = response.status;
-                throw problem;
-            }
-            const data = await response.json();
-            if (['en', 'ceb'].includes(data.language)) language.value = data.language;
-            previousQuestion = data.previous_question || null;
-            typing.remove();
-            if (data.interpreted_question) addMessage(wording('Using: ', 'Gigamit nga pangutana: ') + data.interpreted_question, 'bot');
-            addMessage(data.reply, 'bot', data.actions || [], data.facts ? data.mode : null);
-            showSuggestions(data.suggestions || []);
-        } catch (error) {
-            previousQuestion = null;
-            typing.remove();
-            const message = error.status === 429
-                ? wording('Too many questions in a short time. Please wait a minute and try again.', 'Daghan ra kaayong pangutana sa mubo nga panahon. Paghulat og usa ka minuto ug sulayi pag-usab.')
-                : [401, 419].includes(error.status)
-                    ? wording('Your session has expired. Refresh the page and sign in again.', 'Na-expire ang imong session. I-refresh ang page ug pag-sign in pag-usab.')
-                    : wording('I could not reach RBIM right now. Please try again with a complete question.', 'Dili nako makontak ang RBIM karon. Palihog sulayi pag-usab gamit ang kompleto nga pangutana.');
-            addMessage(message, 'bot');
-        } finally {
-            clearTimeout(timeout);
-            send.disabled = false;
-            reset.disabled = false;
-            language.disabled = false;
-            panel.removeAttribute('aria-busy');
-            suggestions.hidden = false;
-            input.focus();
-        }
-    };
-
-    toggle.addEventListener('click', () => setOpen(panel.hidden));
-    reset.addEventListener('click', () => {
-        if (send.disabled) return;
-        previousQuestion = null;
-        messages.replaceChildren();
-        addMessage(wording('New conversation. Ask a complete question to start a new topic.', 'Bag-ong panag-istorya. Pangutana og kompleto aron magsugod og bag-ong hilisgutan.'), 'bot');
-        input.value = '';
-        input.style.height = '';
-        root.querySelector('[data-assistant-catalog]').open = false;
-        input.focus();
-    });
-    close.addEventListener('click', () => setOpen(false));
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        ask(input.value);
-    });
-    input.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            form.requestSubmit();
-        }
-    });
-    input.addEventListener('input', () => {
-        input.style.height = '';
-        input.style.height = `${Math.min(input.scrollHeight, 92)}px`;
-    });
-    suggestions.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-assistant-suggestion]');
-        if (button) ask(button.textContent);
-    });
-    root.querySelector('[data-assistant-catalog]').addEventListener('click', (event) => {
-        const button = event.target.closest('[data-assistant-question]');
-        if (button && !send.disabled) {
-            root.querySelector('[data-assistant-catalog]').open = false;
-            ask(button.textContent);
-        }
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !panel.hidden) setOpen(false);
-    });
-})();
-</script>
+<script src="{{ asset('js/assistant.js') }}?v={{ filemtime(public_path('js/assistant.js')) }}" defer></script>

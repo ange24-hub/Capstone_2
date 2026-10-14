@@ -49,7 +49,7 @@ class MagataRegistryTest extends TestCase
 
         $this->actingAs($secretary)->get(route('dashboard.barangay'))
             ->assertOk()
-            ->assertSee(route('barangay.registry.new-inhabitants'))
+            ->assertSee(route('barangay.rbi-updates.residents', ['new' => 1]))
             ->assertSee(route('barangay.registry.deceased'));
         $this->get(route('barangay.registry.active'))->assertOk()
             ->assertSee('MAG-ATA')->assertSee('MagataResident')->assertSee('Not provided');

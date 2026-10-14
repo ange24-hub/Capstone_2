@@ -9,12 +9,16 @@
         return;
     }
     const config = JSON.parse(configNode.textContent);
-    const map = L.map('household-map', { preferCanvas: true }).setView([10.268841, 125.026688], 13);
-    const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    const maxMapZoom = 22;
+    const locationZoom = 21;
+    const map = L.map('household-map', { preferCanvas: true, maxZoom: maxMapZoom }).setView([10.268841, 125.026688], 13);
+    const streets = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxNativeZoom: 19, maxZoom: maxMapZoom, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19, attribution: 'Tiles &copy; Esri'
+    // Esri has zoom-18 imagery here, but some zoom-19 tiles are unavailable.
+    // Request an error instead of Esri's gray placeholder so fallback can run.
+    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false', {
+        maxNativeZoom: 18, maxZoom: maxMapZoom, attribution: 'Tiles &copy; Esri'
     });
     map.createPane('hazards');
     map.getPane('hazards').style.zIndex = 350;
@@ -44,6 +48,18 @@
         });
         return box;
     };
+    const locationZoomButton = (latitude, longitude, label) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'gis-location-zoom';
+        button.textContent = label;
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            map.closePopup();
+            map.setView([latitude, longitude], Math.max(map.getZoom(), locationZoom), { animate: false });
+        });
+        return button;
+    };
     let savedMarker = null;
     config.markers.forEach(household => {
         const name = household.household_name || `Household ${household.household_number}`;
@@ -61,6 +77,7 @@
             edit.textContent = 'Edit household';
             content.append(edit);
         }
+        content.append(locationZoomButton(household.latitude, household.longitude, 'Zoom to household'));
         const hazardButton = document.createElement('button');
         hazardButton.type = 'button';
         hazardButton.className = 'gis-hazard-check';
@@ -166,13 +183,42 @@
     const failed = new Set();
     const pending = new Set();
     const retry = document.getElementById('gis-retry');
+    let basemapNotice = '';
+    let satelliteFallbackPending = false;
     const report = () => {
         const errors = descriptors.filter(d => failed.has(d.key)).map(d => d.name);
-        status.textContent = pending.size ? 'Loading map layers...' : errors.length
+        const layerStatus = pending.size ? 'Loading map layers...' : errors.length
             ? `Could not load: ${errors.join(', ')}. Retry or refresh your sign-in.`
             : 'Map ready. Select a household or building polygon for details. Open the layers button to show hazard overlays.';
+        const activeBasemap = map.hasLayer(satellite) ? satellite : streets;
+        const imageryNotice = map.getZoom() > activeBasemap.options.maxNativeZoom
+            ? `${activeBasemap === satellite ? 'Satellite imagery' : 'Street map'} is enlarged at this zoom.` : '';
+        status.textContent = [layerStatus, basemapNotice || imageryNotice].filter(Boolean).join(' ');
         retry.hidden = errors.length === 0 || pending.size > 0;
     };
+    satellite.on('tileerror', () => {
+        if (!map.hasLayer(satellite) || satelliteFallbackPending) return;
+        satelliteFallbackPending = true;
+        // Let Leaflet finish processing the failed tile before removing its layer.
+        setTimeout(() => {
+            satelliteFallbackPending = false;
+            if (!map.hasLayer(satellite)) return;
+            map.removeLayer(satellite);
+            streets.addTo(map);
+            basemapNotice = 'Satellite imagery could not load for this area. Showing OpenStreetMap. Select Satellite from the layers button to retry.';
+            report();
+        }, 0);
+    });
+    streets.on('tileerror', () => {
+        if (!map.hasLayer(streets)) return;
+        basemapNotice = 'The street-map background could not load. Check your connection or try Satellite from the layers button.';
+        report();
+    });
+    map.on('baselayerchange', () => {
+        basemapNotice = '';
+        report();
+    });
+    map.on('zoomend', report);
     const fit = bounds => {
         if (bounds?.isValid()) map.fitBounds(bounds, { padding: [24, 24], maxZoom: 17 });
     };
@@ -257,6 +303,7 @@
                         ['Source', 'Supplied Tomas Oppus building-point layer; not a registry household'],
                         ['Geometry', 'Polygon symbol at the source location; actual building outline unavailable']
                     ]);
+                    content.append(locationZoomButton(latitude, longitude, 'Zoom to building'));
                     const addButton = document.createElement('button');
                     addButton.type = 'button';
                     addButton.textContent = document.querySelector('#gis-household-form input[name="_method"]') ? 'Use this location' : 'Add household here';

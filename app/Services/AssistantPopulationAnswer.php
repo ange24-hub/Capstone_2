@@ -4,18 +4,25 @@ namespace App\Services;
 
 class AssistantPopulationAnswer
 {
-    /** Present selected metrics from the same snapshot used by the formal report. */
-    public function focus(string $question, array $report): ?array
+    /** Reuse explicit user filters when interpreting model output. */
+    public function requestedMetrics(string $question): array
     {
-        if (preg_match('/\b(summary|summarize|overview|report|coverage|encoded|walay data|naay data)\b/iu', $question)) return null;
+        if (preg_match('/\b(summary|summarize|overview|report|coverage|encoded|walay data|naay data)\b/iu', $question)) return [];
         $patterns = [
             'families' => 'family|families|pamilya', 'households' => 'households?|panimalay|balay',
-            'male' => 'male|lalaki|lalake', 'female' => 'female|babaye',
+            'male' => 'males?|lalaki|lalake', 'female' => 'females?|babaye',
             'seniors' => 'seniors?|senior citizens?|tigulang|sc', 'pwd' => 'pwd',
             'children' => 'children|bata', 'adults' => 'adults?', 'ages' => 'age groups?|ages|edad',
         ];
         $selected = array_keys(array_filter($patterns, fn ($pattern) => preg_match('/\b('.$pattern.')\b/iu', $question)));
         if (! $selected && preg_match('/\b(pila|how many|count|total)\b/iu', $question)) $selected = ['residents'];
+        return $selected;
+    }
+
+    /** Present selected metrics from the same snapshot used by the formal report. */
+    public function focus(string $question, array $report): ?array
+    {
+        $selected = $this->requestedMetrics($question);
         if (! $selected) return null;
         $values = [
             'residents' => [AssistantLanguage::text('Registered residents'), $report['totalRecords']],

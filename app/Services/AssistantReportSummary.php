@@ -7,7 +7,7 @@ use App\Models\User;
 
 class AssistantReportSummary
 {
-    public function __construct(private PopulationSummary $population, private MigrationSummary $migration, private LocalAiNarrator $narrator) {}
+    public function __construct(private PopulationSummary $population, private MigrationSummary $migration) {}
 
     public function respond(User $user, string $question): ?array
     {
@@ -51,6 +51,9 @@ class AssistantReportSummary
             $month = $months[0] ?? null;
         }
         if (! $migration && $year !== now()->year) return $this->answer(AssistantLanguage::text('Population reports are current database snapshots. Historical population totals are not available from these records.'));
+        if (! $migration && preg_match('/\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec|last month|this month|miaging bulan|niaging bulan|karong bulana|karong buwan)\b|\b\d{4}-\d{2}\b/iu', $question)) {
+            return $this->answer(AssistantLanguage::text('Population reports are current database snapshots. Historical population totals are not available from these records.'));
+        }
         if ($migration && preg_match('/\\b(forecast|predict|prediction|seasonal|next year)\\b/iu', $question)) {
             return $this->answer(AssistantLanguage::text('Forecasting is not enabled. Recorded migration events alone do not establish reliable future or seasonal trends.'));
         }
@@ -92,12 +95,8 @@ class AssistantReportSummary
         }
         $focused = $migration ? null : app(AssistantPopulationAnswer::class)->focus($question, $r);
         if ($focused) $reply = $focused['reply'];
-        // Exact metric questions need no unrelated demographic narrative.
-        // The optional narrator is English-only; localized summaries use verified templates.
-        $narrative = $focused || app()->getLocale() === 'ceb' ? null : $this->narrator->explain($facts);
-        if ($narrative) $reply .= "\n\nAI explanation (local model):\n".$narrative;
+        // Final chatbot wording and numbers always come from verified report templates.
         $result = $this->answer($reply);
-        $result['mode'] = $narrative ? 'local_ai' : 'database_summary';
         $result['facts'] = $facts;
         if ($focused) $result['focused_metrics'] = $focused['metrics'];
         $result['actions'] = [

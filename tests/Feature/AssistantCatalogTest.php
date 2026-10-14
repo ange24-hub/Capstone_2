@@ -14,6 +14,7 @@ class AssistantCatalogTest extends TestCase
 
     public function test_every_suggested_question_has_a_supported_response_for_each_role(): void
     {
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
         config(['local_ai.enabled' => false]);
         Http::preventStrayRequests();
         foreach ([User::ROLE_RESIDENT, User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU] as $role) {

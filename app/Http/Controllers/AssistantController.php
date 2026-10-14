@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Services\RbimAssistant;
 use App\Services\AssistantFollowUp;
 use App\Services\AssistantLanguage;
+use App\Services\AssistantIntentInterpreter;
+use App\Services\AssistantQuestionNormalizer;
+use App\Services\AssistantScopeGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AssistantController extends Controller
 {
-    public function __invoke(Request $request, RbimAssistant $assistant, AssistantFollowUp $followUp, AssistantLanguage $languages): JsonResponse
+    public function __invoke(Request $request, RbimAssistant $assistant, AssistantFollowUp $followUp, AssistantLanguage $languages, AssistantIntentInterpreter $interpreter, AssistantQuestionNormalizer $normalizer): JsonResponse
     {
         $validated = $request->validate([
             'message' => ['required', 'string', 'max:500'],
@@ -31,11 +34,25 @@ class AssistantController extends Controller
                     'scope' => AssistantLanguage::text('RBIM system only'), 'actions' => [], 'suggestions' => [],
                     'previous_question' => $validated['previous_question'] ?? null];
             } else {
-                $message = $languages->canonicalQuestion($selection['question']);
+                $message = $normalizer->normalize($languages->canonicalQuestion($selection['question']));
                 $question = $followUp->resolve($message, $validated['previous_question'] ?? null);
-                $answer = $followUp->clarification($question, $validated['previous_question'] ?? null)
-                    ?? $assistant->respond($request->user(), $question);
-                $answer['previous_question'] = $followUp->context($answer);
+                $answer = app(AssistantScopeGuard::class)->respond($request->user(), $question)
+                    ?? app(\App\Services\AssistantPopulationNames::class)->respond($request->user(), $question)
+                    ?? app(\App\Services\AssistantKnowledgeBase::class)->respond($request->user(), $question)
+                    ?? $followUp->clarification($question, $validated['previous_question'] ?? null);
+                if ($answer === null) {
+                    $interpretation = $interpreter->interpret($request->user(), $question);
+                    if (isset($interpretation['question'])) $question = $interpretation['question'];
+                    $answer = $interpretation['answer'] ?? $assistant->respond($request->user(), $question);
+                    if (config('assistant_ai.enabled') && $interpretation === null) {
+                        $answer['notice'] = AssistantLanguage::text('AI question understanding is temporarily unavailable. Using the built-in assistant; try a suggested question if needed.');
+                    }
+                    if (($answer['needs_clarification'] ?? false) && config('assistant_ai.enabled')) {
+                        $answer = array_replace($answer, $interpreter->clarification($request->user()));
+                    }
+                }
+                $answer['previous_question'] = $followUp->context($answer)
+                    ?? (($answer['needs_clarification'] ?? false) ? ($validated['previous_question'] ?? null) : null);
                 if ($question !== $message) $answer['interpreted_question'] = $question;
             }
             $answer['language'] = $selection['language'];

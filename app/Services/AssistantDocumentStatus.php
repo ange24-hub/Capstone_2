@@ -7,6 +7,14 @@ use App\Models\User;
 
 class AssistantDocumentStatus
 {
+    public function requestedStatuses(string $question, bool $payment): array
+    {
+        $terms = $payment
+            ? ['not_required' => 'no payment required|not required', 'unpaid' => 'unpaid|wala pa.*bayad', 'pending_verification' => 'pending|verification', 'paid' => 'paid|verified', 'rejected' => 'rejected']
+            : ['pending' => 'pending', 'processing' => 'processing', 'ready' => 'ready', 'completed' => 'completed', 'rejected' => 'rejected'];
+        return array_keys(array_filter($terms, fn ($pattern) => preg_match('/\b('.$pattern.')\b/iu', $question)));
+    }
+
     public function respond(User $user, string $question): ?array
     {
         $q = mb_strtolower($question);
@@ -28,10 +36,7 @@ class AssistantDocumentStatus
         $payment = preg_match('/\b(payment|gcash|bayad|paid|unpaid)\b/u', $q);
         $labels = $payment ? DocumentRequest::paymentStatusLabels() : DocumentRequest::statusLabels();
         $column = $payment ? 'payment_status' : 'status';
-        $terms = $payment
-            ? ['not_required' => 'no payment required|not required', 'unpaid' => 'unpaid|wala pa.*bayad', 'pending_verification' => 'pending|verification', 'paid' => 'paid|verified', 'rejected' => 'rejected']
-            : ['pending' => 'pending', 'processing' => 'processing', 'ready' => 'ready', 'completed' => 'completed', 'rejected' => 'rejected'];
-        $filters = array_keys(array_filter($terms, fn ($pattern) => preg_match('/\b('.$pattern.')\b/u', $q)));
+        $filters = $this->requestedStatuses($q, (bool) $payment);
         // Questions about one's request report its actual latest status, rather than
         // filtering away a request which is not yet ready/paid.
         $latest = $resident && ! preg_match('/\b(pila|how many|count|list|show)\b/u', $q);

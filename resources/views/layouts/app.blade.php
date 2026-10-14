@@ -27,6 +27,9 @@
     <link rel="stylesheet" href="{{ asset('css/profile-navigation.css') }}?v={{ filemtime(public_path('css/profile-navigation.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/print.css') }}?v={{ filemtime(public_path('css/print.css')) }}">
     @vite('resources/css/app.css')
+    @if(!$usesPublicLayout)
+        <link rel="stylesheet" href="{{ asset('css/assistant.css') }}?v={{ filemtime(public_path('css/assistant.css')) }}" media="screen">
+    @endif
     @stack('head')
 </head>
 <body @if(!$usesPublicLayout) class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endif>

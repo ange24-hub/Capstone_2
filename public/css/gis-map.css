@@ -172,6 +172,7 @@
 #household-map .leaflet-control-layers label { display:block; font:13px/1.8 Arial,sans-serif; margin:2px 0; }
 #household-map .leaflet-control-layers input { display:inline-block; width:auto; min-height:0; margin:0 5px 0 0; padding:0; appearance:auto; }
 .gis-popup { min-width:180px; line-height:1.7; overflow-wrap:anywhere; }
+#household-map .gis-popup .gis-location-zoom { display:block; width:100%; margin-top:8px; padding:7px 9px; border:1px solid #2563eb; border-radius:6px; background:#eff6ff; color:#1d4ed8; font-size:12px; font-weight:700; text-align:center; cursor:pointer; }
 #household-map .gis-household-popup .leaflet-popup-content { margin:10px 24px 10px 12px; font-size:12px; }
 #household-map .gis-household-popup .gis-popup { min-width:0; line-height:1.5; }
 #household-map .gis-household-popup .gis-popup > strong { display:block; margin-bottom:5px; font-size:13px; }
