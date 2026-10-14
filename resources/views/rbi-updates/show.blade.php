@@ -6,7 +6,7 @@
 
 @section('content')
     @php($familyCount = collect($rbiUpdate->rows ?? [])->pluck('household_head')->filter()->unique()->count())
-    <section class="rbi-report-view" aria-labelledby="rbi-report-title">
+    <section class="rbi-report-view rbi-report-detail" aria-labelledby="rbi-report-title">
         <header class="rbi-report-header">
             <div class="rbi-report-heading">
                 <span class="rbi-report-emblem" aria-hidden="true"><x-app-icon name="document" /></span>

@@ -91,3 +91,22 @@
     .rbi-report-view .rbi-word-page-number { bottom: 0; right: 0; }
     .rbi-report-view .rbi-word-table tr { break-inside: avoid; }
 }
+
+/* The shared admin link color must not darken text on the PDF action. */
+@layer civic {
+@media screen {
+    html.municipal-ui .app-content .rbi-report-detail a.rbi-report-button.rbi-report-pdf {
+        background:#285d92 !important;
+        border-color:#285d92 !important;
+        color:#fff !important;
+        font-size:14px !important;
+    }
+    html.municipal-ui .app-content .rbi-report-detail a.rbi-report-button.rbi-report-pdf .app-icon { color:#fff !important; }
+    html.municipal-ui .app-content .rbi-report-detail a.rbi-report-button.rbi-report-pdf:hover,
+    html.municipal-ui .app-content .rbi-report-detail a.rbi-report-button.rbi-report-pdf:focus-visible {
+        background:#1d466f !important;
+        border-color:#1d466f !important;
+        color:#fff !important;
+    }
+}
+}
