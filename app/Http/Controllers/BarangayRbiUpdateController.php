@@ -1071,15 +1071,12 @@ class BarangayRbiUpdateController extends Controller
         <font><sz val="11"/><name val="Calibri"/></font>
         <font><b/><sz val="16"/><name val="Calibri"/><color rgb="FF102F2A"/></font>
         <font><b/><sz val="12"/><name val="Calibri"/><color rgb="FF102F2A"/></font>
-        <font><b/><sz val="10"/><name val="Calibri"/><color rgb="FFFFFFFF"/></font>
+        <font><b/><sz val="10"/><name val="Calibri"/><color rgb="FF000000"/></font>
         <font><sz val="10"/><name val="Calibri"/></font>
     </fonts>
-    <fills count="5">
+    <fills count="2">
         <fill><patternFill patternType="none"/></fill>
         <fill><patternFill patternType="gray125"/></fill>
-        <fill><patternFill patternType="solid"><fgColor rgb="FFE8F1EE"/><bgColor indexed="64"/></patternFill></fill>
-        <fill><patternFill patternType="solid"><fgColor rgb="FF145C4D"/><bgColor indexed="64"/></patternFill></fill>
-        <fill><patternFill patternType="solid"><fgColor rgb="FFFFF7E6"/><bgColor indexed="64"/></patternFill></fill>
     </fills>
     <borders count="2">
         <border><left/><right/><top/><bottom/><diagonal/></border>
@@ -1094,9 +1091,9 @@ class BarangayRbiUpdateController extends Controller
     <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
     <cellXfs count="5">
         <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
-        <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-        <xf numFmtId="0" fontId="2" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-        <xf numFmtId="0" fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+        <xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+        <xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+        <xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
         <xf numFmtId="0" fontId="4" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
     </cellXfs>
 </styleSheet>';

@@ -6,7 +6,7 @@
     <style>
         @page { margin: 6mm 8mm; size: A4 landscape; }
         * { box-sizing: border-box; }
-        body { margin: 0; color: #000; font-family: DejaVu Sans, Arial, sans-serif; font-size: 8.2pt; }
+        body { margin: 0; color: #000; background: #fff; font-family: DejaVu Sans, Arial, sans-serif; font-size: 8.2pt; }
         .rbi-page { position: relative; page-break-after: always; }
         .rbi-page:last-child { page-break-after: auto; }
         .header { width: 78%; margin: 0 auto 2mm; border-collapse: collapse; }

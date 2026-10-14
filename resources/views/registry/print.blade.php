@@ -18,9 +18,9 @@
         .meta span { white-space: nowrap; }
         table { width: 100%; table-layout: fixed; border-collapse: collapse; }
         th, td { border: .6pt solid #a9b7c3; padding: 2.5pt 2pt; vertical-align: top; overflow-wrap: break-word; line-height: 1.3; }
-        th { background: #eaf0f4; color: #203957; text-align: center; font-size: 6pt; font-weight: 700; }
+        th { background: #fff; color: #203957; text-align: center; font-size: 6pt; font-weight: 700; }
         td { font-size: 6.5pt; }
-        tbody tr:nth-child(even) { background: #f7f9fa; }
+        tbody tr:nth-child(even) { background: #fff; }
         .household-start td { border-top: 1.3pt solid #6d8599; }
         .empty { padding: 6mm; text-align: center; }
         @media print {

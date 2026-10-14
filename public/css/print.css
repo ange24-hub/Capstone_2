@@ -5,6 +5,14 @@
 @layer print-overrides {
 @media print {
     @page { size: A4; margin: 12mm; }
+    /* Paper copies use white paper without the screen theme's fills or gradients. */
+    html, body { background: #fff !important; }
+    body *, body *::before, body *::after {
+        background: transparent !important;
+        color: #111 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
     .app-sidebar, .sidebar-backdrop, .app-header, .app-footer,
     .workspace-location, .skip-link, .rbim-assistant,
     .population-report-filter, .population-category-nav,

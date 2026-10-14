@@ -143,7 +143,7 @@
         print-color-adjust: exact;
     }
     .population-spreadsheet .table-wrap th,
-    .population-spreadsheet .table-wrap .total-row td { background: #e2e8f0 !important; font-weight: 700 !important; }
+    .population-spreadsheet .table-wrap .total-row td { background: #fff !important; font-weight: 700 !important; }
     .population-spreadsheet .table-wrap th { text-align: center !important; }
     .population-spreadsheet .population-barangay-heading { text-align: center !important; }
     .population-spreadsheet .population-barangay-row,
