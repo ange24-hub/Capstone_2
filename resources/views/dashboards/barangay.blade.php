@@ -38,6 +38,10 @@
             <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert">This account is not assigned to a barangay. Ask the municipal administrator to complete the account assignment.</div>
         @else
             @if (($workspacePage ?? 'overview') === 'overview')
+            <section class="civic-task-metrics" aria-label="Tasks requiring action">
+                <x-summary-card label="Pending resident approvals" :value="number_format($residentApprovalRequests->count())" detail="Review registrations against RBI records" icon="shield" :tone="$residentApprovalRequests->isEmpty() ? 'neutral' : 'warning'" />
+                <x-summary-card label="Pending document requests" :value="number_format($pendingDocuments)" detail="Review requests and verify submitted payments" icon="document" :tone="$pendingDocuments ? 'warning' : 'neutral'" />
+            </section>
             <div class="barangay-overview-layout">
                 <section class="overview-community" aria-labelledby="community-summary-title">
                     <h2 id="community-summary-title" class="sr-only">Resident summary</h2>

@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
+    <style>@layer print-overrides, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">
     @if(request()->routeIs('barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">
@@ -156,6 +157,7 @@
         @include('assistant.widget')
     @endif
     @stack('scripts')
+    <script src="{{ asset('js/workspace-ui.js') }}?v={{ filemtime(public_path('js/workspace-ui.js')) }}" defer></script>
     @if(!$usesPublicLayout)
         <script src="{{ asset('js/philippine-clock.js') }}?v={{ filemtime(public_path('js/philippine-clock.js')) }}" defer></script>
         <script>
@@ -179,13 +181,13 @@
                 const pageTitle = document.querySelector('#main-content h1')?.textContent.trim();
                 if (pageTitle) {
                     document.querySelector('[data-page-location-title]').textContent = pageTitle;
-                    document.querySelector('[data-page-location]').hidden = false;
+                    document.querySelector('[data-page-location]').hidden = {{ request()->routeIs('dashboard.*') ? 'true' : 'false' }};
                     document.title = `${pageTitle} | RBIM · Tomas Oppus`;
                 }
                 document.querySelectorAll('.side-nav a').forEach((link) => {
                     link.setAttribute('aria-label', link.textContent.trim());
                     link.title = link.textContent.trim();
-                    if (link.classList.contains('active')) link.setAttribute('aria-current', 'page');
+                    if (link.classList.contains('active') && !link.hasAttribute('aria-current')) link.setAttribute('aria-current', 'page');
                 });
                 const setOpen = (open) => {
                     const wasOpen = body.classList.contains('sidebar-is-open');

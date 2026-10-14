@@ -29,6 +29,7 @@
         @method('PUT')
     @endif
 
+    <x-form-section title="Household information" description="Record the household number, address and location.">
     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
         <div>
             <label for="registry_sequence">RBI row / HH sequence</label>
@@ -77,7 +78,9 @@
         <label>House coordinate picker</label>
         <div id="coordinate-picker-map" class="picker-map" aria-label="Interactive map for recording household coordinates"></div>
     </div>
+    </x-form-section>
 
+    <x-form-section title="Personal and demographic information">
     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
         <div>
             <label for="first_name">First name</label>
@@ -167,7 +170,9 @@
     <label for="complete_address">Complete address</label><input id="complete_address" name="complete_address" value="{{ old('complete_address', $inhabitant->complete_address ?? '') }}">
     <label for="remarks">RBI remarks / other information</label>
     <textarea id="remarks" name="remarks">{{ old('remarks', \App\Support\RegistryRemarks::display($inhabitant->remarks ?? null)) }}</textarea>
+    </x-form-section>
 
+    <x-form-section title="Migration information" description="Add a movement event when it applies to this resident.">
     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
         <div>
             <label for="migration_type">Migration event</label>
@@ -194,8 +199,9 @@
 
     <label for="reason">Migration reason / notes</label>
     <textarea id="reason" name="reason">{{ old('reason') }}</textarea>
+    </x-form-section>
 
-    <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
+    <div class="form-actions civic-sticky-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
         <button type="submit">{{ $isEdit ? 'Save Changes' : 'Create Record' }}</button>
     </div>
 </form>

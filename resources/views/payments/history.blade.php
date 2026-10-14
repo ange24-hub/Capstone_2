@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="dashboard-card payment-history-card rounded-xl border border-slate-200 bg-white p-5">
-        <div class="payment-history-table-wrap overflow-x-auto">
+        <div class="payment-history-table-wrap table-wrap overflow-x-auto">
             <table class="payment-history-table w-full text-sm">
                 <thead><tr><th>Date (PhST)</th>@if($secretary)<th>Resident</th>@endif<th>Request / document</th><th>Amount</th><th>Method / reference</th><th>Update</th><th>Recorded by / remarks</th><th>Receipt</th></tr></thead>
                 <tbody>
@@ -31,7 +31,7 @@
                         <td>@if(!empty($payment['payment_proof_path']) && ($payment['payment_method'] ?? '') === 'gcash')<a href="{{ route('document-payments.history.proof', $history) }}">View receipt</a>@else — @endif</td>
                     </tr>
                 @empty
-                    <tr><td colspan="{{ $secretary ? 8 : 7 }}">No payment history yet. Payments will appear here when submitted or received.</td></tr>
+                    <tr><td colspan="{{ $secretary ? 8 : 7 }}"><x-empty-state title="No payment history yet." description="Payments will appear here when submitted or received." icon="payment" /></td></tr>
                 @endforelse
                 </tbody>
             </table>

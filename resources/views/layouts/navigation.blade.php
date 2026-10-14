@@ -6,13 +6,13 @@
                 ['municipal.approvals.index', 'municipal.approvals.*', 'check', 'Account approvals'],
                 ['municipal.barangays.index', 'municipal.barangays.*', 'directory', 'Barangay directory'],
             ],
-            'Reports & maps' => [
+            'Reports' => [
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ['migration.dashboard', 'migration.dashboard', 'trend', 'Migration trends'],
-                ['spatial.index', 'spatial.index', 'map', 'Household map'],
                 ['concerns.summary', 'concerns.*', 'users', 'Concern summary'],
             ],
+            'Maps' => [['spatial.index', 'spatial.index', 'map', 'Household map']],
         ];
     } elseif ($user->hasRole(App\Models\User::ROLE_BARANGAY)) {
         $recordLinks = [
@@ -23,13 +23,11 @@
         }
         $recordLinks[] = ['barangay.registry.moved-out', 'barangay.registry.moved-out*', 'trend', 'Moved out'];
         $recordLinks[] = ['barangay.registry.deceased', 'barangay.registry.deceased', 'document', 'Deceased records'];
-        $recordLinks[] = ['spatial.index', 'spatial.index', 'map', 'Household map'];
-        $recordLinks[] = ['offline.household', 'offline.household', 'location', 'Offline household survey'];
         $navigationGroups = [
             'Services' => [
                 ['barangay.resident-approvals.index', 'barangay.resident-approvals.*', 'check', 'Resident approvals'],
                 ['barangay.document-requests.index', 'barangay.document-requests.*', 'document', 'Document requests'],
-                ['barangay.document-payments.history', 'barangay.document-payments.history', 'document', 'Payment history'],
+                ['barangay.document-payments.history', 'barangay.document-payments.history', 'payment', 'Payment history'],
                 ['concerns.index', 'concerns.*', 'users', 'Resident concerns'],
             ],
             'Resident records' => $recordLinks,
@@ -38,13 +36,17 @@
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ['migration.dashboard', 'migration.dashboard', 'trend', 'Migration trends'],
             ],
+            'Maps & surveys' => [
+                ['spatial.index', 'spatial.index', 'map', 'Household map'],
+                ['offline.household', 'offline.household', 'location', 'Offline household survey'],
+            ],
         ];
     } else {
         $navigationGroups = [
             'My services' => [
                 ['resident.document-requests.create', 'resident.document-requests.create', 'form', 'Request a document'],
                 ['resident.document-requests.index', 'resident.document-requests.index', 'document', 'My requests'],
-                ['resident.document-payments.history', 'resident.document-payments.history', 'document', 'Payment history'],
+                ['resident.document-payments.history', 'resident.document-payments.history', 'payment', 'Payment history'],
                 ['concerns.index', 'concerns.*', 'users', 'My concerns'],
             ],
         ];
@@ -52,12 +54,13 @@
 @endphp
 
 <nav class="side-nav" aria-label="Primary navigation">
+    <div class="side-section">Overview</div>
     <a class="{{ request()->routeIs('dashboard', 'dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'active' : '' }}" href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'dashboard.barangay', 'dashboard.municipal', 'dashboard.resident')) aria-current="page" @endif><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
     @if ($user->hasRole(App\Models\User::ROLE_BARANGAY))
-        <a class="{{ request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*') ? 'active' : '' }}" href="{{ route('barangay.rbi-updates.index') }}" @if(request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*')) aria-current="page" @endif><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
+        <a class="{{ request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*') ? 'active' : '' }}" href="{{ route('barangay.rbi-updates.index') }}" @if(request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*')) aria-current="{{ request()->routeIs('barangay.rbi-updates.index') ? 'page' : 'location' }}" @endif><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
         @if(request()->routeIs('barangay.rbi-updates.*', 'registry.new-inhabitants.*'))
             <div class="rbi-sidebar-subpages">
-                <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if(request()->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents')) aria-current="page" @endif>Add residents</a>
+                <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if(request()->routeIs('barangay.rbi-updates.residents')) aria-current="page" @endif>Add residents</a>
                 <a href="{{ route('barangay.rbi-updates.deceased', request()->only('edit', 'new')) }}" @if(request()->routeIs('barangay.rbi-updates.deceased')) aria-current="page" @endif>Deceased inhabitants</a>
                 <a href="{{ route('barangay.rbi-updates.history') }}" @if(request()->routeIs('barangay.rbi-updates.history', 'registry.new-inhabitants.*')) aria-current="page" @endif>Report history</a>
             </div>
@@ -80,6 +83,6 @@
     @endforeach
     @if ($user->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
         <div class="side-section">Account</div>
-        <a class="profile-navigation-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}" @if(request()->routeIs('profile.*')) aria-current="page" @endif><span class="nav-mark"><x-app-icon name="users" /></span><span>Profile Info</span></a>
+        <a class="profile-navigation-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}" @if(request()->routeIs('profile.*')) aria-current="page" @endif><span class="nav-mark"><x-app-icon name="profile" /></span><span>Profile Info</span></a>
     @endif
 </nav>

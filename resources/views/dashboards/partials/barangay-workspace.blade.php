@@ -17,6 +17,7 @@
             <div class="brgy-task-list">
                 <a href="{{ route('barangay.resident-approvals.index') }}"><span class="brgy-task-copy"><strong>Resident registrations</strong></span><span class="brgy-task-count">{{ $residentApprovalRequests->count() }}</span><span class="brgy-link-arrow" aria-hidden="true">&rarr;</span></a>
                 <a href="{{ route('barangay.document-requests.index') }}"><span class="brgy-task-copy"><strong>Document requests</strong></span><span class="brgy-task-count">{{ $pendingDocuments }}</span><span class="brgy-link-arrow" aria-hidden="true">&rarr;</span></a>
+                <a href="{{ route('barangay.document-requests.index') }}#document-requests"><span class="brgy-task-copy"><strong>Verify payments</strong><small>Review GCash proofs and in-person payments in each request</small></span><span class="brgy-link-arrow" aria-hidden="true">&rarr;</span></a>
             </div>
         </section>
     </div>

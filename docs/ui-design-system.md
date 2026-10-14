@@ -1,6 +1,6 @@
 # Frontend design system
 
-The shared Laravel layout loads the Tailwind v4 stylesheet through Vite. The user's final palette choice is the original navy blue: sidebar `#112f40`, primary actions `#244b83`, white cards and slate backgrounds.
+The shared Laravel layout loads Tailwind v4 through Vite. The current civic design uses navy `#142d4e`, blue actions `#2457a7`, white cards, and a neutral `#f4f6f8` canvas. See [the shared design system](design-system.md) for tokens, component usage, cascade order, workflow behavior, and document exclusions.
 
 ## Screen conventions
 

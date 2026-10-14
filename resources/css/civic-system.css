@@ -7,9 +7,9 @@
     --civic-primary: #2457a7;
     --civic-primary-hover: #194587;
     --civic-primary-soft: #edf3fc;
-    --civic-canvas: #e8eff8;
+    --civic-canvas: #f4f6f8;
     --civic-surface: #ffffff;
-    --civic-subtle: #eef4fc;
+    --civic-subtle: #f8fafc;
     --civic-ink: #172b45;
     --civic-text: #40516a;
     --civic-muted: #5c6d82;
@@ -20,9 +20,9 @@
     --civic-warning-soft: #fff7e6;
     --civic-danger: #b02e38;
     --civic-danger-soft: #fff1f2;
-    --civic-radius: 12px;
+    --civic-radius: 8px;
     --civic-control-radius: 8px;
-    --civic-shadow: 0 2px 5px rgb(20 45 78 / 3%);
+    --civic-shadow: 0 1px 2px rgb(20 45 78 / 4%);
     --civic-space-1: 4px;
     --civic-space-2: 8px;
     --civic-space-3: 12px;
@@ -71,8 +71,7 @@
     .municipal-ui .app-content :is(.dashboard-eyebrow,.government-eyebrow,.page-kicker,.overview-section-kicker) { color: var(--civic-primary) !important; font-size: 11px !important; letter-spacing: .09em !important; font-weight: 650 !important; }
     .municipal-ui :is(.field-help,.auth-copy,.workspace-location) { color: var(--civic-muted) !important; font-size: 13px !important; }
     .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.profile-page-heading,.dashboard-hero) {
-      background: linear-gradient(110deg, #dbe9fc, #edf4ff 65%, #e0f0f1) !important; border: 1px solid #bed1e9 !important;
-      border-left: 4px solid var(--civic-primary) !important;
+      background: var(--civic-surface) !important; border: 1px solid var(--civic-border) !important;
       border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important;
       padding: 24px !important; min-height: 0 !important; animation: none !important;
     }
@@ -100,7 +99,7 @@
     .municipal-ui .app-brand strong { font-size: 19px !important; color: #fff !important; }
     .municipal-ui :is(.app-brand small,.app-brand em,.sidebar-office span,.side-label,.side-section) { color: #b6c7dd !important; }
     .municipal-ui .sidebar-office { background: #ffffff06 !important; border-color: #ffffff16 !important; }
-    .municipal-ui .side-nav a { min-height: 44px !important; font-size: 13px !important; line-height: 1.4 !important; color: #e1e9f4 !important; border-radius: var(--civic-control-radius) !important; background: transparent !important; box-shadow: none !important; }
+    .municipal-ui .side-nav a { min-height: 44px !important; font-size: 14px !important; line-height: 1.4 !important; color: #e1e9f4 !important; border-radius: var(--civic-control-radius) !important; background: transparent !important; box-shadow: none !important; }
     .municipal-ui .side-nav a:hover { background: var(--civic-navy-hover) !important; color: #fff !important; }
     .municipal-ui .side-nav a.active { background: #2a4d78 !important; color: #fff !important; box-shadow: inset 3px 0 #a4c7ff !important; font-weight: 600 !important; }
     .municipal-ui .side-nav .nav-mark { background: transparent !important; color: inherit !important; }
@@ -174,8 +173,8 @@
 
     /* Data remains dense enough for office work, with comfortable row spacing. */
     .municipal-ui .app-content :is(.table-wrap,.clean-table-wrap):not(:where(.rbi-source-table,.rbi-document-preview *,.rbi-word-page *)) { border: 1px solid var(--civic-border) !important; border-radius: 10px !important; }
-    .municipal-ui .app-content :is(.table-wrap,.clean-table) th:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: var(--civic-subtle) !important; color: var(--civic-muted) !important; font-size: 11px !important; font-weight: 650 !important; letter-spacing: .055em !important; padding: 13px 16px !important; border-color: var(--civic-border) !important; }
-    .municipal-ui .app-content :is(.table-wrap,.clean-table) td:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { padding: 14px 16px !important; color: var(--civic-text) !important; font-size: 13px !important; border-color: #e9edf3 !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) th:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: var(--civic-subtle) !important; color: var(--civic-ink) !important; font-size: 13px !important; font-weight: 650 !important; letter-spacing: normal !important; text-transform: none !important; padding: 13px 16px !important; border-color: var(--civic-border) !important; }
+    .municipal-ui .app-content :is(.table-wrap,.clean-table) td:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { padding: 14px 16px !important; color: var(--civic-text) !important; font-size: 14px !important; border-color: #e9edf3 !important; }
     .municipal-ui .app-content :is(.table-wrap,.clean-table) tbody tr:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: #fff !important; }
     .municipal-ui .app-content :is(.table-wrap,.clean-table) tbody tr:nth-child(even):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: #fafbfd !important; }
     .municipal-ui .app-content :is(.table-wrap,.clean-table) tbody tr:hover:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background: #f0f5fd !important; }

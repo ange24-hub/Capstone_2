@@ -7,47 +7,47 @@
     <title>Household survey | RBIM</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; background: #f7f5f0; color: #293b50; font: 16px/1.5 system-ui, sans-serif; }
+        body { margin: 0; background: #f4f6f8; color: #172b45; font: 16px/1.5 system-ui, sans-serif; }
         .container { width: min(100% - 32px, 720px); margin: 32px auto; }
         .survey-header { margin-bottom: 24px; }
-        .back-link { color: #3e5975; text-underline-offset: 3px; }
-        h1 { margin: 16px 0 4px; font-size: clamp(26px, 5vw, 32px); line-height: 1.2; }
+        .back-link { color: #2457a7; text-underline-offset: 3px; }
+        h1 { margin: 16px 0 4px; font-size: clamp(24px, 5vw, 28px); line-height: 1.2; }
         h2 { margin: 0; font-size: 19px; }
         p { margin: 8px 0 16px; }
-        .survey-header p, .field-help { color: #6c747a; }
-        .card { margin-bottom: 16px; padding: 24px; background: #fffefb; border: 1px solid #e4e0d8; border-radius: 12px; }
+        .survey-header p, .field-help { color: #5c6d82; }
+        .card { margin-bottom: 16px; padding: 24px; background: #fff; border: 1px solid #dce3ed; border-radius: 8px; }
         .step-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .step-number { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px; border-radius: 6px; background: #edf1f4; color: #3e5975; font-weight: 700; }
+        .step-number { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px; border-radius: 6px; background: #edf1f4; color: #2457a7; font-weight: 700; }
         label { display: block; margin: 16px 0 6px; font-weight: 600; }
-        input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9bac7; border-radius: 6px; background: #fffefb; color: inherit; font: inherit; }
-        input[readonly] { background: #f4f2ed; color: #6c747a; }
-        button { min-height: 44px; margin-top: 12px; padding: 10px 16px; border: 1px solid #afbec9; border-radius: 6px; color: #293b50; background: #fffefb; font: inherit; font-weight: 600; cursor: pointer; }
-        button:hover { background: #f4f2ed; }
+        input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9bac7; border-radius: 6px; background: #fff; color: inherit; font: inherit; }
+        input[readonly] { background: #f8fafc; color: #5c6d82; }
+        button { min-height: 44px; margin-top: 12px; padding: 10px 16px; border: 1px solid #afbec9; border-radius: 6px; color: #172b45; background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+        button:hover { background: #f8fafc; }
         button:disabled { opacity: .6; cursor: wait; }
-        .primary-button { border-color: #3e5975; background: #3e5975; color: white; }
-        .primary-button:hover { background: #314a64; }
+        .primary-button { border-color: #2457a7; background: #2457a7; color: white; }
+        .primary-button:hover { background: #194587; }
         .save-button { width: 100%; margin-top: 20px; }
         .field-help { display: block; margin-top: 6px; font-size: 14px; }
-        #registryStatus { margin-bottom: 0; font-size: 14px; color: #6c747a; }
+        #registryStatus { margin-bottom: 0; font-size: 14px; color: #5c6d82; }
         #householdSuggestions { display: grid; gap: 8px; }
         #householdSuggestions button { text-align: left; margin-top: 0; }
         #householdSuggestions:not(:empty) { margin-top: 12px; }
         .sync-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
         .sync-actions button { margin-top: 0; }
-        .sync-actions a { color: #3e5975; }
+        .sync-actions a { color: #2457a7; }
         .success, .warning, .error { margin-top: 14px; padding: 12px; border-radius: 6px; }
         .success { background: #e1f3e8; color: #205539; }
         .warning { background: #fff3d4; color: #76541d; }
         .error { background: #fbe4e4; color: #8b2929; }
         #pendingList { overflow-wrap: anywhere; }
-        #pendingList > div { padding: 12px 0; border-bottom: 1px solid #e4e0d8; }
+        #pendingList > div { padding: 12px 0; border-bottom: 1px solid #dce3ed; }
         details { margin-top: 16px; }
         summary { min-height: 44px; padding: 10px 0; color: #4d5b68; cursor: pointer; font-weight: 600; }
         .coordinates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
         .device-settings { margin-top: 0; }
-        .device-settings p { font-size: 14px; color: #6c747a; }
+        .device-settings p { font-size: 14px; color: #5c6d82; }
         #clearDeviceButton { color: #8b2929; border-color: #e2bebe; }
-        :is(a, button, input, summary):focus-visible { outline: 3px solid #3e5975; outline-offset: 3px; }
+        :is(a, button, input, summary):focus-visible { outline: 3px solid #2457a7; outline-offset: 3px; }
         @media (max-width: 480px) { .container { margin-block: 20px; } .card { padding: 18px; } .coordinates { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -89,7 +89,7 @@
 
     <section class="card" aria-labelledby="pending-title">
         <div class="step-heading"><span class="step-number" aria-hidden="true">3</span><h2 id="pending-title">Sync saved records (<span id="pendingCount">0</span>)</h2></div>
-        <p class="field-help">When online, sign in as your barangay secretary to upload these records.</p>
+        <p class="field-help">Saved records stay on this device until synchronization succeeds. When online, sign in as your barangay secretary to upload these records.</p>
         <div class="sync-actions">
             <button type="button" id="syncButton" class="primary-button">Sync saved records</button>
             <a href="/login" target="_blank" rel="noopener">Sign in <span class="field-help">Opens in a new tab</span></a>

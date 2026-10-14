@@ -72,11 +72,19 @@
     const wording = (english, bisaya) => language.value === 'ceb' ? bisaya : english;
     let previousQuestion = null;
     let groupState = null;
+    const appShell = document.querySelector('.app-shell');
+    const syncDialog = () => {
+        const modal = !panel.hidden && window.innerWidth <= 680;
+        panel.setAttribute('aria-modal', String(modal));
+        if (appShell) appShell.inert = modal;
+    };
 
     const setOpen = open => {
+        if (open && document.body.classList.contains('sidebar-is-open')) document.querySelector('[data-sidebar-close]')?.click();
         panel.hidden = !open;
         toggle.setAttribute('aria-expanded', String(open));
         root.classList.toggle('is-open', open);
+        syncDialog();
         if (open) (catalog.open ? search : input).focus(); else toggle.focus();
     };
     const setBrowsing = open => {
@@ -214,8 +222,16 @@
                 ? wording('Too many questions in a short time. Please wait a minute and try again.', 'Daghan ra kaayong pangutana sa mubo nga panahon. Paghulat og usa ka minuto ug sulayi pag-usab.')
                 : [401, 419].includes(error.status)
                     ? wording('Your session has expired. Refresh the page and sign in again.', 'Na-expire ang imong session. I-refresh ang page ug pag-sign in pag-usab.')
+                    : error.status === 403
+                        ? wording('Your account does not have permission for this action.', 'Walay permiso ang imong account alang niini nga aksyon.')
                     : wording('I could not reach RBIM right now. Please try again with a complete question.', 'Dili nako makontak ang RBIM karon. Palihog sulayi pag-usab gamit ang kompleto nga pangutana.');
-            addMessage(message, 'bot');
+            const failure = addMessage(message, 'bot');
+            if (![401, 419, 403, 429].includes(error.status)) {
+                const retry = element('button', wording('Retry question', 'Sulayi pag-usab'), 'assistant-retry');
+                retry.type = 'button';
+                retry.addEventListener('click', () => { failure.remove(); ask(clean); });
+                failure.querySelector('.assistant-bubble').appendChild(retry);
+            }
         } finally {
             clearTimeout(timeout);
             send.disabled = reset.disabled = language.disabled = false;
@@ -228,6 +244,7 @@
     close.addEventListener('click', () => setOpen(false));
     reset.addEventListener('click', () => {
         if (send.disabled) return;
+        if (messages.querySelector('.assistant-message-user') && !window.confirm(wording('Clear this conversation and start a new one?', 'Tangtangon ang panag-istorya ug magsugod og bag-o?'))) return;
         previousQuestion = null;
         messages.replaceChildren();
         addMessage(wording('New conversation. Ask a complete question to start a new topic.', 'Bag-ong panag-istorya. Pangutana og kompleto aron magsugod og bag-ong hilisgutan.'), 'bot');
@@ -245,5 +262,13 @@
     search.addEventListener('input', filterQuestions);
     language.addEventListener('change', updateLabels);
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) { event.preventDefault(); setOpen(false); } });
+    panel.addEventListener('keydown', event => {
+        if (event.key !== 'Tab' || panel.hidden || window.innerWidth > 680) return;
+        const controls = [...panel.querySelectorAll('button,input,select,textarea,a,summary')].filter(control => !control.disabled && control.getClientRects().length);
+        const first = controls[0], last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    });
+    window.addEventListener('resize', syncDialog);
     updateLabels();
 })();

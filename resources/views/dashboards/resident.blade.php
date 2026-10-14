@@ -22,10 +22,10 @@
 
         @if (($workspacePage ?? 'overview') === 'overview')
         <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Request summary">
-            <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="document" /></span><div><span>All requests</span><strong>{{ number_format($documentRequests->total()) }}</strong><small>Your complete request history</small></div></article>
-            <article class="metric-card metric-warning rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="clock" /></span><div><span>Awaiting review</span><strong>{{ number_format($pendingRequests) }}</strong><small>Submitted to your barangay</small></div></article>
-            <article class="metric-card metric-info rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span><div><span>In progress</span><strong>{{ number_format($activeRequests) }}</strong><small>Processing or ready to claim</small></div></article>
-            <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="check" /></span><div><span>Completed</span><strong>{{ number_format($completedRequests) }}</strong><small>Finished transactions</small></div></article>
+            <x-summary-card label="In progress" :value="number_format($activeRequests)" detail="Processing or ready to claim" icon="activity" tone="info" />
+            <x-summary-card label="Awaiting review" :value="number_format($pendingRequests)" detail="Submitted to your barangay" icon="clock" tone="warning" />
+            <x-summary-card label="All requests" :value="number_format($documentRequests->total())" detail="Your complete request history" icon="document" />
+            <x-summary-card label="Completed" :value="number_format($completedRequests)" detail="Finished transactions" icon="check" tone="success" />
         </section>
 
         <nav class="workspace-launcher" aria-label="Resident service shortcuts">
@@ -34,6 +34,7 @@
             <a href="{{ route('resident.document-payments.history') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><strong>Payment history</strong><em>View previous payments</em></span><x-app-icon name="arrow-right" /></a>
         </nav>
 
+        @include('dashboards.partials.resident-request-overview')
         @endif
 
         @if (($workspacePage ?? 'overview') === 'create')
@@ -92,13 +93,13 @@
                 <p class="field-help">Showing {{ $documentRequests->firstItem() }}–{{ $documentRequests->lastItem() }} of {{ $documentRequests->total() }} requests · 5 per page</p>
                 <div class="request-card-list">
                     @foreach ($documentRequests as $request)
-                        <article class="resident-request-card">
+                        <article class="resident-request-card" id="request-{{ $request->id }}">
                             <div class="request-card-main">
                                 <div class="request-reference"><small>Reference</small><strong>{{ $request->reference_number }}</strong></div>
                                 <div class="request-document"><strong>{{ $request->typeLabel() }}</strong><span>{{ $request->purpose }}</span><small>Requested {{ $request->created_at->format('M d, Y · h:i A') }}</small></div>
                                 <div class="request-status-stack">
-                                    <x-status-badge :status="$request->status" class="request-status request-status-{{ $request->status }}">{{ $request->statusLabel() }}</x-status-badge>
-                                    @if ($request->requiresPayment())<span class="payment-status payment-status-{{ $request->payment_status }}">{{ $request->paymentStatusLabel() }}</span>@endif
+                                    <span class="civic-status-label">Document status</span><x-status-badge :status="$request->status" class="request-status request-status-{{ $request->status }}">{{ $request->statusLabel() }}</x-status-badge>
+                                    @if ($request->requiresPayment())<span class="civic-status-label">Payment status</span><x-status-badge :status="$request->payment_status" class="payment-status payment-status-{{ $request->payment_status }}">{{ $request->paymentStatusLabel() }}</x-status-badge>@endif
                                 </div>
                             </div>
                             <div class="request-card-details">
