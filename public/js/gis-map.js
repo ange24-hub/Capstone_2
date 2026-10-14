@@ -11,7 +11,7 @@
     const config = JSON.parse(configNode.textContent);
     const maxMapZoom = 22;
     const locationZoom = 21;
-    const map = L.map('household-map', { preferCanvas: true, maxZoom: maxMapZoom }).setView([10.268841, 125.026688], 13);
+    const map = L.map('household-map', { preferCanvas: true, minZoom: 11, maxZoom: maxMapZoom }).setView([10.268841, 125.026688], 13);
     const streets = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxNativeZoom: 19, maxZoom: maxMapZoom, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -180,6 +180,7 @@
         return layerRequests.get(descriptor.key);
     }
     let areaBounds = null;
+    let municipalBounds = null;
     const failed = new Set();
     const pending = new Set();
     const retry = document.getElementById('gis-retry');
@@ -221,6 +222,13 @@
     map.on('zoomend', report);
     const fit = bounds => {
         if (bounds?.isValid()) map.fitBounds(bounds, { padding: [24, 24], maxZoom: 17 });
+    };
+    const constrainToMunicipality = () => {
+        if (!municipalBounds?.isValid()) return;
+        // Keep the whole municipality in reach without letting users zoom out to the world map.
+        map.setMinZoom(Math.max(11, map.getBoundsZoom(municipalBounds, false, L.point(48, 48))));
+        map.setMaxBounds(municipalBounds.pad(0.15));
+        map.panInsideBounds(municipalBounds.pad(0.15), { animate: false });
     };
     document.getElementById('gis-fit-area').addEventListener('click', () => fit(areaBounds));
     document.getElementById('gis-fit-households').addEventListener('click', () => {
@@ -345,6 +353,10 @@
             const layer = makeLayer(data, descriptor);
             descriptor.group.addLayer(layer);
             descriptor.loaded = true;
+            if (descriptor.key === 'municipal-boundary') {
+                municipalBounds = layer.getBounds();
+                constrainToMunicipality();
+            }
             if (descriptor.key === (config.scoped ? 'barangay-boundaries' : 'municipal-boundary')) {
                 areaBounds = layer.getBounds();
                 if (!savedMarker) fit(areaBounds);
@@ -369,5 +381,8 @@
         if (descriptor.visible) descriptor.group.addTo(map);
     });
     retry.addEventListener('click', () => descriptors.filter(d => failed.has(d.key)).forEach(load));
-    if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById('household-map'));
+    if (window.ResizeObserver) new ResizeObserver(() => {
+        map.invalidateSize();
+        constrainToMunicipality();
+    }).observe(document.getElementById('household-map'));
 })();
