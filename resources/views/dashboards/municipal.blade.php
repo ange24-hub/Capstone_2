@@ -18,7 +18,7 @@
             </div>
             <div class="municipal-hero-actions">
                 <a href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" />Barangay directory</a>
-                <a href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" />Migration trends</a>
+                <a href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" />View migration details</a>
             </div>
         </header>
 
@@ -127,49 +127,6 @@
             @endif
             <a class="button" href="{{ route('municipal.barangays.index') }}">Open Barangay Directory</a>
         </div>
-        </div>
-
-        <div class="workflow-card municipal-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="trend-monitoring">
-            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                <div>
-                    <span class="step-pill">Trend Monitoring</span>
-                    <h2 class="section-title text-lg font-semibold text-slate-900">Population and migration</h2>
-                    <p>Compare the latest RBI population change, six-month in/out-migration, and movement against the previous six months.</p>
-                </div>
-                <a class="button secondary-button" href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" />View migration details</a>
-            </div>
-
-            <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
-                <table class="trend-table">
-                    <thead>
-                        <tr>
-                            <th>Barangay</th>
-                            <th>Current Population</th>
-                            <th>Latest RBI Net</th>
-                            <th>In / Out (6 months)</th>
-                            <th>Net Migration</th>
-                            <th>Movement Trend</th>
-                            <th>Recent RBI entry balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($barangays->sortByDesc('movement_total_6m')->take(10) as $barangay)
-                            <tr>
-                                <td><strong>{{ $barangay->name }}</strong></td>
-                                <td>{{ number_format($barangay->inhabitants_count) }}</td>
-                                <td class="signed-value">{{ $barangay->latest_rbi_net_change >= 0 ? '+' : '' }}{{ $barangay->latest_rbi_net_change }}</td>
-                                <td>{{ $barangay->migration_in_6m }} in / {{ $barangay->migration_out_6m }} out</td>
-                                <td class="signed-value">{{ $barangay->net_migration_6m >= 0 ? '+' : '' }}{{ $barangay->net_migration_6m }}</td>
-                                <td>
-                                    <span class="movement-indicator movement-{{ $barangay->movement_level }}">{{ ucfirst($barangay->movement_level) }}</span>
-                                    <small>{{ $barangay->movement_change_percent >= 0 ? '+' : '' }}{{ $barangay->movement_change_percent }}% vs previous period</small>
-                                </td>
-                                <td class="signed-value" title="Rounded mean of inhabitant entries minus deceased entries over up to three latest recorded reporting months. Not a population forecast.">{{ $barangay->predicted_monthly_change >= 0 ? '+' : '' }}{{ $barangay->predicted_monthly_change }} recorded average</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
         </div>
 
         <div class="workflow-card municipal-panel decision-support rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="decision-support">
