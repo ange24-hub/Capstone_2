@@ -65,7 +65,7 @@
     .municipal-ui .app-main { background: var(--civic-canvas) !important; }
     .municipal-ui .app-content { padding: 28px 32px !important; }
     .municipal-ui :is(.app-content, .public-content) { font-size: 14px !important; line-height: 1.6 !important; }
-    .municipal-ui :is(.app-content, .public-content) :is(h1,h2,h3,h4):not(:where(.rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .civic-home-hero *, .registration-guide *)) { color: var(--civic-ink) !important; letter-spacing: -.025em !important; }
+    .municipal-ui :is(.app-content, .public-content) :is(h1,h2,h3,h4):not(:where(.rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .civic-home-hero *, .home-register-card *, .registration-guide *, .portal-login-intro *)) { color: var(--civic-ink) !important; letter-spacing: -.025em !important; }
     .municipal-ui :is(.app-content, .public-content) h1:not(:where(.rbi-document-preview *, .rbi-word-page *, .civic-home-hero *)) { font-size: clamp(24px, 2.2vw, 30px) !important; line-height: 1.25 !important; font-weight: 700 !important; }
     .municipal-ui .app-content :is(.section-title,.content-panel-heading,.dashboard-card-header h2,.government-card-header h2) { font-size: 17px !important; font-weight: 650 !important; }
     .municipal-ui .app-content :is(.dashboard-eyebrow,.government-eyebrow,.page-kicker,.overview-section-kicker) { color: var(--civic-primary) !important; font-size: 11px !important; letter-spacing: .09em !important; font-weight: 650 !important; }
@@ -204,6 +204,16 @@
     .municipal-ui .portal-login-intro { background: var(--civic-navy) !important; }
     .municipal-ui .registration-guide { background: var(--civic-navy) !important; }
     .municipal-ui .registration-guide h1 { color: #fff !important; }
+    /* Keep foregrounds with their surfaces in the shared, higher-priority layer. */
+    .municipal-ui .registration-guide .registration-eyebrow { color: #f2d88f !important; font-size: 11px !important; }
+    .municipal-ui .registration-guide p { color: #e2ebf5 !important; font-size: 13px !important; line-height: 1.6 !important; }
+    .municipal-ui .registration-guide .registration-guide-tag { background: #e4ede7 !important; color: #254c3b !important; border-color: #b5cdbf !important; font-size: 12px !important; line-height: 1.5 !important; }
+    .municipal-ui .home-register-card { color: #fff !important; }
+    .municipal-ui .home-register-card #home-register-title { color: #fff !important; }
+    .municipal-ui .home-register-card .home-section-eyebrow { color: #f2d88f !important; }
+    .municipal-ui .home-register-card p { color: #e2ebf5 !important; }
+    .municipal-ui .home-register-card .home-register-button { background: #fff !important; color: var(--civic-navy) !important; border-color: #fff !important; }
+    .municipal-ui .home-register-card .home-register-button:hover { background: #eaf2fa !important; border-color: #eaf2fa !important; }
     .municipal-ui .service-card { border: 1px solid var(--civic-border) !important; border-radius: var(--civic-radius) !important; box-shadow: var(--civic-shadow) !important; }
     .municipal-ui .service-icon { display: inline-flex; align-items: center; justify-content: center; background: var(--civic-primary-soft) !important; color: var(--civic-primary) !important; }
     .municipal-ui .portal-login-intro h2 { color: #fff !important; }

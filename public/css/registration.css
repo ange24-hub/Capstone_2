@@ -73,7 +73,7 @@
         }
         .municipal-ui .registration-card-head { margin-bottom:17px !important; }
         .municipal-ui .registration-card-head .page-kicker {
-            color:#4c6d82 !important; font-size:10px !important;
+            color:#4c6d82 !important; font-size:12px !important;
             letter-spacing:.09em !important;
         }
         .municipal-ui .registration-card-head h2 {
@@ -105,7 +105,7 @@
             background:#dfe9ee !important; color:#315d77 !important;
         }
         .municipal-ui .account-type-option:has(input:checked) .account-type-icon { background:#d4e4ec !important; color:#244e6b !important; }
-        .municipal-ui .account-type-option small { font-size:10px !important; line-height:1.4 !important; }
+        .municipal-ui .account-type-option small { color:#536879 !important; font-size:12px !important; line-height:1.5 !important; }
         .municipal-ui .registration-section {
             padding:14px 16px 16px !important;
             border:1px solid #d7e0e5 !important;
@@ -115,7 +115,7 @@
         .municipal-ui .registration-section.secretary-fields { border-color:#ddcfab !important; background:#fcfaf4 !important; }
         .municipal-ui .registration-section-head { margin-bottom:4px !important; }
         .municipal-ui .registration-section-head span { color:#294657 !important; font-size:12px !important; }
-        .municipal-ui .registration-section-head small { color:#667b86 !important; font-size:10px !important; }
+        .municipal-ui .registration-section-head small { color:#536879 !important; font-size:12px !important; }
         .municipal-ui .registration-fields { gap:2px 16px !important; }
         .municipal-ui .registration-fields .field-group label { margin-top:8px !important; color:#324d5d !important; font-size:12px !important; }
         .municipal-ui .registration-fields :is(input,select) {
@@ -128,8 +128,8 @@
         }
         .municipal-ui .registration-fields input:focus-visible,
         .municipal-ui .registration-fields select:focus-visible { outline:2px solid #537f9d !important; outline-offset:1px !important; }
-        .municipal-ui .registration-fields .field-group small { color:#5f7480 !important; font-size:11px !important; line-height:1.45 !important; }
-        .municipal-ui .registration-approval-note { padding:9px 12px !important; font-size:11px !important; }
+        .municipal-ui .registration-fields .field-group small { color:#536879 !important; font-size:12px !important; line-height:1.5 !important; }
+        .municipal-ui .registration-approval-note { padding:9px 12px !important; font-size:12px !important; }
         .municipal-ui .registration-submit {
             justify-self:start !important;
             width:auto !important; min-width:225px !important;
