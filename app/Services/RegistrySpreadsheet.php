@@ -56,7 +56,7 @@ class RegistrySpreadsheet
             ['title' => 1, 'label' => 3]);
         $rows = [...$header['rows'],
             $this->row(9, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 34),
-            '<row r="10" ht="25" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',
+            '<row r="10" ht="34" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',
         ];
 
         $previousHousehold = null;
@@ -140,9 +140,9 @@ class RegistrySpreadsheet
     private function styles(): string
     {
         return $this->xml('<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-            .'<fonts count="4"><font><sz val="9"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FF000000"/><name val="Arial"/></font><font><b/><sz val="8"/><color rgb="FF203957"/><name val="Arial"/></font><font><sz val="6"/><name val="Arial"/></font></fonts>'
+            .'<fonts count="4"><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font></fonts>'
             .'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
-            .'<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="medium"/><bottom style="thin"/><diagonal/></border></borders>'
+            .'<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="thin"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border><border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="medium"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border></borders>'
             .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
             .'<cellXfs count="11"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
             .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'

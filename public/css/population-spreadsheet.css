@@ -134,10 +134,10 @@
     .population-spreadsheet .table-wrap table { min-width: 0 !important; width: 100% !important; }
     .population-spreadsheet .table-wrap th,
     .population-spreadsheet .table-wrap td {
-        border: 1px solid #94a3b8 !important;
+        border: 1px solid #000 !important;
         padding: 4px 5px !important;
-        font-size: 8pt !important;
-        color: #111 !important;
+        font-size: 11pt !important;
+        color: #000 !important;
         background: #fff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -148,7 +148,7 @@
     .population-spreadsheet .population-barangay-heading { text-align: center !important; }
     .population-spreadsheet .population-barangay-row,
     .population-spreadsheet .population-subgroup-row { break-after: avoid; }
-    .population-spreadsheet .population-coverage-table { font-size: 7pt !important; }
+    .population-spreadsheet .population-coverage-table { font-size: 11pt !important; }
     .population-spreadsheet thead { display: table-header-group; }
     .population-spreadsheet tr { break-inside: avoid; }
 }

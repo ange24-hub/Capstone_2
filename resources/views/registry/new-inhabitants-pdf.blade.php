@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset="utf-8"><style>
-@page{margin:10mm}body{font-family:DejaVu Sans,sans-serif;font-size:8px;color:#111;background:#fff}h1{text-align:center;font-size:15px;margin:0 0 10px}.meta{display:flex;justify-content:space-between;margin-bottom:10px}.family{page-break-inside:avoid;margin-bottom:14px}.family h2{font-size:10px;margin:0;padding:5px;background:#fff;border:1px solid #111}table{width:100%;border-collapse:collapse}th,td{border:1px solid #111;padding:4px;text-align:center}th{background:#fff;font-size:7px}.footer{margin-top:16px;text-align:center;font-size:7px}
+@page{margin:10mm}body{font-family: "Times New Roman", Times, serif;font-size: 11pt;color:#000;background:#fff}h1{text-align:center;font-size: 11pt;margin:0 0 10px}.meta{display:flex;justify-content:space-between;margin-bottom:10px}.family{page-break-inside:avoid;margin-bottom:14px}.family h2{font-size: 11pt;margin:0;padding:5px;background:#fff;border:1px solid #000}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:4px;text-align:center}th{background:#fff;font-size: 11pt}.footer{margin-top:16px;text-align:center;font-size: 11pt}
 @include('reports._document-header-styles')
 </style></head><body>
 @foreach($families as $household => $members)<section class="family">

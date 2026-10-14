@@ -6,7 +6,7 @@
     <style>
         @page { margin: 6mm 8mm; size: A4 landscape; }
         * { box-sizing: border-box; }
-        body { margin: 0; color: #000; background: #fff; font-family: DejaVu Sans, Arial, sans-serif; font-size: 8.2pt; }
+        body { margin: 0; color: #000; background: #fff; font-family: "Times New Roman", Times, serif; font-size: 11pt; }
         .rbi-page { position: relative; page-break-after: always; }
         .rbi-page:last-child { page-break-after: auto; }
         .header { width: 78%; margin: 0 auto 2mm; border-collapse: collapse; }
@@ -14,29 +14,32 @@
         .logo-cell { width: 19mm; text-align: center; }
         .logo { width: 16mm; height: 16mm; object-fit: contain; }
         .heading { text-align: center; line-height: 1.35; }
-        .heading h1 { margin: 0; font-size: 12.5pt; font-weight: 700; }
-        .heading p { margin: 0; font-size: 10pt; }
-        .continuation { margin-top: 1mm !important; font-size: 8pt !important; font-weight: 700; }
+        .heading h1 { margin: 0; font-size: 11pt; font-weight: 700; }
+        .heading p { margin: 0; font-size: 11pt; }
+        .continuation { margin-top: 1mm !important; font-size: 11pt !important; font-weight: 700; }
         table.form { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        table.form th, table.form td { border: .6pt solid #000; padding: .7mm .8mm; vertical-align: middle; overflow-wrap: anywhere; }
-        table.form th { height: 14mm; text-align: center; font-size: 6pt; line-height: 1.15; font-weight: 700; }
+        table.form th, table.form td { border: .6pt solid #000; padding: .4mm .6mm; vertical-align: middle; overflow-wrap: anywhere; }
+        table.form th { height: 14mm; text-align: center; font-size: 11pt; line-height: 1.15; font-weight: 700; }
         table.form thead tr:first-child th[colspan], table.form thead tr:last-child th:not([rowspan]) { height: 7mm; }
-        table.form td { height: 7.5mm; font-size: 6.5pt; line-height: 1.1; }
+        table.form td { height: 6mm; font-size: 11pt; line-height: 1.1; }
         .head-name, .resident-name { text-transform: uppercase; font-weight: 700; }
         .center { text-align: center; }
         .section-b { margin-top: 1.5mm; }
-        .section-b th { height: 6.5mm !important; font-size: 8pt !important; }
-        .section-b td { height: 6mm !important; }
+        .section-b th { height: 6.5mm !important; font-size: 11pt !important; }
+        .section-b td { height: 4mm !important; }
         .signatures { width: 82%; margin: 2mm auto 0; border-collapse: collapse; table-layout: fixed; page-break-inside: avoid; }
         .signatures td { width: 33.33%; border: 0; padding: 0 5mm; vertical-align: top; }
         .signature-label { margin: 0; text-align: center; }
         .signature-block { text-align: center; }
-        .signature-space { height: 10mm; text-align: center; }
+        .signature-space { height: 6mm; text-align: center; }
         .signature-image { display: block; height: 8mm; max-width: 43mm; margin: 0 auto; object-fit: contain; }
-        .official-name { display: block; min-height: 7mm; padding-top: 1mm; border-bottom: .6pt solid #000; text-transform: uppercase; font-weight: 700; overflow-wrap: break-word; }
+        .official-name { display: block; min-height: 4mm; padding-top: 1mm; border-bottom: .6pt solid #000; text-transform: uppercase; font-weight: 700; overflow-wrap: break-word; }
         .official-title { display: block; margin-top: 1mm; }
-        .page-number { position: absolute; right: 0; bottom: 0; font-size: 6.5pt; color: #333; }
+        .page-number { position: absolute; right: 0; bottom: 0; font-size: 11pt; color: #333; }
         @include('reports._document-header-styles')
+        .report-document-header { margin-bottom: 6pt !important; }
+        .report-document-header .report-document-title { margin-bottom: 8pt !important; }
+        .report-document-header .report-document-fields, .report-document-header .report-document-field, .report-document-header span { line-height: 1.15 !important; }
     </style>
 </head>
 <body>

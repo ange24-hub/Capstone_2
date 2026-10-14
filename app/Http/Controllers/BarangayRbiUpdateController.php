@@ -842,7 +842,7 @@ class BarangayRbiUpdateController extends Controller
                 $mainTableRows = [[
                     'cells' => array_values(\App\Support\HouseholdRbi::fields()),
                     'center' => true,
-                    'size' => 14,
+                    'size' => 22,
                     'height' => 850,
                 ]];
 
@@ -852,10 +852,11 @@ class BarangayRbiUpdateController extends Controller
                             ->map(fn (string $field): string => match ($field) {
                                 'household_head' => $memberIndex === 0 ? $page['household_head'] : '',
                                 'birth_date' => $this->formatFormDate((string) ($row[$field] ?? '')),
+                                'sex' => ['Male' => 'M', 'Female' => 'F'][$row[$field] ?? ''] ?? (string) ($row[$field] ?? ''),
                                 default => (string) ($row[$field] ?? ''),
                             })
                             ->all(),
-                        'size' => 14,
+                        'size' => 22,
                         'height' => 420,
                     ];
                 }
@@ -869,7 +870,7 @@ class BarangayRbiUpdateController extends Controller
                 $deceasedTableRows = [[
                     'cells' => array_values(BarangayRbiUpdate::deceasedRowFields()),
                     'center' => true,
-                    'size' => 14,
+                    'size' => 22,
                     'height' => 400,
                 ]];
 
@@ -879,7 +880,7 @@ class BarangayRbiUpdateController extends Controller
                             (string) ($row['deceased_name'] ?? ''),
                             $this->formatFormDate((string) ($row['death_date'] ?? '')),
                         ],
-                        'size' => 14,
+                        'size' => 22,
                         'height' => 360,
                     ];
                 }
@@ -890,7 +891,7 @@ class BarangayRbiUpdateController extends Controller
                     : '';
 
                 return $this->wordDocumentHeader($barangay, $page['household_number'] ?? '', optional($rbiUpdate->as_of_date)->format('m/d/Y') ?? '')
-                    . $this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 14)
+                    . $this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 22)
                     .$this->wordTable($mainTableRows, $mainWidths)
                     .$this->wordParagraph('', false, false, 4)
                     .$this->wordTable($deceasedTableRows, [5679, 4900])
@@ -912,7 +913,7 @@ class BarangayRbiUpdateController extends Controller
         .$familyPages
         .'<w:sectPr>
             <w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/>
-            <w:pgMar w:top="749" w:right="893" w:bottom="792" w:left="893" w:header="360" w:footer="360" w:gutter="0"/>
+            <w:pgMar w:top="504" w:right="893" w:bottom="504" w:left="893" w:header="360" w:footer="360" w:gutter="0"/>
         </w:sectPr>
     </w:body>
 </w:document>';
@@ -922,8 +923,8 @@ class BarangayRbiUpdateController extends Controller
     {
         $signatureRows = ['', '', '', ''];
         foreach ([['Prepared by:', $preparedBy, 'BHW / Encoder', 'secretary', 1], ['Certified Correct:', $certifiedBy, 'Barangay Secretary', 'certified', 4], ['Verified by:', $notedBy, 'Barangay Captain / Punong Barangay', 'captain', 2]] as [$label, $name, $title, $media, $offset]) {
-            $image = isset($signatureMedia[$media]) ? $this->wordImageDrawing($signatureMedia[$media]['relationship'], $label, $documentIdOffset + $offset) : $this->wordParagraph('', false, true, 14);
-            foreach ([$this->wordParagraph($label, false, true, 16), $image, $this->wordParagraph($name, true, true, 16), $this->wordParagraph($title, false, true, 16)] as $row => $content) {
+            $image = isset($signatureMedia[$media]) ? $this->wordImageDrawing($signatureMedia[$media]['relationship'], $label, $documentIdOffset + $offset) : $this->wordParagraph('', false, true, 22);
+            foreach ([$this->wordParagraph($label, false, true, 22), $image, $this->wordParagraph($name, true, true, 22), $this->wordParagraph($title, false, true, 22)] as $row => $content) {
                 $border = $row === 2 ? '<w:tcBorders><w:bottom w:val="single" w:sz="4" w:color="000000"/></w:tcBorders>' : '';
                 $signatureRows[$row] .= '<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/><w:vAlign w:val="center"/>'.$border.'</w:tcPr>'.$content.'</w:tc>';
             }
@@ -935,10 +936,10 @@ class BarangayRbiUpdateController extends Controller
 
     private function wordDocumentHeader(string $barangay, string $household, string $date): string
     {
-        $header = $this->wordParagraph('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', true, true, 20)
+        $header = $this->wordParagraph('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', true, true, 22)
             .$this->wordParagraph('', false, false, 12);
         foreach ([['A. REGION:', 'VIII'], ['B. PROVINCE:', 'SOUTHERN LEYTE'], ['C. CITY/MUNICIPALITY:', 'TOMAS OPPUS'], ['D. BARANGAY:', $barangay], ['E. HOUSEHOLD NO.:', $household]] as $index => [$label, $value]) {
-            $paragraph = $this->wordParagraph(trim($label.' '.$value), false, false, 16);
+            $paragraph = $this->wordParagraph(trim($label.' '.$value), false, false, 22);
             if ($index === 4) {
                 $paragraph = str_replace('<w:pPr>', '<w:pPr><w:tabs><w:tab w:val="right" w:pos="13500"/></w:tabs>', $paragraph);
                 $paragraph = str_replace('</w:t>', '</w:t><w:tab/><w:t xml:space="preserve">'.$this->xlsxEscape(trim('DATE ACCOMPLISHED: '.$date)).'</w:t>', $paragraph);
@@ -987,7 +988,7 @@ class BarangayRbiUpdateController extends Controller
                         $widths[$index] ?? 1800,
                         (bool) ($row['bold'] ?? false),
                         (bool) ($row['center'] ?? false),
-                        (int) ($row['size'] ?? 18)
+                        (int) ($row['size'] ?? 22)
                     ))
                     ->implode('');
 
@@ -1004,17 +1005,17 @@ class BarangayRbiUpdateController extends Controller
         return '<w:tbl><w:tblPr><w:tblW w:w="'.$tableWidth.'" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/>'.$borderStyle.'</w:tblPr><w:tblGrid>'.$grid.'</w:tblGrid>'.$tableRows.'</w:tbl>';
     }
 
-    private function wordCell(string $value, int $width, bool $bold = false, bool $center = false, int $size = 18): string
+    private function wordCell(string $value, int $width, bool $bold = false, bool $center = false, int $size = 22): string
     {
         return '<w:tc><w:tcPr><w:tcW w:w="'.$width.'" w:type="dxa"/><w:vAlign w:val="center"/><w:tcMar><w:top w:w="55" w:type="dxa"/><w:left w:w="45" w:type="dxa"/><w:bottom w:w="45" w:type="dxa"/><w:right w:w="45" w:type="dxa"/></w:tcMar></w:tcPr>'
             .$this->wordParagraph($value, $bold, $center, $size)
             .'</w:tc>';
     }
 
-    private function wordParagraph(string $value, bool $bold = false, bool $center = false, int $size = 18): string
+    private function wordParagraph(string $value, bool $bold = false, bool $center = false, int $size = 22): string
     {
         $paragraphProperties = '<w:pPr><w:spacing w:before="0" w:after="0"/>'.($center ? '<w:jc w:val="center"/>' : '').'</w:pPr>';
-        $runProperties = '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial"/>'.($bold ? '<w:b/>' : '').'<w:sz w:val="'.$size.'"/><w:szCs w:val="'.$size.'"/></w:rPr>';
+        $runProperties = '<w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman"/>'.($bold ? '<w:b/>' : '').'<w:color w:val="000000"/><w:sz w:val="'.$size.'"/><w:szCs w:val="'.$size.'"/></w:rPr>';
 
         return '<w:p>'.$paragraphProperties.'<w:r>'.$runProperties.'<w:t xml:space="preserve">'.$this->xlsxEscape($value).'</w:t></w:r></w:p>';
     }
