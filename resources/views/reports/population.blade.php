@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <section class="dashboard-page population-report population-spreadsheet grid gap-6" aria-labelledby="population-report-title">
+    @include('reports._document-header', ['documentTitle' => strtoupper($reportTitle).' REPORT', 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y'), 'documentPrintOnly' => true])
     <header class="population-report-header">
         <div class="population-report-heading">
             <span class="population-report-eyebrow">Registry reports</span>
@@ -46,6 +47,7 @@
 @endsection
 
 @push('head')
+    <style>@layer print-overrides { @include('reports._document-header-styles') }</style>
     <link rel="stylesheet" href="{{ asset('css/population-spreadsheet.css') }}?v={{ filemtime(public_path('css/population-spreadsheet.css')) }}">
     @if(in_array($selectedSection, ['coverage', 'area-ages'], true) || ($report['totalBarangays'] > 1 && in_array($selectedSection, ['summary', 'sex', 'ages'], true)))<style>@media print { @page { size: A4 landscape; } }</style>@endif
 @endpush

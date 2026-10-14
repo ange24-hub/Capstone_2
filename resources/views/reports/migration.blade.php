@@ -1,12 +1,14 @@
 @extends('layouts.app')
 
 @push('head')
+    <style>@layer print-overrides { @include('reports._document-header-styles') }</style>
     <link rel="stylesheet" href="{{ asset('css/population-spreadsheet.css') }}?v={{ filemtime(public_path('css/population-spreadsheet.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/migration-report.css') }}?v={{ filemtime(public_path('css/migration-report.css')) }}">
 @endpush
 
 @section('content')
 <section class="dashboard-page population-report migration-report-page" aria-labelledby="migration-report-title">
+    @include('reports._document-header', ['documentTitle' => 'MONTHLY MIGRATION REPORT — '.$selectedYear, 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y'), 'documentPrintOnly' => true])
     <header class="population-report-header migration-report-header">
         <div class="population-report-heading">
             <span class="population-report-eyebrow">Registry reports</span>

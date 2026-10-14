@@ -889,9 +889,8 @@ class BarangayRbiUpdateController extends Controller
                     ? '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
                     : '';
 
-                return $this->wordHeaderTable($month, $barangay, $signatureMedia['seal'] ?? null, $documentIdOffset + 3)
-                    . $this->wordParagraph('A. REGION: VIII    B. PROVINCE: SOUTHERN LEYTE    C. CITY/MUNICIPALITY: TOMAS OPPUS', false, false, 14)
-                    . $this->wordParagraph('D. BARANGAY: '.$barangay.'    E. HOUSEHOLD NO.: '.(($page['household_number'] ?? '') ?: 'Not assigned').'    Household head: '.$page['household_head'], false, false, 14)
+                return $this->wordHeaderTable($barangay, $page['household_number'] ?? '', optional($rbiUpdate->as_of_date)->format('m/d/Y') ?? '')
+                    . $this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 14)
                     .$this->wordTable($mainTableRows, $mainWidths)
                     .$this->wordParagraph('', false, false, 4)
                     .$this->wordTable($deceasedTableRows, [5679, 4900])
@@ -934,24 +933,40 @@ class BarangayRbiUpdateController extends Controller
         return '<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid>'.$rows.'</w:tbl>';
     }
 
-    private function wordHeaderTable(string $month, string $barangay, ?array $sealMedia, int $documentPropertyId = 3): string
+    private function wordHeaderTable(string $barangay, string $household, string $date): string
     {
-        $seal = $sealMedia
-            ? $this->wordImageDrawing($sealMedia['relationship'], 'Tomas Oppus Seal', $documentPropertyId, 566420, 544195)
-            : $this->wordParagraph('', false, true, 8);
-
-        return '<w:tbl>
-            <w:tblPr><w:tblW w:w="7560" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders></w:tblPr>
-            <w:tblGrid><w:gridCol w:w="1123"/><w:gridCol w:w="6437"/></w:tblGrid>
-            <w:tr>
-                <w:tc><w:tcPr><w:tcW w:w="1123" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>'.$seal.'</w:tc>
-                <w:tc><w:tcPr><w:tcW w:w="6437" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>'
-                    .$this->wordParagraph('HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', false, true, 17)
-                    .$this->wordParagraph('For the month of '.$month, true, true, 17)
-                    .$this->wordParagraph('Barangay '.$barangay, false, true, 17)
-                .'</w:tc>
-            </w:tr>
-        </w:tbl>';
+        $widths = [2200, 1600, 1600, 350, 2450, 2500, 2800];
+        $cell = function (string $value, int $width, bool $boxed = false, int $span = 1, ?string $merge = null, ?string $content = null): string {
+            $borders = '';
+            foreach (['top', 'left', 'bottom', 'right'] as $edge) {
+                $borders .= '<w:'.$edge.' w:val="'.($boxed ? 'single' : 'nil').'" w:sz="4" w:color="000000"/>';
+            }
+            return '<w:tc><w:tcPr><w:tcW w:w="'.$width.'" w:type="dxa"/>'
+                .($span > 1 ? '<w:gridSpan w:val="'.$span.'"/>' : '')
+                .($merge ? '<w:vMerge w:val="'.$merge.'"/>' : '')
+                .'<w:tcBorders>'.$borders.'</w:tcBorders><w:vAlign w:val="center"/></w:tcPr>'
+                .($content ?? $this->wordParagraph($value, false, $boxed, 14)).'</w:tc>';
+        };
+        $legend = '';
+        foreach (['PSGC', 'C', 'O', 'D', 'E', 'S'] as $line) {
+            $legend .= '<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="0" w:line="100" w:lineRule="exact"/></w:pPr><w:r><w:rPr><w:sz w:val="10"/></w:rPr><w:t>'.$line.'</w:t></w:r></w:p>';
+        }
+        $rows = '';
+        foreach ([['A. REGION:', 'VIII'], ['B. PROVINCE:', 'SOUTHERN LEYTE'], ['C. CITY/MUNICIPALITY:', 'TOMAS OPPUS'], ['D. BARANGAY:', $barangay], ['E. HOUSEHOLD NO.:', $household]] as $index => [$label, $value]) {
+            $cells = $cell($label, $widths[0]).$cell($value, $widths[1], true);
+            if ($index < 4) {
+                $cells .= $cell('', $widths[2], true).$cell('', $widths[3], true, 1, $index === 0 ? 'restart' : 'continue', $index === 0 ? $legend : null)
+                    .$cell('', array_sum(array_slice($widths, 4)), false, 3);
+            } else {
+                $cells .= $cell('', array_sum(array_slice($widths, 2, 3)), false, 3)
+                    .$cell('DATE ACCOMPLISHED:', $widths[5]).$cell($date, $widths[6], true);
+            }
+            $rows .= '<w:tr><w:trPr><w:cantSplit/><w:trHeight w:val="250" w:hRule="atLeast"/></w:trPr>'.$cells.'</w:tr>';
+        }
+        $grid = implode('', array_map(fn ($width) => '<w:gridCol w:w="'.$width.'"/>', $widths));
+        return $this->wordParagraph('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', true, true, 20)
+            .$this->wordParagraph('', false, false, 12)
+            .'<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>'.$grid.'</w:tblGrid>'.$rows.'</w:tbl>';
     }
 
     private function wordImageDrawing(

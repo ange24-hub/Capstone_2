@@ -20,6 +20,7 @@
         table.form { width: 100%; border-collapse: collapse; table-layout: fixed; }
         table.form th, table.form td { border: .6pt solid #000; padding: .7mm .8mm; vertical-align: middle; overflow-wrap: anywhere; }
         table.form th { height: 14mm; text-align: center; font-size: 6pt; line-height: 1.15; font-weight: 700; }
+        table.form thead tr:first-child th[colspan], table.form thead tr:last-child th:not([rowspan]) { height: 7mm; }
         table.form td { height: 7.5mm; font-size: 6.5pt; line-height: 1.1; }
         .head-name, .resident-name { text-transform: uppercase; font-weight: 700; }
         .center { text-align: center; }
@@ -35,6 +36,7 @@
         .official-name { display: block; min-height: 7mm; padding-top: 1mm; border-bottom: .6pt solid #000; text-transform: uppercase; font-weight: 700; overflow-wrap: break-word; }
         .official-title { display: block; margin-top: 1mm; }
         .page-number { position: absolute; right: 0; bottom: 0; font-size: 6.5pt; color: #333; }
+        @include('reports._document-header-styles')
     </style>
 </head>
 <body>
@@ -44,21 +46,6 @@
         $deceasedRows = collect($page['deceased'])->pad(3, [])->take(3);
     @endphp
     <section class="rbi-page">
-        <table class="header">
-            <tr>
-                <td class="logo-cell">
-                    @if ($logoDataUri)<img class="logo" src="{{ $logoDataUri }}" alt="Barangay seal">@endif
-                </td>
-                <td class="heading">
-                    <h1>HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</h1>
-                    <p>For the month of <strong>{{ strtoupper(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'NOT SET') }}</strong></p>
-                    <p>Barangay {{ $barangayName }}</p>
-                    @if ($page['continued'])<p class="continuation">{{ strtoupper($page['household_head']) }} HOUSEHOLD — CONTINUED</p>@endif
-                </td>
-                <td class="logo-cell"></td>
-            </tr>
-        </table>
-
         @include('rbi-updates._household-meta')
         @include('rbi-updates._household-table')
 

@@ -52,21 +52,18 @@ class RegistrySpreadsheet
 
     private function sheet(Collection $residents, Barangay $barangay, string $title): string
     {
-        $rows = [
-            $this->row(1, [$title], 1, 28),
-            $this->row(2, ['Barangay '.$barangay->name.' · As of '.now()->format('d F Y')], 2, 21),
-            $this->row(4, ['A. REGION: VIII', '', '', '', '', '', '', '', '', 'D. BARANGAY: '.strtoupper($barangay->name)], 3, 20),
-            $this->row(5, ['B. PROVINCE: SOUTHERN LEYTE', '', '', '', '', '', '', '', '', 'HOUSEHOLDS: '.$residents->pluck('household_id')->unique()->count()], 3, 20),
-            $this->row(6, ['C. CITY/MUNICIPALITY: TOMAS OPPUS', '', '', '', '', '', '', '', '', 'RESIDENTS: '.$residents->count()], 3, 20),
-            $this->row(8, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 34),
-            '<row r="9" ht="25" customHeight="1">'.$this->cell('C9', 'LAST NAME', 4).$this->cell('D9', 'FIRST NAME', 4).$this->cell('E9', 'MIDDLE NAME', 4).$this->cell('F9', 'QUALIFIER', 4).'</row>',
+        $header = (new SpreadsheetReportHeader)->build(18, $title, strtoupper($barangay->name), '', now()->format('m/d/Y'),
+            ['title' => 1, 'label' => 3, 'box' => 9, 'legend' => 10]);
+        $rows = [...$header['rows'],
+            $this->row(9, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 34),
+            '<row r="10" ht="25" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',
         ];
 
         $previousHousehold = null;
         foreach ($residents as $index => $resident) {
             $start = $previousHousehold !== $resident->household_id;
             $style = $start ? ($index % 2 ? 8 : 7) : ($index % 2 ? 6 : 5);
-            $rows[] = $this->row($index + 10, [
+            $rows[] = $this->row($index + 11, [
                 $resident->household?->household_number, $resident->family_number,
                 $resident->last_name, $resident->first_name, $resident->middle_name, $resident->suffix,
                 $resident->relationship_to_head, $resident->household?->purok, $resident->birth_place,
@@ -79,19 +76,17 @@ class RegistrySpreadsheet
         }
 
         if ($residents->isEmpty()) {
-            $rows[] = $this->row(10, ['No matching active residents.'], 5, 25);
+            $rows[] = $this->row(11, ['No matching active residents.'], 5, 25);
         }
 
-        $merges = ['A1:R1', 'A2:R2', 'C8:F8'];
-        foreach ([4, 5, 6] as $row) {
-            $merges[] = 'A'.$row.':I'.$row;
-            $merges[] = 'J'.$row.':R'.$row;
-        }
+        $totalRow = max(11, $residents->count() + 10) + 2;
+        $rows[] = $this->row($totalRow, ['HOUSEHOLDS: '.$residents->pluck('household_id')->unique()->count().'    RESIDENTS: '.$residents->count()], 3, 20);
+        $merges = [...$header['merges'], 'C9:F9', 'A'.$totalRow.':R'.$totalRow];
         foreach (['A', 'B', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'] as $column) {
-            $merges[] = $column.'8:'.$column.'9';
+            $merges[] = $column.'9:'.$column.'10';
         }
         if ($residents->isEmpty()) {
-            $merges[] = 'A10:R10';
+            $merges[] = 'A11:R11';
         }
 
         $columns = '';
@@ -103,11 +98,12 @@ class RegistrySpreadsheet
 
         return $this->xml('<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
             .'<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
-            .'<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="9" topLeftCell="A10" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+            .'<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="10" topLeftCell="A11" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
             .'<sheetFormatPr defaultRowHeight="18"/><cols>'.$columns.'</cols><sheetData>'.implode('', $rows).'</sheetData>'
             .'<mergeCells count="'.count($merges).'">'.$mergeXml.'</mergeCells>'
             .'<printOptions horizontalCentered="1"/><pageMargins left="0.25" right="0.25" top="0.3" bottom="0.3" header="0.15" footer="0.15"/>'
-            .'<pageSetup paperSize="256" paperWidth="13in" paperHeight="8.5in" orientation="landscape" fitToWidth="1" fitToHeight="0"/>'
+            // A supported legal-paper preset avoids Excel shrinking custom-size reports incorrectly.
+            .'<pageSetup paperSize="5" orientation="landscape" fitToWidth="1" fitToHeight="0"/>'
             .'</worksheet>');
     }
 
@@ -144,11 +140,11 @@ class RegistrySpreadsheet
     private function styles(): string
     {
         return $this->xml('<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-            .'<fonts count="3"><font><sz val="9"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF203957"/><name val="Arial"/></font><font><b/><sz val="8"/><color rgb="FF203957"/><name val="Arial"/></font></fonts>'
+            .'<fonts count="4"><font><sz val="9"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FF000000"/><name val="Arial"/></font><font><b/><sz val="8"/><color rgb="FF203957"/><name val="Arial"/></font><font><sz val="6"/><name val="Arial"/></font></fonts>'
             .'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
             .'<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="medium"/><bottom style="thin"/><diagonal/></border></borders>'
             .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-            .'<cellXfs count="9"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+            .'<cellXfs count="11"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
             .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>'
@@ -157,6 +153,8 @@ class RegistrySpreadsheet
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'</cellXfs></styleSheet>');
     }
 

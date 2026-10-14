@@ -26,7 +26,8 @@ class RbiDocumentPreviewTest extends TestCase
             ->assertDontSee('contenteditable')->assertDontSee('Update Form')
             ->assertViewHas('wordPages', fn ($pages) => count($pages) === 1 && $pages[0]['show_signatures']);
         $response = $this->get(route('rbi-updates.export-word', $report))->assertOk();
-        $this->get(route('rbi-updates.export-pdf', $report))->assertOk()->assertHeader('content-type', 'application/pdf');
+        $pdf = $this->get(route('rbi-updates.export-pdf', $report))->assertOk()->assertHeader('content-type', 'application/pdf');
+        $this->assertSame(1, preg_match_all('/\/Type\s*\/Page\b/', $pdf->getContent()), 'A household form and its signatures must fit on one PDF page.');
         $path = tempnam(sys_get_temp_dir(), 'rbi-layout-test-');
         try {
             file_put_contents($path, $response->streamedContent());
@@ -48,6 +49,8 @@ class RbiDocumentPreviewTest extends TestCase
         $report->update(['rows' => $rows]);
         $this->get(route('rbi-updates.show', $report))->assertOk()->assertSee('Member 15')
             ->assertViewHas('wordPages', fn ($pages) => count($pages) === 3 && count($pages[2]['members']) === 1 && $pages[2]['show_signatures']);
+        $continuedPdf = $this->get(route('rbi-updates.export-pdf', $report))->assertOk();
+        $this->assertSame(3, preg_match_all('/\/Type\s*\/Page\b/', $continuedPdf->getContent()), 'Continued forms must retain one physical page per household page.');
         $other = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $staff->barangay_id]);
         $this->actingAs($other)->get(route('rbi-updates.show', $report))->assertForbidden();
     }

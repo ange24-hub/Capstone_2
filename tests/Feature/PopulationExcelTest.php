@@ -45,13 +45,15 @@ class PopulationExcelTest extends TestCase
             $this->assertStringContainsString('Registered residents', $workbook);
             $this->assertStringContainsString('Resident 1 Example', $sheet);
             $this->assertStringContainsString('Resident 51 Example', $sheet);
-            $this->assertStringContainsString('BARANGAY: Looc', $sheet);
+            $this->assertStringContainsString('D. BARANGAY:', $sheet);
+            $this->assertStringContainsString('>Looc</t>', $sheet);
             $this->assertStringNotContainsString('ForeignResident', $sheet);
-            $this->assertStringContainsString('topLeftCell="A6"', $sheet);
+            $this->assertStringContainsString('topLeftCell="A10"', $sheet);
             $this->assertStringNotContainsString('Registry coverage', $sheet);
             $this->assertStringNotContainsString('completeness not verified', $sheet);
-            $this->assertStringContainsString('BARANGAY: Looc', $sheet);
-            $this->assertStringContainsString('mergeCell ref="D2:F4"', $sheet);
+            $this->assertStringContainsString('DATE ACCOMPLISHED:', $sheet);
+            $this->assertStringContainsString('mergeCell ref="C3:D3"', $sheet);
+            $this->assertStringContainsString('mergeCell ref="F3:F6"', $sheet);
             $this->assertStringContainsString('autoFilter', $sheet);
             $this->assertNotFalse($zip->getFromName('xl/styles.xml'));
         });
@@ -78,7 +80,7 @@ class PopulationExcelTest extends TestCase
             }
             $summary = $zip->getFromName('xl/worksheets/sheet1.xml');
             $this->assertStringContainsString('Total registered residents', $summary);
-            $this->assertStringContainsString('<c r="B6" s="5"><v>1</v></c>', $summary);
+            $this->assertStringContainsString('<c r="G10" s="5"><v>1</v></c>', $summary);
             $coverage = $zip->getFromName('xl/worksheets/sheet4.xml');
             $this->assertStringContainsString('Looc', $coverage);
             $this->assertStringContainsString('Canlupao', $coverage);
@@ -127,7 +129,7 @@ class PopulationExcelTest extends TestCase
         $workbook = $this->get(route('reports.population.excel', ['section' => 'residents']))->assertOk()->getContent();
         $this->withWorkbook($workbook, function (ZipArchive $zip): void {
             $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
-            $this->assertStringContainsString('<c r="A6" s="6" t="inlineStr"><is><t>Barangay Canlupao</t>', $sheet);
+            $this->assertStringContainsString('<c r="A10" s="6" t="inlineStr"><is><t>Barangay Canlupao</t>', $sheet);
             $this->assertStringContainsString('Barangay Looc', $sheet);
             $this->assertTrue(strpos($sheet, 'Barangay Canlupao') < strpos($sheet, 'Alpha Resident'));
             $this->assertTrue(strpos($sheet, 'Barangay Looc') < strpos($sheet, 'Beta Resident'));
@@ -163,7 +165,7 @@ class PopulationExcelTest extends TestCase
                         $this->assertTrue($xml->loadXML($zip->getFromIndex($index)), $name.' must be valid XML');
                     }
                     if (str_starts_with($name, 'xl/worksheets/')) {
-                        foreach (['REGION: VIII', 'PROVINCE: SOUTHERN LEYTE', 'CITY/MUNICIPALITY: TOMAS OPPUS', 'BARANGAY: '] as $label) {
+                        foreach (['A. REGION:', 'VIII', 'B. PROVINCE:', 'SOUTHERN LEYTE', 'C. CITY/MUNICIPALITY:', 'TOMAS OPPUS', 'D. BARANGAY:', 'E. HOUSEHOLD NO.:', 'DATE ACCOMPLISHED:', 'PSGC'] as $label) {
                             $this->assertStringContainsString($label, $zip->getFromIndex($index));
                         }
                     }

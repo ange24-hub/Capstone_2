@@ -30,14 +30,14 @@
             thead { display: table-header-group; }
             tr { break-inside: avoid; }
         }
+        @include('reports._document-header-styles')
     </style>
 </head>
 <body>
     <div class="print-toolbar"><a href="{{ route('barangay.registry.active') }}">Back to Resident Registry</a><div class="print-actions"><a href="{{ route('barangay.registry.download', ['scope' => $scope]) }}">Download Excel</a><button type="button" onclick="window.print()">Print report</button></div></div>
     <main>
-        <h1>{{ $title }}</h1>
-        <p class="subtitle">Barangay {{ $barangay->name }} &middot; As of {{ now()->format('d F Y') }}</p>
-        <div class="meta"><span>A. REGION: VIII</span><span>D. BARANGAY: {{ strtoupper($barangay->name) }}</span><span>B. PROVINCE: SOUTHERN LEYTE</span><span>HOUSEHOLDS: {{ $residents->pluck('household_id')->unique()->count() }}</span><span>C. CITY/MUNICIPALITY: TOMAS OPPUS</span><span>RESIDENTS: {{ $residents->count() }}</span></div>
+        @include('reports._document-header', ['documentTitle' => $title, 'documentBarangay' => strtoupper($barangay->name), 'documentDate' => now()->format('m/d/Y')])
+        <p class="report-document-context">HOUSEHOLDS: {{ $residents->pluck('household_id')->unique()->count() }} &middot; RESIDENTS: {{ $residents->count() }}</p>
         <table>
             <colgroup>
                 <col style="width: 4%"><col style="width: 4%">

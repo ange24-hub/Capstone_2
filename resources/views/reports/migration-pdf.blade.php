@@ -24,9 +24,9 @@ ol { margin: 4pt 0; padding-left: 15pt; } li { margin-bottom: 3pt; }
 .population-coverage-table th, .population-coverage-table td { padding: 5pt 3pt; }
 footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt solid #8793a0; padding-top: 4pt; font-size: 7pt; color: #465361; }
 .page-number { float: right; } .page-number:after { content: counter(page); }
+@include('reports._document-header-styles')
 </style></head><body>
 <footer>SB-ISPGM | Monthly Migration Report | {{ $report['generatedAt']->format('d M Y') }} <span class="page-number">Page </span></footer>
-<header class="report-header"><p>Republic of the Philippines</p><h1>MONTHLY MIGRATION REPORT — {{ $report['year'] }}</h1></header>
-@include('reports._jurisdiction')
+@include('reports._document-header', ['documentTitle' => 'MONTHLY MIGRATION REPORT — '.$report['year'], 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y')])
 @include('reports.migration-tables', ['showReportNotes' => false])
 </body></html>

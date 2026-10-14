@@ -110,52 +110,60 @@ class PopulationSpreadsheet
 
     private function sheet(array $sheet, array $report): string
     {
-        $columnCount = count($sheet['headings']);
-        $split = max(1, intdiv($columnCount, 2));
+        $logicalColumns = count($sheet['headings']);
+        // Subdivide narrow tables so the document header can retain its boxed layout.
+        $span = max(1, (int) ceil(12 / $logicalColumns));
+        $columnCount = $logicalColumns * $span;
         $barangay = str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays';
-        $regionRow = array_pad(['REGION: VIII'], $split, '');
-        $regionRow[] = 'BARANGAY: '.$barangay;
-        $rows = [
-            $this->row(1, [$sheet['title']], 1),
-            $this->row(2, $regionRow, 7),
-            $this->row(3, ['PROVINCE: SOUTHERN LEYTE'], 7),
-            $this->row(4, ['CITY/MUNICIPALITY: TOMAS OPPUS'], 7),
-            $this->row(5, $sheet['headings'], 3),
-        ];
+        $header = (new SpreadsheetReportHeader)->build($columnCount, $sheet['title'], $barangay, '',
+            $report['generatedAt']->format('m/d/Y'), ['title' => 1, 'label' => 8, 'box' => 9, 'legend' => 10]);
+        $rows = [...$header['rows'], $this->row(9, $sheet['headings'], 3, $span)];
         foreach ($sheet['rows'] as $index => $values) {
-            $rows[] = $this->row($index + 6, $values, in_array($index, $sheet['groupRows'] ?? [], true) ? 6 : 4);
+            $rows[] = $this->row($index + 10, $values, in_array($index, $sheet['groupRows'] ?? [], true) ? 6 : 4, $span);
         }
         if ($sheet['rows'] === []) {
-            $rows[] = $this->row(6, ['No entries available in the selected scope.'], 4);
+            $rows[] = $this->row(10, ['No entries available in the selected scope.'], 4, $span);
         }
         $lastColumn = $this->column($columnCount);
-        $lastRow = max(6, count($sheet['rows']) + 5);
-        $merges = ['A1:'.$lastColumn.'1', $this->column($split + 1).'2:'.$lastColumn.'4'];
-        if ($split > 1) {
-            foreach ([2, 3, 4] as $row) $merges[] = 'A'.$row.':'.$this->column($split).$row;
+        $lastRow = max(10, count($sheet['rows']) + 9);
+        $merges = $header['merges'];
+        if ($span > 1) {
+            for ($row = 9; $row <= $lastRow; $row++) {
+                for ($column = 0; $column < $logicalColumns; $column++) {
+                    $merges[] = $this->column($column * $span + 1).$row.':'.$this->column(($column + 1) * $span).$row;
+                }
+            }
         }
         $mergeXml = implode('', array_map(fn ($range) => '<mergeCell ref="'.$range.'"/>', $merges));
-        $widths = collect($sheet['headings'])->map(fn ($heading, $index) => '<col min="'.($index + 1).'" max="'.($index + 1).'" width="'.($index === 0 ? 32 : ($heading === 'Name' ? 34 : 20)).'" customWidth="1"/>')->implode('');
+        $logicalWidths = array_map(fn ($heading, $index) => $index === 0 ? 32 : ($heading === 'Name' ? 34 : 20), $sheet['headings'], array_keys($sheet['headings']));
+        $scale = max(1, 120 / array_sum($logicalWidths));
+        $widths = '';
+        foreach ($logicalWidths as $index => $width) {
+            $widths .= '<col min="'.($index * $span + 1).'" max="'.(($index + 1) * $span).'" width="'.round($width * $scale / $span, 2).'" customWidth="1"/>';
+        }
 
         return $this->xml('<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
             .'<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
-            .'<sheetViews><sheetView workbookViewId="0"><pane ySplit="5" topLeftCell="A6" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+            .'<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="9" topLeftCell="A10" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
             .'<sheetFormatPr defaultRowHeight="17"/><cols>'.$widths.'</cols><sheetData>'.implode('', $rows).'</sheetData>'
-            .'<autoFilter ref="A5:'.$lastColumn.$lastRow.'"/>'
+            .'<autoFilter ref="A9:'.$lastColumn.$lastRow.'"/>'
             .'<mergeCells count="'.count($merges).'">'.$mergeXml.'</mergeCells>'
             .'<printOptions horizontalCentered="1"/><pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/>'
-            .'<pageSetup orientation="'.(count($sheet['headings']) > 6 ? 'landscape' : 'portrait').'" paperSize="9" fitToWidth="1" fitToHeight="0"/>'
+            .'<pageSetup orientation="landscape" paperSize="9" fitToWidth="1" fitToHeight="0"/>'
             .'</worksheet>');
     }
 
-    private function row(int $number, array $values, int $style): string
+    private function row(int $number, array $values, int $style, int $span = 1): string
     {
         $cells = '';
         foreach (array_values($values) as $index => $value) {
-            $reference = $this->column($index + 1).$number;
+            $reference = $this->column($index * $span + 1).$number;
             $cells .= is_int($value)
                 ? '<c r="'.$reference.'" s="5"><v>'.$value.'</v></c>'
                 : '<c r="'.$reference.'" s="'.$style.'" t="inlineStr"><is><t>'.$this->escape((string) $value).'</t></is></c>';
+            for ($offset = 1; $offset < $span; $offset++) {
+                $cells .= '<c r="'.$this->column($index * $span + $offset + 1).$number.'" s="'.(is_int($value) ? 5 : $style).'"/>';
+            }
         }
 
         return '<row r="'.$number.'"'.($style === 7 ? ' ht="30" customHeight="1"' : '').'>'.$cells.'</row>';
@@ -199,18 +207,21 @@ class PopulationSpreadsheet
     private function styles(): string
     {
         return $this->xml('<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-            .'<fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="15"/><name val="Calibri"/></font><font><b/><color rgb="FF172536"/><sz val="11"/><name val="Calibri"/></font></fonts>'
+            .'<fonts count="5"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FF172536"/><sz val="11"/><name val="Calibri"/></font><font><sz val="6"/><name val="Calibri"/></font><font><sz val="8"/><name val="Calibri"/></font></fonts>'
             .'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
             .'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border></borders>'
             .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-            .'<cellXfs count="8"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
-            .'<xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
+            .'<cellXfs count="11"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+            .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'</cellXfs></styleSheet>');
     }
 

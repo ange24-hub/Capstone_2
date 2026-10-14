@@ -172,7 +172,10 @@ class BarangayRbiUpdateTest extends TestCase
         $zip->close();
         unlink($temporaryDocument);
 
-        $this->assertStringContainsString('HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', $documentXml);
+        $this->assertStringContainsString('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', $documentXml);
+        $this->assertStringContainsString('DATE ACCOMPLISHED:', $documentXml);
+        $this->assertStringContainsString('PSGC', $documentXml);
+        $this->assertStringContainsString('<w:vMerge w:val="restart"/>', $documentXml);
         $this->assertStringContainsString('Household head', $documentXml);
         $this->assertStringContainsString('Pedro Dela Cruz', $documentXml);
         $this->assertStringContainsString('Juan Santos', $documentXml);
@@ -181,7 +184,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->assertStringContainsString('tomas-oppus-seal.png', $documentRelationships);
         $this->assertNotFalse($sealImage);
         $this->assertStringNotContainsString('Family Form 1', $documentXml);
-        $this->assertSame(2, substr_count($documentXml, 'HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)'));
+        $this->assertSame(2, substr_count($documentXml, 'RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD'));
         $this->assertSame(1, substr_count($documentXml, '<w:br w:type="page"/>'));
         $this->assertSame(2, substr_count($documentXml, 'Mercidita L. Saga'));
         $this->assertSame(2, substr_count($documentXml, 'Wenceslao L. Resus'));

@@ -1,21 +1,12 @@
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/rbi-document.css') }}?v={{ filemtime(public_path('css/rbi-document.css')) }}">
+    <style>@layer print-overrides { @include('reports._document-header-styles') }</style>
 @endpush
 
 <p>Document preview — automatically formatted from your saved entries.</p>
 <div class="rbi-document-preview" tabindex="0" role="region" aria-label="RBI document pages">
     @foreach($wordPages as $page)
         <article class="rbi-word-page" aria-label="Page {{ $loop->iteration }}">
-            <header class="rbi-word-heading">
-                @if($logoDataUri)<img src="{{ $logoDataUri }}" alt="Municipality seal">@endif
-                <div>
-                    <h2>HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</h2>
-                    <p><strong>For the month of {{ strtoupper(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'NOT SET') }}</strong></p>
-                    <p>Barangay {{ $rbiUpdate->barangay_name }}</p>
-                    @if($page['continued'])<p>{{ $page['household_head'] }} — continued</p>@endif
-                </div>
-            </header>
-
             @include('rbi-updates._household-meta')
             @include('rbi-updates._household-table', ['tableClass' => 'rbi-word-table'])
 

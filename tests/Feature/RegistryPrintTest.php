@@ -62,13 +62,13 @@ class RegistryPrintTest extends TestCase
 
         $unconfirmedSheet = $this->worksheet($this->get(route('barangay.registry.download', ['scope' => 'unconfirmed']))->assertOk()->getContent());
         $this->assertStringContainsString('UnconfirmedPerson', $unconfirmedSheet);
-        $this->assertStringContainsString('ref="C8:F8"', $unconfirmedSheet);
+        $this->assertStringContainsString('ref="C9:F9"', $unconfirmedSheet);
         $this->assertStringNotContainsString('Here01', $unconfirmedSheet);
 
         $this->get(route('reports.population'))->assertOk()->assertDontSee('Consolidated RBI registry');
     }
 
-    public function test_excel_download_matches_the_printed_registry_and_uses_long_paper(): void
+    public function test_excel_download_matches_the_printed_registry_and_uses_supported_landscape_paper(): void
     {
         $barangay = Barangay::where('name', 'Looc')->firstOrFail();
         $other = Barangay::where('name', 'Hugpa')->firstOrFail();
@@ -93,18 +93,23 @@ class RegistryPrintTest extends TestCase
             try {
                 $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
                 $this->assertIsString($sheet);
-                $this->assertInstanceOf(\SimpleXMLElement::class, simplexml_load_string($sheet));
+                $sheetXml = simplexml_load_string($sheet);
+                $this->assertInstanceOf(\SimpleXMLElement::class, $sheetXml);
+                $sheetXml->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
                 $this->assertInstanceOf(\SimpleXMLElement::class, simplexml_load_string($zip->getFromName('xl/styles.xml')));
                 $this->assertStringContainsString('CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', $sheet);
-                $this->assertStringContainsString('A. REGION: VIII', $sheet);
-                $this->assertStringContainsString('D. BARANGAY: LOOC', $sheet);
+                $this->assertSame('VIII', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="D3"]/s:is/s:t')[0]);
+                $this->assertSame('LOOC', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="D6"]/s:is/s:t')[0]);
+                $this->assertStringContainsString('E. HOUSEHOLD NO.:', $sheet);
+                $this->assertStringContainsString('DATE ACCOMPLISHED:', $sheet);
+                $this->assertStringContainsString('PSGC', $sheet);
                 $this->assertStringContainsString('HOUSEHOLDS: 1', $sheet);
                 $this->assertStringContainsString('RESIDENTS: 2', $sheet);
                 $this->assertStringContainsString('RELATIONSHIP TO HH HEAD', $sheet);
-                $this->assertStringContainsString('ref="C8:F8"', $sheet);
-                $this->assertStringContainsString('r="R10"', $sheet);
-                $this->assertSame(18, preg_match_all('/<c r="[A-R]10"/', $sheet));
-                $this->assertStringContainsString('paperWidth="13in" paperHeight="8.5in"', $sheet);
+                $this->assertStringContainsString('ref="C9:F9"', $sheet);
+                $this->assertStringContainsString('r="R11"', $sheet);
+                $this->assertSame(18, preg_match_all('/<c r="[A-R]11"/', $sheet));
+                $this->assertStringContainsString('paperSize="5" orientation="landscape"', $sheet);
                 $this->assertStringContainsString('HerePerson', $sheet);
                 $this->assertStringContainsString('ElsewherePerson', $sheet);
                 $this->assertStringNotContainsString('MovedPerson', $sheet);

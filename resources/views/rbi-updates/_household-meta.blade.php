@@ -1,1 +1,11 @@
-<table class="household-meta" style="width:100%;margin-bottom:8px;font-size:9px;border-collapse:collapse"><tr><td>A. REGION: VIII</td><td>D. BARANGAY: <strong>{{ $rbiUpdate->barangay_name }}</strong></td></tr><tr><td>B. PROVINCE: SOUTHERN LEYTE</td><td>E. HOUSEHOLD NO.: <strong>{{ $page['household_number'] ?: 'Not assigned' }}</strong></td></tr><tr><td>C. CITY/MUNICIPALITY: TOMAS OPPUS</td><td>Household head: {{ $page['household_head'] }}</td></tr></table>
+@include('reports._document-header', [
+    'documentTitle' => 'RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD',
+    'documentBarangay' => $rbiUpdate->barangay_name,
+    'documentHousehold' => $page['household_number'] ?? '',
+    'documentDate' => optional($rbiUpdate->as_of_date)->format('m/d/Y'),
+])
+<p class="report-document-context">Household head: {{ $page['household_head'] }} &middot; For the month of {{ strtoupper(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'NOT SET') }}
+    @if($page['continued'])
+        &middot; CONTINUED
+    @endif
+</p>
