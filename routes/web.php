@@ -28,9 +28,7 @@ use App\Http\Controllers\OfflineHouseholdController;
 |
 */
 
-Route::get('/', fn () => auth()->check()
-    ? redirect()->route('dashboard')
-    : view('welcome'))->name('home');
+Route::get('/', fn () => view('welcome'))->name('home');
 
 Route::get('/offline', fn () => view('offline'))->name('offline');
 Route::get('/offline-household', [OfflineHouseholdController::class, 'index'])->name('offline.household');

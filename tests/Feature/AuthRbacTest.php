@@ -22,6 +22,23 @@ class AuthRbacTest extends TestCase
         parent::setUp();
     }
 
+    public function test_home_remains_the_landing_page_for_authenticated_users(): void
+    {
+        foreach ([User::ROLE_RESIDENT, User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU] as $role) {
+            $user = User::factory()->create(['role' => $role]);
+
+            $this->actingAs($user)->get(route('home'))
+                ->assertOk()
+                ->assertViewIs('welcome')
+                ->assertSee('class="professional-public"', false)
+                ->assertSee('Go to your dashboard')
+                ->assertSee('href="'.route('dashboard').'"', false)
+                ->assertDontSee('id="app-sidebar"', false)
+                ->assertDontSee('href="'.route('login').'"', false)
+                ->assertDontSee('href="'.route('register').'"', false);
+        }
+    }
+
     public function test_resident_registers_for_a_barangay_and_waits_for_approval(): void
     {
         $barangay = Barangay::where('name', 'Anahawan')->firstOrFail();

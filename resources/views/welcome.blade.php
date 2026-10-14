@@ -23,12 +23,18 @@
                     Access barangay services, submit document requests, and securely manage resident information across the 29 barangays of Tomas Oppus.
                 </p>
                 <div class="home-hero-actions mt-8 flex flex-col gap-3 min-[420px]:flex-row">
+                    @auth
+                    <a href="{{ route('dashboard') }}" class="civic-home-primary inline-flex min-h-12 items-center justify-center gap-3 rounded-lg border border-amber-200 bg-amber-200 px-6 py-3 text-sm font-semibold text-blue-950 shadow-sm transition-colors hover:border-amber-100 hover:bg-amber-100">
+                        Go to your dashboard <x-app-icon name="arrow-right" />
+                    </a>
+                    @else
                     <a href="{{ route('register') }}" class="civic-home-primary inline-flex min-h-12 items-center justify-center gap-3 rounded-lg border border-amber-200 bg-amber-200 px-6 py-3 text-sm font-semibold text-blue-950 shadow-sm transition-colors hover:border-amber-100 hover:bg-amber-100">
                         Create an account <x-app-icon name="arrow-right" />
                     </a>
                     <a href="{{ route('login') }}" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/15">
                         Sign in to your account
                     </a>
+                    @endauth
                 </div>
                 <div class="home-hero-trust mt-9 flex flex-wrap gap-x-7 gap-y-3 border-t border-white/15 pt-5 text-xs text-blue-100 sm:gap-x-10">
                     <span><strong class="mr-1 text-base font-semibold text-white">29</strong> Barangays</span>
@@ -51,17 +57,17 @@
 
     <section class="relative z-10 mx-auto -mt-8 max-w-7xl px-6 sm:px-8" aria-label="Online service shortcuts">
         <div class="grid gap-4 md:grid-cols-3">
-            <a href="{{ route('register') }}" class="civic-home-service group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg sm:p-6">
+            <a href="{{ route(auth()->check() ? 'dashboard' : 'register') }}" class="civic-home-service group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg sm:p-6">
                 <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="form" /></span>
-                <span class="min-w-0 flex-1"><strong class="block text-base font-semibold text-blue-950">Request a document</strong><span class="mt-1 block text-sm leading-6 text-slate-600">Register to access barangay document services.</span></span>
+                <span class="min-w-0 flex-1"><strong class="block text-base font-semibold text-blue-950">Request a document</strong><span class="mt-1 block text-sm leading-6 text-slate-600">{{ auth()->check() ? 'Open your dashboard to access barangay document services.' : 'Register to access barangay document services.' }}</span></span>
                 <span class="mt-1 text-blue-600" aria-hidden="true"><x-app-icon name="arrow-right" /></span>
             </a>
-            <a href="{{ route('login') }}" class="civic-home-service group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg sm:p-6">
+            <a href="{{ route(auth()->check() ? 'dashboard' : 'login') }}" class="civic-home-service group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg sm:p-6">
                 <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span>
-                <span class="min-w-0 flex-1"><strong class="block text-base font-semibold text-blue-950">Track your requests</strong><span class="mt-1 block text-sm leading-6 text-slate-600">Sign in to view updates from your barangay.</span></span>
+                <span class="min-w-0 flex-1"><strong class="block text-base font-semibold text-blue-950">Track your requests</strong><span class="mt-1 block text-sm leading-6 text-slate-600">{{ auth()->check() ? 'Open your dashboard to view updates from your barangay.' : 'Sign in to view updates from your barangay.' }}</span></span>
                 <span class="mt-1 text-blue-600" aria-hidden="true"><x-app-icon name="arrow-right" /></span>
             </a>
-            <a href="{{ route('services') }}" class="civic-home-service group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg sm:p-6">
+            <a href="{{ route(auth()->check() ? 'dashboard' : 'services') }}" class="civic-home-service group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg sm:p-6">
                 <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="directory" /></span>
                 <span class="min-w-0 flex-1"><strong class="block text-base font-semibold text-blue-950">Explore online services</strong><span class="mt-1 block text-sm leading-6 text-slate-600">Find the service you need before getting started.</span></span>
                 <span class="mt-1 text-blue-600" aria-hidden="true"><x-app-icon name="arrow-right" /></span>
@@ -107,7 +113,7 @@
                 <h2 id="home-register-title">Register with your barangay today.</h2>
                 <p>Create your account to get started with local services.</p>
             </div>
-            <a href="{{ route('register') }}" class="home-register-button">Create an Account <x-app-icon name="arrow-right" /></a>
+            <a href="{{ route(auth()->check() ? 'dashboard' : 'register') }}" class="home-register-button">{{ auth()->check() ? 'Go to Dashboard' : 'Create an Account' }} <x-app-icon name="arrow-right" /></a>
         </div>
     </section>
 </div>

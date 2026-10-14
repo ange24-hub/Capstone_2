@@ -1,3 +1,4 @@
+@php($usesPublicLayout = auth()->guest() || request()->routeIs('home'))
 <!doctype html>
 <html lang="en" class="municipal-ui">
 <head>
@@ -16,7 +17,7 @@
     @if(request()->routeIs('dashboard.barangay', 'barangay.resident-approvals.index', 'barangay.document-requests.index', 'barangay.rbi-updates.index'))
         <link rel="stylesheet" href="{{ asset('css/barangay-dashboard-refinement.css') }}?v={{ filemtime(public_path('css/barangay-dashboard-refinement.css')) }}" media="screen">
     @endif
-    @if(auth()->check() && auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
+    @if(!$usesPublicLayout && auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
         <link rel="stylesheet" href="{{ asset('css/municipal-admin-theme.css') }}?v={{ filemtime(public_path('css/municipal-admin-theme.css')) }}" media="screen">
     @endif
     <link rel="stylesheet" href="{{ asset('css/rbim.css') }}?v={{ filemtime(public_path('css/rbim.css')) }}">
@@ -28,9 +29,9 @@
     @vite('resources/css/app.css')
     @stack('head')
 </head>
-<body @auth class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endauth>
+<body @if(!$usesPublicLayout) class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endif>
     <a class="skip-link" href="#main-content">Skip to main content</a>
-    @guest
+    @if($usesPublicLayout)
         <div class="public-shell">
             <div class="ph-government-bar">
                 <div><span>Republic of the Philippines</span><span>Municipality of Tomas Oppus, Southern Leyte</span></div>
@@ -50,9 +51,13 @@
                     <nav class="public-nav" aria-label="Public navigation">
                         <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
                         <a href="{{ route('home') }}#about">About</a>
-                        <a href="{{ route('services') }}" @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
-                        <a class="public-login-link" href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Login</a>
-                        <a class="public-register-link" href="{{ route('register') }}" @if(request()->routeIs('register')) aria-current="page" @endif>Register</a>
+                        @auth
+                            <a class="public-login-link" href="{{ route('dashboard') }}">Dashboard</a>
+                        @else
+                            <a href="{{ route('services') }}" @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
+                            <a class="public-login-link" href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Login</a>
+                            <a class="public-register-link" href="{{ route('register') }}" @if(request()->routeIs('register')) aria-current="page" @endif>Register</a>
+                        @endauth
                     </nav>
                 </div>
             </header>
@@ -101,10 +106,6 @@
                         @endif
                     </div>
                 </div>
-                <form class="sidebar-logout" method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"><span class="nav-mark"><x-app-icon name="logout" /></span><span>Sign out</span></button>
-                </form>
             </aside>
             <button class="sidebar-backdrop" type="button" aria-label="Close navigation" data-sidebar-close></button>
             <div class="app-main min-w-0 bg-slate-50">
@@ -129,6 +130,10 @@
                         @else
                             <span class="header-user">{{ auth()->user()->name }}</span>
                         @endif
+                        <form class="header-logout" method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" aria-label="Sign out" title="Sign out"><x-app-icon name="logout" /><span>Sign out</span></button>
+                        </form>
                     </div>
                 </header>
                 <main class="app-content min-w-0" id="main-content">
@@ -146,9 +151,9 @@
             </div>
         </div>
         @include('assistant.widget')
-    @endguest
+    @endif
     @stack('scripts')
-    @auth
+    @if(!$usesPublicLayout)
         <script src="{{ asset('js/philippine-clock.js') }}?v={{ filemtime(public_path('js/philippine-clock.js')) }}" defer></script>
         <script>
             (() => {
@@ -211,7 +216,7 @@
                 syncViewport();
             })();
         </script>
-    @endauth
+    @endif
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {

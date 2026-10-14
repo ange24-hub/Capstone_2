@@ -22,6 +22,26 @@
     html.municipal-ui .app-header .header-user.profile-navigation-trigger:focus-visible { outline: 3px solid #315e9f; outline-offset: 3px; }
     html.municipal-ui #app-sidebar .side-nav > .profile-navigation-link { border-color: #ffffff14 !important; }
     html.municipal-ui #app-sidebar .side-nav > .profile-navigation-link.active { border-color: #3d797a !important; }
+    html.municipal-ui .app-header .header-logout { flex: 0 0 auto; margin: 0; }
+    html.municipal-ui .app-header .header-logout button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 44px; padding: 8px 12px;
+      border: 1px solid #e2e8f0; border-radius: 10px;
+      background: #fff; color: #334155;
+      font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer;
+    }
+    html.municipal-ui .app-header .header-logout button:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e3a5f; }
+    html.municipal-ui .app-header .header-logout button:focus-visible { outline: 3px solid #315e9f; outline-offset: 3px; }
+    html.municipal-ui .app-header .header-logout .app-icon { width: 17px; height: 17px; }
+    @media (max-width: 1120px) {
+      html.municipal-ui .professional-shell .app-header-meta { display: flex !important; width: auto; align-items: center; margin-left: auto; }
+      html.municipal-ui .professional-shell .app-header-meta .header-date { display: none !important; }
+    }
+    @media (max-width: 680px) {
+      html.municipal-ui .app-header .header-logout button { width: 44px; padding: 8px; }
+      html.municipal-ui .app-header .header-logout button span { display: none; }
+      html.municipal-ui .app-header .header-user:not(.profile-navigation-trigger) { max-width: 90px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
     @media (max-width: 640px) {
       html.municipal-ui .app-header .header-user.profile-navigation-trigger { max-width: 190px !important; min-height: 44px; gap: 8px; padding: 5px 8px !important; }
       html.municipal-ui .profile-navigation-trigger .profile-navigation-avatar { flex-basis: 30px; width: 30px; height: 30px; }
