@@ -889,7 +889,7 @@ class BarangayRbiUpdateController extends Controller
                     ? '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
                     : '';
 
-                return $this->wordHeaderTable($barangay, $page['household_number'] ?? '', optional($rbiUpdate->as_of_date)->format('m/d/Y') ?? '')
+                return $this->wordDocumentHeader($barangay, $page['household_number'] ?? '', optional($rbiUpdate->as_of_date)->format('m/d/Y') ?? '')
                     . $this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 14)
                     .$this->wordTable($mainTableRows, $mainWidths)
                     .$this->wordParagraph('', false, false, 4)
@@ -933,40 +933,20 @@ class BarangayRbiUpdateController extends Controller
         return '<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid>'.$rows.'</w:tbl>';
     }
 
-    private function wordHeaderTable(string $barangay, string $household, string $date): string
+    private function wordDocumentHeader(string $barangay, string $household, string $date): string
     {
-        $widths = [2200, 1600, 1600, 350, 2450, 2500, 2800];
-        $cell = function (string $value, int $width, bool $boxed = false, int $span = 1, ?string $merge = null, ?string $content = null): string {
-            $borders = '';
-            foreach (['top', 'left', 'bottom', 'right'] as $edge) {
-                $borders .= '<w:'.$edge.' w:val="'.($boxed ? 'single' : 'nil').'" w:sz="4" w:color="000000"/>';
-            }
-            return '<w:tc><w:tcPr><w:tcW w:w="'.$width.'" w:type="dxa"/>'
-                .($span > 1 ? '<w:gridSpan w:val="'.$span.'"/>' : '')
-                .($merge ? '<w:vMerge w:val="'.$merge.'"/>' : '')
-                .'<w:tcBorders>'.$borders.'</w:tcBorders><w:vAlign w:val="center"/></w:tcPr>'
-                .($content ?? $this->wordParagraph($value, false, $boxed, 14)).'</w:tc>';
-        };
-        $legend = '';
-        foreach (['PSGC', 'C', 'O', 'D', 'E', 'S'] as $line) {
-            $legend .= '<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="0" w:after="0" w:line="100" w:lineRule="exact"/></w:pPr><w:r><w:rPr><w:sz w:val="10"/></w:rPr><w:t>'.$line.'</w:t></w:r></w:p>';
-        }
-        $rows = '';
+        $header = $this->wordParagraph('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', true, true, 20)
+            .$this->wordParagraph('', false, false, 12);
         foreach ([['A. REGION:', 'VIII'], ['B. PROVINCE:', 'SOUTHERN LEYTE'], ['C. CITY/MUNICIPALITY:', 'TOMAS OPPUS'], ['D. BARANGAY:', $barangay], ['E. HOUSEHOLD NO.:', $household]] as $index => [$label, $value]) {
-            $cells = $cell($label, $widths[0]).$cell($value, $widths[1], true);
-            if ($index < 4) {
-                $cells .= $cell('', $widths[2], true).$cell('', $widths[3], true, 1, $index === 0 ? 'restart' : 'continue', $index === 0 ? $legend : null)
-                    .$cell('', array_sum(array_slice($widths, 4)), false, 3);
-            } else {
-                $cells .= $cell('', array_sum(array_slice($widths, 2, 3)), false, 3)
-                    .$cell('DATE ACCOMPLISHED:', $widths[5]).$cell($date, $widths[6], true);
+            $paragraph = $this->wordParagraph(trim($label.' '.$value), false, false, 16);
+            if ($index === 4) {
+                $paragraph = str_replace('<w:pPr>', '<w:pPr><w:tabs><w:tab w:val="right" w:pos="13500"/></w:tabs>', $paragraph);
+                $paragraph = str_replace('</w:t>', '</w:t><w:tab/><w:t xml:space="preserve">'.$this->xlsxEscape(trim('DATE ACCOMPLISHED: '.$date)).'</w:t>', $paragraph);
             }
-            $rows .= '<w:tr><w:trPr><w:cantSplit/><w:trHeight w:val="250" w:hRule="atLeast"/></w:trPr>'.$cells.'</w:tr>';
+            $header .= $paragraph;
         }
-        $grid = implode('', array_map(fn ($width) => '<w:gridCol w:w="'.$width.'"/>', $widths));
-        return $this->wordParagraph('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', true, true, 20)
-            .$this->wordParagraph('', false, false, 12)
-            .'<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>'.$grid.'</w:tblGrid>'.$rows.'</w:tbl>';
+
+        return $header;
     }
 
     private function wordImageDrawing(

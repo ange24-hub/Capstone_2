@@ -53,7 +53,7 @@ class RegistrySpreadsheet
     private function sheet(Collection $residents, Barangay $barangay, string $title): string
     {
         $header = (new SpreadsheetReportHeader)->build(18, $title, strtoupper($barangay->name), '', now()->format('m/d/Y'),
-            ['title' => 1, 'label' => 3, 'box' => 9, 'legend' => 10]);
+            ['title' => 1, 'label' => 3]);
         $rows = [...$header['rows'],
             $this->row(9, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 34),
             '<row r="10" ht="25" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',

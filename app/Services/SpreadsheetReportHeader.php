@@ -4,15 +4,10 @@ namespace App\Services;
 
 class SpreadsheetReportHeader
 {
-    /** Build the same boxed location header used by PDF and printed reports. */
+    /** Build the same plain text location header used by PDF and printed reports. */
     public function build(int $columns, string $title, string $barangay, string $household, string $date, array $styles): array
     {
-        $labelEnd = max(2, (int) ceil($columns * .16));
-        $valueEnd = max($labelEnd + 2, (int) ceil($columns * .32));
-        $codeEnd = max($valueEnd + 1, (int) floor($columns * .42));
-        $legend = $codeEnd + 1;
-        $dateStart = max($legend + 2, (int) floor($columns * .60) + 1);
-        $dateValue = max($dateStart + 1, (int) floor($columns * .80) + 1);
+        $dateStart = (int) floor($columns * .60) + 1;
         $cells = [];
         $merges = [];
         $add = function (int $row, int $start, int $end, string $value, int $style) use (&$cells, &$merges): void {
@@ -26,16 +21,9 @@ class SpreadsheetReportHeader
             ['C. CITY/MUNICIPALITY:', 'TOMAS OPPUS'], ['D. BARANGAY:', $barangay], ['E. HOUSEHOLD NO.:', $household]];
         foreach ($fields as $index => [$label, $value]) {
             $row = $index + 3;
-            $add($row, 1, $labelEnd, $label, $styles['label']);
-            $add($row, $labelEnd + 1, $valueEnd, $value, $styles['box']);
-            if ($index < 4) {
-                $add($row, $valueEnd + 1, $codeEnd, '', $styles['box']);
-                $add($row, $legend, $legend, $index === 0 ? "PSGC\nC\nO\nD\nE\nS" : '', $styles['legend']);
-            }
+            $add($row, 1, $dateStart - 1, trim($label.' '.$value), $styles['label']);
         }
-        $merges[] = $this->column($legend).'3:'.$this->column($legend).'6';
-        $add(7, $dateStart, $dateValue - 1, 'DATE ACCOMPLISHED:', $styles['label']);
-        $add(7, $dateValue, $columns, $date, $styles['box']);
+        $add(7, $dateStart, $columns, trim('DATE ACCOMPLISHED: '.$date), $styles['label']);
         $rows = [];
         for ($row = 1; $row <= 8; $row++) {
             $rowCells = $cells[$row] ?? [];

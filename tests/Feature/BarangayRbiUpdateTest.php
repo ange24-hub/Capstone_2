@@ -174,8 +174,10 @@ class BarangayRbiUpdateTest extends TestCase
 
         $this->assertStringContainsString('RECORD OF BARANGAY INHABITANTS BY HOUSEHOLD', $documentXml);
         $this->assertStringContainsString('DATE ACCOMPLISHED:', $documentXml);
-        $this->assertStringContainsString('PSGC', $documentXml);
-        $this->assertStringContainsString('<w:vMerge w:val="restart"/>', $documentXml);
+        $headerXml = strstr($documentXml, '<w:tbl>', true);
+        $this->assertStringContainsString('A. REGION: VIII', $headerXml);
+        $this->assertStringContainsString('DATE ACCOMPLISHED:', $headerXml);
+        $this->assertStringNotContainsString('<w:pBdr>', $headerXml);
         $this->assertStringContainsString('Household head', $documentXml);
         $this->assertStringContainsString('Pedro Dela Cruz', $documentXml);
         $this->assertStringContainsString('Juan Santos', $documentXml);

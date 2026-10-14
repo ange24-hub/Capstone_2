@@ -98,11 +98,10 @@ class RegistryPrintTest extends TestCase
                 $sheetXml->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
                 $this->assertInstanceOf(\SimpleXMLElement::class, simplexml_load_string($zip->getFromName('xl/styles.xml')));
                 $this->assertStringContainsString('CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', $sheet);
-                $this->assertSame('VIII', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="D3"]/s:is/s:t')[0]);
-                $this->assertSame('LOOC', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="D6"]/s:is/s:t')[0]);
+                $this->assertSame('A. REGION: VIII', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="A3"]/s:is/s:t')[0]);
+                $this->assertSame('D. BARANGAY: LOOC', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="A6"]/s:is/s:t')[0]);
                 $this->assertStringContainsString('E. HOUSEHOLD NO.:', $sheet);
                 $this->assertStringContainsString('DATE ACCOMPLISHED:', $sheet);
-                $this->assertStringContainsString('PSGC', $sheet);
                 $this->assertStringContainsString('HOUSEHOLDS: 1', $sheet);
                 $this->assertStringContainsString('RESIDENTS: 2', $sheet);
                 $this->assertStringContainsString('RELATIONSHIP TO HH HEAD', $sheet);

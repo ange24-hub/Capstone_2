@@ -116,7 +116,7 @@ class PopulationSpreadsheet
         $columnCount = $logicalColumns * $span;
         $barangay = str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays';
         $header = (new SpreadsheetReportHeader)->build($columnCount, $sheet['title'], $barangay, '',
-            $report['generatedAt']->format('m/d/Y'), ['title' => 1, 'label' => 8, 'box' => 9, 'legend' => 10]);
+            $report['generatedAt']->format('m/d/Y'), ['title' => 1, 'label' => 8]);
         $rows = [...$header['rows'], $this->row(9, $sheet['headings'], 3, $span)];
         foreach ($sheet['rows'] as $index => $values) {
             $rows[] = $this->row($index + 10, $values, in_array($index, $sheet['groupRows'] ?? [], true) ? 6 : 4, $span);

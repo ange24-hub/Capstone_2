@@ -46,14 +46,12 @@ class PopulationExcelTest extends TestCase
             $this->assertStringContainsString('Resident 1 Example', $sheet);
             $this->assertStringContainsString('Resident 51 Example', $sheet);
             $this->assertStringContainsString('D. BARANGAY:', $sheet);
-            $this->assertStringContainsString('>Looc</t>', $sheet);
+            $this->assertStringContainsString('>D. BARANGAY: Looc</t>', $sheet);
             $this->assertStringNotContainsString('ForeignResident', $sheet);
             $this->assertStringContainsString('topLeftCell="A10"', $sheet);
             $this->assertStringNotContainsString('Registry coverage', $sheet);
             $this->assertStringNotContainsString('completeness not verified', $sheet);
             $this->assertStringContainsString('DATE ACCOMPLISHED:', $sheet);
-            $this->assertStringContainsString('mergeCell ref="C3:D3"', $sheet);
-            $this->assertStringContainsString('mergeCell ref="F3:F6"', $sheet);
             $this->assertStringContainsString('autoFilter', $sheet);
             $this->assertNotFalse($zip->getFromName('xl/styles.xml'));
         });
@@ -165,7 +163,7 @@ class PopulationExcelTest extends TestCase
                         $this->assertTrue($xml->loadXML($zip->getFromIndex($index)), $name.' must be valid XML');
                     }
                     if (str_starts_with($name, 'xl/worksheets/')) {
-                        foreach (['A. REGION:', 'VIII', 'B. PROVINCE:', 'SOUTHERN LEYTE', 'C. CITY/MUNICIPALITY:', 'TOMAS OPPUS', 'D. BARANGAY:', 'E. HOUSEHOLD NO.:', 'DATE ACCOMPLISHED:', 'PSGC'] as $label) {
+                        foreach (['A. REGION:', 'VIII', 'B. PROVINCE:', 'SOUTHERN LEYTE', 'C. CITY/MUNICIPALITY:', 'TOMAS OPPUS', 'D. BARANGAY:', 'E. HOUSEHOLD NO.:', 'DATE ACCOMPLISHED:'] as $label) {
                             $this->assertStringContainsString($label, $zip->getFromIndex($index));
                         }
                     }
