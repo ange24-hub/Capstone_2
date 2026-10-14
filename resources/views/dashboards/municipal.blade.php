@@ -26,21 +26,31 @@
             <div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>
         @endif
 
-        <section class="dashboard-metrics municipal-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Municipal summary">
-            <x-summary-card label="Registered residents" :value="number_format($barangays->sum('inhabitants_count'))" detail="Resident records across Tomas Oppus" icon="users" />
-            <x-summary-card label="Registered households" :value="number_format($barangays->sum('households_count'))" detail="Households with recorded numbers" icon="home" />
-            <x-summary-card label="RBI reports received" :value="number_format($rbiUpdates->count())" detail="Submitted barangay reports" icon="form" />
+        <div class="admin-section-heading">
+            <div><span>Overview</span><h2>Key figures</h2></div>
+            <p>Residents, reports, and areas that may need attention.</p>
+        </div>
+        <section class="dashboard-metrics municipal-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Municipal summary">
+            <x-summary-card label="Registered residents" :value="number_format($barangays->sum('inhabitants_count'))" detail="Resident records across Tomas Oppus" icon="users" tone="primary" />
+            <x-summary-card label="Registered households" :value="number_format($barangays->sum('households_count'))" detail="Households with recorded numbers" icon="home" tone="success" />
+            <x-summary-card label="RBI reports received" :value="number_format($rbiUpdates->count())" detail="Submitted barangay reports" icon="form" tone="info" />
             <x-summary-card label="Pending approvals" :value="number_format($secretaryApprovalRequests->count())" detail="Secretary accounts to review" icon="shield" :tone="$secretaryApprovalRequests->isEmpty() ? 'neutral' : 'warning'" />
             <x-summary-card label="Six-month net migration" :value="($analyticsSummary['net_migration_6m'] >= 0 ? '+' : '').number_format($analyticsSummary['net_migration_6m'])" :detail="$analyticsSummary['migration_in_6m'].' in · '.$analyticsSummary['migration_out_6m'].' out'" icon="trend" />
             <x-summary-card label="Priority areas" :value="number_format($analyticsSummary['high_movement_count'])" detail="High-movement barangays" icon="map" :tone="$analyticsSummary['high_movement_count'] > 0 ? 'warning' : 'neutral'" />
         </section>
 
+        <div class="admin-section-heading">
+            <div><span>Navigate</span><h2>Quick access</h2></div>
+        </div>
         <nav class="municipal-shortcuts" aria-label="Municipal quick access">
             <a href="{{ route('municipal.approvals.index') }}"><span><x-app-icon name="shield" /></span><div><strong>Account approvals</strong><small>{{ $secretaryApprovalRequests->count() }} awaiting review</small></div><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('reports.population') }}"><span><x-app-icon name="users" /></span><div><strong>Population reports</strong><small>Review registered residents</small></div><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('spatial.index') }}"><span><x-app-icon name="map" /></span><div><strong>Household map</strong><small>View locations and hazards</small></div><x-app-icon name="arrow-right" /></a>
         </nav>
 
+        <div class="admin-section-heading">
+            <div><span>Review</span><h2>Daily operations</h2></div>
+        </div>
         <div class="municipal-work-grid">
 
         <div class="workflow-card municipal-panel rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="secretary-approvals">

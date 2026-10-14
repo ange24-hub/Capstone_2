@@ -298,3 +298,22 @@ html.municipal-ui .app-content .barangay-dashboard .overview-context-date .ph-cl
 @media (prefers-reduced-motion: reduce) {
     .barangay-dashboard .population-operations > a { transition: none; }
 }
+
+/* The overview follows the order: action queues, work tools, community data. */
+@layer civic {
+@media screen {
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview > .dashboard-page-header { background:linear-gradient(110deg,#f6fbfc,#eaf4f0) !important; border-top:4px solid #428477 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .civic-task-metrics { margin-bottom:0 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .civic-task-metrics .metric-card { min-height:130px !important; background:linear-gradient(145deg,#fff 40%,var(--metric-bg)) !important; border:1px solid #d5e2e7 !important; border-top:3px solid var(--metric-color) !important; border-radius:12px !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .civic-task-metrics .metric-card:first-child { --metric-color:#315f87 !important; --metric-bg:#e9f2f9 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .civic-task-metrics .metric-card:last-child { --metric-color:#266b61 !important; --metric-bg:#e9f5f0 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .civic-task-metrics .metric-card.metric-warning { --metric-color:#8a611e !important; --metric-bg:#fbf3e6 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .civic-task-metrics .metric-icon { background:var(--metric-bg) !important; color:var(--metric-color) !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .overview-work-row :is(.brgy-reporting-card,.brgy-pending-card,.overview-tools) { background:#fff !important; border:1px solid #d5e2e7 !important; border-radius:12px !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .brgy-reporting-card { border-top:3px solid #438474 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .brgy-pending-card { border-top:3px solid #a67a36 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .overview-tools { border-top:3px solid #4a82a7 !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .brgy-quick-links > a:hover { background:#f1f7fa !important; }
+    .municipal-ui .app-content .barangay-dashboard.workspace-page-overview .overview-community .community-analytics { background:#fff !important; border:1px solid #d5e2e7 !important; border-radius:12px !important; }
+}
+}

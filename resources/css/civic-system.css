@@ -138,6 +138,11 @@
     .municipal-ui .app-content .metric-card div > span { color: var(--civic-text) !important; font-size: 13px !important; }
     .municipal-ui .app-content .metric-card small { color: var(--civic-muted) !important; font-size: 12px !important; }
     .municipal-ui .app-content .metric-icon { color: var(--metric-color) !important; background: var(--metric-bg) !important; }
+    .municipal-ui .app-content .admin-section-heading { display:flex; align-items:end; justify-content:space-between; gap:10px 20px; min-width:0; margin:2px 0 -8px; padding:0 2px 10px; border-bottom:1px solid var(--civic-border); }
+    .municipal-ui .app-content .admin-section-heading span { display:block; margin-bottom:3px; color:#315f78 !important; font-size:11px !important; font-weight:700 !important; letter-spacing:.1em; text-transform:uppercase; }
+    .municipal-ui .app-content .admin-section-heading h2 { margin:0 !important; color:var(--civic-ink) !important; font-size:19px !important; font-weight:700 !important; line-height:1.3 !important; }
+    .municipal-ui .app-content .admin-section-heading p { margin:0 !important; color:var(--civic-muted) !important; font-size:12px !important; line-height:1.5 !important; text-align:right; }
+    @media (max-width:640px) { .municipal-ui .app-content .admin-section-heading { align-items:start; flex-direction:column; } .municipal-ui .app-content .admin-section-heading p { text-align:left; } }
     .municipal-ui .app-content .metric-success { --metric-color: var(--civic-success) !important; --metric-bg: var(--civic-success-soft) !important; }
     .municipal-ui .app-content .metric-warning { --metric-color: var(--civic-warning) !important; --metric-bg: var(--civic-warning-soft) !important; }
     .municipal-ui .app-content .metric-danger { --metric-color: var(--civic-danger) !important; --metric-bg: var(--civic-danger-soft) !important; }

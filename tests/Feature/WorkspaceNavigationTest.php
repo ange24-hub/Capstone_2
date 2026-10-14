@@ -34,7 +34,7 @@ class WorkspaceNavigationTest extends TestCase
             ->assertDontSee('id="rbi-history-title"', false);
 
         $this->get(route('dashboard.barangay'))->assertOk()
-            ->assertSeeInOrder(['id="community-summary-title"', 'id="brgy-reporting-title"', 'id="brgy-pending-title"'], false)
+            ->assertSeeInOrder(['id="brgy-reporting-title"', 'id="brgy-pending-title"', 'id="community-summary-title"'], false)
             ->assertSee(route('barangay.rbi-updates.residents', ['new' => 1]))
             ->assertDontSee('id="resident-approvals-title"', false)
             ->assertDontSee('id="document-requests-title"', false);
