@@ -137,7 +137,7 @@
                                             <td class="document-payment-cell">
                                                 @if ($documentRequest->requiresPayment())
                                                     <strong>{{ $documentRequest->amountDueLabel() }}</strong>
-                                                    <span class="payment-status payment-status-{{ $documentRequest->payment_status }}">{{ $documentRequest->paymentStatusLabel() }}</span>
+                                                    <x-status-badge :status="$documentRequest->payment_status" class="payment-status payment-status-{{ $documentRequest->payment_status }}">{{ $documentRequest->paymentStatusLabel() }}</x-status-badge>
                                                     @if ($documentRequest->payment_method === App\Models\DocumentRequest::PAYMENT_METHOD_IN_PERSON)
                                                         <small>Payment method: In person</small>
                                                     @endif
@@ -179,10 +179,10 @@
                                                         <small>Review note: {{ $documentRequest->payment_remarks }}</small>
                                                     @endif
                                                 @else
-                                                    <span class="payment-status payment-status-not_required">No payment required</span>
+                                                    <x-status-badge status="not_required" class="payment-status payment-status-not_required">No payment required</x-status-badge>
                                                 @endif
                                             </td>
-                                            <td><span class="request-status request-status-{{ $documentRequest->status }}">{{ $documentRequest->statusLabel() }}</span></td>
+                                            <td><x-status-badge :status="$documentRequest->status" class="request-status request-status-{{ $documentRequest->status }}">{{ $documentRequest->statusLabel() }}</x-status-badge></td>
                                             <td><form class="request-status-form" method="POST" action="{{ route('barangay.document-requests.update', $documentRequest) }}">@csrf @method('PUT')
                                                 <label for="request-status-{{ $documentRequest->id }}">Request status</label>
                                                 <select id="request-status-{{ $documentRequest->id }}" name="status" aria-label="Status for {{ $documentRequest->reference_number }}" required>@foreach ($documentRequestStatuses as $value => $label)<option value="{{ $value }}" @selected($documentRequest->status === $value)>{{ $label }}</option>@endforeach</select>

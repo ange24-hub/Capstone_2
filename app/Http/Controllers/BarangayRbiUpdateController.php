@@ -95,7 +95,7 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => $validated['as_of_date'] ?? null,
             'prepared_by' => $preparedBy,
             'prepared_signature_path' => $preparedSignaturePath,
-            'certified_by' => $validated['certified_by'] ?? ($request->user()->barangay->secretary_name ?: $request->user()->name),
+            'certified_by' => $validated['certified_by'] ?? $request->user()->barangay->secretary_name,
             'certified_signature_path' => $submitted ? $this->storeSignature($request, 'certified') : null,
             'attested_by' => $attestedBy,
             'attested_signature_path' => $attestedSignaturePath,
@@ -295,7 +295,7 @@ class BarangayRbiUpdateController extends Controller
 
         $barangay = $rbiUpdate->barangayUser?->barangay;
         $barangayName = $barangay?->name ?: $rbiUpdate->barangay_name ?: 'Barangay';
-        $secretaryName = $rbiUpdate->prepared_by ?: $barangay?->secretary_name ?: $rbiUpdate->barangayUser?->name;
+        $secretaryName = $rbiUpdate->certified_by;
         $punongBarangayName = $rbiUpdate->attested_by ?: $barangay?->punong_barangay_name;
         $pages = $this->pdfPages($rbiUpdate);
         $month = optional($rbiUpdate->reporting_month)->format('F_Y') ?: 'Undated';
@@ -693,7 +693,7 @@ class BarangayRbiUpdateController extends Controller
             <td colspan="4" class="signature-label">Noted by:</td>
         </tr>
         <tr>
-            <td colspan="3" class="signature-line">'.$this->excelEscape($rbiUpdate->prepared_by ?: ($rbiUpdate->barangayUser->name ?? '')).'</td>
+            <td colspan="3" class="signature-line">'.$this->excelEscape($rbiUpdate->prepared_by ?? '').'</td>
             <td colspan="1" class="no-border"></td>
             <td colspan="4" class="signature-line">'.$this->excelEscape($rbiUpdate->attested_by ?: '').'</td>
         </tr>

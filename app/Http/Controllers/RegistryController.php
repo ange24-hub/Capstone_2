@@ -291,7 +291,7 @@ class RegistryController extends Controller
                 'barangay_name' => $request->user()->barangay->name,
                 'household_head' => $rows[0]['household_head'] ?? null,
                 'as_of_date' => now()->toDateString(),
-                'prepared_by' => $request->user()->barangay->secretary_name ?: $request->user()->name,
+                'certified_by' => $request->user()->barangay->secretary_name,
                 'attested_by' => $request->user()->barangay->punong_barangay_name,
                 'status' => BarangayRbiUpdate::STATUS_SUBMITTED,
                 'rows' => $rows,

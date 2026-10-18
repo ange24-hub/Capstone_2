@@ -23,7 +23,8 @@
         @endif
 
         @if ($errors->any())
-            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+            <div class="errors rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900" role="alert" id="login-errors">
+                <strong>Unable to sign in. Please review the details below.</strong>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -36,10 +37,13 @@
             @csrf
 
             <label for="login">Email or user ID</label>
-            <input id="login" name="login" type="text" value="{{ old('login', old('email')) }}" autocomplete="username" placeholder="Email address or staff ID" required autofocus>
+            <input id="login" name="login" type="text" value="{{ old('login', old('email')) }}" autocomplete="username" placeholder="Email address or staff ID" @if($errors->hasAny(['login', 'email'])) aria-invalid="true" aria-describedby="login-errors" @endif required autofocus>
 
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" autocomplete="current-password" required>
+            <div class="portal-password-control">
+                <input id="password" name="password" type="password" autocomplete="current-password" @error('password') aria-invalid="true" aria-describedby="login-errors" @enderror required>
+                <button class="password-toggle" type="button" aria-controls="password" aria-label="Show password" aria-pressed="false" data-password-toggle hidden>Show</button>
+            </div>
 
             <p class="auth-help-link"><a href="{{ route('password.request') }}">Forgot your password?</a></p>
 

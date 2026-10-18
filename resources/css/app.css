@@ -6,6 +6,7 @@
 @import "./workspace-design.css";
 @import "./workspace-motion.css";
 @import "./workspace-layout.css";
+@import "./government-portal.css";
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../**/*.blade.php";

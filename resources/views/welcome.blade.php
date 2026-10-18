@@ -8,7 +8,6 @@
 <div class="civic-home">
     <section class="civic-home-hero relative isolate overflow-hidden bg-blue-950 text-white" aria-labelledby="home-title">
         <div class="civic-home-pattern pointer-events-none absolute inset-0" aria-hidden="true"></div>
-        <div class="home-running-lights" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="home-hero-layout relative mx-auto grid items-center">
             <div class="home-hero-copy min-w-0">
                 <p class="mb-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[.18em] text-amber-200 sm:text-xs">

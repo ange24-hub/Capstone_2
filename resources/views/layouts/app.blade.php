@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
-    <style>@layer print-overrides, civic, workspace-headers, theme, base, components, utilities;</style>
+    <style>@layer print-overrides, portal, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">
     @if(request()->routeIs('barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">
@@ -65,7 +65,7 @@
                     </nav>
                 </div>
             </header>
-            <main class="public-content" id="main-content">
+            <main class="public-content" id="main-content" tabindex="-1">
                 @yield('content')
             </main>
             <footer class="public-footer">
@@ -87,7 +87,8 @@
         </div>
     @else
         <div class="app-shell">
-            <aside class="app-sidebar bg-blue-950 text-white" id="app-sidebar">
+            <aside class="app-sidebar bg-blue-950 text-white" id="app-sidebar" aria-label="Main navigation">
+                <button class="sidebar-close-button" type="button" aria-label="Close navigation" data-sidebar-close><x-app-icon name="close" /></button>
                 <a class="app-brand" href="{{ route('dashboard') }}">
                     <span class="seal-crop app-brand-seal">
                         <img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal">
@@ -121,7 +122,7 @@
                         <button class="mobile-menu-button" type="button" aria-label="Open navigation" aria-controls="app-sidebar" aria-expanded="false" data-sidebar-toggle>
                             <x-app-icon name="menu" />
                         </button>
-                        <strong>{{ auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? 'Municipal administrator' : auth()->user()->roleLabel() }}</strong>
+                        <div class="portal-header-identity"><span>Municipality of Tomas Oppus</span><strong>{{ auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? 'Municipal administrator' : auth()->user()->roleLabel() }}</strong></div>
                     </div>
                     <div class="app-header-meta">
                         <time class="header-date" data-ph-header-date aria-label="Device local date and time"></time>
@@ -140,7 +141,7 @@
                         </form>
                     </div>
                 </header>
-                <main class="app-content min-w-0" id="main-content">
+                <main class="app-content min-w-0" id="main-content" tabindex="-1">
                     <nav class="workspace-location" aria-label="Page location" hidden data-page-location>
                         <a href="{{ route('dashboard') }}">Workspace</a>
                         <span aria-hidden="true">/</span>
@@ -164,7 +165,7 @@
             (() => {
                 const body = document.body;
                 const toggle = document.querySelector('[data-sidebar-toggle]');
-                const close = document.querySelector('[data-sidebar-close]');
+                const closeButtons = document.querySelectorAll('[data-sidebar-close]');
                 const collapse = document.querySelector('[data-sidebar-collapse]');
                 const sidebar = document.getElementById('app-sidebar');
                 const workspace = document.querySelector('.app-main');
@@ -204,8 +205,10 @@
                     syncCollapse();
                     try { localStorage.setItem('rbim.sidebar.collapsed', String(isCollapsed)); } catch (_) {}
                 });
-                close?.addEventListener('click', () => setOpen(false));
-                document.addEventListener('keydown', (event) => event.key === 'Escape' && setOpen(false));
+                closeButtons.forEach(button => button.addEventListener('click', () => setOpen(false)));
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && body.classList.contains('sidebar-is-open')) setOpen(false);
+                });
                 document.addEventListener('keydown', (event) => {
                     if (event.key !== 'Tab' || !body.classList.contains('sidebar-is-open')) return;
                     const items = [...sidebar.querySelectorAll('a,button')].filter(el => el.getClientRects().length && !el.disabled);

@@ -6,7 +6,7 @@
             <div class="brgy-latest-report">
                 @if ($rbiUpdates->isNotEmpty())
                     @php($latestRbi = $rbiUpdates->first())
-                    <span>Latest report</span><strong>{{ optional($latestRbi->reporting_month)->format('F Y') ?: 'Month not set' }}</strong><span class="brgy-status-pill">{{ $latestRbi->statusLabel() }}</span>
+                    <span>Latest report</span><strong>{{ optional($latestRbi->reporting_month)->format('F Y') ?: 'Month not set' }}</strong><x-status-badge :status="$latestRbi->status">{{ $latestRbi->statusLabel() }}</x-status-badge>
                 @else
                     <span>No monthly report yet</span><a class="brgy-text-link" href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}">Create RBI form &rarr;</a>
                 @endif
