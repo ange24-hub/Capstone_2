@@ -118,6 +118,7 @@
     .gis-map-card .gis-map-toolbar { padding:14px; }
     .gis-map-title p { display:none; }
     .gis-map-card .gis-map-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; }
+    .gis-map-card #gis-restore-layers { grid-column:1 / -1; }
     .gis-workspace #household-map { height:55vh; min-height:360px; }
     .gis-map-footer { padding:10px 14px; }
     .gis-household-list { padding:16px; }
@@ -167,6 +168,7 @@
 .gis-physical-bars li strong { flex:0 0 auto; color:#182b43; }
 .gis-physical-bars li i { display:block; height:7px; margin-top:5px; border-radius:999px; background:linear-gradient(to right,#2563eb var(--bar-width),#e2e8f0 var(--bar-width)); }
 #household-map { isolation:isolate; z-index:0; }
+#household-map .gis-barangay-tooltip { padding:7px 11px; border:1px solid #b39350; border-radius:7px; background:#fff; color:#173653; font-size:14px; font-weight:600; line-height:1.4; box-shadow:0 3px 12px #102a4320; pointer-events:none; }
 #household-map .leaflet-control-layers { max-width:260px; color:#182b43; }
 #household-map .leaflet-control-layers-expanded { max-height:320px; overflow-y:auto; padding:10px; }
 #household-map .leaflet-control-layers label { display:block; font:13px/1.8 Arial,sans-serif; margin:2px 0; }

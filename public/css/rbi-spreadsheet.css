@@ -1,0 +1,41 @@
+.rbi-spreadsheet { min-width: 0; color: #172b24; background: #fff; font-family: Calibri, "Segoe UI", sans-serif; }
+.rbi-sheet-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 12px 18px; border-bottom: 1px solid #c9d7cf; background: #f1f6f3; color: #52655b; font-size: 12px; }
+.rbi-sheet-file { display: inline-flex; align-items: center; gap: 8px; color: #1e6746; font-weight: 600; }
+.rbi-sheet-file svg { width: 18px; height: 18px; }
+.rbi-sheet-scroll { width: 100%; max-height: 72vh; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; background: #e9eeeb; }
+.rbi-sheet-scroll:focus-visible { outline: 3px solid #43846a; outline-offset: -3px; }
+html.municipal-ui .app-content .rbi-sheet-grid { width: max-content; min-width: 100%; margin: 0; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-family: Calibri, "Segoe UI", sans-serif; font-size: 14px; line-height: 1.25; background: #fff; }
+.rbi-sheet-row-column { width: 46px; }
+html.municipal-ui .app-content .rbi-sheet-grid th,
+html.municipal-ui .app-content .rbi-sheet-grid td { box-sizing: border-box; padding: 5px 7px; border: 0; border-right: 1px solid #dce3de; border-bottom: 1px solid #dce3de; border-radius: 0; color: #15291f; background: #fff; font: inherit; font-family: "Times New Roman", Times, serif; white-space: normal; overflow-wrap: anywhere; vertical-align: middle; }
+html.municipal-ui .app-content .rbi-sheet-grid thead th { position: sticky; top: 0; z-index: 3; height: 28px; padding: 4px; color: #53635a; background: #e9eeeb; font-family: Calibri, "Segoe UI", sans-serif; font-size: 12px; text-align: center; font-weight: 500; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-row-number { position: sticky; left: 0; z-index: 2; width: 46px; padding: 4px 9px; color: #53635a; background: #edf1ee; font-family: Calibri, "Segoe UI", sans-serif; font-size: 12px; text-align: right; font-weight: 400; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-corner { left: 0; z-index: 4; background: #dbe5de; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-title { font-size: 20px; font-weight: 700; text-align: center; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-context { color: #405c4c; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-heading { border-color: #97a99e; background: #f4f7f5; font-weight: 600; text-align: center; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-text { border-color: #bac8bf; vertical-align: top; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-center,
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-name { text-align: center; }
+html.municipal-ui .app-content .rbi-sheet-grid .rbi-sheet-cell-name { font-weight: 700; }
+.rbi-sheet-cell img { display: block; width: auto; max-width: 180px; height: auto; max-height: 44px; margin: auto; object-fit: contain; }
+.rbi-sheet-tabs { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; min-height: 42px; padding: 0 16px; border-top: 1px solid #c4d2c9; background: #edf2ef; font-size: 12px; }
+.rbi-sheet-tab { display: inline-flex; align-items: center; min-height: 42px; padding: 0 18px; border-bottom: 3px solid #217346; background: #fff; color: #217346; font-weight: 600; }
+.rbi-sheet-status { color: #52655b; padding: 8px 0; }
+@media (max-width: 640px) { .rbi-sheet-toolbar { padding: 10px 12px; } .rbi-sheet-scroll { max-height: 68vh; } .rbi-sheet-tabs { padding: 0 10px; gap: 0; } }
+.rbi-report-print-document { display: none; }
+@layer portal {
+@media screen {
+    .role-municipal-lgu .app-content .rbi-sheet-grid tbody tr,
+    .role-municipal-lgu .app-content .rbi-sheet-grid tbody tr:nth-child(even),
+    .role-municipal-lgu .app-content .rbi-sheet-grid tbody tr:hover,
+    .role-municipal-lgu .app-content .rbi-sheet-grid td { background: #fff !important; color: #15291f !important; }
+    .role-municipal-lgu .app-content .rbi-sheet-grid .rbi-sheet-cell-heading { background: #f4f7f5 !important; }
+    .role-municipal-lgu .app-content .rbi-sheet-grid .rbi-sheet-row-number { background: #edf1ee !important; }
+}
+}
+@media print {
+    .rbi-spreadsheet { display: none !important; }
+    .rbi-report-print-document { display: block !important; }
+    .rbi-report-print-document > p { display: none !important; }
+}

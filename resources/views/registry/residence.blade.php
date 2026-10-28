@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/resident-registry-table.css') }}?v={{ filemtime(public_path('css/resident-registry-table.css')) }}" media="screen">
+@endpush
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/registry-accents.css') }}?v={{ filemtime(public_path('css/registry-accents.css')) }}" media="screen">
@@ -24,7 +27,7 @@
     </div>
     <p>Green means registered here but living elsewhere. Only residents marked “Living in barangay” appear in the local-residents file. Moved-out and deceased records remain separate.</p>
     <form class="toolbar flex flex-wrap items-end gap-3" method="GET"><input type="hidden" name="scope" value="{{ $scope }}"><input name="search" value="{{ request('search') }}" placeholder="Search resident name"><button type="submit">Search</button></form>
-    <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200"><table><thead><tr><th>Name</th><th>Household</th><th>Current residence</th><th>Remarks</th><th>Action</th></tr></thead><tbody>
+    <div class="table-wrap registry-document-table registry-document-list w-full overflow-x-auto rounded-xl border border-slate-200"><table><thead><tr><th>Name</th><th>Household</th><th>Current residence</th><th>Remarks</th><th>Action</th></tr></thead><tbody>
     @forelse($residents as $resident)
         <tr class="{{ $resident->residence_status === 'living_elsewhere' ? 'residence-elsewhere' : '' }}">
             <td>{{ $resident->fullName() }}</td><td>{{ $resident->household->household_number }}</td>

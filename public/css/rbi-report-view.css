@@ -73,7 +73,8 @@
 }
 
 @media print {
-    @page rbi-report { size: A4 landscape; margin: 8mm; }
+    /* Keep browser-generated titles and URLs outside the printable area. */
+    @page rbi-report { size: A4 landscape; margin: 0; }
     .rbi-report-header, .rbi-report-metrics, .rbi-preview-heading,
     .rbi-preview-panel > p { display: none !important; }
     .rbi-report-view, .rbi-preview-panel, .rbi-report-view .rbi-document-preview {
@@ -84,11 +85,11 @@
     }
     .rbi-report-view .rbi-word-page {
         page: rbi-report; width: 100% !important; min-height: 0 !important;
-        margin: 0 !important; padding: 0 0 8mm !important; box-shadow: none !important;
+        margin: 0 !important; padding: 8mm !important; box-shadow: none !important;
         break-after: page;
     }
     .rbi-report-view .rbi-word-page:last-child { break-after: auto; }
-    .rbi-report-view .rbi-word-page-number { bottom: 0; right: 0; }
+    .rbi-report-view .rbi-word-page-number { position: static; margin-top: 4pt; text-align: right; }
     .rbi-report-view .rbi-word-table tr { break-inside: avoid; }
 }
 
@@ -108,5 +109,30 @@
         border-color:#1d466f !important;
         color:#fff !important;
     }
+}
+}
+
+/* Compact official print form; preserve its columns and keep certification on the same page. */
+@layer print-overrides {
+@media print {
+    .rbi-report-detail .rbi-word-page .report-document-header { margin-bottom: 5pt !important; }
+    .rbi-report-detail .rbi-word-page .report-document-title { margin-bottom: 9pt !important; }
+    .rbi-report-detail .rbi-word-page .report-document-fields,
+    .rbi-report-detail .rbi-word-page .report-document-field,
+    .rbi-report-detail .rbi-word-page .report-document-header span { font: 10pt/1.2 "Times New Roman", Times, serif !important; }
+    .rbi-report-detail .rbi-word-page .report-document-context { margin: 2pt 0 5pt !important; font: 10pt/1.15 "Times New Roman", Times, serif !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-table th,
+    .rbi-report-detail .rbi-word-page .rbi-word-table td { font: 9pt/1.1 "Times New Roman", Times, serif !important; padding: 2pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-table th { height: 21pt !important; min-height: 0 !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-table td { height: 16pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-deceased { margin-top: 4pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-deceased th { height: 18pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-signatures { margin-top: 6pt !important; gap: 14pt !important; break-inside: avoid; }
+    .rbi-report-detail .rbi-word-page .rbi-word-signatures * { font-size: 10pt !important; line-height: 1.1 !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-signature-image { height: 24pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-signature-image img { max-height: 24pt !important; max-width: 100pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-signatures strong { min-height: 12pt !important; padding-bottom: 2pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-signatures span { margin-top: 2pt !important; }
+    .rbi-report-detail .rbi-word-page .rbi-word-page-number { font-size: 9pt !important; }
 }
 }

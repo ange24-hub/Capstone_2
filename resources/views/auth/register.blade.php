@@ -103,7 +103,9 @@
 
                             <div class="field-group">
                                 <label for="access_code">LGU access code</label>
-                                <input id="access_code" name="access_code" type="password" autocomplete="off" placeholder="Code issued by Municipal LGU" @error('access_code') aria-invalid="true" @enderror>
+                                <x-password-control field-id="access_code" label="access code">
+                                    <input id="access_code" name="access_code" type="password" autocomplete="off" placeholder="Code issued by Municipal LGU" @error('access_code') aria-invalid="true" @enderror>
+                                </x-password-control>
                                 <small class="field-help">Contact the Municipal LGU if you have not received a code.</small>
                                 @error('access_code') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
@@ -119,13 +121,17 @@
                         <div class="registration-fields grid grid-cols-1 gap-5 md:grid-cols-2">
                             <div class="field-group">
                                 <label for="password">Password</label>
-                                <input id="password" name="password" type="password" autocomplete="new-password" @error('password') aria-invalid="true" @enderror required>
+                                <x-password-control field-id="password">
+                                    <input id="password" name="password" type="password" autocomplete="new-password" @error('password') aria-invalid="true" @enderror required>
+                                </x-password-control>
                                 @error('password') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
                             <div class="field-group">
                                 <label for="password_confirmation">Confirm password</label>
-                                <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+                                <x-password-control field-id="password_confirmation" label="password confirmation">
+                                    <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+                                </x-password-control>
                             </div>
                         </div>
                     </div>

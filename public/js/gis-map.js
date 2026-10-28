@@ -155,6 +155,39 @@
         { key: 'storm-surge', name: 'Storm surge susceptibility' }
     ];
     const layerRequests = new Map();
+    let barangayAreas = [];
+    const barangayLabel = document.createElement('span');
+    const barangayTooltip = L.tooltip({
+        permanent: true, direction: 'top', offset: [0, -12], opacity: 1,
+        className: 'gis-barangay-tooltip', interactive: false
+    }).setContent(barangayLabel);
+    const hideBarangay = () => {
+        if (map.hasLayer(barangayTooltip)) map.removeLayer(barangayTooltip);
+    };
+    const showBarangay = latlng => {
+        const point = [latlng.lng, latlng.lat];
+        const area = barangayAreas.find(({ bounds, feature }) =>
+            point[0] >= bounds[0] && point[0] <= bounds[2]
+            && point[1] >= bounds[1] && point[1] <= bounds[3]
+            && window.GisGeometry.containsPoint(feature.geometry, point));
+        if (!area) { hideBarangay(); return; }
+        barangayLabel.textContent = `Barangay ${area.feature.properties.Name}`;
+        barangayTooltip.setLatLng(latlng);
+        if (!map.hasLayer(barangayTooltip)) barangayTooltip.addTo(map);
+    };
+    const mapContainer = map.getContainer();
+    const isMapControl = event => event.target.closest('.leaflet-control, .leaflet-popup');
+    // Capture events before buildings or hazards stop Leaflet's event bubbling.
+    mapContainer.addEventListener('pointermove', event => {
+        if (event.pointerType === 'touch') return;
+        if (event.buttons || isMapControl(event)) { hideBarangay(); return; }
+        showBarangay(map.mouseEventToLatLng(event));
+    }, { capture: true, passive: true });
+    mapContainer.addEventListener('click', event => {
+        if (!isMapControl(event)) showBarangay(map.mouseEventToLatLng(event));
+    }, { capture: true, passive: true });
+    mapContainer.addEventListener('pointerleave', hideBarangay);
+    map.on('movestart', hideBarangay);
     async function fetchLayerData(descriptor) {
         if (!layerRequests.has(descriptor.key)) {
             const request = (async () => {
@@ -164,7 +197,11 @@
                     const response = await fetch(config.layers[descriptor.key], {
                         headers: { Accept: 'application/json' }, credentials: 'same-origin', signal: controller.signal
                     });
+                    if ([401, 403, 419].includes(response.status)) throw new Error(`Sign in again (HTTP ${response.status})`);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    if (response.headers.get('content-type')?.includes('text/html')) {
+                        throw new Error('A web page was returned instead of map data; refresh your sign-in');
+                    }
                     const data = await response.json();
                     if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) throw new Error('Invalid map layer');
                     return data;
@@ -187,7 +224,7 @@
     let basemapNotice = '';
     let satelliteFallbackPending = false;
     const report = () => {
-        const errors = descriptors.filter(d => failed.has(d.key)).map(d => d.name);
+        const errors = descriptors.filter(d => failed.has(d.key)).map(d => `${d.name} (${d.error})`);
         const layerStatus = pending.size ? 'Loading map layers...' : errors.length
             ? `Could not load: ${errors.join(', ')}. Retry or refresh your sign-in.`
             : 'Map ready. Select a household or building polygon for details. Open the layers button to show hazard overlays.';
@@ -234,6 +271,17 @@
     document.getElementById('gis-fit-households').addEventListener('click', () => {
         households.addTo(map);
         fit(households.getBounds());
+    });
+    document.getElementById('gis-restore-layers').addEventListener('click', () => {
+        households.addTo(map);
+        descriptors.filter(descriptor => descriptor.visible).forEach(descriptor => {
+            descriptor.group.addTo(map);
+            // An already-visible group does not emit another add event after a failed request.
+            if (failed.has(descriptor.key)) load(descriptor);
+        });
+        layersControl.expand();
+        map.invalidateSize();
+        fit(areaBounds);
     });
     const classification = (feature, key) => {
         if (key === 'storm-surge') return { color: '#e51919', label: 'Storm surge susceptible' };
@@ -334,9 +382,11 @@
                     }
                     layer.bindPopup(content);
                 } else if (boundary) {
-                    const label = document.createElement('span');
-                    label.textContent = feature.properties?.Name || 'Tomas Oppus';
-                    layer.bindTooltip(label, { sticky: true });
+                    if (key !== 'barangay-boundaries') {
+                        const label = document.createElement('span');
+                        label.textContent = feature.properties?.Name || 'Tomas Oppus';
+                        layer.bindTooltip(label, { sticky: true });
+                    }
                 } else {
                     layer.bindPopup(popup(descriptor.name, [['Susceptibility', classification(feature, key).label], ['Source', 'Supplied Tomas Oppus hazard shapefile']]));
                 }
@@ -353,6 +403,18 @@
             const layer = makeLayer(data, descriptor);
             descriptor.group.addLayer(layer);
             descriptor.loaded = true;
+            if (descriptor.key === 'barangay-boundaries') {
+                barangayAreas = data.features.map(feature => {
+                    const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+                    const polygons = feature.geometry.type === 'Polygon'
+                        ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+                    polygons.forEach(rings => rings.forEach(ring => ring.forEach(([x, y]) => {
+                        bounds[0] = Math.min(bounds[0], x); bounds[1] = Math.min(bounds[1], y);
+                        bounds[2] = Math.max(bounds[2], x); bounds[3] = Math.max(bounds[3], y);
+                    })));
+                    return { feature, bounds };
+                });
+            }
             if (descriptor.key === 'municipal-boundary') {
                 municipalBounds = layer.getBounds();
                 constrainToMunicipality();
@@ -368,6 +430,7 @@
             households.bringToFront();
         } catch (error) {
             failed.add(descriptor.key);
+            descriptor.error = error.name === 'AbortError' ? 'Request timed out' : error.message;
             console.error(`GIS ${descriptor.key}:`, error);
         } finally {
             pending.delete(descriptor.key);

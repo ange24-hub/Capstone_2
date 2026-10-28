@@ -97,6 +97,9 @@ class RegistryPrintTest extends TestCase
                 $this->assertInstanceOf(\SimpleXMLElement::class, $sheetXml);
                 $sheetXml->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
                 $this->assertInstanceOf(\SimpleXMLElement::class, simplexml_load_string($zip->getFromName('xl/styles.xml')));
+                $workbook = simplexml_load_string($zip->getFromName('xl/workbook.xml'));
+                $workbook->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+                $this->assertSame("'Resident Registry'!\$9:\$10", (string) $workbook->xpath('s:definedNames/s:definedName[@name="_xlnm.Print_Titles"]')[0]);
                 $this->assertStringContainsString('CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)', $sheet);
                 $this->assertSame('A. REGION: VIII', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="A3"]/s:is/s:t')[0]);
                 $this->assertSame('D. BARANGAY: LOOC', (string) $sheetXml->xpath('s:sheetData/s:row/s:c[@r="A6"]/s:is/s:t')[0]);
@@ -138,6 +141,28 @@ class RegistryPrintTest extends TestCase
         $this->actingAs($resident)->get(route('barangay.registry.print'))->assertForbidden();
         $this->actingAs($staff)->get(route('barangay.registry.download', ['scope' => 'invalid']))->assertStatus(302);
         $this->actingAs($resident)->get(route('barangay.registry.download'))->assertForbidden();
+    }
+
+    public function test_long_registry_values_wrap_in_the_view_and_have_room_in_every_excel_scope(): void
+    {
+        $barangay = Barangay::where('name', 'Punong')->firstOrFail();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
+        $household = Household::create(['barangay_id' => $barangay->id, 'household_number' => '001']);
+        $name = 'Maria Christina Alexandra Delos Santos';
+        $remark = "Registered with family in Southern Leyte.\nCurrently residing in Cebu City for employment.\nResidence confirmed by the barangay secretary.";
+        $this->resident($barangay, $household, $name, Inhabitant::RESIDENCE_HERE);
+        Inhabitant::where('household_id', $household->id)->update(['remarks' => $remark]);
+        $view = $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk();
+        $view->assertSee('<span class="registry-cell-value">'.$name.'</span>', false)
+            ->assertSee('registry-document-table')->assertSee('Edit '.$name.' Example in RBI Forms');
+        foreach (['consolidated', 'registered'] as $scope) {
+            $sheet = $this->worksheet($this->get(route('barangay.registry.download', ['scope' => $scope]))->assertOk()->getContent());
+            $xml = simplexml_load_string($sheet);
+            $xml->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+            $this->assertGreaterThanOrEqual(108, (int) $xml->xpath('s:sheetData/s:row[@r="11"]')[0]['ht']);
+            $this->assertSame($remark, (string) $xml->xpath('s:sheetData/s:row/s:c[@r="Q11"]/s:is/s:t')[0]);
+            $this->assertSame('001', (string) $xml->xpath('s:sheetData/s:row/s:c[@r="A11"]/s:is/s:t')[0]);
+        }
     }
 
     private function resident(Barangay $barangay, Household $household, string $firstName, string $residence, string $status = Inhabitant::STATUS_ACTIVE): void

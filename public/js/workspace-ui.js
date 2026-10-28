@@ -85,12 +85,18 @@
     scope.querySelectorAll('[data-password-toggle]').forEach(button => {
         const field = document.getElementById(button.getAttribute('aria-controls'));
         if (!field) return;
+        const label = button.dataset.passwordLabel || 'password';
+        const text = button.querySelector('[data-password-text]');
+        const showIcon = button.querySelector('[data-password-show-icon]');
+        const hideIcon = button.querySelector('[data-password-hide-icon]');
         button.hidden = false;
         button.addEventListener('click', () => {
             const show = field.type === 'password';
             field.type = show ? 'text' : 'password';
-            button.textContent = show ? 'Hide' : 'Show';
-            button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            if (text) text.textContent = show ? 'Hide' : 'Show';
+            if (showIcon) showIcon.hidden = show;
+            if (hideIcon) hideIcon.hidden = !show;
+            button.setAttribute('aria-label', `${show ? 'Hide' : 'Show'} ${label}`);
             button.setAttribute('aria-pressed', String(show));
         });
     });

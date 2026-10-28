@@ -15,23 +15,23 @@
 @foreach ($inhabitants as $inhabitant)
     @php($rowForm = 'rbi-row-'.$inhabitant->id)
     <tr class="{{ filled($inhabitant->registry_sequence) ? 'rbi-household-start' : '' }}">
-        <td><input value="{{ $inhabitant->household->household_number === 'Not recorded' ? '' : $inhabitant->household->household_number }}" readonly aria-label="Household number"><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
-        <td><input form="{{ $rowForm }}" name="family_number" value="{{ $inhabitant->family_number }}" aria-label="Family number"></td>
-        <td><input form="{{ $rowForm }}" name="individual_number" value="{{ $inhabitant->individual_number }}" aria-label="Individual number"></td>
-        <td><input form="{{ $rowForm }}" name="last_name" value="{{ $inhabitant->last_name }}" required aria-label="Last name"></td>
-        <td><input form="{{ $rowForm }}" name="first_name" value="{{ $inhabitant->first_name }}" required aria-label="First name"></td>
-        <td><input form="{{ $rowForm }}" name="middle_name" value="{{ $inhabitant->middle_name }}" aria-label="Middle name"></td>
-        <td><input form="{{ $rowForm }}" name="relationship_to_head" value="{{ $inhabitant->relationship_to_head }}" aria-label="Relationship"></td>
-        <td><input form="{{ $rowForm }}" name="purok" value="{{ $inhabitant->household->purok }}" aria-label="Purok"></td>
-        <td><input form="{{ $rowForm }}" name="birth_place" value="{{ $inhabitant->birth_place }}" aria-label="Place of birth"></td>
-        <td><input form="{{ $rowForm }}" name="birth_date" type="date" value="{{ optional($inhabitant->birth_date)->format('Y-m-d') }}" aria-label="Date of birth"></td>
-        <td><input form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" value="{{ $inhabitant->recorded_age }}" aria-label="Age"></td>
-        <td><select form="{{ $rowForm }}" name="sex" required><option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select></td>
-        <td><input form="{{ $rowForm }}" name="civil_status" value="{{ $inhabitant->civil_status }}" aria-label="Civil status"></td>
-        <td><input form="{{ $rowForm }}" name="education_level" value="{{ $inhabitant->education_level }}" aria-label="Education"></td>
-        <td><input form="{{ $rowForm }}" name="religion" value="{{ $inhabitant->religion }}" aria-label="Religion"></td>
-        <td><input form="{{ $rowForm }}" name="occupation" value="{{ $inhabitant->occupation }}" aria-label="Occupation"></td>
-        <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($inhabitant->remarks) }}" aria-label="Remarks"></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" :value="$inhabitant->household->household_number === 'Not recorded' ? '' : $inhabitant->household->household_number" readonly aria-label="Household number" /><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="family_number" :value="$inhabitant->family_number" aria-label="Family number" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="individual_number" :value="$inhabitant->individual_number" aria-label="Individual number" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="last_name" :value="$inhabitant->last_name" required aria-label="Last name" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="first_name" :value="$inhabitant->first_name" required aria-label="First name" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="middle_name" :value="$inhabitant->middle_name" aria-label="Middle name" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="relationship_to_head" :value="$inhabitant->relationship_to_head" aria-label="Relationship" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="purok" :value="$inhabitant->household->purok" aria-label="Purok" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_place" :value="$inhabitant->birth_place" aria-label="Place of birth" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_date" type="date" :value="optional($inhabitant->birth_date)->format('Y-m-d')" aria-label="Date of birth" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" :value="$inhabitant->recorded_age" aria-label="Age" /></td>
+        <td>@if($editThroughRbi)<span class="registry-cell-value">{{ ['Male' => 'M', 'Female' => 'F'][$inhabitant->sex] ?? ($inhabitant->sex ?: 'Not provided') }}</span>@else<select form="{{ $rowForm }}" name="sex" required><option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select>@endif</td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="civil_status" :value="$inhabitant->civil_status" aria-label="Civil status" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="education_level" :value="$inhabitant->education_level" aria-label="Education" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="religion" :value="$inhabitant->religion" aria-label="Religion" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="occupation" :value="$inhabitant->occupation" aria-label="Occupation" /></td>
+        <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="remarks" :value="\App\Support\RegistryRemarks::display($inhabitant->remarks)" aria-label="Remarks" /></td>
         <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
         @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
         <td class="rbi-row-save" hidden><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">@csrf @method('PUT')<input type="hidden" name="source" value="BIASONG.xlsx"><input type="hidden" name="barangay_id" value="{{ $inhabitant->barangay_id }}"><input type="hidden" name="household_number" value="{{ $inhabitant->household->household_number }}"><input type="hidden" name="address" value="{{ $inhabitant->household->address }}"><input type="hidden" name="status" value="{{ $inhabitant->status }}"></form></td>

@@ -112,7 +112,7 @@
                                 @foreach ($barangayReports as $report)
                                     <article>
                                         <div><strong>{{ optional($report->reporting_month)->format('F Y') ?: 'Month not set' }}</strong><span>{{ collect($report->rows ?? [])->pluck('household_head')->filter()->unique()->count() }} families · {{ count($report->rows ?? []) }} members</span></div>
-                                        <div class="row-actions"><a href="{{ route('rbi-updates.show', $report) }}">View</a><a href="{{ route('rbi-updates.export-pdf', $report) }}">PDF</a><a href="{{ route('rbi-updates.export-word', $report) }}">Word</a></div>
+                                        <div class="row-actions"><a href="{{ route('rbi-updates.show', $report) }}">View</a><a href="{{ route('rbi-updates.export-pdf', $report) }}">PDF</a><a href="{{ route('rbi-updates.export-excel', $report) }}">Excel</a></div>
                                     </article>
                                 @endforeach
                             </div>

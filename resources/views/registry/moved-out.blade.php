@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/resident-registry-table.css') }}?v={{ filemtime(public_path('css/resident-registry-table.css')) }}" media="screen">
+@endpush
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/moved-out.css') }}?v={{ filemtime(public_path('css/moved-out.css')) }}" media="screen">
@@ -31,7 +34,7 @@
     </div>
     <div class="workflow-card moved-out-list-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
         <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><h2>Moved-out residents</h2><p>{{ number_format($residents->total()) }} records found.</p></div><form method="GET" class="toolbar flex flex-wrap items-end gap-3"><input type="search" name="search" value="{{ request('search') }}" placeholder="Search resident name" aria-label="Search moved-out residents"><button type="submit">Search</button></form></div>
-        <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200"><table><thead><tr><th>Resident No.</th><th>Name</th><th>Household</th><th>Date moved out</th><th>Destination</th><th>Reason / Source remarks</th><th>Action</th></tr></thead><tbody>
+        <div class="table-wrap registry-document-table registry-document-list w-full overflow-x-auto rounded-xl border border-slate-200"><table><thead><tr><th>Resident No.</th><th>Name</th><th>Household</th><th>Date moved out</th><th>Destination</th><th>Reason / Source remarks</th><th>Action</th></tr></thead><tbody>
         @forelse($residents as $resident)
             @php($departure = $resident->migrationRecords->first())
             <tr><td>{{ $residents->firstItem() + $loop->index }}</td><td>{{ $resident->fullName() }}</td><td>{{ $resident->household->household_number }}</td><td>{{ $departure?->movement_date?->format('M d, Y') ?? 'Not recorded' }}</td><td>{{ $departure?->destination ?: $resident->sourceTransferDestination() ?: 'Not recorded' }}</td><td>{{ $departure?->reason ?: \App\Support\RegistryRemarks::display($resident->remarks) ?: '—' }}</td><td>

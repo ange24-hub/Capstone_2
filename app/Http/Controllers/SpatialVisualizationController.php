@@ -64,7 +64,7 @@ class SpatialVisualizationController extends Controller
             'selectedBarangayId' => $scope?->id,
             'scopeName' => $scope?->name ?? 'Tomas Oppus',
             'layerUrls' => collect(array_keys(GisLayers::FILES))->mapWithKeys(fn ($layer) => [
-                $layer => route('spatial.layers', array_filter(['layer' => $layer, 'barangay_id' => $scope?->id])),
+                $layer => route('spatial.layers', array_filter(['layer' => $layer, 'barangay_id' => $scope?->id]), false),
             ]),
             'barangays' => $isBarangaySecretary
                 ? Barangay::whereKey($request->user()->barangay_id)->get()

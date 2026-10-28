@@ -56,7 +56,7 @@
                                     <summary>Downloads</summary>
                                     <div class="rbi-history-downloads" aria-label="Download {{ optional($report->reporting_month)->format('F Y') ?: 'monthly' }} form">
                                         <a href="{{ route('rbi-updates.export-pdf', $report) }}">Download PDF</a>
-                                        <a href="{{ route('rbi-updates.export-word', $report) }}">Download Word</a>
+                                        <a href="{{ route('rbi-updates.export-excel', $report) }}">Download Excel</a>
                                     </div>
                                 </details>
                             </div>

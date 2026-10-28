@@ -19,7 +19,7 @@
             <div class="rbi-report-downloads" aria-label="Report actions">
                 <button class="rbi-report-button" type="button" onclick="window.print()"><x-app-icon name="document" />Print Report</button>
                 <a class="rbi-report-button rbi-report-pdf" href="{{ route('rbi-updates.export-pdf', $rbiUpdate) }}"><x-app-icon name="document" />Download Consolidated PDF</a>
-                <a class="rbi-report-button rbi-report-word" href="{{ route('rbi-updates.export-word', $rbiUpdate) }}"><x-app-icon name="form" />Download Word Document</a>
+                <a class="rbi-report-button rbi-report-word" href="{{ route('rbi-updates.export-excel', $rbiUpdate) }}"><x-app-icon name="form" />Download Excel</a>
                 @if ($rbiUpdate->source_file_path)<a class="rbi-report-button" href="{{ route('rbi-updates.download', $rbiUpdate) }}">Original Upload</a>@endif
             </div>
         </header>
@@ -48,8 +48,11 @@
         </div>
 
         <section class="rbi-preview-panel" aria-labelledby="rbi-preview-title">
-            <div class="rbi-preview-heading"><h2 id="rbi-preview-title"><x-app-icon name="document" />Document preview</h2><span>{{ count($wordPages) }} {{ Str::plural('page', count($wordPages)) }}</span></div>
-            @include('rbi-updates._document-preview')
+            <div class="rbi-preview-heading"><h2 id="rbi-preview-title"><x-app-icon name="form" />Excel preview</h2><span>.xlsx</span></div>
+            @include('rbi-updates._spreadsheet-preview')
+            <div class="rbi-report-print-document">
+                @include('rbi-updates._document-preview')
+            </div>
         </section>
     </section>
 @endsection

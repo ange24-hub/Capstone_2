@@ -169,3 +169,30 @@
     outline-offset: 2px;
 }
 }
+
+/* Override form-control themes only inside the document table. */
+@layer print-overrides {
+@media screen {
+    #main-content .registry-document-table { max-width: 100%; overflow: auto; border: 1px solid #9ba3ab !important; border-radius: 0 !important; background: #fff !important; }
+    #main-content .registry-document-list table { min-width: 900px !important; table-layout: auto; }
+    #main-content .registry-document-table fieldset { margin: 0; min-width: 0; padding: 0; border: 0; }
+    #main-content .registry-document-table table { width: 100%; min-width: 2500px; table-layout: fixed; border-collapse: collapse; border-spacing: 0; }
+    #main-content .registry-document-table :is(th, td) { box-sizing: border-box; border: 1px solid #9ba3ab !important; padding: 9px 10px !important; color: #202020 !important; background: #fff !important; font-family: "Times New Roman", Times, serif !important; font-size: 15px !important; line-height: 1.4 !important; white-space: normal !important; overflow-wrap: anywhere; word-break: normal; height: auto !important; vertical-align: top !important; }
+    #main-content .registry-document-table th { font-weight: 700 !important; text-align: center; vertical-align: middle; letter-spacing: 0 !important; text-transform: none !important; background: #f4f4f4 !important; }
+    #main-content .registry-document-table tbody tr { height: auto !important; }
+    #main-content .registry-document-table tbody td { width: auto !important; text-align: left !important; }
+    #main-content .registry-document-table .registry-cell-value { display: block; font: inherit !important; color: inherit !important; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #main-content .registry-document-table :is(input:not([type="hidden"]), select, textarea) { display: block; box-sizing: border-box; width: 100% !important; min-width: 0 !important; max-width: 100% !important; min-height: 21px !important; height: auto; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: #202020 !important; box-shadow: none !important; font: inherit !important; line-height: 1.4 !important; text-align: left; opacity: 1 !important; -webkit-text-fill-color: #202020; }
+    #main-content .registry-document-table textarea { resize: vertical; overflow: hidden; white-space: pre-wrap; field-sizing: content; }
+    #main-content .registry-document-table :is(input, textarea, select):focus-visible { outline: 2px solid #305c83 !important; outline-offset: 3px; }
+    #main-content .registry-document-table .rbi-household-start td { border-top: 2px solid #555 !important; }
+    #main-content .registry-document-table .residence-elsewhere td { background: #faf7ee !important; }
+    #main-content .registry-document-table .rbi-spacer-row { display: none; }
+    #main-content .registry-document-table .rbi-meta-row th { text-align: left; background: #fff !important; }
+    #main-content .registry-document-table .rbi-title-row th { padding: 18px !important; font-size: 19px !important; background: #fff !important; }
+    #main-content .registry-table-summary { background: #fff !important; border-top: 0 !important; padding: 20px !important; }
+    #main-content .registry-table-summary :is(h3, dt, dd) { font-family: "Times New Roman", Times, serif !important; color: #202020 !important; }
+    #main-content .registry-table-summary h3 { text-align: center; font-size: 19px !important; margin-bottom: 12px; }
+    #main-content .registry-table-summary :is(dt, dd) { font-size: 15px !important; }
+}
+}

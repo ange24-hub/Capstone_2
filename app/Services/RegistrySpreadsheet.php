@@ -10,7 +10,7 @@ use ZipArchive;
 
 class RegistrySpreadsheet
 {
-    private const COLUMNS = [8, 10, 17, 18, 17, 11, 20, 15, 20, 14, 7, 8, 14, 17, 16, 19, 18, 15];
+    private const COLUMNS = [8, 9, 21, 24, 21, 10, 19, 22, 26, 14, 7, 8, 15, 24, 20, 25, 32, 18];
 
     public function build(Collection $residents, Barangay $barangay, string $title): string
     {
@@ -29,7 +29,7 @@ class RegistrySpreadsheet
             try {
                 $zip->addFromString('[Content_Types].xml', $this->xml('<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'));
                 $zip->addFromString('_rels/.rels', $this->xml('<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'));
-                $zip->addFromString('xl/workbook.xml', $this->xml('<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Resident Registry" sheetId="1" r:id="rId1"/></sheets></workbook>'));
+                $zip->addFromString('xl/workbook.xml', $this->xml('<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Resident Registry" sheetId="1" r:id="rId1"/></sheets><definedNames><definedName name="_xlnm.Print_Titles" localSheetId="0">&apos;Resident Registry&apos;!$9:$10</definedName><definedName name="_xlnm.Print_Area" localSheetId="0">&apos;Resident Registry&apos;!$A$1:$R$'.(max(11, $residents->count() + 10) + 2).'</definedName></definedNames></workbook>'));
                 $zip->addFromString('xl/_rels/workbook.xml.rels', $this->xml('<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'));
                 $zip->addFromString('xl/styles.xml', $this->styles());
                 $zip->addFromString('xl/worksheets/sheet1.xml', $this->sheet($residents, $barangay, $title));
@@ -63,7 +63,7 @@ class RegistrySpreadsheet
         foreach ($residents as $index => $resident) {
             $start = $previousHousehold !== $resident->household_id;
             $style = $start ? ($index % 2 ? 8 : 7) : ($index % 2 ? 6 : 5);
-            $rows[] = $this->row($index + 11, [
+            $values = [
                 $resident->household?->household_number, $resident->family_number,
                 $resident->last_name, $resident->first_name, $resident->middle_name, $resident->suffix,
                 $resident->relationship_to_head, $resident->household?->purok, $resident->birth_place,
@@ -71,7 +71,8 @@ class RegistrySpreadsheet
                 ['Male' => 'M', 'Female' => 'F'][$resident->sex] ?? $resident->sex,
                 $resident->civil_status, $resident->education_level, $resident->religion,
                 $resident->occupation, RegistryRemarks::display($resident->remarks), $resident->ethnicity,
-            ], $style, 21);
+            ];
+            $rows[] = $this->row($index + 11, $values, $style, $this->rowHeight($values));
             $previousHousehold = $resident->household_id;
         }
 
@@ -105,6 +106,36 @@ class RegistrySpreadsheet
             // A supported legal-paper preset avoids Excel shrinking custom-size reports incorrectly.
             .'<pageSetup paperSize="5" orientation="landscape" fitToWidth="1" fitToHeight="0"/>'
             .'</worksheet>');
+    }
+
+    /** Reserve space for wrapped text, including explicit line breaks. */
+    private function rowHeight(array $values): int
+    {
+        $lines = 1;
+        foreach ($values as $index => $value) {
+            // Leave room for cell padding and wide characters in Excel's font-based widths.
+            $capacity = max(1, (int) floor((self::COLUMNS[$index] - 2) * 0.85));
+            $wrappedLines = 0;
+            foreach (preg_split('/\R/u', (string) ($value ?? '')) as $paragraph) {
+                $used = 0;
+                $wrappedLines++;
+                foreach (preg_split('/\s+/u', trim($paragraph), -1, PREG_SPLIT_NO_EMPTY) as $word) {
+                    $length = mb_strwidth($word, 'UTF-8');
+                    if ($used && $used + 1 + $length > $capacity) {
+                        $wrappedLines++;
+                        $used = 0;
+                    }
+                    $used += ($used ? 1 : 0) + $length;
+                    while ($used > $capacity) {
+                        $wrappedLines++;
+                        $used -= $capacity;
+                    }
+                }
+            }
+            $lines = max($lines, $wrappedLines);
+        }
+
+        return min(409, max(30, $lines * 16 + 12));
     }
 
     private function row(int $number, array $values, int $style, int $height): string
@@ -149,10 +180,10 @@ class RegistrySpreadsheet
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'</cellXfs></styleSheet>');

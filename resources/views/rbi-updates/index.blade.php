@@ -103,7 +103,7 @@
                 <div class="toolbar flex flex-wrap items-end gap-3">
                     <a class="button" href="{{ route('rbi-updates.show', $submittedReport) }}">View Submitted Form</a>
                     <a class="button secondary-button" href="{{ route('rbi-updates.export-pdf', $submittedReport) }}">Download Consolidated PDF</a>
-                    <a class="button secondary-button" href="{{ route('rbi-updates.export-word', $submittedReport) }}">Download Word Copy</a>
+                    <a class="button secondary-button" href="{{ route('rbi-updates.export-excel', $submittedReport) }}">Download Excel Copy</a>
                 </div>
             </div>
         @endif

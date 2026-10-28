@@ -112,7 +112,7 @@
                         </dl>
                     </div>
                 @endif
-                <div class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200 {{ request('source') ? 'rbi-source-table' : '' }} {{ request()->routeIs('barangay.registry.active') && ! $isBiasong ? 'rbi-active-registry-table' : '' }}">
+                <div tabindex="0" role="region" aria-label="Resident records; scroll horizontally for all columns" class="table-wrap w-full overflow-x-auto rounded-xl border border-slate-200 {{ request('source') ? 'rbi-source-table' : '' }} {{ request('source') && request('sheet') !== 'new-inhabitants' ? 'registry-document-table' : '' }}">
                     <fieldset @disabled($editThroughRbi) class="min-w-0 border-0 p-0">
                     <table @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong) class="rbi-compact-household-columns" @endif>
                         @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong)
@@ -140,23 +140,23 @@
                             @foreach ($deceasedRecords as $record)
                                 @php($rowForm = 'deceased-row-'.$record->id)
                                 <tr>
-                                    <td><input form="{{ $rowForm }}" name="household_number" value="{{ $record->household_number }}" required aria-label="Household number"></td>
-                                    <td><input form="{{ $rowForm }}" name="last_name" value="{{ $record->last_name }}" required aria-label="Last name"></td>
-                                    <td><input form="{{ $rowForm }}" name="first_name" value="{{ $record->first_name }}" required aria-label="First name"></td>
-                                    <td><input form="{{ $rowForm }}" name="middle_name" value="{{ $record->middle_name }}" aria-label="Middle name"></td>
-                                    <td><input form="{{ $rowForm }}" name="suffix" value="{{ $record->suffix }}" aria-label="Qualifier"></td>
-                                    <td><input form="{{ $rowForm }}" name="relationship_to_head" value="{{ $record->relationship_to_head }}" aria-label="Relationship"></td>
-                                    <td><input form="{{ $rowForm }}" name="purok" value="{{ $record->purok }}" aria-label="Purok"></td>
-                                    <td><input form="{{ $rowForm }}" name="birth_place" value="{{ $record->birth_place }}" aria-label="Place of birth"></td>
-                                    <td><input form="{{ $rowForm }}" name="birth_date" type="date" value="{{ optional($record->birth_date)->format('Y-m-d') }}" aria-label="Date of birth"></td>
-                                    <td><input form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" value="{{ $record->recorded_age }}" aria-label="Age"></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="household_number" :value="$record->household_number" required aria-label="Household number" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="last_name" :value="$record->last_name" required aria-label="Last name" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="first_name" :value="$record->first_name" required aria-label="First name" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="middle_name" :value="$record->middle_name" aria-label="Middle name" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="suffix" :value="$record->suffix" aria-label="Qualifier" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="relationship_to_head" :value="$record->relationship_to_head" aria-label="Relationship" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="purok" :value="$record->purok" aria-label="Purok" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_place" :value="$record->birth_place" aria-label="Place of birth" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_date" type="date" :value="optional($record->birth_date)->format('Y-m-d')" aria-label="Date of birth" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" :value="$record->recorded_age" aria-label="Age" /></td>
                                     <td><select form="{{ $rowForm }}" name="sex" aria-label="Sex"><option value="Male" @selected($record->sex === 'Male')>M</option><option value="Female" @selected($record->sex === 'Female')>F</option></select></td>
-                                    <td><input form="{{ $rowForm }}" name="civil_status" value="{{ $record->civil_status }}" aria-label="Civil status"></td>
-                                    <td><input form="{{ $rowForm }}" name="education_level" value="{{ $record->education_level }}" aria-label="Education"></td>
-                                    <td><input form="{{ $rowForm }}" name="religion" value="{{ $record->religion }}" aria-label="Religion"></td>
-                                    <td><input form="{{ $rowForm }}" name="occupation" value="{{ $record->occupation }}" aria-label="Occupation"></td>
-                                    <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($record->remarks) }}" aria-label="Remarks"></td>
-                                    <td><input form="{{ $rowForm }}" name="death_date" type="date" value="{{ optional($record->death_date)->format('Y-m-d') }}" aria-label="Date of death"></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="civil_status" :value="$record->civil_status" aria-label="Civil status" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="education_level" :value="$record->education_level" aria-label="Education" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="religion" :value="$record->religion" aria-label="Religion" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="occupation" :value="$record->occupation" aria-label="Occupation" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="remarks" :value="\App\Support\RegistryRemarks::display($record->remarks)" aria-label="Remarks" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="death_date" type="date" :value="optional($record->death_date)->format('Y-m-d')" aria-label="Date of death" /></td>
                                     <td class="rbi-row-save" hidden><form id="{{ $rowForm }}" data-deceased-update method="POST" action="{{ route('registry.deceased.update', $record) }}">@csrf @method('PUT')</form></td>
                                 </tr>
                             @endforeach
@@ -238,24 +238,24 @@
                                 @php($householdStart = $householdNumber !== 'Not recorded' && $householdNumber !== $previousHousehold)
                                 @php($previousHousehold = $householdNumber)
                                 <tr class="{{ $householdStart ? 'rbi-household-start' : '' }} {{ $householdStart ? 'punong-household-start' : '' }} {{ $inhabitant->residence_status === 'living_elsewhere' ? 'residence-elsewhere' : '' }}">
-                                    <td><input form="{{ $rowForm }}" name="household_number" value="{{ $inhabitant->household->household_number }}" required aria-label="Household number"><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
-                                    <td><input form="{{ $rowForm }}" name="family_number" value="{{ $inhabitant->family_number }}" aria-label="Family number"></td>
-                                    <td><input form="{{ $rowForm }}" name="last_name" value="{{ $inhabitant->last_name }}" required aria-label="Last name"></td>
-                                    <td><input form="{{ $rowForm }}" name="first_name" value="{{ $inhabitant->first_name }}" required aria-label="First name"></td>
-                                    <td><input form="{{ $rowForm }}" name="middle_name" value="{{ $inhabitant->middle_name }}" aria-label="Middle name"></td>
-                                    <td><input form="{{ $rowForm }}" name="suffix" value="{{ $inhabitant->suffix }}" aria-label="Qualifier"></td>
-                                    <td><input form="{{ $rowForm }}" name="relationship_to_head" value="{{ $inhabitant->relationship_to_head }}" aria-label="Relationship to household head"></td>
-                                    <td><input form="{{ $rowForm }}" name="purok" value="{{ $inhabitant->household->purok }}" aria-label="Purok or sitio"></td>
-                                    <td><input form="{{ $rowForm }}" name="birth_place" value="{{ $inhabitant->birth_place }}" aria-label="Place of birth"></td>
-                                    <td><input form="{{ $rowForm }}" name="birth_date" type="date" value="{{ optional($inhabitant->birth_date)->format('Y-m-d') }}" aria-label="Date of birth"></td>
-                                    <td><input form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" value="{{ $inhabitant->recorded_age }}" aria-label="Age"></td>
-                                    <td><select form="{{ $rowForm }}" name="sex" required aria-label="Sex">@if(blank($inhabitant->sex))<option value="" selected>Not provided</option>@endif<option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select></td>
-                                    <td><input form="{{ $rowForm }}" name="civil_status" value="{{ $inhabitant->civil_status }}" aria-label="Civil status"></td>
-                                    <td><input form="{{ $rowForm }}" name="education_level" value="{{ $inhabitant->education_level }}" aria-label="School level completed"></td>
-                                    <td><input form="{{ $rowForm }}" name="religion" value="{{ $inhabitant->religion }}" aria-label="Religion"></td>
-                                    <td><input form="{{ $rowForm }}" name="occupation" value="{{ $inhabitant->occupation }}" aria-label="Occupation"></td>
-                                    <td><input form="{{ $rowForm }}" name="remarks" value="{{ \App\Support\RegistryRemarks::display($inhabitant->remarks) }}" aria-label="Remarks"></td>
-                                    <td><input form="{{ $rowForm }}" name="ethnicity" value="{{ $inhabitant->ethnicity }}" aria-label="Ethnicity"></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="household_number" :value="$inhabitant->household->household_number" required aria-label="Household number" /><input type="hidden" form="{{ $rowForm }}" name="registry_sequence" value="{{ $inhabitant->registry_sequence }}"></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="family_number" :value="$inhabitant->family_number" aria-label="Family number" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="last_name" :value="$inhabitant->last_name" required aria-label="Last name" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="first_name" :value="$inhabitant->first_name" required aria-label="First name" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="middle_name" :value="$inhabitant->middle_name" aria-label="Middle name" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="suffix" :value="$inhabitant->suffix" aria-label="Qualifier" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="relationship_to_head" :value="$inhabitant->relationship_to_head" aria-label="Relationship to household head" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="purok" :value="$inhabitant->household->purok" aria-label="Purok or sitio" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_place" :value="$inhabitant->birth_place" aria-label="Place of birth" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_date" type="date" :value="optional($inhabitant->birth_date)->format('Y-m-d')" aria-label="Date of birth" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" :value="$inhabitant->recorded_age" aria-label="Age" /></td>
+                                    <td>@if($editThroughRbi)<span class="registry-cell-value">{{ ['Male' => 'M', 'Female' => 'F'][$inhabitant->sex] ?? ($inhabitant->sex ?: 'Not provided') }}</span>@else<select form="{{ $rowForm }}" name="sex" required aria-label="Sex">@if(blank($inhabitant->sex))<option value="" selected>Not provided</option>@endif<option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select>@endif</td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="civil_status" :value="$inhabitant->civil_status" aria-label="Civil status" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="education_level" :value="$inhabitant->education_level" aria-label="School level completed" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="religion" :value="$inhabitant->religion" aria-label="Religion" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="occupation" :value="$inhabitant->occupation" aria-label="Occupation" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="remarks" :value="\App\Support\RegistryRemarks::display($inhabitant->remarks)" aria-label="Remarks" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="ethnicity" :value="$inhabitant->ethnicity" aria-label="Ethnicity" /></td>
                                     @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
                                     <td class="rbi-row-save" hidden>
                                         <form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">
@@ -304,7 +304,8 @@
         </div>
     </section>
 @push('scripts')<script src="{{ asset('js/registry-confirm.js') }}?v={{ filemtime(public_path('js/registry-confirm.js')) }}" defer></script>@endpush
-@if(request()->routeIs('barangay.registry.active'))
+@if(request('source') || request()->routeIs('barangay.registry.*'))
     @push('head')<link rel="stylesheet" href="{{ asset('css/resident-registry-table.css') }}?v={{ filemtime(public_path('css/resident-registry-table.css')) }}" media="screen">@endpush
+    @push('scripts')<script src="{{ asset('js/registry-table.js') }}?v={{ filemtime(public_path('js/registry-table.js')) }}" defer></script>@endpush
 @endif
 @endsection

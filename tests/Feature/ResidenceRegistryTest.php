@@ -95,7 +95,7 @@ class ResidenceRegistryTest extends TestCase
 
         $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk()
             ->assertSee('Family<br>No.', false)
-            ->assertSee('name="family_number" value="7"', false)
+            ->assertSee('<span class="registry-cell-value">7</span>', false)
             ->assertDontSee('Resident No.');
 
         $this->actingAs($staff)->get(route('barangay.registry.print', ['scope' => 'consolidated']))

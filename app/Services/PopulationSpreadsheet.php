@@ -10,10 +10,12 @@ class PopulationSpreadsheet
     public function build(array $report, string $section, string $title): string
     {
         $sheets = $this->sheets($report, $section, $title);
-        $path = tempnam(sys_get_temp_dir(), 'population-xlsx-');
-        if ($path === false) {
-            throw new RuntimeException('Could not create the population spreadsheet.');
+        // Keep exports independent of the web server's system temporary directory.
+        $directory = storage_path('framework/cache');
+        if (! is_dir($directory) || ! is_writable($directory)) {
+            throw new RuntimeException('The application cache directory is not writable.');
         }
+        $path = $directory.DIRECTORY_SEPARATOR.'population-xlsx-'.bin2hex(random_bytes(16)).'.tmp';
 
         try {
             $zip = new ZipArchive;
@@ -40,7 +42,9 @@ class PopulationSpreadsheet
 
             return $contents;
         } finally {
-            unlink($path);
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 
@@ -80,8 +84,13 @@ class PopulationSpreadsheet
 
         $key = ['sex' => 'By Sex', 'ages' => 'By Age', 'coverage' => 'By Barangay', 'area-ages' => 'Age by Barangay'][$section] ?? null;
         if ($key !== null) {
-            if ($report['totalBarangays'] > 1 && $section === 'sex') return ['By Sex' => $summary['By Sex'], 'By Barangay' => $summary['By Barangay']];
-            if ($report['totalBarangays'] > 1 && $section === 'ages') return ['By Age' => $summary['By Age'], 'Age by Barangay' => $summary['Age by Barangay']];
+            if ($report['totalBarangays'] > 1 && $section === 'sex') {
+                return ['By Sex' => $summary['By Sex'], 'By Barangay' => $summary['By Barangay']];
+            }
+            if ($report['totalBarangays'] > 1 && $section === 'ages') {
+                return ['By Age' => $summary['By Age'], 'Age by Barangay' => $summary['Age by Barangay']];
+            }
+
             return [$key => $summary[$key]];
         }
 
@@ -92,11 +101,11 @@ class PopulationSpreadsheet
         foreach ($report['detailGroups'] as $group) {
             if ($report['totalBarangays'] > 1 && $group['barangay'] !== $lastBarangay) {
                 $groupRows[] = count($rows);
-                $rows[] = array_pad(['Barangay '.$group['barangay']], 6, '');
+                $rows[] = array_pad(['Barangay '.$group['barangay']], $grouped ? 6 : 5, '');
                 $lastBarangay = $group['barangay'];
             }
             foreach ($group['members'] as $member) {
-                $rows[] = [$member['barangay'], $grouped ? $group['title'] : '', $member['name'] ?: 'Name not encoded',
+                $rows[] = [$member['barangay'], ...($grouped ? [$group['title']] : []), $member['name'] ?: 'Name not encoded',
                     $member['age'] ?? 'Unknown', $member['household'] ?: 'Not encoded', $member['birth_date'] ?? 'Not encoded'];
             }
             if ($grouped && $group['members']->isEmpty()) {
@@ -105,68 +114,99 @@ class PopulationSpreadsheet
             }
         }
 
-        return [$title => ['title' => $title, 'headings' => ['Barangay', $grouped ? 'Group' : 'Category', 'Name', 'Age', 'Household number', 'Birthdate'], 'rows' => $rows, 'groupRows' => $groupRows]];
+        return [$title => ['title' => $title, 'headings' => ['Barangay', ...($grouped ? ['Group'] : []), 'Name', 'Age', 'Household number', 'Birthdate'], 'rows' => $rows, 'groupRows' => $groupRows]];
     }
 
     private function sheet(array $sheet, array $report): string
     {
-        $logicalColumns = count($sheet['headings']);
-        // Subdivide narrow tables so the document header can retain its boxed layout.
-        $span = max(1, (int) ceil(12 / $logicalColumns));
-        $columnCount = $logicalColumns * $span;
-        $barangay = str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays';
-        $header = (new SpreadsheetReportHeader)->build($columnCount, $sheet['title'], $barangay, '',
-            $report['generatedAt']->format('m/d/Y'), ['title' => 1, 'label' => 8]);
-        $rows = [...$header['rows'], $this->row(9, $sheet['headings'], 3, $span)];
-        foreach ($sheet['rows'] as $index => $values) {
-            $rows[] = $this->row($index + 10, $values, in_array($index, $sheet['groupRows'] ?? [], true) ? 6 : 4, $span);
-        }
-        if ($sheet['rows'] === []) {
-            $rows[] = $this->row(10, ['No entries available in the selected scope.'], 4, $span);
-        }
+        // Each visible field occupies one actual Excel column, so filters never overlap merged headings.
+        $columnCount = count($sheet['headings']);
         $lastColumn = $this->column($columnCount);
         $lastRow = max(10, count($sheet['rows']) + 9);
-        $merges = $header['merges'];
-        if ($span > 1) {
-            for ($row = 9; $row <= $lastRow; $row++) {
-                for ($column = 0; $column < $logicalColumns; $column++) {
-                    $merges[] = $this->column($column * $span + 1).$row.':'.$this->column(($column + 1) * $span).$row;
-                }
+        $widths = array_map(fn ($heading) => match ($heading) {
+            'Name' => 46, 'Barangay' => 23, 'Group' => 25, 'Age' => 9,
+            'Household number' => 20, 'Birthdate' => 22,
+            'Indicator', 'Category', 'Age group (years)' => 62,
+            default => $columnCount === 2 ? 38 : 18,
+        }, $sheet['headings']);
+        $barangay = str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays';
+        $rows = [$this->row(1, [$sheet['title']], 1, 30), $this->row(2, [], 0, 8)];
+        $merges = ['A1:'.$lastColumn.'1'];
+        foreach (['A. REGION: VIII', 'B. PROVINCE: SOUTHERN LEYTE', 'C. CITY/MUNICIPALITY: TOMAS OPPUS', 'D. BARANGAY: '.$barangay] as $index => $label) {
+            $number = $index + 3;
+            $rows[] = $this->row($number, [$label], 8, 22);
+            $merges[] = 'A'.$number.':'.$lastColumn.$number;
+        }
+        $dateColumn = max(2, $columnCount - 1);
+        $location = array_fill(0, $columnCount, '');
+        $location[0] = 'E. HOUSEHOLD NO.:';
+        $location[$dateColumn - 1] = 'DATE ACCOMPLISHED: '.$report['generatedAt']->format('m/d/Y');
+        $rows[] = $this->row(7, $location, 8, 30);
+        if ($dateColumn > 2) {
+            $merges[] = 'A7:'.$this->column($dateColumn - 1).'7';
+        }
+        if ($dateColumn < $columnCount) {
+            $merges[] = $this->column($dateColumn).'7:'.$lastColumn.'7';
+        }
+        $rows[] = $this->row(8, [], 0, 8);
+        $rows[] = $this->row(9, $sheet['headings'], 3, 32);
+        foreach ($sheet['rows'] as $index => $values) {
+            $group = in_array($index, $sheet['groupRows'] ?? [], true);
+            $rows[] = $this->row($index + 10, $values, $group ? 6 : 4, $group ? 28 : $this->rowHeight($values, $widths));
+            if ($group) {
+                $merges[] = 'A'.($index + 10).':'.$lastColumn.($index + 10);
             }
         }
-        $mergeXml = implode('', array_map(fn ($range) => '<mergeCell ref="'.$range.'"/>', $merges));
-        $logicalWidths = array_map(fn ($heading, $index) => $index === 0 ? 32 : ($heading === 'Name' ? 34 : 20), $sheet['headings'], array_keys($sheet['headings']));
-        $scale = max(1, 120 / array_sum($logicalWidths));
-        $widths = '';
-        foreach ($logicalWidths as $index => $width) {
-            $widths .= '<col min="'.($index * $span + 1).'" max="'.(($index + 1) * $span).'" width="'.round($width * $scale / $span, 2).'" customWidth="1"/>';
+        if ($sheet['rows'] === []) {
+            $rows[] = $this->row(10, ['No entries available in the selected scope.'], 4, 30);
+            $merges[] = 'A10:'.$lastColumn.'10';
         }
+        $mergeXml = implode('', array_map(fn ($range) => '<mergeCell ref="'.$range.'"/>', $merges));
+        $columns = '';
+        foreach ($widths as $index => $width) {
+            $columns .= '<col min="'.($index + 1).'" max="'.($index + 1).'" width="'.$width.'" customWidth="1"/>';
+        }
+        // Section headings stay with their groups; flat lists can be filtered normally.
+        $filter = empty($sheet['groupRows']) && $sheet['rows'] !== []
+            ? '<autoFilter ref="A9:'.$lastColumn.$lastRow.'"/>' : '';
 
         return $this->xml('<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
             .'<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
+            .'<dimension ref="A1:'.$lastColumn.$lastRow.'"/>'
             .'<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="9" topLeftCell="A10" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
-            .'<sheetFormatPr defaultRowHeight="17"/><cols>'.$widths.'</cols><sheetData>'.implode('', $rows).'</sheetData>'
-            .'<autoFilter ref="A9:'.$lastColumn.$lastRow.'"/>'
-            .'<mergeCells count="'.count($merges).'">'.$mergeXml.'</mergeCells>'
-            .'<printOptions horizontalCentered="1"/><pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/>'
+            .'<sheetFormatPr defaultRowHeight="26"/><cols>'.$columns.'</cols><sheetData>'.implode('', $rows).'</sheetData>'
+            .$filter.'<mergeCells count="'.count($merges).'">'.$mergeXml.'</mergeCells>'
+            .'<printOptions horizontalCentered="1"/><pageMargins left="0.3" right="0.3" top="0.4" bottom="0.4" header="0" footer="0"/>'
             .'<pageSetup orientation="landscape" paperSize="9" fitToWidth="1" fitToHeight="0"/>'
             .'</worksheet>');
     }
 
-    private function row(int $number, array $values, int $style, int $span = 1): string
+    private function rowHeight(array $values, array $widths): int
+    {
+        $lines = 1;
+        foreach (array_values($values) as $index => $value) {
+            $capacity = max(1, (int) floor(($widths[$index] - 3) * 0.85));
+            $wrapped = 0;
+            foreach (preg_split('/\R/u', (string) $value) as $paragraph) {
+                $wrapped += max(1, (int) ceil(mb_strwidth($paragraph, 'UTF-8') / $capacity));
+            }
+            $lines = max($lines, $wrapped);
+        }
+
+        return min(409, max(26, $lines * 16 + 10));
+    }
+
+    private function row(int $number, array $values, int $style, int $height): string
     {
         $cells = '';
         foreach (array_values($values) as $index => $value) {
-            $reference = $this->column($index * $span + 1).$number;
+            $reference = $this->column($index + 1).$number;
             $cells .= is_int($value)
                 ? '<c r="'.$reference.'" s="5"><v>'.$value.'</v></c>'
                 : '<c r="'.$reference.'" s="'.$style.'" t="inlineStr"><is><t>'.$this->escape((string) $value).'</t></is></c>';
-            for ($offset = 1; $offset < $span; $offset++) {
-                $cells .= '<c r="'.$this->column($index * $span + $offset + 1).$number.'" s="'.(is_int($value) ? 5 : $style).'"/>';
-            }
         }
 
-        return '<row r="'.$number.'"'.($style === 7 ? ' ht="30" customHeight="1"' : '').'>'.$cells.'</row>';
+        return '<row r="'.$number.'" ht="'.$height.'" customHeight="1">'.$cells.'</row>';
     }
 
     private function contentTypes(int $count): string
@@ -186,11 +226,17 @@ class PopulationSpreadsheet
     private function workbook(array $sheets): string
     {
         $entries = '';
+        $printNames = '';
         foreach (array_keys($sheets) as $index => $name) {
             $entries .= '<sheet name="'.$this->escape($name).'" sheetId="'.($index + 1).'" r:id="rId'.($index + 1).'"/>';
+            $quotedName = $this->escape("'".str_replace("'", "''", $name)."'");
+            $lastColumn = $this->column(count($sheets[$name]['headings']));
+            $lastRow = max(10, count($sheets[$name]['rows']) + 9);
+            $printNames .= '<definedName name="_xlnm.Print_Titles" localSheetId="'.$index.'">'.$quotedName.'!$9:$9</definedName>'
+                .'<definedName name="_xlnm.Print_Area" localSheetId="'.$index.'">'.$quotedName.'!$A$1:$'.$lastColumn.'$'.$lastRow.'</definedName>';
         }
 
-        return $this->xml('<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'.$entries.'</sheets></workbook>');
+        return $this->xml('<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'.$entries.'</sheets><definedNames>'.$printNames.'</definedNames></workbook>');
     }
 
     private function workbookRelationships(int $count): string
@@ -207,7 +253,7 @@ class PopulationSpreadsheet
     private function styles(): string
     {
         return $this->xml('<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-            .'<fonts count="5"><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font></fonts>'
+            .'<fonts count="5"><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="14"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font></fonts>'
             .'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
             .'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="thin"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border></borders>'
             .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
@@ -215,14 +261,14 @@ class PopulationSpreadsheet
             .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1" indent="1"/></xf>'
+            .'<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
-            .'</cellXfs></styleSheet>');
+            .'</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>');
     }
 
     private function column(int $number): string

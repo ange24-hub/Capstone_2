@@ -57,7 +57,7 @@
   .municipal-ui .admin-section-heading h2 { color: var(--portal-navy) !important; font-size: 18px !important; }
   .municipal-ui .admin-section-heading :is(p,span) { color: var(--portal-muted) !important; font-size: 12px !important; }
   .municipal-ui .metric-card { position: relative !important; display: flex !important; align-items: flex-start !important; gap: 16px !important; padding: 22px !important; min-height: 148px !important; border: 1px solid var(--portal-line) !important; border-top: 3px solid #6985a0 !important; border-radius: var(--portal-radius) !important; background: #fff !important; box-shadow: 0 2px 6px #102a4305 !important; }
-  .municipal-ui .metric-card .metric-icon { position: static !important; flex: 0 0 42px !important; width: 42px !important; height: 42px !important; border-radius: 10px !important; color: var(--portal-navy) !important; background: #edf3f8 !important; }
+  .municipal-ui .metric-card .metric-icon { display: grid !important; place-items: center; position: static !important; flex: 0 0 42px !important; width: 42px !important; height: 42px !important; border-radius: 10px !important; color: var(--portal-navy) !important; background: #edf3f8 !important; }
   .municipal-ui .metric-card div > span { display: block !important; min-height: 0 !important; padding-right: 0 !important; font-size: 14px !important; line-height: 1.5 !important; color: var(--portal-muted) !important; }
   .municipal-ui .metric-card strong { font-size: 32px !important; line-height: 1.2 !important; margin: 8px 0 !important; color: var(--portal-navy) !important; font-variant-numeric: tabular-nums; }
   .municipal-ui .metric-card small { display: block !important; font-size: 12px !important; line-height: 1.6 !important; color: var(--portal-muted) !important; }
@@ -124,10 +124,13 @@
   .municipal-ui .municipal-hero-actions a:hover { filter: none !important; box-shadow: 0 0 0 3px #2866a018 !important; }
   .municipal-ui .public-nav a[aria-current=page] { box-shadow: inset 0 -3px var(--portal-gold) !important; }
   .municipal-ui .auth-panel { border: 1px solid var(--portal-line) !important; border-radius: 12px !important; box-shadow: 0 8px 30px #102a4308 !important; }
-  .portal-password-control { position: relative; }
-  .municipal-ui .public-content .portal-password-control input { padding-right: 76px !important; }
-  .municipal-ui .public-content .portal-password-control .password-toggle { position: absolute; inset: 2px 2px 2px auto; min-width: 64px; min-height: 40px !important; padding: 6px 12px !important; background: #edf3f8 !important; border: 0 !important; color: var(--portal-navy) !important; font-size: 13px !important; }
-  .municipal-ui .public-content .portal-password-control .password-toggle:hover { background: #e0eaf3 !important; color: var(--portal-navy) !important; }
+  .portal-password-control { position: relative; min-width: 0; width: 100%; }
+  .password-control-current { max-width: 360px; }
+  .municipal-ui :is(.app-content,.public-content) .portal-password-control input { width: 100% !important; min-height: 48px !important; margin: 0 !important; padding-right: 104px !important; }
+  .municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle { display: inline-flex !important; align-items: center; justify-content: center; gap: 6px !important; position: absolute; inset: 2px 2px 2px auto; min-width: 88px; min-height: 44px !important; margin: 0 !important; padding: 6px 10px !important; background: #edf3f8 !important; border: 0 !important; color: var(--portal-navy) !important; font-size: 13px !important; cursor: pointer; }
+  .municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle[hidden] { display: none !important; }
+  .municipal-ui .password-toggle .app-icon { width: 18px !important; height: 18px !important; }
+  .municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle:hover { background: #e0eaf3 !important; color: var(--portal-navy) !important; }
   @media (min-width: 961px) { .municipal-ui body.sidebar-collapsed #app-sidebar .side-section { font-size: 0 !important; } }
   @media (max-width: 1100px) {
    .municipal-ui .app-content { padding: 24px !important; }
@@ -136,14 +139,16 @@
   @media (max-width: 960px) {
    .municipal-ui .app-header { padding-inline: 16px !important; }
    .municipal-ui #app-sidebar { padding-top: 54px !important; }
-   .municipal-ui #app-sidebar .sidebar-close-button { display: grid !important; place-items: center; position: absolute; top: 10px; right: 14px; width: 38px; height: 38px; padding: 8px; border: 1px solid #658096; border-radius: 8px; color: #fff; background: #213f5b; }
+   .municipal-ui #app-sidebar .sidebar-close-button { display: grid !important; place-items: center; position: absolute; top: 8px; right: 14px; width: 44px; height: 44px; padding: 10px; border: 1px solid #658096; border-radius: 8px; color: #fff; background: #213f5b; }
    .municipal-ui body.sidebar-is-open { overflow: hidden !important; }
    .municipal-ui .portal-header-identity > span { display: none; }
   }
   @media (max-width: 640px) {
    .municipal-ui .app-content { padding: 18px 14px 28px !important; }
+   .municipal-ui .app-main, .municipal-ui .app-content, .municipal-ui #main-content > * { min-width: 0 !important; max-width: 100% !important; }
    .municipal-ui .app-header { gap: 8px !important; min-height: 68px !important; }
    .municipal-ui .app-header-primary { min-width: 0; gap: 8px !important; }
+   .municipal-ui .portal-header-identity { min-width: 0; }
    .municipal-ui .app-header .portal-header-identity strong { font-size: 12px !important; }
    .municipal-ui .app-header-meta { gap: 8px !important; }
    .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.government-page-heading,.profile-page-heading,.municipal-hero) { padding: 20px 16px !important; gap: 16px !important; }
@@ -152,10 +157,27 @@
    .municipal-ui :is(.dashboard-header-actions,.municipal-hero-actions) > a { flex: 1 1 160px; }
    .municipal-ui :is(.dashboard-metrics,.civic-task-metrics,.municipal-dashboard .municipal-metrics) { grid-template-columns: minmax(0,1fr) !important; gap: 12px !important; }
    .municipal-ui .metric-card { min-height: 124px !important; padding: 18px !important; }
+   .municipal-ui .app-content :is(.dashboard-card,.workflow-card,.government-content-card,.government-side-card,.brgy-work-card,.profile-section,.resident-request-card) { min-width: 0 !important; max-width: 100% !important; }
+   .municipal-ui .app-content :is(.table-wrap,.clean-table-wrap,.payment-history-table-wrap) { max-width: 100% !important; overflow-x: auto !important; }
    .municipal-ui :is(.workspace-launcher,.municipal-shortcuts,.profile-fields) { grid-template-columns: minmax(0,1fr) !important; }
+   .municipal-ui .resident-dashboard .dashboard-context-card { width: 100% !important; max-width: 100% !important; }
    .municipal-ui .app-content :is(.government-card-header,.profile-section-heading) { padding: 16px !important; }
    .municipal-ui :where(.app-content,.public-content) :is(input,select,textarea):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *)) { font-size: 16px !important; }
    .municipal-ui .assistant-form textarea { font-size: 16px !important; }
+   .municipal-ui .public-header-inner { width: 100% !important; padding: 12px 16px !important; gap: 12px !important; }
+   .municipal-ui .public-brand { flex: 1 1 100% !important; min-width: 0 !important; }
+   .municipal-ui .public-nav { display: flex !important; flex: 1 1 100% !important; width: 100% !important; flex-wrap: wrap !important; gap: 6px !important; }
+   .municipal-ui .public-nav a { display: inline-flex !important; flex: 1 1 80px !important; align-items: center !important; justify-content: center !important; min-height: 44px !important; margin: 0 !important; padding: 8px 10px !important; font-size: 13px !important; text-align: center !important; }
+   .municipal-ui .public-nav a:not(.public-login-link):not(.public-register-link) { display: inline-flex !important; }
+   .municipal-ui .civic-home-hero .home-hero-actions a { min-height: 44px !important; }
+  }
+  @media (max-width: 480px) {
+   .municipal-ui .app-content :is(.dashboard-page-header,.page-head,.government-page-heading,.profile-page-heading,.municipal-hero) { padding: 18px 14px !important; }
+   .municipal-ui :is(.dashboard-header-actions,.municipal-hero-actions) > a { flex: 1 1 100% !important; width: 100% !important; }
+   .municipal-ui .staff-profile .profile-account-details { grid-template-columns: minmax(0,1fr) !important; }
+   .municipal-ui .population-resident-visual { grid-template-columns: minmax(0,1fr) !important; }
+   .municipal-ui .population-pie-figure { margin-inline: auto !important; }
+   .municipal-ui .registration-card { padding: 18px 14px !important; }
   }
  }
 }

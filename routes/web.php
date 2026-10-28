@@ -169,6 +169,10 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('rbi-updates.export-word');
 
+    Route::get('/rbi-updates/{rbiUpdate}/excel', [BarangayRbiUpdateController::class, 'exportExcel'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('rbi-updates.export-excel');
+
     Route::get('/rbi-updates/{rbiUpdate}/pdf', [BarangayRbiUpdateController::class, 'exportPdf'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('rbi-updates.export-pdf');

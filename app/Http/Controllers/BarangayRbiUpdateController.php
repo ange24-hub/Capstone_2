@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BarangayRbiFamily;
 use App\Models\BarangayRbiUpdate;
 use App\Models\User;
+use App\Services\RbiSpreadsheet;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -244,9 +245,12 @@ class BarangayRbiUpdateController extends Controller
     {
         $this->authorizeView($request, $rbiUpdate);
 
+        $pages = $this->pdfPages($rbiUpdate);
+
         return view('rbi-updates.show', [
             'rbiUpdate' => $rbiUpdate->load('barangayUser'),
-            'wordPages' => $this->pdfPages($rbiUpdate),
+            'wordPages' => $pages,
+            'spreadsheet' => app(RbiSpreadsheet::class)->layout($rbiUpdate, $pages),
             'logoDataUri' => $this->absoluteImageDataUri(public_path('images/tomas-oppus-seal.png')),
             'rbiRowFields' => BarangayRbiUpdate::rowFields(),
             'rbiDeceasedRowFields' => BarangayRbiUpdate::deceasedRowFields(),
@@ -281,6 +285,20 @@ class BarangayRbiUpdateController extends Controller
             echo $this->buildWordDocument($rbiUpdate);
         }, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ]);
+    }
+
+    public function exportExcel(Request $request, BarangayRbiUpdate $rbiUpdate, RbiSpreadsheet $spreadsheet): Response
+    {
+        $this->authorizeView($request, $rbiUpdate);
+
+        $barangay = str($rbiUpdate->barangay_name ?: 'barangay')->slug('-');
+        $month = optional($rbiUpdate->reporting_month)->format('Y-m') ?: 'undated';
+
+        return response($spreadsheet->build($rbiUpdate, $this->pdfPages($rbiUpdate)), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="rbi-monthly-'.$barangay.'-'.$month.'.xlsx"',
+            'Cache-Control' => 'private, no-store',
         ]);
     }
 
@@ -721,11 +739,11 @@ class BarangayRbiUpdateController extends Controller
 
     private function buildWordDocument(BarangayRbiUpdate $rbiUpdate): string
     {
-        $temporaryPath = tempnam(sys_get_temp_dir(), 'rbi-word-');
-
-        if ($temporaryPath === false) {
-            throw new \RuntimeException('Unable to create the temporary Word document.');
+        $directory = storage_path('framework/cache');
+        if (! is_dir($directory) || ! is_writable($directory)) {
+            throw new \RuntimeException('The application cache directory is not writable.');
         }
+        $temporaryPath = $directory.DIRECTORY_SEPARATOR.'rbi-word-'.bin2hex(random_bytes(16)).'.tmp';
 
         $zip = new ZipArchive;
 
@@ -890,7 +908,7 @@ class BarangayRbiUpdateController extends Controller
                     ? '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
                     : '';
 
-                return $this->wordDocumentHeader($barangay, $page['household_number'] ?? '', optional($rbiUpdate->as_of_date)->format('m/d/Y') ?? '')
+                return $this->wordDocumentHeader($barangay, $page['household_number'] ?? '', $rbiUpdate->accomplishedDate()->format('m/d/Y'))
                     . $this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 22)
                     .$this->wordTable($mainTableRows, $mainWidths)
                     .$this->wordParagraph('', false, false, 4)
@@ -1018,152 +1036,6 @@ class BarangayRbiUpdateController extends Controller
         $runProperties = '<w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman"/>'.($bold ? '<w:b/>' : '').'<w:color w:val="000000"/><w:sz w:val="'.$size.'"/><w:szCs w:val="'.$size.'"/></w:rPr>';
 
         return '<w:p>'.$paragraphProperties.'<w:r>'.$runProperties.'<w:t xml:space="preserve">'.$this->xlsxEscape($value).'</w:t></w:r></w:p>';
-    }
-
-    private function xlsxContentTypes(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-    <Default Extension="xml" ContentType="application/xml"/>
-    <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-    <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-    <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-</Types>';
-    }
-
-    private function xlsxRootRelationships(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-</Relationships>';
-    }
-
-    private function xlsxWorkbook(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-    <sheets>
-        <sheet name="RBI Monthly Update" sheetId="1" r:id="rId1"/>
-    </sheets>
-</workbook>';
-    }
-
-    private function xlsxWorkbookRelationships(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-    <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>';
-    }
-
-    private function xlsxStyles(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-    <fonts count="5">
-        <font><sz val="11"/><name val="Calibri"/></font>
-        <font><b/><sz val="16"/><name val="Calibri"/><color rgb="FF102F2A"/></font>
-        <font><b/><sz val="12"/><name val="Calibri"/><color rgb="FF102F2A"/></font>
-        <font><b/><sz val="10"/><name val="Calibri"/><color rgb="FF000000"/></font>
-        <font><sz val="10"/><name val="Calibri"/></font>
-    </fonts>
-    <fills count="2">
-        <fill><patternFill patternType="none"/></fill>
-        <fill><patternFill patternType="gray125"/></fill>
-    </fills>
-    <borders count="2">
-        <border><left/><right/><top/><bottom/><diagonal/></border>
-        <border>
-            <left style="thin"><color rgb="FF98A2B3"/></left>
-            <right style="thin"><color rgb="FF98A2B3"/></right>
-            <top style="thin"><color rgb="FF98A2B3"/></top>
-            <bottom style="thin"><color rgb="FF98A2B3"/></bottom>
-            <diagonal/>
-        </border>
-    </borders>
-    <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-    <cellXfs count="5">
-        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
-        <xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-        <xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-        <xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
-        <xf numFmtId="0" fontId="4" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
-    </cellXfs>
-</styleSheet>';
-    }
-
-    private function xlsxSheet(BarangayRbiUpdate $rbiUpdate): string
-    {
-        $rows = [];
-        $rows[] = '<row r="1" ht="28" customHeight="1">'.$this->xlsxCell('A', 1, 'UPDATES OF BARANGAY REGISTRY OF BARANGAY INHABITANTS', 1).'</row>';
-        $rows[] = '<row r="2" ht="22" customHeight="1">'.$this->xlsxCell('A', 2, 'of Barangay '.($rbiUpdate->barangay_name ?: '____________'), 2).'</row>';
-        $rows[] = '<row r="3" ht="22" customHeight="1">'.$this->xlsxCell('A', 3, 'Reporting Month: '.(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'Not set').'    As of: '.(optional($rbiUpdate->as_of_date)->format('F d, Y') ?: 'Not set'), 2).'</row>';
-        $rows[] = '<row r="4" ht="22" customHeight="1">'.$this->xlsxCell('A', 4, 'One continuous monthly form', 2).'</row>';
-        $rows[] = '<row r="5" ht="42" customHeight="1">'.collect(array_values(BarangayRbiUpdate::rowFields()))
-            ->map(fn (string $label, int $index): string => $this->xlsxCell($this->xlsxColumn($index + 1), 5, $label, 3))
-            ->implode('').'</row>';
-
-        $rowNumber = 6;
-
-        foreach ($rbiUpdate->rows ?? [] as $row) {
-            $cells = collect(array_keys(BarangayRbiUpdate::rowFields()))
-                ->map(fn (string $field, int $index): string => $this->xlsxCell($this->xlsxColumn($index + 1), $rowNumber, (string) ($row[$field] ?? ''), 4))
-                ->implode('');
-            $rows[] = '<row r="'.$rowNumber.'" ht="34" customHeight="1">'.$cells.'</row>';
-            $rowNumber++;
-        }
-
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-    <sheetViews>
-        <sheetView workbookViewId="0">
-            <pane ySplit="5" topLeftCell="A6" activePane="bottomLeft" state="frozen"/>
-        </sheetView>
-    </sheetViews>
-    <cols>
-        <col min="1" max="1" width="10" customWidth="1"/>
-        <col min="2" max="2" width="24" customWidth="1"/>
-        <col min="3" max="3" width="24" customWidth="1"/>
-        <col min="4" max="4" width="34" customWidth="1"/>
-        <col min="5" max="5" width="10" customWidth="1"/>
-        <col min="6" max="6" width="16" customWidth="1"/>
-        <col min="7" max="7" width="24" customWidth="1"/>
-        <col min="8" max="8" width="16" customWidth="1"/>
-        <col min="9" max="9" width="16" customWidth="1"/>
-        <col min="10" max="10" width="20" customWidth="1"/>
-        <col min="11" max="11" width="18" customWidth="1"/>
-        <col min="12" max="12" width="24" customWidth="1"/>
-    </cols>
-    <sheetData>'.implode('', $rows).'</sheetData>
-    <mergeCells count="4">
-        <mergeCell ref="A1:H1"/>
-        <mergeCell ref="A2:H2"/>
-        <mergeCell ref="A3:H3"/>
-        <mergeCell ref="A4:H4"/>
-    </mergeCells>
-    <pageMargins left="0.25" right="0.25" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>
-</worksheet>';
-    }
-
-    private function xlsxCell(string $column, int $row, string $value, int $style): string
-    {
-        return '<c r="'.$column.$row.'" s="'.$style.'" t="inlineStr"><is><t>'.$this->xlsxEscape($value).'</t></is></c>';
-    }
-
-    private function xlsxColumn(int $number): string
-    {
-        $column = '';
-
-        while ($number > 0) {
-            $number--;
-            $column = chr(65 + ($number % 26)).$column;
-            $number = intdiv($number, 26);
-        }
-
-        return $column;
     }
 
     private function xlsxEscape(string $value): string

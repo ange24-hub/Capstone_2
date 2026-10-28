@@ -16,9 +16,13 @@
         <label for="email">Email address</label>
         <input id="email" name="email" type="email" value="{{ old('email', $email) }}" autocomplete="email" required autofocus>
         <label for="password">New password</label>
-        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        <x-password-control field-id="password" label="new password">
+            <input id="password" name="password" type="password" autocomplete="new-password" required>
+        </x-password-control>
         <label for="password_confirmation">Confirm new password</label>
-        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+        <x-password-control field-id="password_confirmation" label="password confirmation">
+            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+        </x-password-control>
         <button class="primary-block" type="submit">Reset password</button>
     </form>
     <p class="form-footer"><a href="{{ route('login') }}">Return to sign in</a></p>

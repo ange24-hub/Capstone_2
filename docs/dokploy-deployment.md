@@ -127,6 +127,14 @@ Before live use, check:
 - Phone GPS, service-worker updates, and offline synchronization work over HTTPS.
 - A redeployment preserves users and uploaded files.
 
+### Missing GIS buildings or other layers
+
+Push the latest code and rebuild/redeploy **app** in Dokploy after GIS JavaScript, CSS, or controller changes. Updating local files alone does not update the deployed map. The layer data files under `resources/gis` are included in the app image.
+
+On the signed-in map page, select **Show buildings & boundaries** to restore the default overlays and open the layer controls. Flood, landslide, and storm-surge overlays can then be selected individually. Point to an area, or tap it on a phone, to see its barangay name.
+
+If layers still fail, read the message below the map and inspect the failed `/spatial-visualization/layers/...` request in the browser's Network panel. Map layer URLs use the current website's origin so they retain HTTPS and the signed-in session behind the proxy. A 401/403 response requires checking the sign-in and account permissions; a 404/500 response requires checking the deployed release and app logs. A layer URL returning 401 when opened without signing in is expected.
+
 The optional chatbot question interpreter can now use the private Ollama service below. The older report narrator/concern classifier (`LOCAL_AI_ENABLED`) and Python prediction service remain disabled in this stack. Their settings are separate from the chatbot interpreter. The database assistant and moving-average migration fallback remain available without AI.
 
 ## Enable the Ollama chatbot on your VPS

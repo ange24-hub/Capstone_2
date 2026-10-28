@@ -40,10 +40,9 @@
             <input id="login" name="login" type="text" value="{{ old('login', old('email')) }}" autocomplete="username" placeholder="Email address or staff ID" @if($errors->hasAny(['login', 'email'])) aria-invalid="true" aria-describedby="login-errors" @endif required autofocus>
 
             <label for="password">Password</label>
-            <div class="portal-password-control">
+            <x-password-control field-id="password">
                 <input id="password" name="password" type="password" autocomplete="current-password" @error('password') aria-invalid="true" aria-describedby="login-errors" @enderror required>
-                <button class="password-toggle" type="button" aria-controls="password" aria-label="Show password" aria-pressed="false" data-password-toggle hidden>Show</button>
-            </div>
+            </x-password-control>
 
             <p class="auth-help-link"><a href="{{ route('password.request') }}">Forgot your password?</a></p>
 

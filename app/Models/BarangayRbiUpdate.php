@@ -73,6 +73,16 @@ class BarangayRbiUpdate extends Model
         return $this->hasMany(BarangayRbiDeceasedRecord::class)->orderBy('position');
     }
 
+    /** Use the report's recorded completion date, including older forms without an as-of date. */
+    public function accomplishedDate(): \Carbon\Carbon
+    {
+        if ($this->as_of_date) {
+            return $this->as_of_date->copy();
+        }
+
+        return ($this->submitted_at ?? $this->created_at ?? now())->copy()->timezone('Asia/Manila');
+    }
+
     public function statusLabel(): string
     {
         return ucfirst($this->status);

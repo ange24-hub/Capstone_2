@@ -111,7 +111,7 @@ class BarangayRbiUpdateTest extends TestCase
             ->assertSee('Submission Complete')
             ->assertSee('View Submitted Form')
             ->assertSee('Download Consolidated PDF')
-            ->assertSee('Download Word Copy')
+            ->assertSee('Download Excel Copy')
             ->assertDontSee('Pedro Dela Cruz');
 
         $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
@@ -129,12 +129,13 @@ class BarangayRbiUpdateTest extends TestCase
             ->get(route('rbi-updates.show', $update))
             ->assertOk()
             ->assertSee('RBI Monthly Form')
-            ->assertSee('A. Newly Registered Barangay Inhabitants')
-            ->assertSee('Monthly Form Certification')
+            ->assertSee('Excel preview')
+            ->assertSee('Monthly RBI spreadsheet')
+            ->assertSee('Certified Correct:')
             ->assertSee('Pedro Dela Cruz')
             ->assertSee('Juan Santos')
             ->assertSee('B. Name of Deceased Registered Brgy. Inhabitant')
-            ->assertSee('Dela Cruz, Ana Maria S.')
+            ->assertSee('Ana Maria S.')
             ->assertSee('Juan Santos');
 
         $pdfResponse = $this->actingAs($municipal)

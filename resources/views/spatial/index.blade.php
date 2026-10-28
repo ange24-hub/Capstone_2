@@ -103,8 +103,9 @@
 
         <section class="gis-map-card" aria-labelledby="gis-map-title">
         <div class="gis-map-toolbar">
-            <div class="gis-map-title"><span class="gis-map-title-icon"><x-app-icon name="map" /></span><div><h2 id="gis-map-title">Interactive map</h2><p>Explore locations. Use the layers button to show boundaries and hazards.</p></div></div>
+            <div class="gis-map-title"><span class="gis-map-title-icon"><x-app-icon name="map" /></span><div><h2 id="gis-map-title">Interactive map</h2><p>Point to or tap an area to see its barangay. Use the layers button to show hazards.</p></div></div>
             <div class="gis-map-actions">
+                <button type="button" class="secondary-button" id="gis-restore-layers"><x-app-icon name="building" />Show buildings &amp; boundaries</button>
                 <button type="button" class="secondary-button" id="gis-fit-area"><x-app-icon name="map" />Fit area</button>
                 <button type="button" id="gis-fit-households" @disabled($markers->isEmpty())><x-app-icon name="location" />Find households</button>
             </div>

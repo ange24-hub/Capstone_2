@@ -128,6 +128,17 @@ class GisMappingTest extends TestCase
         $this->getJson(route('spatial.layers', ['layer' => 'building-points', 'barangay_id' => 999999]))->assertUnprocessable();
     }
 
+    public function test_map_layer_urls_stay_on_the_current_origin_behind_a_deployment_proxy(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]));
+        $area = Barangay::where('name', 'San Isidro')->firstOrFail();
+        $response = $this->get(route('spatial.index', ['barangay_id' => $area->id]))->assertOk();
+        foreach ($response->viewData('layerUrls') as $key => $url) {
+            $this->assertSame(route('spatial.layers', ['layer' => $key, 'barangay_id' => $area->id], false), $url);
+            $this->assertStringStartsWith('/spatial-visualization/layers/', $url);
+        }
+    }
+
     public function test_municipal_staff_cannot_save_a_location_outside_the_selected_barangay(): void
     {
         $area = Barangay::where('name', 'San Isidro')->firstOrFail();

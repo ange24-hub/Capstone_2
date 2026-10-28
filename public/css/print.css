@@ -4,7 +4,9 @@
 /* This layer precedes the app utilities so print rules win over their important declarations. */
 @layer print-overrides {
 @media print {
-    @page { size: A4; margin: 12mm; }
+    /* Zero browser page margins suppress automatic dates, titles, URLs and page counters.
+       The document itself supplies its printable spacing below. */
+    @page { size: A4; margin: 0; }
     /* Paper copies use white paper without the screen theme's fills or gradients. */
     html, body { background: #fff !important; }
     body *, body *::before, body *::after {
@@ -32,6 +34,13 @@
     .app-content {
         width: 100% !important; max-width: none !important;
         margin: 0 !important; padding: 0 !important;
+    }
+    /* RBI household forms already supply their own padding on each landscape page. */
+    .app-content:not(:has(.rbi-report-detail)) {
+        box-sizing: border-box !important;
+        padding: 12mm !important;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
     }
     .population-report { display: block !important; font-size: 11pt !important; }
     .population-report > * { box-shadow: none !important; }

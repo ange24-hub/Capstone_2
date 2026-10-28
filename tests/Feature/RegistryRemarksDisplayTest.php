@@ -41,7 +41,7 @@ class RegistryRemarksDisplayTest extends TestCase
         }
         DeceasedInhabitant::create(['barangay_id' => $barangay->id, 'household_number' => '1', 'last_name' => 'Example', 'first_name' => 'HistoricalPerson']);
         $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk()
-            ->assertViewHas('registryHouseholdCount', 1)->assertSee('HerePerson')->assertSee('OverseasPerson')->assertSee('CebuPerson')->assertDontSee('[Source:')->assertSee('value="Cebu"', false);
+            ->assertViewHas('registryHouseholdCount', 1)->assertSee('HerePerson')->assertSee('OverseasPerson')->assertSee('CebuPerson')->assertDontSee('[Source:')->assertSee('<span class="registry-cell-value">Cebu</span>', false);
         foreach (['living_here' => 'HerePerson', 'living_elsewhere' => 'OverseasPerson', 'unconfirmed' => 'CebuPerson'] as $scope => $name) {
             $this->get(route('barangay.residence.index', ['scope' => $scope]))->assertOk()
                 ->assertDontSee('[Source:')->assertViewHas('residents', fn ($rows) => $rows->total() === 1 && $rows->first()->first_name === $name);

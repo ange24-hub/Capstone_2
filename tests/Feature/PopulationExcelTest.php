@@ -35,10 +35,12 @@ class PopulationExcelTest extends TestCase
             ->assertSee('population-spreadsheet.css')
             ->assertSee('REGION: VIII')->assertSee('PROVINCE: SOUTHERN LEYTE')
             ->assertSee('CITY/MUNICIPALITY: TOMAS OPPUS')->assertSee('BARANGAY: <strong>Looc</strong>', false);
+        $temporaryFiles = glob(storage_path('framework/cache/population-xlsx-*.tmp'));
         $response = $this->get(route('reports.population.excel', ['barangay_id' => $area->id, 'section' => 'residents']))
             ->assertOk()->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $this->assertStringContainsString('.xlsx', $response->headers->get('content-disposition'));
         $this->assertStringStartsWith('PK', $response->getContent());
+        $this->assertSame($temporaryFiles, glob(storage_path('framework/cache/population-xlsx-*.tmp')));
         $this->withWorkbook($response->getContent(), function (ZipArchive $zip): void {
             $workbook = $zip->getFromName('xl/workbook.xml');
             $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
@@ -78,7 +80,7 @@ class PopulationExcelTest extends TestCase
             }
             $summary = $zip->getFromName('xl/worksheets/sheet1.xml');
             $this->assertStringContainsString('Total registered residents', $summary);
-            $this->assertStringContainsString('<c r="G10" s="5"><v>1</v></c>', $summary);
+            $this->assertStringContainsString('<c r="B10" s="5"><v>1</v></c>', $summary);
             $coverage = $zip->getFromName('xl/worksheets/sheet4.xml');
             $this->assertStringContainsString('Looc', $coverage);
             $this->assertStringContainsString('Canlupao', $coverage);
@@ -148,9 +150,38 @@ class PopulationExcelTest extends TestCase
         $this->assertStringNotContainsString('#166534', file_get_contents(public_path('css/population-spreadsheet.css')));
     }
 
+    public function test_population_columns_are_filterable_without_merged_data_and_long_names_have_space(): void
+    {
+        $barangay = Barangay::where('name', 'Punong')->firstOrFail();
+        $home = Household::create(['barangay_id' => $barangay->id, 'household_number' => '001']);
+        $name = 'Maria Christina Alexandra Elizabeth';
+        Inhabitant::create(['barangay_id' => $barangay->id, 'household_id' => $home->id,
+            'first_name' => $name, 'last_name' => 'Dela Cruz Santos', 'sex' => 'Female', 'family_number' => '1']);
+        $this->actingAs(User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]));
+        foreach (['residents' => 5, 'families' => 6, 'households' => 6] as $section => $columns) {
+            $this->withWorkbook($this->get(route('reports.population.excel', ['section' => $section]))->assertOk()->getContent(),
+                function (ZipArchive $zip) use ($name, $columns): void {
+                    $xml = simplexml_load_string($zip->getFromName('xl/worksheets/sheet1.xml'));
+                    $xml->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+                    $this->assertCount($columns, $xml->xpath('s:sheetData/s:row[@r="9"]/s:c'));
+                    $lastColumn = $columns === 5 ? 'E' : 'F';
+                    $this->assertSame('A9:'.$lastColumn.'10', (string) $xml->autoFilter['ref']);
+                    foreach ($xml->mergeCells->mergeCell as $merge) {
+                        $this->assertDoesNotMatchRegularExpression('/\d*(?:9|10):/', (string) $merge['ref']);
+                    }
+                    $this->assertGreaterThanOrEqual(42, (int) $xml->xpath('s:sheetData/s:row[@r="10"]')[0]['ht']);
+                    $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
+                    $this->assertStringContainsString($name.' Dela Cruz Santos', $sheet);
+                    $this->assertStringContainsString('>001</t>', $sheet);
+                    $this->assertStringNotContainsString('sheetProtection', $sheet);
+                    $this->assertStringContainsString('_xlnm.Print_Titles', $zip->getFromName('xl/workbook.xml'));
+                });
+        }
+    }
+
     private function withWorkbook(string $contents, callable $inspect): void
     {
-        $path = tempnam(sys_get_temp_dir(), 'population-test-');
+        $path = storage_path('framework/cache/population-test-'.bin2hex(random_bytes(16)).'.xlsx');
         file_put_contents($path, $contents);
         try {
             $zip = new ZipArchive;
