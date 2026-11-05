@@ -202,4 +202,5 @@ return [
     'Barangay :name has :residents inhabitant record(s) across :households household(s) in the Central Registry.' => 'Ang Barangay :name adunay :residents ka inhabitant records sa :households ka panimalay sa Central Registry.',
     'The municipal registry covers :areas barangay(s), :residents inhabitant record(s), and :households household(s).' => 'Ang municipal registry adunay :areas ka barangay, :residents ka inhabitant records, ug :households ka panimalay.',
     ':area has :total recorded movement(s): :incoming in-migration and :outgoing out-migration, for a net change of ' => 'Ang :area adunay :total ka natala nga pagbalhin: :incoming ang in-migration ug :outgoing ang out-migration, nga adunay kalainan nga ',
+    'System help & troubleshooting' => 'Giya sa system ug pagsulbad sa problema',
 ];

@@ -25,9 +25,9 @@ class AssistantKnowledgeBaseTest extends TestCase
         return User::factory()->create(['role' => $role, 'barangay_id' => Barangay::where('name', 'Looc')->value('id')]);
     }
 
-    public function test_all_55_questions_answer_as_guidance_for_each_role_without_model_calls_or_record_writes(): void
+    public function test_all_reviewed_questions_answer_as_guidance_for_each_role_without_model_calls_or_record_writes(): void
     {
-        $this->assertCount(55, AssistantKnowledgeBase::entries());
+        $this->assertCount(66, AssistantKnowledgeBase::entries());
         foreach ([User::ROLE_RESIDENT, User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU] as $role) {
             $user = $this->user($role);
             $before = User::orderBy('id')->get()->toArray();

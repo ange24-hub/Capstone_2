@@ -18,12 +18,15 @@ class AssistantController extends Controller
         $validated = $request->validate([
             'message' => ['required', 'string', 'max:500'],
             'previous_question' => ['nullable', 'string', 'max:500'],
-            'language' => ['nullable', 'in:en,ceb'],
+            'language' => ['nullable', 'in:auto,en,ceb'],
         ]);
 
         $key = 'assistant.language.'.$request->user()->id;
-        $selection = $languages->resolve(trim($validated['message']), $validated['language'] ?? $request->session()->get($key, 'en'));
+        $preferenceKey = 'assistant.language_preference.'.$request->user()->id;
+        $selection = $languages->resolve(trim($validated['message']), $validated['language']
+            ?? $request->session()->get($preferenceKey, $request->session()->get($key, 'en')));
         $request->session()->put($key, $selection['language']);
+        $request->session()->put($preferenceKey, $selection['preference']);
         $locale = app()->getLocale();
         app()->setLocale($selection['language']);
         try {
@@ -37,8 +40,10 @@ class AssistantController extends Controller
                 $message = $normalizer->normalize($languages->canonicalQuestion($selection['question']));
                 $question = $followUp->resolve($message, $validated['previous_question'] ?? null);
                 $answer = app(AssistantScopeGuard::class)->respond($request->user(), $question)
+                    ?? app(\App\Services\AssistantHazardSummary::class)->respond($request->user(), $question)
                     ?? app(\App\Services\AssistantPopulationNames::class)->respond($request->user(), $question)
                     ?? app(\App\Services\AssistantKnowledgeBase::class)->respond($request->user(), $question)
+                    ?? app(\App\Services\AssistantKnowledgeBase::class)->clarifyWorkflow($request->user(), $question)
                     ?? $followUp->clarification($question, $validated['previous_question'] ?? null);
                 if ($answer === null) {
                     $interpretation = $interpreter->interpret($request->user(), $question);
@@ -56,6 +61,7 @@ class AssistantController extends Controller
                 if ($question !== $message) $answer['interpreted_question'] = $question;
             }
             $answer['language'] = $selection['language'];
+            $answer['language_preference'] = $selection['preference'];
             $answer['suggestions'] = array_map([AssistantLanguage::class, 'text'], $answer['suggestions'] ?? []);
             foreach ($answer['actions'] ?? [] as $index => $action) {
                 $answer['actions'][$index]['label'] = AssistantLanguage::text($action['label']);

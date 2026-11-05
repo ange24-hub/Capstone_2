@@ -94,8 +94,9 @@ class GisLayers
         return false;
     }
 
-    private function containsGeometry(array $geometry, float $latitude, float $longitude): bool
+    public function containsGeometry(array $geometry, float $latitude, float $longitude): bool
     {
+        if (! in_array($geometry['type'] ?? null, ['Polygon', 'MultiPolygon'], true)) return false;
         $polygons = $geometry['type'] === 'Polygon' ? [$geometry['coordinates']] : $geometry['coordinates'];
         foreach ($polygons as $rings) {
             if (! $this->insideRing($rings[0], $longitude, $latitude)) {

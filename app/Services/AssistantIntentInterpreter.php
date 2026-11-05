@@ -100,11 +100,17 @@ PROMPT;
         $boundary = app(AssistantScopeGuard::class)->respond($user, $question);
         if ($boundary !== null) return ['answer' => $boundary];
 
+        $hazards = app(AssistantHazardSummary::class)->respond($user, $question);
+        if ($hazards !== null) return ['answer' => $hazards];
+
         $names = app(AssistantPopulationNames::class)->respond($user, $question);
         if ($names !== null) return ['answer' => $names];
 
         $knowledge = app(AssistantKnowledgeBase::class)->respond($user, $question);
         if ($knowledge !== null) return ['answer' => $knowledge];
+
+        $workflow = app(AssistantKnowledgeBase::class)->clarifyWorkflow($user, $question);
+        if ($workflow !== null) return ['answer' => $workflow];
 
         $plan = $this->classify($question);
         if ($plan === null) return null;

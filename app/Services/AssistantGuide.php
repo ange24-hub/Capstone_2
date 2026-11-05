@@ -27,7 +27,7 @@ class AssistantGuide
         $common[] = AssistantLanguage::text('Show PWD names');
         $common[] = AssistantLanguage::text('Show senior citizen names');
 
-        return array_merge(['Pila ka tawo sa among barangay?', 'Pila ka pamilya ug household?', 'Pila ka lalaki ug babaye?', 'Pila ka senior citizen ug PWD?', 'Pila ka bata?', AssistantLanguage::text('Show migration this month'), AssistantLanguage::text('Show migration last month'), AssistantLanguage::text('Which month has the most migration?'), AssistantLanguage::text('Show population coverage'), AssistantLanguage::text('Summarize submitted RBI forms'), AssistantLanguage::text('Show pending approvals')], $common);
+        return array_merge(['Pila ka tawo sa among barangay?', 'Pila ka pamilya ug household?', 'Pila ka lalaki ug babaye?', 'Pila ka senior citizen ug PWD?', 'Pila ka bata?', 'Asa nga mga balay ang naa sa flood o landslide areas?', AssistantLanguage::text('Show migration this month'), AssistantLanguage::text('Show migration last month'), AssistantLanguage::text('Which month has the most migration?'), AssistantLanguage::text('Show population coverage'), AssistantLanguage::text('Summarize submitted RBI forms'), AssistantLanguage::text('Show pending approvals')], $common);
     }
 
     public function respond(User $user, string $question): ?array

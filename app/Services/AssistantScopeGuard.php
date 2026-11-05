@@ -21,7 +21,10 @@ class AssistantScopeGuard
             return $this->answer($user, 'read_only', 'Chat can explain records and guide you to the correct page, but it cannot change passwords, edit records, approve requests, or make payments. Use the authorized system form.', false);
         }
 
-        // Exact reviewed FAQ questions are instructions, never database lookups.
+        // Hazard lookups enforce their own household scope and map-only filters.
+        if (AssistantHazardSummary::isRequest($question)) return null;
+
+        // Reviewed workflow questions are instructions, never database lookups.
         // Do not mistake "types of documents" or "in the system" for place names.
         if (app(AssistantKnowledgeBase::class)->questionId($question) !== null) return null;
 

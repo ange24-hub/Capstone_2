@@ -250,7 +250,7 @@
       .municipal-ui .public-nav a { @apply inline-flex! min-h-10! items-center! justify-center! px-3! py-2!; }
     }
     @media (max-width: 640px) {
-      .municipal-ui .assistant-panel { width: calc(100vw - 24px) !important; max-height: calc(100dvh - 100px) !important; }
+      .municipal-ui .assistant-panel { width: calc(100vw - 24px) !important; max-height: calc(var(--assistant-viewport-height, 100dvh) - 24px) !important; }
       .municipal-ui .rbim-assistant { right: 12px !important; bottom: 12px !important; }
       .municipal-ui .table-wrap { max-width: 100% !important; }
       .municipal-ui .portal-login-layout { @apply mx-4! grid! grid-cols-1!; }

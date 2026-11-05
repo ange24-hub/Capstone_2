@@ -69,11 +69,15 @@
     const catalog = find('[data-assistant-catalog]'), search = find('[data-assistant-search]');
     const groups = [...root.querySelectorAll('[data-assistant-question-group]')];
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-    const wording = (english, bisaya) => language.value === 'ceb' ? bisaya : english;
+    let replyLanguage = language.value === 'ceb' ? 'ceb' : 'en';
+    const wording = (english, bisaya) => replyLanguage === 'ceb' ? bisaya : english;
     let previousQuestion = null;
     let groupState = null;
     const appShell = document.querySelector('.app-shell');
     const syncDialog = () => {
+        const viewport = window.visualViewport;
+        root.style.setProperty('--assistant-viewport-height', `${viewport?.height || window.innerHeight}px`);
+        root.style.setProperty('--assistant-viewport-offset', `${viewport ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop) : 0}px`);
         const modal = !panel.hidden && window.innerWidth <= 680;
         panel.setAttribute('aria-modal', String(modal));
         if (appShell) appShell.inert = modal;
@@ -85,7 +89,7 @@
         toggle.setAttribute('aria-expanded', String(open));
         root.classList.toggle('is-open', open);
         syncDialog();
-        if (open) (catalog.open ? search : input).focus(); else toggle.focus();
+        if (open) (catalog.open ? search : input).focus({ preventScroll: true }); else toggle.focus();
     };
     const setBrowsing = open => {
         catalog.open = open;
@@ -209,7 +213,9 @@
             });
             if (!response.ok) { const problem = new Error('Request failed'); problem.status = response.status; throw problem; }
             const data = await response.json();
-            if (['en', 'ceb'].includes(data.language)) language.value = data.language;
+            if (['en', 'ceb'].includes(data.language)) replyLanguage = data.language;
+            if (['auto', 'en', 'ceb'].includes(data.language_preference)) language.value = data.language_preference;
+            else if (['en', 'ceb'].includes(data.language)) language.value = data.language;
             previousQuestion = data.previous_question || null;
             typing.remove();
             addMessage(data.reply, 'bot', data);
@@ -237,7 +243,7 @@
             send.disabled = reset.disabled = language.disabled = false;
             panel.removeAttribute('aria-busy');
             suggestionsWrap.hidden = !suggestions.childElementCount;
-            if (!panel.hidden) input.focus();
+            if (!panel.hidden) input.focus({ preventScroll: true });
         }
     };
     toggle.addEventListener('click', () => setOpen(panel.hidden));
@@ -260,7 +266,10 @@
     catalog.addEventListener('click', event => { const button = event.target.closest('[data-assistant-question]'); if (button && !send.disabled) ask(button.textContent); });
     catalog.addEventListener('toggle', () => { panel.classList.toggle('is-browsing', catalog.open); if (catalog.open && !panel.hidden) search.focus(); });
     search.addEventListener('input', filterQuestions);
-    language.addEventListener('change', updateLabels);
+    language.addEventListener('change', () => {
+        if (language.value !== 'auto') replyLanguage = language.value;
+        updateLabels();
+    });
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) { event.preventDefault(); setOpen(false); } });
     panel.addEventListener('keydown', event => {
         if (event.key !== 'Tab' || panel.hidden || window.innerWidth > 680) return;
@@ -270,5 +279,8 @@
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     });
     window.addEventListener('resize', syncDialog);
+    window.visualViewport?.addEventListener('resize', syncDialog);
+    window.visualViewport?.addEventListener('scroll', syncDialog);
+    syncDialog();
     updateLabels();
 })();

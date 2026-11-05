@@ -1,7 +1,7 @@
 /* Shared assistant: scroll the conversation or catalog, keeping controls visible. */
 .rbim-assistant { --assistant-ink: #23384c; --assistant-muted: #64748b; --assistant-line: #e2e8f0; --assistant-primary: var(--to-primary, #244b83); }
 .rbim-assistant [hidden] { display: none !important; }
-.rbim-assistant .assistant-panel { display: flex; flex-direction: column; width: min(460px, calc(100vw - 32px)); height: min(720px, calc(100dvh - 100px)); max-height: calc(100dvh - 100px); border-radius: 16px; isolation: isolate; }
+.rbim-assistant .assistant-panel { display: flex; flex-direction: column; box-sizing: border-box; width: min(460px, calc(100vw - 32px)); height: min(720px, calc(var(--assistant-viewport-height, 100dvh) - 100px)); max-height: calc(var(--assistant-viewport-height, 100dvh) - 24px); border-radius: 16px; isolation: isolate; }
 .rbim-assistant .assistant-header { min-height: 70px; flex: 0 0 auto; padding: 14px 18px; gap: 12px; }
 .rbim-assistant .assistant-header strong { font-size: 15px; line-height: 1.4; }
 .rbim-assistant .assistant-header-copy span { margin-top: 3px; font-size: 11px; }
@@ -13,7 +13,7 @@
 .rbim-assistant .assistant-reset { border: 0; border-radius: 6px; padding: 8px 0; background: transparent; color: var(--assistant-primary); font-size: 12px; font-weight: 600; cursor: pointer; }
 .rbim-assistant .assistant-toolbar label { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--assistant-muted); font-size: 11px; white-space: nowrap; }
 .rbim-assistant .assistant-toolbar select { width: auto; min-height: 32px; max-width: 100px; flex: 0 0 auto; margin: 0; border: 1px solid var(--assistant-line); border-radius: 6px; padding: 4px 7px; background: #fff; color: var(--assistant-ink); font-size: 12px; }
-.rbim-assistant .assistant-messages { height: auto; min-height: 100px; flex: 1 1 0; gap: 16px; padding: 18px 16px; background: #f6f8fb; overscroll-behavior: contain; }
+.rbim-assistant .assistant-messages { height: 0; min-height: 0; flex: 1 1 0; overflow-x: hidden; overflow-y: auto; gap: 16px; padding: 18px 16px; background: #f6f8fb; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: auto; scrollbar-gutter: stable; }
 .rbim-assistant .assistant-message { flex-shrink: 0; min-width: 0; }
 .rbim-assistant .assistant-bubble { min-width: 0; max-width: 100%; padding: 14px; border-radius: 3px 12px 12px 12px; font-size: 13px; line-height: 1.65; white-space: normal; overflow-wrap: anywhere; color: var(--assistant-ink); box-shadow: none; }
 .rbim-assistant .assistant-message-bot .assistant-bubble { width: 100%; }
@@ -60,7 +60,7 @@
 .rbim-assistant .assistant-search-label { margin: 0; color: var(--assistant-muted); font-size: 11px; }
 .rbim-assistant .assistant-catalog-body input { width: 100%; min-height: 38px; flex-shrink: 0; margin: 0; border: 1px solid #cbd5e1; border-radius: 7px; padding: 8px 10px; background: #fff; color: var(--assistant-ink); font: inherit; font-size: 12px; }
 .rbim-assistant .assistant-search-status { margin: 0; font-size: 11px; color: var(--assistant-muted); }
-.rbim-assistant .assistant-catalog-groups { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.rbim-assistant .assistant-catalog-groups { min-height: 0; }
 .rbim-assistant .assistant-catalog-group { margin-bottom: 7px; border: 1px solid var(--assistant-line); border-radius: 8px; }
 .rbim-assistant .assistant-catalog-group > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; padding: 10px 12px; color: var(--assistant-ink); font-size: 12px; font-weight: 600; cursor: pointer; }
 .rbim-assistant .assistant-catalog-group > summary span:last-child { margin-left: auto; color: var(--assistant-muted); font-size: 10px; }
@@ -71,7 +71,8 @@
 .rbim-assistant .assistant-question-list button { display: block; width: 100%; min-height: 40px; margin: 0; border: 0; border-radius: 5px; padding: 9px 8px; background: #fff; color: #334155; font: inherit; font-size: 12px; line-height: 1.5; text-align: left; cursor: pointer; }
 .rbim-assistant .assistant-question-list button:hover { background: #f0f5fb; color: var(--assistant-primary); }
 .rbim-assistant .assistant-panel.is-browsing .assistant-messages, .rbim-assistant .assistant-panel.is-browsing .assistant-suggestions-wrap { display: none; }
-.rbim-assistant .assistant-panel.is-browsing .assistant-catalog { display: flex; flex: 1 1 0; flex-direction: column; }
+.rbim-assistant .assistant-panel.is-browsing .assistant-catalog { display: block; flex: 1 1 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: auto; scrollbar-gutter: stable; }
+.rbim-assistant .assistant-panel.is-browsing .assistant-catalog > summary { position: sticky; top: 0; z-index: 1; background: #fff; }
 .rbim-assistant .assistant-composer { flex: 0 0 auto; border-top: 1px solid var(--assistant-line); background: #fff; }
 .rbim-assistant .assistant-form { padding: 12px 16px 7px; gap: 8px; }
 .rbim-assistant .assistant-form textarea { min-height: 42px; margin: 0; padding: 10px 12px; border-radius: 9px; font-size: 13px; }
@@ -80,13 +81,13 @@
 .rbim-assistant :is(button, a, input, select, textarea, summary):focus-visible { outline: 2px solid #527eae; outline-offset: 3px; }
 .rbim-assistant button:disabled { cursor: wait; opacity: .6; }
 @media (max-width: 600px) {
-    .rbim-assistant .assistant-panel { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: calc(100vw - 24px); height: min(720px, calc(100dvh - 100px)); }
+    .rbim-assistant .assistant-panel { right: 12px; bottom: calc(max(12px, env(safe-area-inset-bottom)) + var(--assistant-viewport-offset, 0px)); width: calc(100vw - 24px); height: min(720px, calc(var(--assistant-viewport-height, 100dvh) - 24px)); }
     .rbim-assistant .assistant-header, .rbim-assistant .assistant-messages { padding-left: 12px; padding-right: 12px; }
     .rbim-assistant .assistant-bubble { padding: 12px; }
 }
 @media (max-height: 540px) {
-    .rbim-assistant .assistant-panel { height: calc(100dvh - 24px); max-height: calc(100dvh - 24px); }
+    .rbim-assistant .assistant-panel { height: calc(var(--assistant-viewport-height, 100dvh) - 24px); max-height: calc(var(--assistant-viewport-height, 100dvh) - 24px); }
     .rbim-assistant .assistant-header { min-height: 52px; padding-block: 7px; }
     .rbim-assistant .assistant-suggestions-wrap { display: none; }
-    .rbim-assistant .assistant-messages { min-height: 50px; }
+    .rbim-assistant .assistant-messages { min-height: 0; }
 }

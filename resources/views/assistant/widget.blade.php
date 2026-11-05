@@ -1,5 +1,6 @@
 @php
     $assistantBisaya = session('assistant.language.'.auth()->id(), 'en') === 'ceb';
+    $assistantPreference = session('assistant.language_preference.'.auth()->id(), 'auto');
     $assistantGroups = App\Services\AssistantGuide::questionGroups(auth()->user());
 @endphp
 <div class="rbim-assistant" data-assistant data-endpoint="{{ route('assistant.chat') }}">
@@ -16,12 +17,13 @@
             <button class="assistant-reset" type="button" data-assistant-reset><span data-assistant-reset-label>New conversation</span></button>
             <label for="assistant-language">Reply in
                 <select id="assistant-language" data-assistant-language>
-                    <option value="en" @selected(!$assistantBisaya)>English</option>
-                    <option value="ceb" @selected($assistantBisaya)>Bisaya</option>
+                    <option value="auto" @selected($assistantPreference === 'auto')>Automatic</option>
+                    <option value="en" @selected($assistantPreference === 'en')>English</option>
+                    <option value="ceb" @selected($assistantPreference === 'ceb')>Bisaya</option>
                 </select>
             </label>
         </div>
-        <div class="assistant-messages" data-assistant-messages role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation">
+        <div class="assistant-messages" data-assistant-messages role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation" tabindex="0">
             <div class="assistant-message assistant-message-bot">
                 <div class="assistant-bubble">
                     <span class="assistant-source">RBIM Assistant</span>

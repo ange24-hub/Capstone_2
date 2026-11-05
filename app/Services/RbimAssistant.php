@@ -20,11 +20,17 @@ class RbimAssistant
         $boundary = app(AssistantScopeGuard::class)->respond($user, $message);
         if ($boundary !== null) return $boundary;
 
+        $hazards = app(AssistantHazardSummary::class)->respond($user, $message);
+        if ($hazards !== null) return $hazards;
+
         $names = app(AssistantPopulationNames::class)->respond($user, $message);
         if ($names !== null) return $names;
 
         $knowledge = app(AssistantKnowledgeBase::class)->respond($user, $message);
         if ($knowledge !== null) return $knowledge;
+
+        $workflow = app(AssistantKnowledgeBase::class)->clarifyWorkflow($user, $message);
+        if ($workflow !== null) return $workflow;
 
         $documentStatus = app(AssistantDocumentStatus::class)->respond($user, $message);
         if ($documentStatus !== null) return $documentStatus;
