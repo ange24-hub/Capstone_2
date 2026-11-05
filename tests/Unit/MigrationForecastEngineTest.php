@@ -76,4 +76,28 @@ class MigrationForecastEngineTest extends TestCase
         $this->assertTrue($result['ready']);
         $this->assertSame(0.0, $result['prediction']);
     }
+
+    public function test_quarterly_horizons_keep_the_selected_method_and_do_not_use_held_out_actuals(): void
+    {
+        $engine = new MigrationForecastEngine();
+        $rows = $this->rows(range(1, 18));
+        $selection = $engine->evaluate($rows, 4);
+        $this->assertTrue($selection['ready']);
+        $this->assertSame(18, $selection['required_months']);
+        $this->assertSame(3, $selection['validation_months']);
+        $this->assertEqualsWithDelta(22, $selection['prediction'], 1e-9);
+        foreach ([2, 3, 4] as $horizon) {
+            $result = $engine->evaluate($rows, $horizon, $selection['method_key']);
+            $this->assertSame($selection['method_key'], $result['method_key']);
+            $this->assertEqualsWithDelta(18 + $horizon, $result['prediction'], 1e-9);
+            $this->assertSame(0.0, $result['mae']);
+        }
+        $rows[15]['count'] = 999;
+        $rows[16]['count'] = 1;
+        $rows[17]['count'] = 500;
+        $changed = $engine->evaluate($rows, 4);
+        $this->assertSame($selection['method_key'], $changed['method_key']);
+        $this->assertSame($selection['validation_mae'], $changed['validation_mae']);
+        $this->assertSame(array_column($selection['backtest'], 'predicted'), array_column($changed['backtest'], 'predicted'));
+    }
 }

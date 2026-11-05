@@ -80,6 +80,8 @@ class AssistantReportSummary
             $scope = $areaId ? 'Barangay '.Barangay::findOrFail($areaId)->name : Barangay::MUNICIPALITY;
             $facts = ['scope' => $scope, 'forecast_month' => $report['predictionMonthLabel'],
                 'verified_months' => count($report['forecastSource']['consecutive']), 'required_months' => $evaluation['required_months'],
+                'source_through' => $report['sourceMonthLabel'], 'refresh_every_months' => 3,
+                'next_refresh' => $report['forecastNextRefreshLabel'],
                 'basis' => 'Verified consecutive departure counts; chronological model selection and held-out evaluation. Not a confirmed future count.'];
             if ($report['predictedOutMigration'] === null) {
                 $reply = $ceb ? 'Dili pa makahatag og forecast nga adunay igo nga verified history para sa '.$scope.'. Kinahanglan ang '.$evaluation['required_months'].' ka sunod-sunod nga kompleto nga reporting months hangtod '.$report['sourceMonthLabel'].'. Ablihi ang Forecast tab aron i-review ang actual records ug kumpirmahon ang completeness. Dili gamiton ang demo data o wala ma-verify nga zero months.'
@@ -92,6 +94,7 @@ class AssistantReportSummary
                     ."\n".($ceb ? 'Average absolute error sa 3 ka held-out months: ' : 'Average absolute error on 3 held-out months: ').number_format($evaluation['mae'], 2)
                     ."\n".($ceb ? 'Base sa verified monthly counts; dili confirmed nga ihap sa umaabot o prediction kon kinsa ang mobalhin.' : 'Based on verified monthly counts; this is not a confirmed future count or a prediction of which resident will move.');
             }
+            $reply .= "\n".($ceb ? 'Ang source records i-refresh matag 3 ka bulan. Sunod nga refresh: ' : 'Source records refresh every 3 months. Next refresh: ').$report['forecastNextRefreshLabel'].'.';
             return ['reply' => $reply, 'facts' => $facts, 'mode' => 'database_forecast', 'scope' => AssistantLanguage::text('RBIM system only'),
                 'actions' => [['label' => AssistantLanguage::text('Open relevant page'), 'url' => $url]], 'suggestions' => []];
         }

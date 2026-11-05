@@ -6,6 +6,9 @@
     </header>
     @if(session('status'))<p class="success" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+    @if($forecastNextRefreshLabel)
+        <p class="forecast-note" data-forecast-schedule>Records refresh every 3 months (January, April, July and October). This cycle uses records through {{ $sourceMonthLabel }}. Next refresh: <b>{{ $forecastNextRefreshLabel }}</b>.</p>
+    @endif
     @if($predictedOutMigration !== null)
         <div class="forecast-result" role="status"><span>{{ $predictionMonthLabel }}</span>
             <strong>About {{ number_format(round($predictedOutMigration)) }} <small>{{ $selectedBarangayId ? 'moves out of the barangay' : 'moves out across the barangays' }}</small></strong>
@@ -58,7 +61,7 @@
     <div class="table-wrap"><table><caption class="sr-only">Held-out forecast evaluation</caption><thead><tr><th>Target month</th><th>Actual</th><th>Predicted</th><th>Baseline</th><th>Absolute error</th></tr></thead><tbody>
         @foreach($evaluationRows as $row)<tr><td>{{ $row['label'] }}</td><td>{{ $row['actual'] }}</td><td>{{ number_format($row['predicted'], 2) }}</td><td>{{ number_format($row['baseline'], 2) }}</td><td>{{ number_format($row['absolute_error'], 2) }}</td></tr>@endforeach
     </tbody></table></div>
-    <details class="forecast-method"><summary>How the forecast is evaluated</summary><p>Last-month, three-month moving-average, exponential-smoothing and Holt linear-trend models are compared on earlier rolling validation windows. The chosen method is fixed before the final three test months are evaluated. For each target month, training ends {{ $forecastHorizon }} month(s) earlier. The final estimate is fitted again using all available consecutive verified months. Demo data, unverified months and possible duplicate events are excluded from training. Missing months break the series instead of becoming zeros.</p></details>
+    <details class="forecast-method"><summary>How the forecast is evaluated</summary><p>Last-month, three-month moving-average, exponential-smoothing and Holt linear-trend models are compared on earlier rolling validation windows at a {{ $forecastEvaluation['model_selection_horizon'] }}-month horizon. The chosen method is fixed before the final three test months are evaluated. For each test target month, training ends {{ $forecastHorizon }} month(s) earlier. The final estimate uses all consecutive verified months through {{ $sourceMonthLabel }}. @if($forecastNextRefreshLabel)The source window and method stay the same within this quarter; the next-month target advances each month. Corrections to source records require another review immediately.@endif Demo data, unverified months and possible duplicate events are excluded from training. Missing months break the series instead of becoming zeros.</p></details>
 </section>
 </details>
 @endif

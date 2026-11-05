@@ -10,12 +10,12 @@ class MigrationForecastEngine
 
     public function requiredMonths(int $horizon): int
     {
-        if (! in_array($horizon, [1, 2], true)) throw new \InvalidArgumentException('Use a one- or two-month forecast horizon.');
+        if ($horizon < 1 || $horizon > 4) throw new \InvalidArgumentException('Use a forecast horizon between one and four months.');
         return self::MIN_TRAINING + self::MIN_VALIDATION + self::TEST_MONTHS + 2 * ($horizon - 1);
     }
 
     /** Hyperparameters use only the earlier validation window; the final test months stay held out. */
-    public function evaluate(array $rows, int $horizon = 1): array
+    public function evaluate(array $rows, int $horizon = 1, ?string $fixedMethod = null): array
     {
         $required = $this->requiredMonths($horizon);
         if (count($rows) < $required) return ['ready' => false, 'required_months' => $required, 'available_months' => count($rows)];
@@ -33,11 +33,13 @@ class MigrationForecastEngine
         $testStart = count($values) - self::TEST_MONTHS;
         $validation = array_slice($values, 0, $testStart - $horizon + 1);
         $methods = ['last_month', 'moving_average_3', 'smoothing_0.2', 'smoothing_0.5', 'smoothing_0.8', 'holt_0.3_0.1', 'holt_0.6_0.2'];
+        if ($fixedMethod !== null && ! in_array($fixedMethod, $methods, true)) throw new \InvalidArgumentException('Unknown forecast method.');
         $scores = [];
         foreach ($methods as $method) $scores[$method] = $this->mae($validation, $method, $horizon);
         // Stable ties prefer the transparent moving-average benchmark.
         $chosen = 'moving_average_3';
         foreach ($methods as $method) if ($scores[$method] < $scores[$chosen] - 1e-9) $chosen = $method;
+        $chosen = $fixedMethod ?? $chosen;
         $backtest = [];
         for ($target = $testStart; $target < count($values); $target++) {
             $training = array_slice($values, 0, $target - $horizon + 1);

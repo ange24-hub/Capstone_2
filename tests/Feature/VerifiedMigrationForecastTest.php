@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\{Barangay, Household, Inhabitant, MigrationRecord, MigrationReportingPeriod, User};
 use App\Services\MigrationForecastHistory;
+use App\Services\MigrationForecastReport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -45,11 +47,11 @@ class VerifiedMigrationForecastTest extends TestCase
             'type' => 'out', 'movement_date' => $date, 'reason' => $reason]);
     }
 
-    private function verifiedHistory(Barangay $area, User $user, int $months = 14): void
+    private function verifiedHistory(Barangay $area, User $user, int $months = 18): void
     {
         $person = $this->person($area);
         for ($i = 0; $i < $months; $i++) {
-            $month = now()->startOfMonth()->subMonths($months - $i);
+            $month = now()->startOfQuarter()->subMonths($months - $i);
             $this->event($person, $month->toDateString());
             $source = $this->source($area, $month->format('Y-m'));
             MigrationReportingPeriod::create(['barangay_id' => $area->id, 'month' => $month->format('Y-m'),
@@ -73,7 +75,8 @@ class VerifiedMigrationForecastTest extends TestCase
         $staff = $this->staff($area);
         $this->verifiedHistory($area, $staff);
         $this->actingAs($staff)->get(route('migration.dashboard', ['section' => 'forecast']))
-            ->assertOk()->assertViewHas('predictionMonthLabel', 'December 2026')->assertViewHas('sourceMonthLabel', 'October 2026')
+            ->assertOk()->assertViewHas('predictionMonthLabel', 'December 2026')->assertViewHas('sourceMonthLabel', 'September 2026')
+            ->assertViewHas('forecastNextRefreshLabel', 'January 1, 2027')->assertSee('Records refresh every 3 months')
             ->assertViewHas('predictedOutMigration', 1.0)->assertViewHas('forecastEvaluation', fn ($r) => $r['mae'] === 0.0 && count($r['backtest']) === 3)
             ->assertSee('Actual versus predicted departures')->assertSee('Selected model MAE')->assertSee('Holt linear-trend')
             ->assertDontSee('Private Resident');
@@ -104,11 +107,11 @@ class VerifiedMigrationForecastTest extends TestCase
         $staff = $this->staff($area);
         $this->verifiedHistory($area, $staff);
         $person = $this->person($area);
-        $this->event($person, '2026-10-15');
-        $source = $this->source($area, '2026-10');
+        $this->event($person, '2026-09-15');
+        $source = $this->source($area, '2026-09');
         $this->assertFalse($source['verified']);
         $this->assertSame('Records changed — recheck', $source['status']);
-        $history = app(MigrationForecastHistory::class)->build($area->id, Carbon::parse('2026-10-01'));
+        $history = app(MigrationForecastHistory::class)->build($area->id, Carbon::parse('2026-09-01'));
         $this->assertCount(0, $history['consecutive']);
         $this->actingAs($staff)->get(route('migration.dashboard', ['section' => 'forecast']))
             ->assertOk()->assertViewHas('predictedOutMigration', null);
@@ -157,7 +160,7 @@ class VerifiedMigrationForecastTest extends TestCase
         $this->actingAs($this->staff($area, User::ROLE_MUNICIPAL_LGU))->get(route('migration.dashboard', ['section' => 'forecast']))
             ->assertOk()->assertViewHas('predictedOutMigration', null)->assertSee('every configured barangay');
         foreach (Barangay::whereKeyNot($area->id)->get() as $other) {
-            for ($i = 1; $i <= 14; $i++) MigrationReportingPeriod::create(['barangay_id' => $other->id, 'month' => now()->startOfMonth()->subMonths($i)->format('Y-m'),
+            for ($i = 1; $i <= 18; $i++) MigrationReportingPeriod::create(['barangay_id' => $other->id, 'month' => now()->startOfQuarter()->subMonths($i)->format('Y-m'),
                 'out_count' => 0, 'source_fingerprint' => hash('sha256', '[]'), 'verified_by' => $staff->id, 'verified_at' => now()]);
         }
         $this->get(route('migration.dashboard', ['section' => 'forecast']))->assertOk()->assertViewHas('predictedOutMigration', 1.0);
@@ -185,6 +188,8 @@ class VerifiedMigrationForecastTest extends TestCase
         $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Predict out-migration next month', 'language' => 'en'])
             ->assertOk()->assertJsonPath('mode', 'database_forecast')->assertJsonPath('facts.predicted_departures', 1)
             ->assertJsonPath('facts.forecast_month', 'December 2026')->assertJsonPath('facts.mae', 0)
+            ->assertJsonPath('facts.source_through', 'September 2026')->assertJsonPath('facts.refresh_every_months', 3)
+            ->assertJsonPath('facts.next_refresh', 'January 1, 2027')
             ->assertJsonPath('actions.0.url', route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => $area->id]));
         $this->postJson(route('assistant.chat'), ['message' => 'Pila ang predicted migration sunod bulan?', 'language' => 'auto'])
             ->assertOk()->assertJsonPath('language', 'ceb')->assertJsonPath('facts.predicted_departures', 1)->assertSee('Banabana');
@@ -211,5 +216,67 @@ class VerifiedMigrationForecastTest extends TestCase
             ->assertOk()->assertViewHas('predictionMonthLabel', 'January 2026')->assertViewHas('predictedOutMigration', 0.0)
             ->assertViewHas('forecastHorizon', 1)->assertViewHas('forecastEvaluation', fn ($r) => $r['source_end'] === '2025-12' && $r['mae'] === 0.0);
         Http::assertNothingSent();
+    }
+
+    public function test_quarter_keeps_source_and_method_fixed_while_next_month_target_advances(): void
+    {
+        $area = Barangay::firstOrFail();
+        $this->verifiedHistory($area, $this->staff($area));
+        $method = null;
+        foreach ([10 => 'November 2026', 11 => 'December 2026', 12 => 'January 2027'] as $month => $target) {
+            $this->travelTo(Carbon::create(2026, $month, 5, 10));
+            $report = app(MigrationForecastReport::class)->build($area->id);
+            $this->assertSame('September 2026', $report['sourceMonthLabel']);
+            $this->assertSame('October 1, 2026', $report['forecastRefreshLabel']);
+            $this->assertSame('January 1, 2027', $report['forecastNextRefreshLabel']);
+            $this->assertSame($target, $report['predictionMonthLabel']);
+            $this->assertSame($month - 8, $report['forecastHorizon']);
+            $this->assertSame(18, $report['forecastEvaluation']['required_months']);
+            $this->assertSame(3, $report['forecastEvaluation']['validation_months']);
+            $this->assertSame(4, $report['forecastEvaluation']['model_selection_horizon']);
+            $this->assertSame(1.0, $report['predictedOutMigration']);
+            $method ??= $report['predictionMethod'];
+            $this->assertSame($method, $report['predictionMethod']);
+        }
+        $this->event($this->person($area), '2026-10-15');
+        $unchanged = app(MigrationForecastReport::class)->build($area->id);
+        $this->assertSame(1.0, $unchanged['predictedOutMigration']);
+        $this->assertSame('2026-09', $unchanged['forecastEvaluation']['source_end']);
+
+        // New-quarter records must be checked before they can enter a forecast.
+        $this->travelTo(Carbon::parse('2027-01-01 00:00:00'));
+        $newQuarter = app(MigrationForecastReport::class)->build($area->id);
+        $this->assertSame('December 2026', $newQuarter['sourceMonthLabel']);
+        $this->assertSame('February 2027', $newQuarter['predictionMonthLabel']);
+        $this->assertSame('April 1, 2027', $newQuarter['forecastNextRefreshLabel']);
+        $this->assertNull($newQuarter['predictedOutMigration']);
+        foreach (['2026-10', '2026-11', '2026-12'] as $month) {
+            $source = $this->source($area, $month);
+            MigrationReportingPeriod::create(['barangay_id' => $area->id, 'month' => $month,
+                'out_count' => $source['count'], 'source_fingerprint' => $source['fingerprint'],
+                'verified_by' => User::firstOrFail()->id, 'verified_at' => now()]);
+        }
+        $refreshed = app(MigrationForecastReport::class)->build($area->id);
+        $this->assertNotNull($refreshed['predictedOutMigration']);
+        $this->assertSame('2026-12', $refreshed['forecastEvaluation']['source_end']);
+        $this->assertSame(2, $refreshed['forecastHorizon']);
+    }
+
+    public function test_quarterly_readiness_does_not_change_mid_quarter_and_audit_matches_dashboard(): void
+    {
+        $area = Barangay::firstOrFail();
+        $this->verifiedHistory($area, $this->staff($area), 17);
+        foreach ([10, 11, 12] as $month) {
+            $this->travelTo(Carbon::create(2026, $month, 5, 10));
+            $report = app(MigrationForecastReport::class)->build($area->id);
+            $this->assertNull($report['predictedOutMigration']);
+            $this->assertSame(18, $report['forecastEvaluation']['required_months']);
+        }
+        $this->withoutMockingConsoleOutput();
+        $this->assertSame(0, Artisan::call('migration:forecast-audit', ['--barangay' => $area->id]));
+        $audit = json_decode(Artisan::output(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame('September 2026', $audit['source_through']);
+        $this->assertSame('January 1, 2027', $audit['next_refresh']);
+        $this->assertSame(18, $audit['evaluation']['required_months']);
     }
 }
