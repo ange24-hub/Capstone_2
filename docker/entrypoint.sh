@@ -25,7 +25,7 @@ gosu www-data php artisan view:cache
 if [ "${RUN_MIGRATIONS:-false}" = 'true' ]; then
     gosu www-data php artisan migrate --force --no-interaction
 else
-    # This reviewed release only adds completeness confirmations. No existing
+    # These reviewed releases only add completeness confirmations. No existing
     # records are rewritten and other pending migrations remain opt-in.
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
 fi

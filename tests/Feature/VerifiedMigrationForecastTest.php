@@ -171,10 +171,12 @@ class VerifiedMigrationForecastTest extends TestCase
     public function test_release_installer_only_adds_the_reporting_table_and_is_idempotent(): void
     {
         Schema::drop('migration_reporting_periods');
-        DB::table('migrations')->where('migration', '2026_11_05_000000_create_migration_reporting_periods_table')->delete();
+        DB::table('migrations')->whereIn('migration', ['2026_11_05_000000_create_migration_reporting_periods_table',
+            '2026_11_05_010000_add_arrival_verification_to_migration_reporting_periods'])->delete();
         $before = User::count();
         $this->artisan('migration:prepare-forecast-storage')->assertSuccessful();
         $this->assertTrue(Schema::hasTable('migration_reporting_periods'));
+        $this->assertTrue(Schema::hasColumn('migration_reporting_periods', 'in_verified_at'));
         $this->artisan('migration:prepare-forecast-storage')->assertSuccessful();
         $this->assertSame($before, User::count());
         $this->assertDatabaseCount('migration_reporting_periods', 0);
@@ -193,7 +195,10 @@ class VerifiedMigrationForecastTest extends TestCase
             ->assertJsonPath('actions.0.url', route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => $area->id]));
         $this->postJson(route('assistant.chat'), ['message' => 'Pila ang predicted migration sunod bulan?', 'language' => 'auto'])
             ->assertOk()->assertJsonPath('language', 'ceb')->assertJsonPath('facts.predicted_departures', 1)->assertSee('Banabana');
-        foreach (['Predict in migration next month', 'Predict migration in 2027'] as $question) {
+        $this->postJson(route('assistant.chat'), ['message' => 'Predict in migration next month', 'language' => 'en'])
+            ->assertOk()->assertJsonPath('mode', 'database_forecast')->assertJsonMissingPath('facts.predicted_arrivals')
+            ->assertJsonMissingPath('facts.predicted_net_migration')->assertSee('Insufficient verified records');
+        foreach (['Predict migration in 2027'] as $question) {
             $this->postJson(route('assistant.chat'), ['message' => $question, 'language' => 'en'])->assertOk()
                 ->assertJsonPath('needs_clarification', true)->assertJsonMissingPath('facts');
         }

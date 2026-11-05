@@ -17,6 +17,10 @@
 .forecast-overview .forecast-result strong { font-size: 36px; }
 .forecast-overview .forecast-result strong small { display: block; margin-top: 7px; font-size: 15px; font-weight: 500; }
 .forecast-review-link { margin-top: 4px; }
+.forecast-estimates strong { font-size: 30px; }
+.forecast-series-evaluation { padding: 20px 0; border-bottom: 1px solid #dce4eb; }
+.forecast-series-evaluation h3 { margin: 0; color: #193c5b; font-size: 19px; }
+.forecast-status-line + .forecast-status-line { margin-top: 10px; }
 .forecast-secondary > summary { color: #244765; font-size: 15px; font-weight: 650; cursor: pointer; }
 .forecast-secondary > summary::marker { color: #526579; }
 .forecast-details-section { min-width: 0; padding-top: 20px; }

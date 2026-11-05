@@ -1,0 +1,238 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\{Barangay, Household, Inhabitant, MigrationRecord, MigrationReportingPeriod, User};
+use App\Services\{MigrationForecastHistory, MigrationForecastReport};
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\{DB, Http, Schema};
+use Tests\TestCase;
+
+class NetMigrationForecastTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->travelTo(Carbon::parse('2026-11-05 10:00:00'));
+        Http::preventStrayRequests();
+    }
+
+    private function staff(): User
+    {
+        return User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => Barangay::where('name', 'Looc')->value('id')]);
+    }
+
+    private function person(User $staff): Inhabitant
+    {
+        $home = Household::firstOrCreate(['barangay_id' => $staff->barangay_id, 'household_number' => 'NET-TEST']);
+        return Inhabitant::create(['barangay_id' => $staff->barangay_id, 'household_id' => $home->id,
+            'first_name' => 'Private', 'last_name' => 'Identity', 'sex' => 'Female']);
+    }
+
+    private function event(Inhabitant $person, string $type, string $date, ?string $reason = null): void
+    {
+        MigrationRecord::create(['barangay_id' => $person->barangay_id, 'inhabitant_id' => $person->id,
+            'type' => $type, 'movement_date' => $date, 'reason' => $reason]);
+    }
+
+    private function source(User $staff, string $type, string $month = '2026-09'): array
+    {
+        return app(MigrationForecastHistory::class)->build($staff->barangay_id, Carbon::createFromFormat('!Y-m', $month), 1, $type)['rows'][0];
+    }
+
+    private function seedHistory(User $staff, int $in = 3, int $out = 1, bool $verifyArrivals = true): void
+    {
+        $person = $this->person($staff);
+        for ($i = 18; $i >= 1; $i--) {
+            $month = now()->startOfQuarter()->subMonths($i);
+            foreach (['in' => $in, 'out' => $out] as $type => $count) {
+                for ($j = 0; $j < $count; $j++) $this->event($person, $type, $month->copy()->addDays($j)->toDateString());
+            }
+            $arrival = $this->source($staff, 'in', $month->format('Y-m'));
+            $departure = $this->source($staff, 'out', $month->format('Y-m'));
+            MigrationReportingPeriod::create(['barangay_id' => $staff->barangay_id, 'month' => $month->format('Y-m'),
+                'out_count' => $out, 'source_fingerprint' => $departure['fingerprint'], 'verified_at' => now(), 'verified_by' => $staff->id,
+                'in_count' => $verifyArrivals ? $in : null, 'in_source_fingerprint' => $verifyArrivals ? $arrival['fingerprint'] : null,
+                'in_verified_at' => $verifyArrivals ? now() : null, 'in_verified_by' => $verifyArrivals ? $staff->id : null]);
+        }
+    }
+
+    private function review(User $staff, string $action = 'verify'): array
+    {
+        return ['barangay_id' => $staff->barangay_id, 'year' => 2026, 'month' => '2026-09', 'movement_scope' => 'all',
+            'source_fingerprint' => $this->source($staff, 'out')['fingerprint'],
+            'in_source_fingerprint' => $this->source($staff, 'in')['fingerprint'], 'action' => $action, 'confirm_complete' => 1];
+    }
+
+    public function test_verified_components_produce_a_net_forecast_and_three_separate_accuracy_reports(): void
+    {
+        $staff = $this->staff();
+        $this->seedHistory($staff);
+        $this->actingAs($staff)->get(route('migration.dashboard', ['section' => 'forecast']))
+            ->assertOk()->assertViewHas('predictedInMigration', 3.0)->assertViewHas('predictedOutMigration', 1.0)
+            ->assertViewHas('predictedNetMigration', 2.0)->assertViewHas('predictionMonthLabel', 'December 2026')
+            ->assertViewHas('forecastNetEvaluation', fn ($net) => $net['mae'] === 0.0 && count($net['backtest']) === 3)
+            ->assertSee('Actual versus predicted arrivals')->assertSee('Actual versus predicted departures')
+            ->assertSee('Actual versus predicted net migration')->assertSee('name="in_source_fingerprint"', false)
+            ->assertDontSee('Private Identity');
+        Http::assertNothingSent();
+    }
+
+    public function test_negative_net_and_verified_zero_events_are_valid_estimates(): void
+    {
+        $staff = $this->staff();
+        $this->seedHistory($staff, 0, 2);
+        $report = app(MigrationForecastReport::class)->build($staff->barangay_id);
+        $this->assertSame(0.0, $report['predictedInMigration']);
+        $this->assertSame(-2.0, $report['predictedNetMigration']);
+        $this->actingAs($staff)->get(route('migration.dashboard', ['section' => 'forecast']))->assertOk()->assertSee('-2.0');
+        foreach ($report['forecastNetEvaluation']['backtest'] as $row) $this->assertSame(-2, $row['actual']);
+        $this->event($this->person($staff), 'in', '2026-10-20');
+        $this->assertSame(-2.0, app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
+    }
+
+    public function test_departure_only_confirmations_never_verify_arrivals_or_produce_net(): void
+    {
+        $staff = $this->staff();
+        $this->seedHistory($staff, 3, 1, false);
+        $report = app(MigrationForecastReport::class)->build($staff->barangay_id);
+        $this->assertSame(1.0, $report['predictedOutMigration']);
+        $this->assertNull($report['predictedInMigration']);
+        $this->assertNull($report['predictedNetMigration']);
+        $this->assertFalse($this->source($staff, 'in')['verified']);
+        $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Predict net migration next month', 'language' => 'en'])
+            ->assertOk()->assertJsonMissingPath('facts.predicted_net_migration')->assertSee('Insufficient verified records');
+    }
+
+    public function test_arrival_changes_invalidate_net_and_joint_reverification_and_reopening_are_audited(): void
+    {
+        $staff = $this->staff();
+        $this->seedHistory($staff);
+        $this->event($this->person($staff), 'in', '2026-09-20');
+        $report = app(MigrationForecastReport::class)->build($staff->barangay_id);
+        $this->assertNull($report['predictedInMigration']);
+        $this->assertNull($report['predictedNetMigration']);
+        $this->assertSame(1.0, $report['predictedOutMigration']);
+        $this->assertSame('Records changed — recheck', $this->source($staff, 'in')['status']);
+        $this->actingAs($staff)->post(route('migration.reporting-periods.store'), $this->review($staff))
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertNotNull(app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
+        $this->assertDatabaseHas('migration_reporting_periods', ['barangay_id' => $staff->barangay_id, 'month' => '2026-09', 'in_count' => 4, 'out_count' => 1]);
+        $this->post(route('migration.reporting-periods.store'), $this->review($staff, 'reopen'))->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertFalse($this->source($staff, 'in')['verified']);
+        $this->assertFalse($this->source($staff, 'out')['verified']);
+        $this->assertDatabaseCount('registry_activities', 2);
+        $audit = json_decode(DB::table('registry_activities')->latest('id')->value('changes'), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame('all', $audit['movement_scope']);
+    }
+
+    public function test_joint_confirmation_requires_both_fingerprints_and_is_atomic_for_stale_arrivals(): void
+    {
+        $staff = $this->staff();
+        $data = $this->review($staff);
+        $this->event($this->person($staff), 'in', '2026-09-01');
+        $this->actingAs($staff)->postJson(route('migration.reporting-periods.store'), $data)
+            ->assertUnprocessable()->assertJsonValidationErrors('in_source_fingerprint');
+        $this->assertDatabaseCount('migration_reporting_periods', 0);
+        unset($data['in_source_fingerprint']);
+        $this->postJson(route('migration.reporting-periods.store'), $data)->assertUnprocessable()->assertJsonValidationErrors('in_source_fingerprint');
+        $other = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => Barangay::whereKeyNot($staff->barangay_id)->value('id')]);
+        $this->actingAs($other)->postJson(route('migration.reporting-periods.store'), $this->review($staff))->assertForbidden();
+    }
+
+    public function test_duplicate_arrivals_block_confirmation_and_synthetic_arrivals_are_excluded(): void
+    {
+        $staff = $this->staff();
+        $person = $this->person($staff);
+        $this->event($person, 'in', '2026-09-01');
+        $this->event($person, 'in', '2026-09-01');
+        $this->event($person, 'in', '2026-09-02', MigrationForecastHistory::DEMO_MARKER);
+        $source = $this->source($staff, 'in');
+        $this->assertSame(2, $source['count']);
+        $this->assertSame(1, $source['duplicates']);
+        $this->assertSame(1, $source['demo_count']);
+        $this->actingAs($staff)->postJson(route('migration.reporting-periods.store'), $this->review($staff))
+            ->assertUnprocessable()->assertJsonValidationErrors('month');
+        $this->assertDatabaseCount('migration_reporting_periods', 0);
+    }
+
+    public function test_municipal_net_requires_arrival_confirmation_from_every_barangay(): void
+    {
+        $staff = $this->staff();
+        $this->seedHistory($staff);
+        foreach (Barangay::whereKeyNot($staff->barangay_id)->get() as $area) {
+            for ($i = 18; $i >= 1; $i--) MigrationReportingPeriod::create(['barangay_id' => $area->id,
+                'month' => now()->startOfQuarter()->subMonths($i)->format('Y-m'), 'out_count' => 0,
+                'source_fingerprint' => hash('sha256', '[]'), 'verified_at' => now(), 'verified_by' => $staff->id]);
+        }
+        $this->assertNull(app(MigrationForecastReport::class)->build(null)['predictedNetMigration']);
+        MigrationReportingPeriod::where('barangay_id', '!=', $staff->barangay_id)->update(['in_count' => 0,
+            'in_source_fingerprint' => hash('sha256', '[]'), 'in_verified_at' => now(), 'in_verified_by' => $staff->id]);
+        $this->assertSame(2.0, app(MigrationForecastReport::class)->build(null)['predictedNetMigration']);
+        $this->actingAs($staff)->get(route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => Barangay::whereKeyNot($staff->barangay_id)->value('id')]))
+            ->assertOk()->assertViewHas('selectedBarangayId', $staff->barangay_id)->assertViewHas('predictedNetMigration', 2.0);
+    }
+
+    public function test_native_assistant_answers_arrival_and_net_forecasts_in_english_and_bisaya(): void
+    {
+        $staff = $this->staff();
+        $this->seedHistory($staff);
+        $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Predict net migration next month', 'language' => 'en'])
+            ->assertOk()->assertJsonPath('mode', 'database_forecast')->assertJsonPath('facts.predicted_net_migration', 2)
+            ->assertJsonPath('facts.net_mae', 0)->assertJsonPath('facts.predicted_arrivals', 3)->assertJsonPath('facts.predicted_departures', 1)
+            ->assertSee('Net migration: +2.0');
+        $this->postJson(route('assistant.chat'), ['message' => 'Predict arrivals next month', 'language' => 'en'])
+            ->assertOk()->assertJsonPath('mode', 'database_forecast')->assertSee('Arrivals: 3.0');
+        $this->postJson(route('assistant.chat'), ['message' => 'Predict arrivals, departures and net migration next month', 'language' => 'en'])
+            ->assertOk()->assertSee('Arrivals: 3.0')->assertSee('Departures: 1.0')->assertSee('Net migration: +2.0');
+        $this->postJson(route('assistant.chat'), ['message' => 'Pila ang net migration sunod bulan?', 'language' => 'auto'])
+            ->assertOk()->assertJsonPath('language', 'ceb')->assertJsonPath('facts.predicted_net_migration', 2)->assertSee('Banabana');
+        $this->postJson(route('assistant.chat'), ['message' => 'Predict net migration in Canlupao'])->assertOk()
+            ->assertJsonPath('blocked_reason', 'assigned_barangay_only')->assertJsonMissingPath('facts');
+        Http::assertNothingSent();
+    }
+
+    public function test_upgrade_preserves_departure_checks_without_automatically_verifying_arrivals(): void
+    {
+        $staff = $this->staff();
+        MigrationReportingPeriod::create(['barangay_id' => $staff->barangay_id, 'month' => '2026-09', 'out_count' => 0,
+            'source_fingerprint' => hash('sha256', '[]'), 'verified_at' => now(), 'verified_by' => $staff->id, 'notes' => 'Existing log check']);
+        $migration = require database_path('migrations/2026_11_05_010000_add_arrival_verification_to_migration_reporting_periods.php');
+        $migration->down();
+        DB::table('migrations')->where('migration', '2026_11_05_010000_add_arrival_verification_to_migration_reporting_periods')->delete();
+        $this->assertTrue($this->source($staff, 'out')['verified']);
+        $this->assertFalse($this->source($staff, 'in')['verified']);
+        $this->artisan('migration:prepare-forecast-storage')->assertSuccessful();
+        $this->artisan('migration:prepare-forecast-storage')->assertSuccessful();
+        $this->assertTrue(Schema::hasColumn('migration_reporting_periods', 'in_count'));
+        $this->assertTrue($this->source($staff, 'out')['verified']);
+        $this->assertFalse($this->source($staff, 'in')['verified']);
+        $this->assertDatabaseHas('migration_reporting_periods', ['notes' => 'Existing log check', 'in_verified_at' => null, 'in_count' => null]);
+        $this->assertDatabaseCount('migration_records', 0);
+        $this->assertDatabaseCount('registry_activities', 0);
+    }
+
+    public function test_historical_joint_forecast_excludes_later_events_and_future_years_show_no_estimate(): void
+    {
+        $staff = $this->staff();
+        for ($month = 1; $month <= 12; $month++) MigrationReportingPeriod::create(['barangay_id' => $staff->barangay_id,
+            'month' => sprintf('2025-%02d', $month), 'out_count' => 0, 'in_count' => 0,
+            'source_fingerprint' => hash('sha256', '[]'), 'in_source_fingerprint' => hash('sha256', '[]'),
+            'verified_at' => now(), 'in_verified_at' => now(), 'verified_by' => $staff->id, 'in_verified_by' => $staff->id]);
+        $this->event($this->person($staff), 'in', '2026-01-01');
+        $report = app(MigrationForecastReport::class)->build($staff->barangay_id, 2025);
+        $this->assertSame('January 2026', $report['predictionMonthLabel']);
+        $this->assertSame(0.0, $report['predictedInMigration']);
+        $this->assertSame(0.0, $report['predictedOutMigration']);
+        $this->assertSame(0.0, $report['predictedNetMigration']);
+        $this->assertSame(1, $report['forecastNetEvaluation']['horizon']);
+        $this->assertNull($report['forecastNextRefreshLabel']);
+        $future = app(MigrationForecastReport::class)->build($staff->barangay_id, 2027);
+        $this->assertNull($future['predictedInMigration']);
+        $this->assertNull($future['predictedOutMigration']);
+        $this->assertNull($future['predictedNetMigration']);
+    }
+}

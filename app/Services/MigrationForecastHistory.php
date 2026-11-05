@@ -13,21 +13,29 @@ class MigrationForecastHistory
     public const DEMO_MARKER = 'RBIM migration demo v1';
 
     /** Read only aggregate counts and source fingerprints; no identities enter the model. */
-    public function build(?int $barangayId, Carbon $end, int $months = 36): array
+    public function build(?int $barangayId, Carbon $end, int $months = 36, string $type = MigrationRecord::TYPE_OUT): array
     {
+        if (! in_array($type, [MigrationRecord::TYPE_IN, MigrationRecord::TYPE_OUT], true)) throw new \InvalidArgumentException('Use arrival or departure events.');
+        $arrival = $type === MigrationRecord::TYPE_IN;
+        $countField = $arrival ? 'in_count' : 'out_count';
+        $fingerprintField = $arrival ? 'in_source_fingerprint' : 'source_fingerprint';
+        $verifiedField = $arrival ? 'in_verified_at' : 'verified_at';
+        $notesField = $arrival ? 'in_notes' : 'notes';
+        $verifier = $arrival ? 'arrivalVerifier' : 'verifier';
         $start = $end->copy()->startOfMonth()->subMonths($months - 1);
         $areas = Barangay::when($barangayId, fn ($q) => $q->whereKey($barangayId))->orderBy('name')->get(['id', 'name']);
         $events = MigrationRecord::query()->leftJoin('inhabitants', 'inhabitants.id', '=', 'migration_records.inhabitant_id')
             ->leftJoin('households', 'households.id', '=', 'inhabitants.household_id')
             ->whereIn('migration_records.barangay_id', $areas->pluck('id'))
-            ->where('migration_records.type', MigrationRecord::TYPE_OUT)
+            ->where('migration_records.type', $type)
             ->whereBetween('movement_date', [$start->toDateString(), $end->copy()->endOfMonth()->toDateString()])
             ->orderBy('migration_records.id')->get(['migration_records.id', 'migration_records.barangay_id',
                 'migration_records.inhabitant_id', 'movement_date', 'migration_records.updated_at',
                 'migration_records.reason', 'inhabitants.remarks', 'households.household_number'])
             ->groupBy(fn ($event) => $event->barangay_id.'|'.substr((string) $event->getRawOriginal('movement_date'), 0, 7));
-        $storageReady = Schema::hasTable('migration_reporting_periods');
-        $checks = $storageReady ? MigrationReportingPeriod::with('verifier:id,name')->whereIn('barangay_id', $areas->pluck('id'))
+        $storageReady = Schema::hasTable('migration_reporting_periods') && (! $arrival
+            || Schema::hasColumns('migration_reporting_periods', ['in_count', 'in_source_fingerprint', 'in_verified_by', 'in_verified_at', 'in_notes']));
+        $checks = $storageReady ? MigrationReportingPeriod::with($verifier.':id,name')->whereIn('barangay_id', $areas->pluck('id'))
             ->whereBetween('month', [$start->format('Y-m'), $end->format('Y-m')])->get()->keyBy(fn ($row) => $row->barangay_id.'|'.$row->month) : collect();
         $rows = [];
         $byArea = [];
@@ -49,14 +57,14 @@ class MigrationForecastHistory
                     (string) $event->getRawOriginal('updated_at'),
                 ])->values()->all(), JSON_THROW_ON_ERROR));
                 $check = $checks->get($key);
-                $verified = $storageReady && $check?->verified_at && ! $duplicates
-                    && hash_equals($check->source_fingerprint, $fingerprint) && $check->out_count === $real->count();
+                $verified = $storageReady && $check?->{$verifiedField} && ! $duplicates
+                    && hash_equals((string) $check->{$fingerprintField}, $fingerprint) && $check->{$countField} === $real->count();
                 $status = $duplicates ? 'Review duplicate events' : ($verified ? 'Verified complete'
-                    : ($check?->verified_at ? 'Records changed — recheck' : 'Not verified'));
+                    : ($check?->{$verifiedField} ? 'Records changed — recheck' : 'Not verified'));
                 $areaRow = ['month' => $month, 'label' => $row['label'], 'count' => $real->count(), 'verified' => (bool) $verified,
                     'fingerprint' => $fingerprint, 'demo_count' => $items->count() - $real->count(), 'duplicates' => $duplicates,
-                    'status' => $status, 'verified_at' => $check?->verified_at?->format('M d, Y H:i'),
-                    'verified_by' => $check?->verifier?->name, 'notes' => $check?->notes];
+                    'status' => $status, 'verified_at' => $check?->{$verifiedField}?->format('M d, Y H:i'),
+                    'verified_by' => $check?->{$verifier}?->name, 'notes' => $check?->{$notesField}];
                 $byArea[$area->id][] = $areaRow;
                 $row['count'] += $real->count();
                 $row['demo_count'] += $areaRow['demo_count'];
@@ -82,6 +90,6 @@ class MigrationForecastHistory
                 'verified_months' => count(array_filter($series, fn ($row) => $row['verified'])), 'consecutive_months' => $streak];
         })->all();
         return ['rows' => $rows, 'consecutive' => $consecutive, 'coverage' => $coverage,
-            'storage_ready' => $storageReady, 'excluded_demo_events' => $demoTotal];
+            'storage_ready' => $storageReady, 'excluded_demo_events' => $demoTotal, 'movement_type' => $type];
     }
 }

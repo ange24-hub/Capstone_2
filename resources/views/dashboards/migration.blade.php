@@ -18,7 +18,7 @@
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
                 <h1 id="migration-dashboard-title">Migration Trends</h1>
                 <p>{{ match ($migrationSection) {
-                    'forecast' => 'Choose a barangay to see an estimate of moves out next month.',
+                    'forecast' => 'Choose a barangay to see estimated arrivals, departures and net migration next month.',
                     'events' => 'Review the latest recorded arrivals and departures.',
                     default => 'Compare monthly arrivals and departures for '.$selectedYear.'.',
                 } }}</p>
