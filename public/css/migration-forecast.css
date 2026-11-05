@@ -10,6 +10,15 @@
 .forecast-result p, .forecast-unavailable p { margin-bottom: 0; }
 .forecast-unavailable { border-color: #e6d8b6; background: #fffbef; color: #705724; }
 .forecast-note { margin: 12px 0; color: #526579; font-size: 13px; line-height: 1.6; }
+.forecast-start { margin: 18px 0 0; padding: 22px; border-radius: 10px; background: #f1f6fa; color: #244765; }
+.forecast-start strong { font-size: 19px; }
+.forecast-start p { margin-bottom: 0; }
+.forecast-overview .forecast-result strong { font-size: 36px; }
+.forecast-overview .forecast-result strong small { display: block; margin-top: 7px; font-size: 15px; font-weight: 500; }
+.forecast-review-link { margin-top: 4px; }
+.forecast-secondary > summary { color: #244765; font-size: 15px; font-weight: 650; cursor: pointer; }
+.forecast-secondary > summary::marker { color: #526579; }
+.forecast-details-section { min-width: 0; padding-top: 20px; }
 .forecast-comparison-chart { display: block; width: 100%; max-width: 760px; margin: 16px auto; }
 .forecast-comparison-chart text { fill: #526579; font: 12px system-ui, sans-serif; }
 .forecast-chart-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 20px; font-size: 13px; }

@@ -1,31 +1,38 @@
-<section class="dashboard-card migration-forecast-card" aria-labelledby="out-migration-forecast-title">
+<section class="dashboard-card migration-forecast-card forecast-overview" aria-labelledby="out-migration-forecast-title">
     <header class="dashboard-card-header">
-        <div><span class="dashboard-eyebrow">Predictive Analytics</span><h2 id="out-migration-forecast-title">Out-Migration Forecast</h2>
-            <p>Estimate for {{ $predictionMonthLabel }} using verified completed months through {{ $sourceMonthLabel }}.</p></div>
+        <div><h2 id="out-migration-forecast-title">Departure estimate</h2>
+            <p>Banabana sa posibleng pagbalhin gawas sa barangay para sa {{ $predictionMonthLabel }}.</p></div>
         <span class="section-icon"><x-app-icon name="trend" /></span>
     </header>
     @if(session('status'))<p class="success" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
-    <div class="forecast-summary-grid">
-        <article><span>Latest completed month</span><strong>{{ number_format($currentMonthOut) }}</strong><small>Recorded departures · {{ $sourceMonthLabel }}</small></article>
-        <article><span>Consecutive complete history</span><strong>{{ count($forecastSource['consecutive']) }} / {{ $forecastEvaluation['required_months'] }}</strong><small>Verified months available / minimum required</small></article>
-        <article><span>Excluded synthetic events</span><strong>{{ number_format($forecastSource['excluded_demo_events']) }}</strong><small>Across the 36-month review window</small></article>
-    </div>
     @if($predictedOutMigration !== null)
-        <div class="forecast-result" role="status"><div><span>Estimate for {{ $predictionMonthLabel }}</span>
-            <strong>{{ number_format($predictedOutMigration, 1) }} <small>departure events</small></strong>
-            <p>{{ $predictionMethod }} · {{ $forecastHorizon }}-month horizon from the last completed source month.</p></div></div>
-        <p class="forecast-note">This is a planning estimate, not a confirmed future count or a prediction of which resident will move. The model uses monthly totals only.</p>
+        <div class="forecast-result" role="status"><span>{{ $predictionMonthLabel }}</span>
+            <strong>About {{ number_format(round($predictedOutMigration)) }} <small>{{ $selectedBarangayId ? 'moves out of the barangay' : 'moves out across the barangays' }}</small></strong>
+            <p>Based on {{ count($forecastSource['consecutive']) }} complete monthly reports through {{ $sourceMonthLabel }}.</p>
+        </div>
+        <p class="forecast-note">Use this estimate for planning. The actual number may be different.</p>
+    @elseif(!$forecastSource['storage_ready'])
+        <div class="forecast-unavailable" role="status"><strong>Forecast setup is not ready yet</strong><p>Ask the system administrator to complete the setup.</p></div>
+    @elseif($selectedYear > now()->year)
+        <div class="forecast-unavailable" role="status"><strong>Choose the current year or a past year</strong><p>The system needs completed records to prepare an estimate.</p></div>
+    @elseif(!$selectedBarangayId)
+        <div class="forecast-start" role="status"><strong>Choose a barangay to start</strong><p>Select a barangay above, then choose <b>Show forecast</b>.</p></div>
     @else
-        <div class="forecast-unavailable" role="status"><strong>Insufficient data for a reliable forecast</strong><p>{{ $predictionError }}</p></div>
+        <div class="forecast-unavailable" role="status"><strong>Not enough checked records yet</strong>
+            <p>Wala pa tay igo nga nasusi nga monthly records aron makabanabana.</p>
+            <p><b>{{ count($forecastSource['consecutive']) }}</b> complete months checked. <b>{{ $forecastEvaluation['required_months'] }}</b> consecutive complete months are needed.</p>
+        </div>
+        <a class="button forecast-review-link" href="{{ route('migration.dashboard', ['section' => 'forecast', 'year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'review' => 1]) }}#forecast-records">Review monthly records</a>
+        <p class="forecast-note">Check the actual barangay transfer log before confirming a month.</p>
     @endif
-    @if($forecastHorizon === 2)<p class="forecast-note">The current calendar month is still in progress and is excluded from training. The estimate targets the next calendar month.</p>@endif
-    @if($selectedYear < now()->year)<p class="forecast-note">Historical forecast exercise: source records after {{ $sourceMonthLabel }} are excluded.</p>@endif
-    @if($selectedBarangayId === null)<p class="forecast-note">A municipal forecast requires every configured barangay to confirm the same reporting months. Select one barangay to review its own history.</p>@endif
+    @if($selectedYear < now()->year)<p class="forecast-note">Historical estimate based on records through {{ $sourceMonthLabel }}.</p>@endif
 </section>
 
 @if($predictedOutMigration !== null)
-<section class="dashboard-card migration-forecast-card" aria-labelledby="forecast-evaluation-title">
+<details class="dashboard-card migration-forecast-card forecast-secondary" data-forecast-accuracy>
+    <summary>How close were earlier estimates?</summary>
+    <section class="forecast-details-section" aria-labelledby="forecast-evaluation-title">
     <header class="dashboard-card-header"><div><span class="dashboard-eyebrow">Historical evaluation</span><h2 id="forecast-evaluation-title">Actual versus predicted departures</h2>
         <p>The final three verified months were held out from model selection. Each prediction uses only records available before its target month.</p></div></header>
     <div class="forecast-summary-grid">
@@ -53,15 +60,21 @@
     </tbody></table></div>
     <details class="forecast-method"><summary>How the forecast is evaluated</summary><p>Last-month, three-month moving-average, exponential-smoothing and Holt linear-trend models are compared on earlier rolling validation windows. The chosen method is fixed before the final three test months are evaluated. For each target month, training ends {{ $forecastHorizon }} month(s) earlier. The final estimate is fitted again using all available consecutive verified months. Demo data, unverified months and possible duplicate events are excluded from training. Missing months break the series instead of becoming zeros.</p></details>
 </section>
+</details>
 @endif
 
-<section class="dashboard-card migration-forecast-card" aria-labelledby="forecast-history-title">
+<details id="forecast-records" class="dashboard-card migration-forecast-card forecast-secondary" @if(request()->boolean('review') || session('status') || $errors->any()) open @endif>
+    <summary>Check the records used</summary>
+    <section class="forecast-details-section" aria-labelledby="forecast-history-title">
     <header class="dashboard-card-header"><div><span class="dashboard-eyebrow">Data readiness</span><h2 id="forecast-history-title">Review monthly departure reporting</h2>
         <p>Confirm a month only after checking the barangay transfer log. A confirmed zero means staff verified that there were no departures.</p></div></header>
+    @if($predictionError)<p class="forecast-note">{{ $predictionError }}</p>@endif
+    @if($selectedBarangayId === null)<p class="forecast-note">A municipal forecast requires every configured barangay to confirm the same reporting months. Select one barangay to review its own history.</p>@endif
+    @if($forecastSource['excluded_demo_events'])<p class="forecast-note">{{ number_format($forecastSource['excluded_demo_events']) }} synthetic events are excluded from forecasting.</p>@endif
     @if(!$forecastSource['storage_ready'])<p class="forecast-unavailable">Reporting-period storage is not ready. Ask the administrator to complete the forecast installation.</p>
     @elseif(!$selectedBarangayId)
         <div class="table-wrap"><table><thead><tr><th>Barangay</th><th>Recorded departures</th><th>Verified months</th><th>Consecutive latest months</th><th>Review</th></tr></thead><tbody>
-            @foreach($forecastSource['coverage'] as $area)<tr><td>{{ $area['name'] }}</td><td>{{ $area['events'] }}</td><td>{{ $area['verified_months'] }}</td><td>{{ $area['consecutive_months'] }}</td><td><a href="{{ route('migration.dashboard', ['section' => 'forecast', 'year' => $selectedYear, 'barangay_id' => $area['id']]) }}">Review months</a></td></tr>@endforeach
+            @foreach($forecastSource['coverage'] as $area)<tr><td>{{ $area['name'] }}</td><td>{{ $area['events'] }}</td><td>{{ $area['verified_months'] }}</td><td>{{ $area['consecutive_months'] }}</td><td><a href="{{ route('migration.dashboard', ['section' => 'forecast', 'year' => $selectedYear, 'barangay_id' => $area['id'], 'review' => 1]) }}#forecast-records">Review months</a></td></tr>@endforeach
         </tbody></table></div>
     @else
         <p class="forecast-note">If a departure is added, removed, moved to another month or reassigned to a different resident after verification, that month automatically needs another review. Possible duplicate events must be resolved before verification. Every confirmation and reopening is recorded in Registry Activity History.</p>
@@ -85,3 +98,4 @@
         </tbody></table></div>
     @endif
 </section>
+</details>

@@ -18,7 +18,7 @@
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
                 <h1 id="migration-dashboard-title">Migration Trends</h1>
                 <p>{{ match ($migrationSection) {
-                    'forecast' => 'Review verified reporting months, departure estimates and forecast accuracy.',
+                    'forecast' => 'Choose a barangay to see an estimate of moves out next month.',
                     'events' => 'Review the latest recorded arrivals and departures.',
                     default => 'Compare monthly arrivals and departures for '.$selectedYear.'.',
                 } }}</p>
@@ -46,15 +46,15 @@
             @else
                 <div class="migration-filter-scope"><span>Barangay scope</span><strong>{{ auth()->user()->barangay?->name }}</strong></div>
             @endif
-            <button type="submit"><x-app-icon name="filter" />Apply filters</button>
+            <button type="submit"><x-app-icon name="filter" />{{ $migrationSection === 'forecast' ? 'Show forecast' : 'Apply filters' }}</button>
         </form>
 
         @if ($selectedBarangay && ! auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
             <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} &middot; {{ $selectedYear }}</span><a href="{{ route('migration.dashboard', ['year' => $selectedYear, 'section' => $migrationSection]) }}">Clear barangay filter</a></div>
         @endif
 
-        @if ($demoRecordCount > 0)
-            <p role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">@if($migrationSection === 'forecast')Synthetic migration events are excluded from forecast training and evaluation.@else Demo data included: {{ $demoRecordCount }} synthetic migration events. Remove demo data before using official reports.@endif</p>
+        @if ($demoRecordCount > 0 && $migrationSection !== 'forecast')
+            <p role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">Demo data included: {{ $demoRecordCount }} synthetic migration events. Remove demo data before using official reports.</p>
         @endif
 
         @if ($migrationSection === 'trends')
