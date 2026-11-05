@@ -201,6 +201,6 @@ class AssistantKnowledgeBase
                 18 => 'concerns.create', 19 => 'concerns.index', default => null,
             };
         } else { $route = null; }
-        return $route ? [['label' => AssistantLanguage::text('Open relevant page'), 'url' => route($route)]] : [];
+        return $route ? [['label' => AssistantLanguage::text('Open relevant page'), 'url' => route($route, $id === 46 ? ['section' => 'forecast'] : [])]] : [];
     }
 }

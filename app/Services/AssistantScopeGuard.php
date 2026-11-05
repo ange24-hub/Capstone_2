@@ -28,7 +28,7 @@ class AssistantScopeGuard
         // Do not mistake "types of documents" or "in the system" for place names.
         if (app(AssistantKnowledgeBase::class)->questionId($question) !== null) return null;
 
-        $records = preg_match('/\b(?:population|populasyon|residents?|inhabitants?|people|tawo|nagpuyo|famil(?:y|ies)|pamilya|households?|panimalay|balay|males?|females?|lalaki|babaye|seniors?|pwd|children|adults?|ages?|edad|migration|migrasyon|pagbalhin|balhin|movements?|approvals?|accounts?|registrations?|rbi|forms?|documents?|requests?|payment|papeles)\b/iu', $question);
+        $records = preg_match('/\b(?:population|populasyon|residents?|inhabitants?|people|tawo|nagpuyo|famil(?:y|ies)|pamilya|households?|panimalay|balay|males?|females?|lalaki|babaye|seniors?|pwd|children|adults?|ages?|edad|migration|migrasyon|departures?|pagbalhin|balhin|movements?|approvals?|accounts?|registrations?|rbi|forms?|documents?|requests?|payment|papeles)\b/iu', $question);
         if (! $records || $guidance) return null;
 
         if (preg_match('/\b(?:population|populasyon)\b/iu', $question)
@@ -69,7 +69,7 @@ class AssistantScopeGuard
             && $mentioned->contains(fn ($name) => $name !== $user->barangay?->name)) {
             return $this->answer($user, 'assigned_barangay_only', 'You can only view reports for your assigned barangay.');
         }
-        $report = preg_match('/\b(?:population|populasyon|migration|migrasyon|pagbalhin|balhin|movements?|famil(?:y|ies)|pamilya|households?|residents?|male|female|seniors?|pwd|children|adults?)\b/iu', $question)
+        $report = preg_match('/\b(?:population|populasyon|migration|migrasyon|departures?|pagbalhin|balhin|movements?|famil(?:y|ies)|pamilya|households?|residents?|male|female|seniors?|pwd|children|adults?)\b/iu', $question)
             && ! preg_match('/\b(?:documents?|requests?|approvals?|rbi|forms?|payment)\b/iu', $question);
         if ($user->hasRole(User::ROLE_MUNICIPAL_LGU) && $mentioned->isNotEmpty() && ! $report) {
             return $this->answer($user, 'unsupported_filter', 'That barangay filter is not supported for this chat summary. Use the authorized records page, or ask for a population or migration report for that barangay.', true);

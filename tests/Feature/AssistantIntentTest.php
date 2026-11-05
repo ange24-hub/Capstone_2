@@ -94,7 +94,7 @@ class AssistantIntentTest extends TestCase
         $this->postJson(route('assistant.chat'), ['message' => 'Kumusta ang pagbalhin sa Looc ug Canlupao?'])
             ->assertOk()->assertJsonMissingPath('facts')->assertSee('one barangay per question');
         $this->postJson(route('assistant.chat'), ['message' => 'Kumusta ang pagbalhin sunod tuig?'])
-            ->assertOk()->assertJsonMissingPath('facts')->assertSee('Forecasting is not enabled');
+            ->assertOk()->assertJsonMissingPath('facts')->assertJsonPath('needs_clarification', true)->assertSee('next calendar month');
     }
 
     public function test_ai_document_status_reads_only_the_residents_latest_request(): void

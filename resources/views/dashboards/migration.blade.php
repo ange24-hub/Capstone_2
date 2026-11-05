@@ -2,6 +2,7 @@
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/migration-workspace.css') }}?v={{ filemtime(public_path('css/migration-workspace.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/migration-forecast.css') }}?v={{ filemtime(public_path('css/migration-forecast.css')) }}">
 @endpush
 
 @section('content')
@@ -17,7 +18,7 @@
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
                 <h1 id="migration-dashboard-title">Migration Trends</h1>
                 <p>{{ match ($migrationSection) {
-                    'forecast' => 'Review the exploratory departure estimate and its source months.',
+                    'forecast' => 'Review verified reporting months, departure estimates and forecast accuracy.',
                     'events' => 'Review the latest recorded arrivals and departures.',
                     default => 'Compare monthly arrivals and departures for '.$selectedYear.'.',
                 } }}</p>
@@ -53,7 +54,7 @@
         @endif
 
         @if ($demoRecordCount > 0)
-            <p role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">Demo data included: {{ $demoRecordCount }} synthetic migration events. Remove demo data before using official reports.</p>
+            <p role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">@if($migrationSection === 'forecast')Synthetic migration events are excluded from forecast training and evaluation.@else Demo data included: {{ $demoRecordCount }} synthetic migration events. Remove demo data before using official reports.@endif</p>
         @endif
 
         @if ($migrationSection === 'trends')
@@ -66,142 +67,7 @@
         @endif
 
         @if ($migrationSection === 'forecast')
-        <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6"
-                 aria-labelledby="out-migration-forecast-title">
-
-            <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                <div>
-                    <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-emerald-700">
-                        Predictive Analytics
-                    </span>
-
-                    <h2 id="out-migration-forecast-title">
-                        Out-Migration Forecast
-                    </h2>
-
-                    <p>
-                        Estimate for {{ $predictionMonthLabel }} using completed months through {{ $sourceMonthLabel }}.
-                    </p>
-                </div>
-
-                <span class="section-icon">
-                    <x-app-icon name="trend" />
-                </span>
-            </header>
-
-            <div class="migration-forecast-stats">
-
-                <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <span class="text-sm text-slate-500">
-                        {{ $sourceMonthLabel }}
-                    </span>
-
-                    <strong class="mt-1 block text-2xl text-slate-900">
-                        {{ number_format($currentMonthOut ?? 0) }}
-                    </strong>
-
-                    <small class="text-slate-500">
-                        recorded out-migration
-                    </small>
-                </article>
-
-                <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <span class="text-sm text-slate-500">
-                        {{ $previousMonthLabel }}
-                    </span>
-
-                    <strong class="mt-1 block text-2xl text-slate-900">
-                        {{ number_format($previousMonthOut ?? 0) }}
-                    </strong>
-
-                    <small class="text-slate-500">
-                        recorded out-migration
-                    </small>
-                </article>
-
-                <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <span class="text-sm text-slate-500">
-                        3-Month Average
-                    </span>
-
-                    <strong class="mt-1 block text-2xl text-slate-900">
-                        {{ number_format($threeMonthAverage ?? 0, 2) }}
-                    </strong>
-
-                    <small class="text-slate-500">
-                        average monthly departures
-                    </small>
-                </article>
-
-            </div>
-
-            @if ($predictedOutMigration !== null)
-
-                <div class="migration-estimate mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-
-                    <div class="flex flex-wrap items-center justify-between gap-4">
-
-                        <div>
-                            <span class="text-sm font-semibold uppercase tracking-wider text-emerald-700">
-                                Estimate for {{ $predictionMonthLabel }}
-                            </span>
-
-                            <div class="mt-1 text-3xl font-bold text-emerald-900">
-                                {{ number_format(round($predictedOutMigration)) }}
-                                <span class="text-base font-medium">
-                                    estimated departure events
-                                </span>
-                            </div>
-
-                            <p class="mt-2 text-sm text-emerald-800">
-                                Based on recorded migration events in the selected area.
-                            </p>
-                        </div>
-
-                        <div class="rounded-xl bg-white px-5 py-4 text-center shadow-sm">
-                            <span class="block text-xs uppercase tracking-wider text-slate-500">
-                                Model
-                            </span>
-
-                            <strong class="block text-sm text-slate-900">
-                                {{ $predictionMethod }}
-                            </strong>
-
-                            <span class="block text-xs text-slate-500">
-                                Exploratory estimate
-                            </span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            @else
-
-                <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5">
-
-                    <strong class="text-amber-900">
-                        Prediction currently unavailable.
-                    </strong>
-
-                    <p class="mt-1 text-sm text-amber-800">
-                        {{ $predictionError }}
-                    </p>
-
-                </div>
-
-            @endif
-
-            <p class="migration-forecast-note mt-4 text-xs text-slate-500">
-                @if ($predictionMethod === 'Gradient Boosting prototype')
-                    The prototype model used synthetically assigned training dates.
-                @else
-                    This estimate uses the average of the last three completed months.
-                @endif
-                Months with no recorded events count as zero. Reporting completeness is unverified; this estimate is unvalidated and is not an official forecast.
-            </p>
-
-        </section>
+            @include('dashboards._migration-forecast')
         @endif
 
         @if ($migrationSection === 'trends')

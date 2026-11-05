@@ -2,6 +2,8 @@
 
 ## Running RBIM locally
 
+For **verified out-migration forecasting**, see [completeness checks, model evaluation and deployment](docs/migration-forecasting.md). The Forecast page runs on the existing PHP host and requires staff-confirmed historical reporting periods.
+
 For **Hostinger VPS + Dokploy**, follow the [Docker deployment guide](docs/dokploy-deployment.md). The root `Dockerfile` and `docker-compose.yml` build the production Laravel app and run it with persistent MySQL and upload storage. Configure Dokploy using `.env.dokploy.example` and route the domain to service `app`, port `80`.
 
 For deployment, follow [the cPanel installation guide](docs/cpanel-deployment.md). Use `.env.production.example` for the server configuration and `php artisan sbispgm:deployment-check` to check release prerequisites without exposing credentials. Run `powershell.exe -NoProfile -File scripts/test-system.ps1` for isolated PHP, offline JavaScript, local prediction tests, and a production frontend build.

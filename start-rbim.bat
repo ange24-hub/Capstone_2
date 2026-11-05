@@ -36,15 +36,13 @@ if errorlevel 1 (
 
 if /I "%~1"=="--check" (
     echo Database ready.
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\start-migration-prediction.ps1" -CheckOnly
+    php artisan migration:forecast-audit
     if errorlevel 1 exit /b 1
     exit /b 0
 )
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\start-migration-prediction.ps1"
-if errorlevel 1 (
-    echo Prediction model unavailable. Migration estimates will use the 3-month average when recent records exist.
-)
+php artisan migration:prepare-forecast-storage
+if errorlevel 1 exit /b 1
 
 echo Database ready. Starting RBIM at http://127.0.0.1:8000 ...
 php artisan serve --host=127.0.0.1 --port=8000

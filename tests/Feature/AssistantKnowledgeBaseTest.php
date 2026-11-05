@@ -63,7 +63,7 @@ class AssistantKnowledgeBaseTest extends TestCase
     {
         $user = $this->user(User::ROLE_MUNICIPAL_LGU);
         foreach ([15 => ['13-digit', 'PDF is not accepted'], 26 => ['current database snapshot', 'cannot reconstruct historical'],
-            42 => ['does not implement a dedicated senior/PWD household filter'], 46 => ['three-month moving average', 'separate from chatbot Ollama'],
+            42 => ['does not implement a dedicated senior/PWD household filter'], 46 => ['14 consecutive verified months', 'held-out months', 'separate from chatbot Ollama'],
             47 => ['does not identify which resident'], 51 => ['does not continuously track'],
             52 => ['cannot edit official migration records'], 53 => ['does not submit PSA']] as $id => $phrases) {
             $response = $this->actingAs($user)->postJson(route('assistant.chat'), ['message' => AssistantKnowledgeBase::entries()[$id][0]])->assertOk();

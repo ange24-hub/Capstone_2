@@ -43,6 +43,7 @@ class AssistantController extends Controller
                     ?? app(\App\Services\AssistantHazardSummary::class)->respond($request->user(), $question)
                     ?? app(\App\Services\AssistantPopulationNames::class)->respond($request->user(), $question)
                     ?? app(\App\Services\AssistantKnowledgeBase::class)->respond($request->user(), $question)
+                    ?? app(\App\Services\AssistantReportSummary::class)->respondForecast($request->user(), $question)
                     ?? app(\App\Services\AssistantKnowledgeBase::class)->clarifyWorkflow($request->user(), $question)
                     ?? $followUp->clarification($question, $validated['previous_question'] ?? null);
                 if ($answer === null) {
@@ -52,7 +53,8 @@ class AssistantController extends Controller
                     if (config('assistant_ai.enabled') && $interpretation === null) {
                         $answer['notice'] = AssistantLanguage::text('AI question understanding is temporarily unavailable. Using the built-in assistant; try a suggested question if needed.');
                     }
-                    if (($answer['needs_clarification'] ?? false) && config('assistant_ai.enabled')) {
+                    if (($answer['needs_clarification'] ?? false) && config('assistant_ai.enabled')
+                        && ($answer['mode'] ?? null) !== 'system_guidance') {
                         $answer = array_replace($answer, $interpreter->clarification($request->user()));
                     }
                 }

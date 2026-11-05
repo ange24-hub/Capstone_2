@@ -9,10 +9,22 @@ class AssistantReportSummary
 {
     public function __construct(private PopulationSummary $population, private MigrationSummary $migration) {}
 
+    public function respondForecast(User $user, string $question): ?array
+    {
+        if (! preg_match('/\b(?:migration|migrasyon|departures?|pagbalhin|balhin)\b/iu', $question)
+            || ! preg_match('/\b(?:forecast|predict|prediction|estimate|next month|sunod bulan)\b/iu', $question)) return null;
+        if (app(AssistantKnowledgeBase::class)->isWorkflowQuestion($question)) return null;
+        if (! $user->hasAnyRole([User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU]) || ! $user->isApproved()
+            || ($user->hasRole(User::ROLE_BARANGAY) && ! $user->barangay_id)) {
+            return $this->answer(AssistantLanguage::text('An approved barangay account with an assigned barangay is required to read reports.'));
+        }
+        return $this->respond($user, $question);
+    }
+
     public function respond(User $user, string $question): ?array
     {
         if (! $user->hasAnyRole([User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU])) return null;
-        $migration = preg_match('/\\b(migration|migrasyon|movement|moved (in|out)|nibalhin|nangbalhin|balhin|trend)\\b/iu', $question);
+        $migration = preg_match('/\\b(migration|migrasyon|departures?|movement|moved (in|out)|nibalhin|nangbalhin|balhin|trend)\\b/iu', $question);
         $population = preg_match('/\\b(population|populasyon|famil(?:y|ies)|pamilya|households?|panimalay|balay|pwd|seniors?|tigulang|sc|male|female|lalaki|lalake|babaye|edad|ages?|bata|children|adults?|inhabitants?|residente|tawo|resident count)\\b/iu', $question);
         if (! $migration && ! $population) return null;
         if ($user->hasRole(User::ROLE_BARANGAY) && (! $user->isApproved() || ! $user->barangay_id)) {
@@ -55,7 +67,33 @@ class AssistantReportSummary
             return $this->answer(AssistantLanguage::text('Population reports are current database snapshots. Historical population totals are not available from these records.'));
         }
         if ($migration && preg_match('/\\b(forecast|predict|prediction|seasonal|next year)\\b/iu', $question)) {
-            return $this->answer(AssistantLanguage::text('Forecasting is not enabled. Recorded migration events alone do not establish reliable future or seasonal trends.'));
+            $ceb = app()->getLocale() === 'ceb';
+            $url = route('migration.dashboard', array_filter(['section' => 'forecast', 'barangay_id' => $areaId]));
+            if (preg_match('/\b(?:19|20)\d{2}\b|\b(?:seasonal|next year|monthly|by month|most|highest|peak|pinakadaghan|in[ -]migration|arrivals?|january|february|march|april|may|june|july|august|september|october|november|december)\b/iu', $question)) {
+                return ['reply' => $ceb ? 'Ang forecast sa chat para sa sunod nga calendar month. Ablihi ang Forecast tab aron susihon ang historical reporting year; dili suportado dinhi ang ubang forecast horizons o seasonal claims.'
+                    : 'Chat forecasts cover out-migration for the next calendar month. Open the Forecast tab to review a historical reporting year; arrival forecasts, other horizons and seasonal claims are not supported here.',
+                    'mode' => 'system_guidance', 'needs_clarification' => true, 'scope' => AssistantLanguage::text('RBIM system only'),
+                    'actions' => [['label' => AssistantLanguage::text('Open relevant page'), 'url' => $url]], 'suggestions' => []];
+            }
+            $report = app(MigrationForecastReport::class)->build($areaId);
+            $evaluation = $report['forecastEvaluation'];
+            $scope = $areaId ? 'Barangay '.Barangay::findOrFail($areaId)->name : Barangay::MUNICIPALITY;
+            $facts = ['scope' => $scope, 'forecast_month' => $report['predictionMonthLabel'],
+                'verified_months' => count($report['forecastSource']['consecutive']), 'required_months' => $evaluation['required_months'],
+                'basis' => 'Verified consecutive departure counts; chronological model selection and held-out evaluation. Not a confirmed future count.'];
+            if ($report['predictedOutMigration'] === null) {
+                $reply = $ceb ? 'Dili pa makahatag og forecast nga adunay igo nga verified history para sa '.$scope.'. Kinahanglan ang '.$evaluation['required_months'].' ka sunod-sunod nga kompleto nga reporting months hangtod '.$report['sourceMonthLabel'].'. Ablihi ang Forecast tab aron i-review ang actual records ug kumpirmahon ang completeness. Dili gamiton ang demo data o wala ma-verify nga zero months.'
+                    : 'Insufficient verified history for '.$scope.'. At least '.$evaluation['required_months'].' consecutive complete reporting months through '.$report['sourceMonthLabel'].' are required. Open the Forecast tab to review actual records and confirm completeness. Demo data and unverified zero months are not used.';
+            } else {
+                $facts += ['predicted_departures' => round($report['predictedOutMigration'], 2), 'method' => $report['predictionMethod'],
+                    'mae' => $evaluation['mae'], 'baseline_mae' => $evaluation['baseline_mae'], 'test_months' => count($evaluation['backtest'])];
+                $reply = ($ceb ? 'Banabana sa departure events para sa ' : 'Estimated departure events for ').$report['predictionMonthLabel'].': '.number_format($report['predictedOutMigration'], 1)
+                    ."\n".($ceb ? 'Pamaagi: ' : 'Method: ').$report['predictionMethod']
+                    ."\n".($ceb ? 'Average absolute error sa 3 ka held-out months: ' : 'Average absolute error on 3 held-out months: ').number_format($evaluation['mae'], 2)
+                    ."\n".($ceb ? 'Base sa verified monthly counts; dili confirmed nga ihap sa umaabot o prediction kon kinsa ang mobalhin.' : 'Based on verified monthly counts; this is not a confirmed future count or a prediction of which resident will move.');
+            }
+            return ['reply' => $reply, 'facts' => $facts, 'mode' => 'database_forecast', 'scope' => AssistantLanguage::text('RBIM system only'),
+                'actions' => [['label' => AssistantLanguage::text('Open relevant page'), 'url' => $url]], 'suggestions' => []];
         }
         if ($migration) {
             $r = $this->migration->build($areaId, $year);

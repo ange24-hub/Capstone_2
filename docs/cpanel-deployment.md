@@ -8,7 +8,7 @@ Use PHP 8.2 or newer with Composer support and the extensions checked by `php ar
 
 Ask the provider about terminal/SSH access, MySQL database limits, request/upload limits, writable private storage, SMTP delivery, and scheduled backups. If terminal access is unavailable, arrange for the provider to run the installation commands. Do not publish a web route or temporary PHP installer to run Artisan commands.
 
-Local Ollama and the Python prediction service require runtimes on the same host. The cPanel environment template disables them. Database assistant responses remain available; migration estimates use the three-month moving average when sufficient source events exist. Predictions remain provisional until validated against verified history. Use a host that supports these runtimes if the defense requires demonstrating the local model online. Do not point loopback endpoints to the development PC or upload resident data to a cloud model.
+Local Ollama requires a supported runtime on the same host; the cPanel environment template disables it. Database assistant responses and verified migration forecasting run in PHP. The Forecast page requires consecutive complete reporting months and displays held-out MAE and actual-versus-predicted counts. The legacy Python synthetic-date prototype is not used by that page. See [forecast installation and evaluation](migration-forecasting.md). Do not point loopback endpoints to the development PC or upload resident data to a cloud model.
 
 ## Prepare the release
 

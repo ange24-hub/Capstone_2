@@ -20,9 +20,14 @@ gosu www-data php artisan config:cache
 gosu www-data php artisan route:cache
 gosu www-data php artisan view:cache
 
-# Schema changes are opt-in. Never seed demo accounts on container startup.
+# General migrations remain opt-in; only this release's additive forecast
+# storage is prepared automatically. Never seed demo accounts on startup.
 if [ "${RUN_MIGRATIONS:-false}" = 'true' ]; then
     gosu www-data php artisan migrate --force --no-interaction
+else
+    # This reviewed release only adds completeness confirmations. No existing
+    # records are rewritten and other pending migrations remain opt-in.
+    gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
 fi
 
 if [ "${1:-}" = 'apache2-foreground' ]; then

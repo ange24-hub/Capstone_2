@@ -3,7 +3,8 @@
 return [
 
     'migration_prediction' => [
-        'enabled' => (bool) env('MIGRATION_PREDICTION_ENABLED', true),
+        // Legacy synthetic-date Python prototype; the verified dashboard uses the native time-series engine.
+        'enabled' => (bool) env('MIGRATION_PREDICTION_ENABLED', false),
         'url' => env('MIGRATION_PREDICTION_URL', 'http://127.0.0.1:5001'),
     ],
 

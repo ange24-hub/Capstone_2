@@ -19,7 +19,8 @@ class AssistantQuestionNormalizer
             'niaging bulana|miaging bulana|miaging buwan|niaging buwan|last mo' => 'last month',
             'karong tuiga|karong tuig' => 'this year',
             'niaging tuig|miaging tuiga' => 'last year',
-            'sunod tuig|sunod nga tuig|sunod bulan|sunod nga bulan|next month' => 'forecast',
+            'sunod tuig|sunod nga tuig' => 'next year',
+            'sunod bulan|sunod nga bulan|next month' => 'forecast',
         ];
         foreach ($aliases as $pattern => $replacement) {
             $question = preg_replace('/(?<![\pL\pN])(?:'.$pattern.')(?![\pL\pN])/iu', $replacement, $question);

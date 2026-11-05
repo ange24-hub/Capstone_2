@@ -135,7 +135,7 @@ On the signed-in map page, select **Show buildings & boundaries** to restore the
 
 If layers still fail, read the message below the map and inspect the failed `/spatial-visualization/layers/...` request in the browser's Network panel. Map layer URLs use the current website's origin so they retain HTTPS and the signed-in session behind the proxy. A 401/403 response requires checking the sign-in and account permissions; a 404/500 response requires checking the deployed release and app logs. A layer URL returning 401 when opened without signing in is expected.
 
-The optional chatbot question interpreter can now use the private Ollama service below. The older report narrator/concern classifier (`LOCAL_AI_ENABLED`) and Python prediction service remain disabled in this stack. Their settings are separate from the chatbot interpreter. The database assistant and moving-average migration fallback remain available without AI.
+The optional chatbot question interpreter can use the private Ollama service below. The older report narrator/concern classifier (`LOCAL_AI_ENABLED`) and legacy Python predictor remain disabled. The database assistant and verified migration forecasting run in the PHP application. Forecasting includes completeness confirmations, held-out MAE and actual-versus-predicted comparisons; see [forecast installation and evaluation](migration-forecasting.md). The reviewed release installs only its additive reporting-period table at startup when general migrations are disabled.
 
 ## Enable the Ollama chatbot on your VPS
 

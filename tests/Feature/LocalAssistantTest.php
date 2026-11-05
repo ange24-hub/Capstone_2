@@ -48,7 +48,8 @@ class LocalAssistantTest extends TestCase
         $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Show Looc migration 2026'])
             ->assertOk()->assertJsonPath('facts.recorded_events', 0)->assertJsonPath('facts.year', 2026);
         $response = $this->postJson(route('assistant.chat'), ['message' => 'Predict migration next year'])->assertOk();
-        $this->assertStringContainsString('Forecasting is not enabled', $response->json('reply'));
+        $this->assertStringContainsString('next calendar month', $response->json('reply'));
+        $response->assertJsonMissingPath('facts')->assertJsonPath('needs_clarification', true);
         Http::assertNothingSent();
     }
 

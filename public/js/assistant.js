@@ -96,6 +96,7 @@
         panel.classList.toggle('is-browsing', open);
     };
     const sourceLabel = data => data.mode === 'database_list' ? wording('Registry names', 'Mga ngalan sa registry')
+        : data.mode === 'database_forecast' ? wording('Migration forecast', 'Banabana sa migration')
         : data.mode === 'database_summary' ? wording('Database summary', 'Summary sa database')
         : data.mode === 'system_guidance' ? wording('System guide', 'Giya sa system') : 'RBIM Assistant';
 

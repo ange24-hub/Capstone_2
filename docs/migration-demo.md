@@ -1,14 +1,14 @@
 # Migration trends and demo data
 
-Open `/migration-monitoring`. The year and barangay filters control recorded trends. Secretaries always see their assigned barangay. Forecast estimates use completed calendar months: the last completed month for the current year, or December for a past year. A past-year estimate is for the following January. Future years and empty recent history do not produce an estimate.
+Open `/migration-monitoring`. The year and barangay filters control recorded trends. Secretaries always see their assigned barangay. **Forecast** now uses explicitly verified, consecutive monthly departure counts and a native time-series engine. Current-year estimates target the next calendar month and require 14 complete months; past-year exercises target the following January and require 12. See [verified forecasting](migration-forecasting.md) for completeness checks, chronological evaluation, MAE and installation.
 
-The local model is optional. If it is offline, returns an error, or supplies an invalid result, the dashboard uses the three-month average of recorded departures, labelled with its method. Neither method is a validated population forecast. No-record months contribute zero recorded events; completeness is unverified.
+The dashboard compares fitted statistical models with a three-month moving-average benchmark. It does not use the bundled synthetic-date Python prototype. Unverified no-record months are unknown, not zero training observations. Insufficient verified history produces no forecast. The assistant uses the same scoped forecast and readiness checks.
 
 ## Removable sample records
 
 Run `php artisan migration:demo` locally to add synthetic arrivals and departures for the current month and previous 12 months in every existing barangay. Use `--barangay=ID` to limit creation to one barangay. Each event has a separate clearly named demo resident under `DEMO-MIGRATION-V1`. Data uses the marker `RBIM migration demo v1`. Re-running skips existing demo households. Creation is disabled in production and is never part of normal database seeding.
 
-Demo profiles affect population totals and reports while installed. The migration dashboard displays a demo notice. These are test records, not imported historical evidence or model evaluation data. Do not edit demo profiles into real residents.
+Demo profiles affect population totals and ordinary reports while installed. The migration dashboard displays a demo notice. Forecast training and evaluation explicitly exclude their events. These are test records, not imported historical evidence or model evaluation data. Do not edit demo profiles into real residents.
 
 Before deployment, run:
 
@@ -18,7 +18,9 @@ php artisan migration:demo --remove
 
 This removes tagged migration events and their tagged demo residents and empty demo households. It preserves other migration events and real residents. If staff linked a demo resident to a user, document request, RBI record, new-inhabitant record, or another movement event, cleanup preserves that profile and prints a message for manual review. Removal can be repeated and works in production. It does not reset or truncate the database.
 
-## Optional Python model
+## Legacy Python prototype
+
+The files below remain available for compatibility checks only. They do not supply the verified Forecast page. Its model fitting and evaluation run in PHP on the existing host; no Python service needs enabling.
 
 From the project root, set up an isolated Python environment once:
 

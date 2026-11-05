@@ -46,6 +46,7 @@ services:
       ASSISTANT_AI_URL: http://ollama:11434
       ASSISTANT_AI_MODEL: ${ASSISTANT_AI_MODEL:-qwen2.5:1.5b}
       ASSISTANT_AI_TIMEOUT: ${ASSISTANT_AI_TIMEOUT:-20}
+      # Verified forecasting runs in PHP. Keep the legacy synthetic-date model disabled.
       MIGRATION_PREDICTION_ENABLED: "false"
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
     expose:

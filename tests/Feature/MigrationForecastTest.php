@@ -17,7 +17,7 @@ class MigrationForecastTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_forecast_uses_completed_months_and_secretary_scope_at_month_end(): void
+    public function test_unverified_counts_preserve_scope_but_do_not_train_at_month_end(): void
     {
         $this->travelTo(now()->setDate(2026, 3, 31));
         $area = Barangay::firstOrFail();
@@ -32,13 +32,12 @@ class MigrationForecastTest extends TestCase
         $this->actingAs($user)->get(route('migration.dashboard', ['barangay_id' => $other->id]))
             ->assertOk()->assertViewHas('currentMonthOut', 2)
             ->assertViewHas('previousMonthOut', 1)
-            ->assertViewHas('predictionMonthLabel', 'March 2026')
-            ->assertViewHas('predictedOutMigration', 4.2);
-        Http::assertSent(fn ($request) => $request['month'] === 2 && $request['year'] === 2026
-            && $request['out_migration_count'] === 2 && $request['out_3month_avg'] == 1);
+            ->assertViewHas('predictionMonthLabel', 'April 2026')
+            ->assertViewHas('predictedOutMigration', null);
+        Http::assertNothingSent();
     }
 
-    public function test_historical_year_falls_back_and_empty_or_future_history_does_not_call_model(): void
+    public function test_historical_unverified_empty_or_future_history_does_not_call_a_model(): void
     {
         $this->travelTo(now()->setDate(2026, 9, 23));
         $area = Barangay::firstOrFail();
@@ -49,8 +48,8 @@ class MigrationForecastTest extends TestCase
         $this->event($person, '2025-11-01');
         Http::fake(fn () => throw new ConnectionException('offline'));
         $this->actingAs($user)->get(route('migration.dashboard', ['year' => 2025]))
-            ->assertOk()->assertViewHas('predictedOutMigration', 1.0)
-            ->assertViewHas('predictionMethod', '3-month moving average')
+            ->assertOk()->assertViewHas('predictedOutMigration', null)
+            ->assertViewHas('predictionMethod', null)
             ->assertViewHas('predictionMonthLabel', 'January 2026');
         Http::fake();
         foreach ([2024, 2027] as $year) {
@@ -62,6 +61,7 @@ class MigrationForecastTest extends TestCase
 
     public function test_invalid_model_responses_are_unavailable_and_negative_predictions_are_clamped(): void
     {
+        config(['services.migration_prediction.enabled' => true]);
         $features = ['out_migration_count' => 1, 'previous_month_out' => 1, 'out_3month_avg' => 1, 'year' => 2026, 'month' => 8];
         Http::fake(['*' => Http::sequence()->push([])
             ->push(['predicted_next_month_out_migration' => 'invalid'])
