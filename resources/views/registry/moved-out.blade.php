@@ -25,7 +25,10 @@
         </div>
         <form method="POST" action="{{ route('barangay.registry.moved-out.store') }}" class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
             @csrf
-            <label>Resident<select name="inhabitant_id" required><option value="">Select an active resident</option>@foreach($activeResidents as $resident)<option value="{{ $resident->id }}" @selected((string) old('inhabitant_id') === (string) $resident->id)>{{ $resident->fullName() }} — Household {{ $resident->household->household_number }}</option>@endforeach</select></label>
+            <div class="resident-picker" data-resident-picker>
+                <label for="departure-resident">Resident</label>
+                <select id="departure-resident" name="inhabitant_id" required><option value="">Select an active resident</option>@foreach($activeResidents as $resident)<option value="{{ $resident->id }}" @selected((string) old('inhabitant_id') === (string) $resident->id)>{{ $resident->fullName() }} — Household {{ $resident->household->household_number }}</option>@endforeach</select>
+            </div>
             <label>Date moved out<input type="date" name="movement_date" value="{{ old('movement_date') }}" required></label>
             <label>Destination<input name="destination" maxlength="255" value="{{ old('destination') }}"></label>
             <label>Reason<input name="reason" maxlength="1000" value="{{ old('reason') }}"></label>
@@ -54,3 +57,7 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('js/resident-picker.js') }}?v={{ filemtime(public_path('js/resident-picker.js')) }}" defer></script>
+@endpush
