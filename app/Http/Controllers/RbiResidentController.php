@@ -27,7 +27,7 @@ class RbiResidentController extends Controller
     {
         $this->authorizeResident($request, $resident);
         $rules = ['first_name' => ['required', 'string', 'max:255'], 'last_name' => ['required', 'string', 'max:255'],
-            'birth_date' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'], 'recorded_age' => ['nullable', 'integer', 'between:0,150'],
+            'birth_date' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'], 'recorded_age' => ['nullable', new \App\Rules\RecordedAge],
             'sex' => ['required', 'in:Male,Female'], 'record_version' => ['required', 'string']];
         foreach (array_keys(HouseholdRbi::fields()) as $field) {
             $field = $field === 'relationship' ? 'relationship_to_head' : $field;

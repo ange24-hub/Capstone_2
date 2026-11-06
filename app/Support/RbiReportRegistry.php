@@ -107,7 +107,7 @@ class RbiReportRegistry
                     'barangay_id' => $barangay->id, 'household_id' => $household->id,
                     'last_name' => $last, 'first_name' => $first, 'middle_name' => $middle, 'suffix' => $suffix ?: null,
                     'complete_address' => ($row['complete_address'] ?? '') ?: null,
-                    'recorded_age' => filled($row['recorded_age'] ?? null) ? (int) $row['recorded_age'] : null,
+                    'recorded_age' => filled($row['recorded_age'] ?? null) ? (string) $row['recorded_age'] : null,
                     'education_level' => ($row['education_level'] ?? '') ?: null,
                     'religion' => ($row['religion'] ?? '') ?: null,
                     'sex' => $row['sex'], 'birth_date' => $date,

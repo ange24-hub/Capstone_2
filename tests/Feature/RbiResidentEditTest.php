@@ -32,11 +32,13 @@ class RbiResidentEditTest extends TestCase
             $this->assertSame($count, Inhabitant::count());
             $response = $this->put(route('barangay.rbi-residents.update', $resident), [
                 'record_version' => (string) $resident->updated_at, 'first_name' => 'Corrected', 'last_name' => 'Resident', 'sex' => 'Female',
-                'civil_status' => 'Married', 'religion' => 'Roman Catholic', 'education_level' => 'College graduate', 'remarks' => 'Updated remark',
+                'recorded_age' => '2 months old', 'civil_status' => 'Married', 'religion' => 'Roman Catholic', 'education_level' => 'College graduate', 'remarks' => 'Updated remark',
                 'barangay_id' => 999999, 'household_id' => 999999, 'status' => Inhabitant::STATUS_MIGRATED_OUT,
             ])->assertSessionHasNoErrors()->assertRedirect(route('barangay.registry.active', ['search' => 'Resident']));
             $resident->refresh();
             $this->assertSame('Corrected', $resident->first_name);
+            $this->assertSame('2 months old', $resident->recorded_age);
+            $this->get($url)->assertOk()->assertSee('2 months old');
             $this->assertSame('Married', $resident->civil_status);
             $this->assertSame('10.1', $resident->family_number);
             $this->assertSame('Teacher', $resident->occupation);

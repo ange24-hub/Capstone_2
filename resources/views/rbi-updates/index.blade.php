@@ -166,7 +166,7 @@
                         @elseif ($field === 'sex')
                             <select data-row-field="{{ $field }}" required><option value=""></option><option value="Male">Male</option><option value="Female">Female</option></select>
                         @else
-                            <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" @required(in_array($field, $requiredMemberFields, true)) @if($field === 'recorded_age') min="0" max="150" @endif>
+                            <input data-row-field="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : 'text' }}" @required(in_array($field, $requiredMemberFields, true)) @if($field === 'recorded_age') maxlength="30" placeholder="e.g. 25 or 2 months old" @endif>
                         @endif
                     </div>
                 @endforeach

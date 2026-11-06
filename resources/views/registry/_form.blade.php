@@ -116,7 +116,7 @@
         </div>
         <div>
             <label for="recorded_age">Age recorded in RBI</label>
-            <input id="recorded_age" name="recorded_age" type="number" min="0" max="150" value="{{ old('recorded_age', $inhabitant->recorded_age ?? '') }}">
+            <input id="recorded_age" name="recorded_age" type="text" maxlength="30" placeholder="e.g. 25 or 2 months old" value="{{ old('recorded_age', $inhabitant->recorded_age ?? '') }}">
         </div>
         <div>
             <label for="birth_place">Birth place</label>

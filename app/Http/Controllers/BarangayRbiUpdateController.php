@@ -369,7 +369,7 @@ class BarangayRbiUpdateController extends Controller
             'rows.*.middle_name' => ['nullable', 'string', 'max:255'],
             'rows.*.suffix' => ['nullable', 'string', 'max:30'],
             'rows.*.complete_address' => ['nullable', 'string', 'max:255'],
-            'rows.*.recorded_age' => ['nullable', 'integer', 'min:0', 'max:150'],
+            'rows.*.recorded_age' => ['nullable', new \App\Rules\RecordedAge],
             'rows.*.education_level' => ['nullable', 'string', 'max:255'],
             'rows.*.religion' => ['nullable', 'string', 'max:255'],
             'rows.*.remarks' => ['nullable', 'string', 'max:2000'],

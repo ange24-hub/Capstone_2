@@ -19,7 +19,7 @@ class DeceasedInhabitant extends Model
     protected $casts = [
         'birth_date' => 'date',
         'death_date' => 'date',
-        'recorded_age' => 'integer',
+        'recorded_age' => 'string',
     ];
 
     public function barangay(): BelongsTo

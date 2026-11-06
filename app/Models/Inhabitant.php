@@ -52,7 +52,7 @@ class Inhabitant extends Model
 
     protected $casts = [
         'birth_date' => 'date',
-        'recorded_age' => 'integer',
+        'recorded_age' => 'string',
     ];
 
     public static function statusLabels(): array

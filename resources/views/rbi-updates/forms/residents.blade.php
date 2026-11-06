@@ -62,7 +62,7 @@
                                                                 <option value="Female" @selected(($member[$field] ?? '') === 'Female')>Female</option>
                                                             </select>
                                                         @else
-                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" value="{{ $member[$field] ?? '' }}" @required(in_array($field, $requiredMemberFields, true)) @if($field === 'recorded_age') min="0" max="150" @endif>
+                                                            <input name="rows[{{ $currentRowIndex }}][{{ $field }}]" type="{{ $field === 'birth_date' ? 'date' : 'text' }}" value="{{ $member[$field] ?? '' }}" @required(in_array($field, $requiredMemberFields, true)) @if($field === 'recorded_age') maxlength="30" placeholder="e.g. 25 or 2 months old" @endif>
                                                         @endif
                                                     </div>
                                                 @endforeach

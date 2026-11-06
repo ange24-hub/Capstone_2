@@ -20,7 +20,7 @@ class NewInhabitant extends Model
     protected $casts = [
         'birth_date' => 'date',
         'reporting_month' => 'date',
-        'recorded_age' => 'integer',
+        'recorded_age' => 'string',
         'added_to_active_at' => 'datetime',
     ];
 

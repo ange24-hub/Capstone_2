@@ -20,7 +20,7 @@
                     @elseif($field === 'remarks')
                         <textarea id="resident-remarks" name="remarks" rows="3">{{ $value }}</textarea>
                     @else
-                        <input id="resident-{{ $field }}" name="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : ($field === 'recorded_age' ? 'number' : 'text') }}" value="{{ $value }}" @required(in_array($field, ['last_name','first_name'])) @if($field === 'recorded_age') min="0" max="150" @endif>
+                        <input id="resident-{{ $field }}" name="{{ $field }}" type="{{ $field === 'birth_date' ? 'date' : 'text' }}" value="{{ $value }}" @required(in_array($field, ['last_name','first_name'])) @if($field === 'recorded_age') maxlength="30" placeholder="e.g. 25 or 2 months old" @endif>
                     @endif
                 </div>
             @endforeach

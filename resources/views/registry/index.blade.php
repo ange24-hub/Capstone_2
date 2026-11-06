@@ -149,7 +149,7 @@
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="purok" :value="$record->purok" aria-label="Purok" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_place" :value="$record->birth_place" aria-label="Place of birth" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_date" type="date" :value="optional($record->birth_date)->format('Y-m-d')" aria-label="Date of birth" /></td>
-                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" :value="$record->recorded_age" aria-label="Age" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="text" maxlength="30" placeholder="e.g. 25 or 2 months old" :value="$record->recorded_age" aria-label="Age" /></td>
                                     <td><select form="{{ $rowForm }}" name="sex" aria-label="Sex"><option value="Male" @selected($record->sex === 'Male')>M</option><option value="Female" @selected($record->sex === 'Female')>F</option></select></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="civil_status" :value="$record->civil_status" aria-label="Civil status" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="education_level" :value="$record->education_level" aria-label="Education" /></td>
@@ -184,7 +184,7 @@
                                     <td><input form="{{ $rowForm }}" name="purok" value="{{ $record->purok }}" aria-label="Purok"></td>
                                     <td><input form="{{ $rowForm }}" name="birth_place" value="{{ $record->birth_place }}" aria-label="Place of birth"></td>
                                     <td><input form="{{ $rowForm }}" name="birth_date" type="date" value="{{ optional($record->birth_date)->format('Y-m-d') }}" aria-label="Date of birth"></td>
-                                    <td><input form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" value="{{ $record->recorded_age }}" aria-label="Age"></td>
+                                    <td><input form="{{ $rowForm }}" name="recorded_age" type="text" maxlength="30" placeholder="e.g. 25 or 2 months old" value="{{ $record->recorded_age }}" aria-label="Age"></td>
                                     <td><select form="{{ $rowForm }}" name="sex" aria-label="Sex"><option value="Male" @selected($record->sex === 'Male')>M</option><option value="Female" @selected($record->sex === 'Female')>F</option></select></td>
                                     <td><input form="{{ $rowForm }}" name="civil_status" value="{{ $record->civil_status }}" aria-label="Civil status"></td>
                                     <td><input form="{{ $rowForm }}" name="education_level" value="{{ $record->education_level }}" aria-label="Education"></td>
@@ -248,7 +248,7 @@
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="purok" :value="$inhabitant->household->purok" aria-label="Purok or sitio" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_place" :value="$inhabitant->birth_place" aria-label="Place of birth" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="birth_date" type="date" :value="optional($inhabitant->birth_date)->format('Y-m-d')" aria-label="Date of birth" /></td>
-                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="number" min="0" max="150" :value="$inhabitant->recorded_age" aria-label="Age" /></td>
+                                    <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="recorded_age" type="text" maxlength="30" placeholder="e.g. 25 or 2 months old" :value="$inhabitant->recorded_age" aria-label="Age" /></td>
                                     <td>@if($editThroughRbi)<span class="registry-cell-value">{{ ['Male' => 'M', 'Female' => 'F'][$inhabitant->sex] ?? ($inhabitant->sex ?: 'Not provided') }}</span>@else<select form="{{ $rowForm }}" name="sex" required aria-label="Sex">@if(blank($inhabitant->sex))<option value="" selected>Not provided</option>@endif<option value="Male" @selected($inhabitant->sex === 'Male')>M</option><option value="Female" @selected($inhabitant->sex === 'Female')>F</option></select>@endif</td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="civil_status" :value="$inhabitant->civil_status" aria-label="Civil status" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="education_level" :value="$inhabitant->education_level" aria-label="School level completed" /></td>
