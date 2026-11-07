@@ -25,6 +25,7 @@
         <p><a href="{{ route('rbi-updates.show', $editingReport) }}" target="_blank" rel="noopener">Review saved report</a></p>
         <form method="POST" enctype="multipart/form-data" action="{{ route($certificationAction === 'submit' ? 'barangay.rbi-updates.submit' : 'barangay.rbi-updates.add-to-registry', $editingReport) }}">
             @csrf
+            @if($certificationAction === 'submit' && empty($editingReport->rows) && empty($editingReport->deceased_rows))<label><input type="checkbox" name="confirm_no_activity" value="1" required> I confirm that no new residents or deceased inhabitants were recorded for this reporting month.</label>@endif
             @include('rbi-updates.forms._certification', ['collectSignatures' => true])
             <p class="field-help">BHW / Encoder and Punong Barangay signatures are required. The Barangay Secretary signature is optional.</p>
             <div class="form-actions">

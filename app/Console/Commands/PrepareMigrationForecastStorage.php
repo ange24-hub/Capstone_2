@@ -21,8 +21,12 @@ class PrepareMigrationForecastStorage extends Command
                 '--path' => 'database/migrations/2026_11_05_000000_create_migration_reporting_periods_table.php']);
             if ($result !== self::SUCCESS) return $result;
         }
-        if (Schema::hasColumns('migration_reporting_periods', ['in_count', 'in_source_fingerprint', 'in_verified_by', 'in_verified_at', 'in_notes'])) return self::SUCCESS;
-        return $this->call('migrate', ['--force' => true,
-            '--path' => 'database/migrations/2026_11_05_010000_add_arrival_verification_to_migration_reporting_periods.php']);
+        if (! Schema::hasColumns('migration_reporting_periods', ['in_count', 'in_source_fingerprint', 'in_verified_by', 'in_verified_at', 'in_notes'])) {
+            $result=$this->call('migrate', ['--force'=>true,'--path'=>'database/migrations/2026_11_05_010000_add_arrival_verification_to_migration_reporting_periods.php']);
+            if($result!==self::SUCCESS) return $result;
+        }
+        if (!Schema::hasTable('rbi_arrival_periods')) return $this->call('migrate',['--force'=>true,
+            '--path'=>'database/migrations/2026_11_07_010000_create_rbi_arrival_periods_table.php']);
+        return self::SUCCESS;
     }
 }

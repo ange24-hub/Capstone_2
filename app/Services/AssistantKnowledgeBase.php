@@ -185,7 +185,7 @@ class AssistantKnowledgeBase
                 23 => 'barangay.rbi-updates.deceased', 24, 25 => 'barangay.rbi-updates.history',
                 26, 27 => 'reports.population', 28 => 'barangay.resident-approvals.index',
                 29, 30 => 'barangay.document-requests.index', 31 => 'concerns.index', 44 => 'barangay.registry.moved-out',
-                40, 41, 42, 62, 66 => 'spatial.index', 43, 45, 46, 47 => 'migration.dashboard',
+                40, 41, 42, 62, 66 => 'spatial.index', 43, 45, 47 => 'migration.dashboard', 46 => 'rbi.arrivals.index',
                 56, 57 => 'barangay.registry.moved-out', 59, 60 => 'offline.household', 61 => 'barangay.rbi-updates.history',
                 63 => 'reports.population', default => null,
             };
@@ -201,6 +201,6 @@ class AssistantKnowledgeBase
                 18 => 'concerns.create', 19 => 'concerns.index', default => null,
             };
         } else { $route = null; }
-        return $route ? [['label' => AssistantLanguage::text('Open relevant page'), 'url' => route($route, $id === 46 ? ['section' => 'forecast'] : [])]] : [];
+        return $route ? [['label' => AssistantLanguage::text('Open relevant page'), 'url' => route($route, $id === 46 && $route === 'migration.dashboard' ? ['section' => 'forecast'] : [])]] : [];
     }
 }

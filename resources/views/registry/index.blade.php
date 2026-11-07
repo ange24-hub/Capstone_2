@@ -20,7 +20,7 @@
                     @elseif (request()->routeIs('barangay.registry.deceased'))
                         Maintain the official deceased resident records for Barangay {{ $registryBarangay->name }}.
                     @elseif (request()->routeIs('barangay.registry.active'))
-                        @if($isBiasong) Maintain the resident registry for Barangay Biasong. @else All registered residents of Barangay {{ $registryBarangay->name }}, including those living elsewhere. Moved-out and deceased records are separate. @endif
+                        @if($isBiasong) Maintain the resident registry for Barangay Biasong. @else All registered residents of Barangay {{ $registryBarangay->name }}, including those living elsewhere. Moved-out residents remain registered here. Transferred and deceased records are separate. @endif
                     @elseif (request('source'))
                         Editable records imported from {{ request('source') }}. The information is separated per person and household.
                     @else
@@ -73,7 +73,7 @@
             <div class="workflow-head registry-records-heading flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <h2 class="section-title text-lg font-semibold text-slate-900">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
-                    <p>@if ($editThroughRbi) {{ number_format($inhabitants->total()) }} records found. Click Edit to make corrections in RBI Forms. Saved changes appear here automatically. @elseif ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
+                    <p>@if ($editThroughRbi) {{ number_format($inhabitants->total()) }} records found. Edit resident details or person / household movement in Resident Registry. Saved changes appear here automatically. @elseif ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
                     @if (request('source') && ! $isDedicatedRegistryPage)
                         <div class="rbi-sheet-tabs">
                             <a class="button {{ request('sheet') !== 'deceased' ? '' : 'secondary-button' }}" href="{{ route('registry.index', ['source' => request('source')]) }}">Active Household</a>
@@ -256,7 +256,7 @@
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="occupation" :value="$inhabitant->occupation" aria-label="Occupation" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="remarks" :value="\App\Support\RegistryRemarks::display($inhabitant->remarks)" aria-label="Remarks" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="ethnicity" :value="$inhabitant->ethnicity" aria-label="Ethnicity" /></td>
-                                    @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
+                                    @if($editThroughRbi)<td><a href="{{ route('registry.edit', $inhabitant) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in Resident Registry">Edit</a> <a href="{{ route('registry.movement', $inhabitant) }}">Movement</a></td>@endif
                                     <td class="rbi-row-save" hidden>
                                         <form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">
                                             @csrf
@@ -290,7 +290,7 @@
                                     <td>{{ $inhabitant->household->coordinate() }}</td>
                                     <td><span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $inhabitant->statusLabel() }}</span></td>
                                     <td>{{ $inhabitant->migrationRecords->count() }}</td>
-                                    <td class="row-actions"><a href="{{ route('registry.edit', $inhabitant) }}">Edit</a></td>
+                                    <td class="row-actions"><a href="{{ route('registry.edit', $inhabitant) }}">Edit</a> <a href="{{ route('registry.movement', $inhabitant) }}">Movement</a></td>
                                 </tr>
                             @endforeach
                         </tbody>

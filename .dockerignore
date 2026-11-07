@@ -25,6 +25,8 @@ database/*.sqlite*
 **/.venv
 android-resident
 ml
+output
+resources/forecast-experiments
 tests
 scripts
 docs

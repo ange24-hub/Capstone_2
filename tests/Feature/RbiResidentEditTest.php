@@ -25,7 +25,7 @@ class RbiResidentEditTest extends TestCase
             $resident = $this->resident($name);
             $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $resident->barangay_id]);
             $url = route('barangay.rbi-updates.index', ['edit_resident' => $resident->id]);
-            $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk()->assertSee($url)->assertSee('Action')->assertSee('Click Edit');
+            $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk()->assertSee(route('registry.edit',$resident))->assertSee('Action')->assertSee('Resident Registry');
             $count = Inhabitant::count();
             $household = $resident->household->toArray();
             $this->get($url)->assertOk()->assertSee('Edit registered resident')->assertSee('Existing custom value')->assertSee('Save RBI Changes');

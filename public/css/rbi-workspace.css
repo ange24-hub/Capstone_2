@@ -329,3 +329,10 @@ html.municipal-ui #report-history .rbi-history-workflow .history-submit:hover { 
     #report-history .rbi-history-page-links { width:100%; }
     #report-history .rbi-history-page-links :is(a,span) { flex:1 1 auto; }
 }
+
+@layer portal {
+    #rbi-monthly-form .rbi-entry-classification { margin:14px 0 20px !important; padding:16px !important; border:1px solid #cbd8e6 !important; border-radius:10px !important; background:#f8fafc !important; }
+    #rbi-monthly-form .rbi-entry-classification legend { padding:0 6px !important; font-weight:700 !important; color:#2e4e70 !important; }
+    #rbi-monthly-form [data-arrival-fields][hidden] { display:none !important; }
+    #rbi-monthly-form .member-entry-card:target { scroll-margin-top:100px !important; outline:3px solid #52799b !important; outline-offset:4px !important; }
+}

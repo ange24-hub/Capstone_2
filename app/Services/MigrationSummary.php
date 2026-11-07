@@ -13,30 +13,34 @@ class MigrationSummary
         $barangays = Barangay::when($barangayId, fn ($q) => $q->whereKey($barangayId))
             ->orderBy('name')->get(['id', 'name']);
         $records = MigrationRecord::whereIn('barangay_id', $barangays->modelKeys())
-            ->whereYear('movement_date', $year)->whereIn('type', [MigrationRecord::TYPE_IN, MigrationRecord::TYPE_OUT])
+            ->whereYear('movement_date', $year)->where('type', MigrationRecord::TYPE_OUT)
             ->get(['barangay_id', 'type', 'movement_date']);
+        $arrivals = app(RbiArrivalReview::class)->history($barangayId, \Illuminate\Support\Carbon::create($year, 12, 1), 12);
+        $arrivalMonths = collect($arrivals['rows'])->keyBy('month');
+        $arrivalAreas = collect($arrivals['coverage'])->keyBy('id');
         $byMonth = $records->groupBy(fn ($record) => $record->movement_date->month);
-        $months = collect(range(1, 12))->map(fn ($month) => [
-            'label' => Carbon::create($year, $month, 1)->format('F'),
-            'month' => sprintf('%04d-%02d', $year, $month),
-        ] + $this->counts($byMonth->get($month, collect())));
+        $months = collect(range(1, 12))->map(function ($month) use ($year, $byMonth, $arrivalMonths) {
+            $key = sprintf('%04d-%02d', $year, $month);
+            $in = $arrivalMonths->get($key)['count'] ?? 0;
+            $out = $byMonth->get($month, collect())->count();
+
+            return ['label' => Carbon::create($year, $month, 1)->format('F'), 'month' => $key, 'in' => $in, 'out' => $out, 'net' => $in - $out, 'total' => $in + $out];
+        });
         $byBarangay = $records->groupBy('barangay_id');
-        $coverage = $barangays->map(fn ($barangay) => ['name' => $barangay->name]
-            + $this->counts($byBarangay->get($barangay->id, collect())));
+        $coverage = $barangays->map(function ($barangay) use ($arrivalAreas, $byBarangay) {
+            $in = $arrivalAreas->get($barangay->id)['events'] ?? 0;
+            $out = $byBarangay->get($barangay->id, collect())->count();
+
+            return ['name' => $barangay->name, 'in' => $in, 'out' => $out, 'net' => $in - $out, 'total' => $in + $out];
+        });
+        $in = $months->sum('in');
+        $out = $months->sum('out');
 
         return [
             'year' => $year, 'generatedAt' => now(), 'months' => $months, 'coverage' => $coverage,
             'scopeLabel' => $barangayId ? 'Barangay '.$barangays->firstOrFail()->name : 'Municipality of Tomas Oppus',
             'coveredBarangays' => $coverage->where('total', '>', 0)->count(),
             'totalBarangays' => $barangays->count(),
-        ] + $this->counts($records);
-    }
-
-    private function counts($records): array
-    {
-        $in = $records->where('type', MigrationRecord::TYPE_IN)->count();
-        $out = $records->where('type', MigrationRecord::TYPE_OUT)->count();
-
-        return ['in' => $in, 'out' => $out, 'net' => $in - $out, 'total' => $in + $out];
+        ] + ['in' => $in, 'out' => $out, 'net' => $in - $out, 'total' => $in + $out];
     }
 }

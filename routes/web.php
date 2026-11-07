@@ -1,21 +1,21 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AssistantController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangayDocumentRequestController;
 use App\Http\Controllers\BarangayPaymentSettingsController;
 use App\Http\Controllers\BarangayRbiUpdateController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\DocumentPaymentController;
+use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\MigrationDashboardController;
+use App\Http\Controllers\OfflineHouseholdController;
 use App\Http\Controllers\RegistryController;
 use App\Http\Controllers\ResidentApprovalController;
 use App\Http\Controllers\SecretaryApprovalController;
 use App\Http\Controllers\SpatialVisualizationController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\OfflineHouseholdController;
 
 /*
 |--------------------------------------------------------------------------
@@ -125,6 +125,13 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.history');
 
+    Route::get('/barangay/rbi-arrivals', [\App\Http\Controllers\RbiArrivalPeriodController::class, 'index'])
+        ->middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->name('rbi.arrivals.index');
+    Route::post('/barangay/rbi-arrivals', [\App\Http\Controllers\RbiArrivalPeriodController::class, 'store'])
+        ->middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->name('rbi.arrivals.store');
+    Route::post('/barangay/rbi-arrivals/reopen', [\App\Http\Controllers\RbiArrivalPeriodController::class, 'reopen'])
+        ->middleware('role:'.User::ROLE_BARANGAY.','.User::ROLE_MUNICIPAL_LGU)->name('rbi.arrivals.reopen');
+
     Route::get('/barangay/rbi-updates/deceased-inhabitants', [DashboardController::class, 'barangay'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.deceased');
@@ -132,6 +139,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/barangay/rbi-updates', [BarangayRbiUpdateController::class, 'store'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('barangay.rbi-updates.store');
+    Route::post('/barangay/rbi-updates/zero-activity', [BarangayRbiUpdateController::class, 'storeZeroActivity'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.rbi-updates.zero-activity');
     Route::put('/barangay/rbi-residents/{resident}', [\App\Http\Controllers\RbiResidentController::class, 'update'])
         ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.rbi-residents.update');
 
@@ -280,6 +289,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitant-monthly-reports.pdf');
     Route::post('/registry/new-inhabitant-monthly-reports/{month}/submit', [RegistryController::class, 'submitNewMonthlyReport'])
         ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitant-monthly-reports.submit');
+    Route::post('/registry/report-history/{month}/prepare-arrivals', [RegistryController::class, 'prepareHistoryForArrivals'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.history.prepare-arrivals');
 
     Route::post('/registry/new-inhabitants/{newInhabitant}/add-to-active', [RegistryController::class, 'addNewMemberToActive'])
         ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.new-inhabitants.add-to-active');
@@ -296,6 +307,11 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('registry.edit');
 
+    Route::get('/registry/{inhabitant}/movement', [RegistryController::class, 'movement'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.movement');
+    Route::put('/registry/{inhabitant}/movement', [RegistryController::class, 'updateMovement'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('registry.movement.update');
+
     Route::put('/registry/{inhabitant}', [RegistryController::class, 'update'])
         ->middleware('role:'.User::ROLE_BARANGAY)
         ->name('registry.update');
@@ -308,9 +324,32 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('migration.dashboard');
 
-    Route::get('/migration-monitoring/demo', \App\Http\Controllers\DemoMigrationForecastController::class)
-        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
-        ->name('migration.demo');
+    // Research screens stay local; production exposes only actual-record forecasting.
+    if (app()->environment('local', 'testing')) {
+        Route::get('/migration-monitoring/demo', \App\Http\Controllers\DemoMigrationForecastController::class)
+            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+            ->name('migration.demo');
+
+        Route::get('/migration-monitoring/history-experiment', \App\Http\Controllers\ShortHistoryForecastController::class)
+            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+            ->name('migration.history-experiment');
+
+        Route::get('/municipal/prediction-analytics', \App\Http\Controllers\MunicipalPredictionController::class)
+            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+            ->name('municipal.prediction-analytics');
+    }
+
+    Route::get('/municipal/rbi-report-history', [\App\Http\Controllers\MunicipalPredictionController::class, 'reports'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+        ->name('municipal.rbi-report-history');
+
+    Route::get('/municipal/prediction-analytics/forecast', MigrationDashboardController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+        ->name('municipal.prediction-forecast');
+
+    Route::get('/municipal/prediction-analytics/history/{barangay}', [\App\Http\Controllers\MunicipalPredictionController::class, 'history'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+        ->name('municipal.prediction-history');
 
     Route::post('/migration-monitoring/reporting-periods', [\App\Http\Controllers\MigrationReportingPeriodController::class, 'store'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)

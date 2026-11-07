@@ -154,7 +154,7 @@ class RegistryPrintTest extends TestCase
         Inhabitant::where('household_id', $household->id)->update(['remarks' => $remark]);
         $view = $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk();
         $view->assertSee('<span class="registry-cell-value">'.$name.'</span>', false)
-            ->assertSee('registry-document-table')->assertSee('Edit '.$name.' Example in RBI Forms');
+            ->assertSee('registry-document-table')->assertSee('Edit '.$name.' Example in Resident Registry');
         foreach (['consolidated', 'registered'] as $scope) {
             $sheet = $this->worksheet($this->get(route('barangay.registry.download', ['scope' => $scope]))->assertOk()->getContent());
             $xml = simplexml_load_string($sheet);

@@ -15,12 +15,34 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use ZipArchive;
 
 class BarangayRbiUpdateController extends Controller
 {
+    public function storeZeroActivity(Request $request): RedirectResponse
+    {
+        $data = $request->validate(['reporting_month' => ['required', 'date_format:Y-m'], 'confirmed' => ['required', 'accepted']]);
+        if (\Carbon\Carbon::createFromFormat('!Y-m', $data['reporting_month'])->gt(now()->startOfMonth())) {
+            throw ValidationException::withMessages(['reporting_month' => 'Choose the current month or a completed month.']);
+        }
+        $area = $request->user()->barangay;
+        abort_unless($area, 403);
+        $report = DB::transaction(function () use ($area, $request, $data) {
+            \App\Models\Barangay::whereKey($area->id)->lockForUpdate()->firstOrFail();
+            if (BarangayRbiUpdate::where('barangay_name', $area->name)->whereDate('reporting_month', $data['reporting_month'].'-01')->exists()) {
+                throw ValidationException::withMessages(['reporting_month' => 'A form already exists for this month. Review that form instead; its contents have not been replaced.']);
+            }
+
+            return BarangayRbiUpdate::create(['barangay_user_id' => $request->user()->id, 'barangay_name' => $area->name,
+                'reporting_month' => $data['reporting_month'].'-01', 'rows' => [], 'deceased_rows' => [], 'status' => BarangayRbiUpdate::STATUS_DRAFT]);
+        });
+
+        return redirect()->route('barangay.rbi-updates.certification', [$report, 'action' => 'submit'])
+            ->with('status', 'Zero-activity draft created. Review, sign and submit it before it can supply an arrival count.');
+    }
+
     public function certification(Request $request, BarangayRbiUpdate $rbiUpdate): View
     {
         $this->authorizeBarangayReportOwner($request, $rbiUpdate);
@@ -46,8 +68,10 @@ class BarangayRbiUpdateController extends Controller
             $result = \App\Support\RbiReportRegistry::add($barangay, $report);
             $report->update($this->reportSignatureAttributes($request, $report));
             $this->syncRelationalRecords($report, $this->cleanRows($result['rows']), $this->cleanDeceasedRows($report->deceased_rows ?? []));
+
             return $result;
         });
+
         return redirect()->route('barangay.rbi-updates.history')
             ->with('status', $result['created'].' resident(s) added to Consolidated RBI; '.$result['linked'].' already registered. Household links saved.');
     }
@@ -213,13 +237,14 @@ class BarangayRbiUpdateController extends Controller
     public function submit(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
     {
         $this->authorizeBarangayReportOwner($request, $rbiUpdate);
+        \App\Support\RbiEntryClassification::validateRows($rbiUpdate->rows ?? [], $rbiUpdate->reporting_month->format('Y-m'));
         app(\App\Services\RbiDuplicateEntries::class)->validate(
             $rbiUpdate->rows ?? [], $rbiUpdate->deceased_rows ?? [], $this->assignedBarangayName($request),
             $rbiUpdate->reporting_month->format('Y-m'), $rbiUpdate->id
         );
 
-        if (empty($this->cleanRows($rbiUpdate->rows ?? [])) && empty($this->cleanDeceasedRows($rbiUpdate->deceased_rows ?? []))) {
-            return back()->withErrors(['rows' => 'Add at least one family member or deceased inhabitant before submitting to Municipal LGU.']);
+        if (empty($this->cleanRows($rbiUpdate->rows ?? [])) && empty($this->cleanDeceasedRows($rbiUpdate->deceased_rows ?? [])) && ! $request->boolean('confirm_no_activity')) {
+            return back()->withErrors(['rows' => 'Add at least one family member or deceased inhabitant, or explicitly confirm this is a zero-activity monthly report.']);
         }
 
         $rbiUpdate->update($this->reportSignatureAttributes($request, $rbiUpdate) + [
@@ -347,6 +372,7 @@ class BarangayRbiUpdateController extends Controller
         $section = $validated['form_section'] ?? null;
         $rows = $this->cleanRows($section === 'deceased' ? ($report?->rows ?? []) : ($validated['rows'] ?? []));
         $this->ensureHouseholdHeads($rows);
+        \App\Support\RbiEntryClassification::validateRows($rows, $validated['reporting_month']);
         // A subpage owns only its own rows; omitted entries on the other page must survive.
         $deceasedRows = $section === 'residents'
             ? $this->cleanDeceasedRows($report?->deceased_rows ?? [])
@@ -363,6 +389,7 @@ class BarangayRbiUpdateController extends Controller
             'as_of_date' => ['nullable', 'date'],
             'prepared_by' => ['nullable', 'string', 'max:255'],
             'attested_by' => ['nullable', 'string', 'max:255'],
+            'rows.*.history_record_id' => ['nullable', 'integer', Rule::exists('new_inhabitants', 'id')->where('barangay_id', request()->user()?->barangay_id)],
             'rows.*.household_number' => ['nullable', 'string', 'max:100'],
             'rows.*.last_name' => ['nullable', 'string', 'max:255'],
             'rows.*.first_name' => ['nullable', 'string', 'max:255'],
@@ -373,6 +400,11 @@ class BarangayRbiUpdateController extends Controller
             'rows.*.education_level' => ['nullable', 'string', 'max:255'],
             'rows.*.religion' => ['nullable', 'string', 'max:255'],
             'rows.*.remarks' => ['nullable', 'string', 'max:2000'],
+            'rows.*.entry_type' => ['nullable', Rule::in(array_keys(\App\Support\RbiEntryClassification::labels()))],
+            'rows.*.previous_residence' => ['nullable', 'string', 'max:255'],
+            'rows.*.previous_residence_unknown' => ['nullable', 'boolean'],
+            'rows.*.arrival_date' => ['nullable', 'date_format:Y-m-d'],
+            'rows.*.arrival_month' => ['nullable', 'date_format:Y-m'],
             'certified_by' => ['nullable', 'string', 'max:255'],
             'rows' => ['nullable', 'array'],
             'rows.*.household_head' => ['nullable', 'string', 'max:255'],
@@ -432,6 +464,7 @@ class BarangayRbiUpdateController extends Controller
         if (! $attributes['attested_by']) {
             $attributes['attested_by'] = $request->user()->barangay?->punong_barangay_name;
         }
+
         return $attributes;
     }
 
@@ -449,6 +482,7 @@ class BarangayRbiUpdateController extends Controller
             if (! $info || ! in_array($info['mime'], ['image/png', 'image/jpeg'], true) || strlen($bytes) > 2 * 1024 * 1024) {
                 throw ValidationException::withMessages([$type.'_signature_upload' => 'Upload a valid PNG or JPG signature image no larger than 2 MB.']);
             }
+
             return [$bytes, $info['mime'] === 'image/png' ? 'png' : 'jpg'];
         }
         if ($dataUrl === '') {
@@ -478,6 +512,7 @@ class BarangayRbiUpdateController extends Controller
         if (! Storage::put($path, $bytes)) {
             throw ValidationException::withMessages([$type.'_signature_data' => 'The signature could not be saved. Please try again.']);
         }
+
         return $path;
     }
 
@@ -849,7 +884,7 @@ class BarangayRbiUpdateController extends Controller
 
     private function wordDocumentXml(BarangayRbiUpdate $rbiUpdate, array $signatureMedia): string
     {
-        $mainWidths = array_map(fn($width) => $width * 135, \App\Support\HouseholdRbi::widths());
+        $mainWidths = array_map(fn ($width) => $width * 135, \App\Support\HouseholdRbi::widths());
         $month = strtoupper(optional($rbiUpdate->reporting_month)->format('F Y') ?: 'NOT SET');
         $barangay = $rbiUpdate->barangay_name ?: '____________';
         $pages = collect($this->pdfPages($rbiUpdate));
@@ -909,7 +944,7 @@ class BarangayRbiUpdateController extends Controller
                     : '';
 
                 return $this->wordDocumentHeader($barangay, $page['household_number'] ?? '', $rbiUpdate->accomplishedDate()->format('m/d/Y'))
-                    . $this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 22)
+                    .$this->wordParagraph('Household head: '.$page['household_head'].'    For the month of '.$month.($page['continued'] ? ' — CONTINUED' : ''), false, false, 22)
                     .$this->wordTable($mainTableRows, $mainWidths)
                     .$this->wordParagraph('', false, false, 4)
                     .$this->wordTable($deceasedTableRows, [5679, 4900])
@@ -948,7 +983,10 @@ class BarangayRbiUpdateController extends Controller
             }
         }
         $rows = '';
-        foreach ($signatureRows as $index => $cells) $rows .= '<w:tr><w:trPr><w:cantSplit/>'.($index === 1 ? '<w:trHeight w:val="1000" w:hRule="atLeast"/>' : '').'</w:trPr>'.$cells.'</w:tr>';
+        foreach ($signatureRows as $index => $cells) {
+            $rows .= '<w:tr><w:trPr><w:cantSplit/>'.($index === 1 ? '<w:trHeight w:val="1000" w:hRule="atLeast"/>' : '').'</w:trPr>'.$cells.'</w:tr>';
+        }
+
         return '<w:tbl><w:tblPr><w:tblW w:w="13500" w:type="dxa"/><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid>'.$rows.'</w:tbl>';
     }
 
@@ -974,8 +1012,7 @@ class BarangayRbiUpdateController extends Controller
         int $documentPropertyId,
         int $width = 1800000,
         int $height = 600000
-    ): string
-    {
+    ): string {
         $safeName = $this->xlsxEscape($name);
 
         return '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">
@@ -1045,19 +1082,25 @@ class BarangayRbiUpdateController extends Controller
 
     private function cleanRows(array $rows): array
     {
-        $fields = array_merge(['household_id', 'household_number', 'inhabitant_id', 'inhabitant_name'], array_keys(BarangayRbiUpdate::rowFields()));
+        $fields = array_merge(['household_id', 'household_number', 'inhabitant_id', 'inhabitant_name', 'history_record_id'], array_keys(BarangayRbiUpdate::rowFields()), \App\Support\RbiEntryClassification::fields());
 
         return collect($rows)
             ->map(fn (array $row): array => \App\Support\HouseholdRbi::normalize($row))
             ->map(function (array $row): array {
-                if (! empty($row['household_id'])) $row['household_number'] = \App\Models\Household::whereKey($row['household_id'])->value('household_number') ?? '';
+                if (filter_var($row['previous_residence_unknown'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+                    $row['previous_residence'] = '';
+                }
+                if (! empty($row['household_id'])) {
+                    $row['household_number'] = \App\Models\Household::whereKey($row['household_id'])->value('household_number') ?? '';
+                }
+
                 return $row;
             })
             ->map(fn (array $row): array => collect($fields)
                 ->mapWithKeys(fn (string $field): array => [$field => trim((string) ($row[$field] ?? ''))])
                 ->all())
             ->filter(fn (array $row): bool => collect($row)
-                ->except(['household_id', 'household_number', 'inhabitant_id', 'household_head'])
+                ->except(array_merge(['household_id', 'household_number', 'inhabitant_id', 'household_head', 'history_record_id'], \App\Support\RbiEntryClassification::fields()))
                 ->contains(fn (string $value): bool => $value !== ''))
             ->values()
             ->all();
@@ -1078,8 +1121,7 @@ class BarangayRbiUpdateController extends Controller
         ?string $currentAttestedPath,
         bool $required,
         string $attestedBy
-    ): array
-    {
+    ): array {
         if (! $required) {
             return [$currentPreparedPath, $currentAttestedPath];
         }
@@ -1088,6 +1130,7 @@ class BarangayRbiUpdateController extends Controller
             'attested_signature_path' => $currentAttestedPath,
         ]);
         $this->validateReportSignatures($request, $report, $attestedBy);
+
         return [
             $this->storeSignature($request, 'prepared', $currentPreparedPath),
             $this->storeSignature($request, 'attested', $currentAttestedPath),
@@ -1170,7 +1213,7 @@ class BarangayRbiUpdateController extends Controller
                     $family->members()->create([
                         'inhabitant_id' => $member['inhabitant_id'] ?: null,
                         'inhabitant_name' => $member['inhabitant_name'],
-                        'details' => collect($member)->only(array_keys(\App\Support\HouseholdRbi::fields()))->all(),
+                        'details' => collect($member)->only(array_merge(array_keys(\App\Support\HouseholdRbi::fields()), \App\Support\RbiEntryClassification::fields()))->all(),
                         'sex' => $member['sex'] ?: null,
                         'birth_date' => $member['birth_date'] ?: null,
                         'birth_place' => $member['birth_place'] ?: null,
@@ -1241,7 +1284,7 @@ class BarangayRbiUpdateController extends Controller
                 ->map(fn ($members): array => [
                     'household_head' => (string) ($members->first()['household_head'] ?? ''),
                     'household_number' => $members->first()['household_number'] ?? (\App\Models\Household::find($members->first()['household_id'] ?? null)?->household_number ?? ''),
-                    'members' => $members->map(fn($row) => \App\Support\HouseholdRbi::normalize($row))->values()->all(),
+                    'members' => $members->map(fn ($row) => \App\Support\HouseholdRbi::normalize($row))->values()->all(),
                     'deceased' => [],
                 ])->values()->all();
         }

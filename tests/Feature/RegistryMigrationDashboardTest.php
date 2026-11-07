@@ -16,6 +16,7 @@ use Tests\TestCase;
 class RegistryMigrationDashboardTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\SubmittedArrivalFixture;
 
     public function test_monthly_migration_filters_year_and_barangay_and_includes_empty_months(): void
     {
@@ -38,6 +39,8 @@ class RegistryMigrationDashboardTest extends TestCase
             }
         }
 
+        $this->submittedArrivals($barangay,$secretary,'2026-01',[1,0,0]);
+        $this->submittedArrivals($otherBarangay,$secretary,'2026-01',[1,0,0]);
         $assertMonthly = function ($response): void {
             $response->assertOk()->assertSee('Monthly migration in 2026')
                 ->assertViewHas('totalIn', 1)->assertViewHas('totalOut', 1)
@@ -137,8 +140,8 @@ class RegistryMigrationDashboardTest extends TestCase
             ->get(route('migration.dashboard', ['section' => 'events']))
             ->assertOk()
             ->assertSee('San Isidro')
-            ->assertSee('In-migration')
-            ->assertSee('Maria Santos');
+            ->assertSee('Recent departure records')
+            ->assertDontSee('Maria Santos');
 
         $this->actingAs($municipal)
             ->get(route('spatial.index'))

@@ -54,6 +54,7 @@
                     </div>
                 </div>
                 <div class="rbi-report-downloads" aria-label="Workspace actions">
+                    <a class="rbi-report-button" href="{{ route('rbi.arrivals.index') }}">3-month arrival counts</a>
                     <a class="rbi-report-button rbi-report-pdf" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @if ($editingReport)
                         <a class="rbi-report-button rbi-report-word" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start Another Month</a>
@@ -156,6 +157,7 @@
             <input type="hidden" data-row-field="household_head" data-household-head-hidden>
             <input type="hidden" data-row-field="household_number" data-household-number-hidden><input type="hidden" data-row-field="household_id" data-household-id-hidden>
             <input type="hidden" data-row-field="inhabitant_id">
+            @include('rbi-updates.forms._entry-classification',['entryTemplate'=>true])
             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                 @foreach ($memberFields as $field => $label)
                     <div>
@@ -357,3 +359,7 @@
     </script>
     <script src="{{ asset('js/rbi-duplicates.js') }}?v={{ filemtime(public_path('js/rbi-duplicates.js')) }}" defer></script>
 @endsection
+
+@push('scripts')
+<script type="module" src="{{ asset('js/rbi-entry-classification.js') }}?v={{ filemtime(public_path('js/rbi-entry-classification.js')) }}"></script>
+@endpush

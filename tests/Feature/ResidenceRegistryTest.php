@@ -61,8 +61,8 @@ class ResidenceRegistryTest extends TestCase
         $this->assertStringContainsString('ElsewherePerson', $registered);
         $this->assertStringContainsString('UnknownPerson', $registered);
         $this->assertStringNotContainsString('MovedPerson', $registered);
-        $this->put(route('barangay.residence.update', $away), ['residence_status'=>'living_here'])->assertSessionHasNoErrors();
-        $this->assertSame('Confirmed by barangay staff', $away->fresh()->residence_source);
+         $this->put(route('registry.movement.update', $away), ['action'=>'living_here','scope'=>'person','confirmed'=>1,'versions'=>[$away->id=>app(\App\Services\RegistryMovement::class)->version($away)]])->assertSessionHasNoErrors();
+        $this->assertSame('Confirmed in Resident Registry', $away->fresh()->residence_source);
         $this->get(route('barangay.residence.index'))->assertViewHas('residents', fn ($rows) => $rows->total() === 2);
     }
 

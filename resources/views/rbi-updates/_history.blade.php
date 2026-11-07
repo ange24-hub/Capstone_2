@@ -80,5 +80,6 @@
             @endif
         </section>
 
+        <section class="workflow-card"><h2>Three-month arrival counts</h2><p>Review newly arrived residents from submitted monthly RBI forms. These reviewed counts supply in-migration analytics.</p><a class="button secondary-button" href="{{ route('rbi.arrivals.index') }}">Open 3-month arrival review</a><details><summary>Month with no new or deceased residents?</summary><form method="POST" action="{{ route('barangay.rbi-updates.zero-activity') }}">@csrf<label>Reporting month<input type="month" name="reporting_month" max="{{ now()->format('Y-m') }}" required></label><label><input type="checkbox" name="confirmed" value="1" required> No new or deceased resident entries were recorded this month.</label><button type="submit" class="secondary-button">Create zero-activity draft for signing</button></form></details></section>
         @include('rbi-updates._saved-inhabitants')
         @include('rbi-updates._consolidated-inhabitants')

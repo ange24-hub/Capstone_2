@@ -83,6 +83,17 @@ class Inhabitant extends Model
         return $query->where('status', self::STATUS_ACTIVE)->where('residence_status', self::RESIDENCE_HERE);
     }
 
+    public function scopeMovedOutRecords($query)
+    {
+        return $query->where(fn($q) => $q->where('status', self::STATUS_MIGRATED_OUT)
+            ->orWhere(fn($q) => $q->where('status', self::STATUS_ACTIVE)->where('residence_status', self::RESIDENCE_ELSEWHERE)));
+    }
+
+    public function movementLabel(): string
+    {
+        return $this->status === self::STATUS_MIGRATED_OUT ? 'Transferred' : 'Moved out — still registered';
+    }
+
     public function barangay(): BelongsTo
     {
         return $this->belongsTo(Barangay::class);

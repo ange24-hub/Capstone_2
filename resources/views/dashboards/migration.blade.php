@@ -10,15 +10,17 @@
         $netMovement = $totalIn - $totalOut;
         $selectedBarangay = $barangays->firstWhere('id', (int) $selectedBarangayId);
         $migrationSection = in_array(request('section'), ['forecast', 'events'], true) ? request('section') : 'trends';
+        $isAdminForecast = request()->routeIs('municipal.prediction-forecast');
+        $forecastRoute = $isAdminForecast ? 'municipal.prediction-forecast' : 'migration.dashboard';
     @endphp
 
     <section class="dashboard-page migration-dashboard" aria-labelledby="migration-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
             <x-workspace-heading icon="trend">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
-                <h1 id="migration-dashboard-title">Migration Trends</h1>
+                <h1 id="migration-dashboard-title">{{ $isAdminForecast ? 'Prediction analytics' : 'Migration Trends' }}</h1>
                 <p>{{ match ($migrationSection) {
-                    'forecast' => 'Choose a barangay to see estimated arrivals, departures and net migration next month.',
+                    'forecast' => 'Seasonal estimates from reviewed RBI arrivals and dated Moved Out records.',
                     'events' => 'Review the latest recorded arrivals and departures.',
                     default => 'Compare monthly arrivals and departures for '.$selectedYear.'.',
                 } }}</p>
@@ -26,13 +28,15 @@
         </header>
 
         <nav class="migration-section-nav" aria-label="Migration trends sections">
-            @foreach (['trends' => 'Trends', 'forecast' => 'Forecast', 'events' => 'Recent events'] as $section => $label)
-                <a href="{{ route('migration.dashboard', array_filter(['year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'section' => $section], fn ($value) => $value !== null)) }}" @if($migrationSection === $section) aria-current="page" @endif>{{ $label }}</a>
+            @foreach ((auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? ['trends' => 'Trends', 'forecast' => 'Verified forecast', 'events' => 'Recent events'] : ['trends' => 'Trends', 'events' => 'Recent events']) as $section => $label)
+                <a href="{{ route($isAdminForecast && $section === 'forecast' ? $forecastRoute : 'migration.dashboard', array_filter(['year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'section' => $section], fn ($value) => $value !== null)) }}" @if($migrationSection === $section) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
-            <a href="{{ route('migration.demo') }}">Demo prediction analysis</a>
+            @if(auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
+            <a href="{{ route('municipal.rbi-report-history') }}">RBI report history</a>
+            @endif
         </nav>
 
-        <form class="migration-filters" method="GET" action="{{ route('migration.dashboard') }}" aria-label="Migration filters">
+        <form class="migration-filters" method="GET" action="{{ route($forecastRoute) }}" aria-label="Migration filters">
             <input type="hidden" name="section" value="{{ $migrationSection }}">
             <div class="migration-filter-field">
                 <label for="migration-year">Reporting year</label>
@@ -51,7 +55,7 @@
         </form>
 
         @if ($selectedBarangay && ! auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
-            <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} &middot; {{ $selectedYear }}</span><a href="{{ route('migration.dashboard', ['year' => $selectedYear, 'section' => $migrationSection]) }}">Clear barangay filter</a></div>
+            <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} &middot; {{ $selectedYear }}</span><a href="{{ route($forecastRoute, ['year' => $selectedYear, 'section' => $migrationSection]) }}">Clear barangay filter</a></div>
         @endif
 
         @if ($demoRecordCount > 0 && $migrationSection !== 'forecast')
@@ -61,7 +65,7 @@
         @if ($migrationSection === 'trends')
         <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Migration summary">
             <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Registry population</span><strong>{{ number_format($totalInhabitants) }}</strong><small>Current resident profiles in scope</small></div></article>
-            <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon metric-arrow-in flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="arrow-right" /></span><div><span>Arrivals</span><strong>{{ number_format($totalIn) }}</strong><small>Recorded in-migration</small></div></article>
+            <article class="metric-card metric-success rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon metric-arrow-in flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="arrow-right" /></span><div><span>Arrivals</span><strong>{{ number_format($totalIn) }}</strong><small>Reviewed RBI arrivals</small></div></article>
             <article class="metric-card metric-warning rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="arrow-right" /></span><div><span>Departures</span><strong>{{ number_format($totalOut) }}</strong><small>Recorded out-migration</small></div></article>
             <article class="metric-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md {{ $netMovement < 0 ? 'metric-danger' : 'metric-info' }}"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="activity" /></span><div><span>Net movement</span><strong>{{ $netMovement > 0 ? '+' : '' }}{{ number_format($netMovement) }}</strong><small>Arrivals minus departures</small></div></article>
         </section>
@@ -132,7 +136,7 @@
 
         @if ($migrationSection === 'events')
         <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="recent-events-title">
-            <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Latest activity</span><h2 id="recent-events-title">Recent migration events</h2><p>The 12 most recent movement records in the selected scope.</p></div><span class="count-chip">{{ $records->count() }} shown</span></header>
+            <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Latest activity</span><h2 id="recent-events-title">Recent departure records</h2><p>The 12 most recent dated departures. Arrival counts are reviewed in RBI Forms → 3-month arrival counts.</p></div><span class="count-chip">{{ $records->count() }} shown</span></header>
             @if ($records->isEmpty())
                 <div class="dashboard-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"><span class="empty-icon"><x-app-icon name="inbox" /></span><strong>No migration events</strong><span>New records will appear here.</span></div>
             @else

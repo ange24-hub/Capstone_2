@@ -136,3 +136,4 @@
     .rbi-report-detail .rbi-word-page .rbi-word-page-number { font-size: 9pt !important; }
 }
 }
+@media print { .rbi-entry-summary { display:none !important; } }

@@ -149,22 +149,12 @@
         <div>
             <label for="status">Record status</label>
             <select id="status" name="status" required>
-                @foreach ($statusLabels as $value => $label)
+                @foreach (array_filter($statusLabels, fn($label,$value) => $value !== App\Models\Inhabitant::STATUS_MIGRATED_OUT || ($inhabitant->status ?? null) === $value, ARRAY_FILTER_USE_BOTH) as $value => $label)
                     <option value="{{ $value }}" @selected(old('status', $inhabitant->status ?? App\Models\Inhabitant::STATUS_ACTIVE) === $value)>{{ $label }}</option>
                 @endforeach
             </select>
         </div>
-        @if(($inhabitant->barangay ?? auth()->user()->barangay)?->usesResidenceRegistry())
-        <div>
-            <label for="residence_status">Current residence</label>
-            <select id="residence_status" name="residence_status">
-                <option value="transferred" @selected(old('residence_status') === 'transferred')>Transferred to...</option>
-                @foreach(App\Models\Inhabitant::residenceLabels() as $value=>$label)
-                    <option value="{{ $value }}" @selected(old('residence_status', $inhabitant->residence_status ?? 'unconfirmed') === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
-        @endif
+
     </div>
 
     <label for="complete_address">Complete address</label><input id="complete_address" name="complete_address" value="{{ old('complete_address', $inhabitant->complete_address ?? '') }}">
@@ -172,34 +162,10 @@
     <textarea id="remarks" name="remarks">{{ old('remarks', \App\Support\RegistryRemarks::display($inhabitant->remarks ?? null)) }}</textarea>
     </x-form-section>
 
-    <x-form-section title="Migration information" description="Add a movement event when it applies to this resident.">
-    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
-        <div>
-            <label for="migration_type">Migration event</label>
-            <select id="migration_type" name="migration_type">
-                <option value="">No new event</option>
-                @foreach ($migrationTypes as $value => $label)
-                    <option value="{{ $value }}" @selected(old('migration_type') === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label for="movement_date">Movement date</label>
-            <input id="movement_date" name="movement_date" type="date" value="{{ old('movement_date') }}">
-        </div>
-        <div>
-            <label for="origin">Origin</label>
-            <input id="origin" name="origin" type="text" value="{{ old('origin') }}">
-        </div>
-        <div>
-            <label for="destination">Destination</label>
-            <input id="destination" name="destination" type="text" value="{{ old('destination') }}">
-        </div>
-    </div>
+    @if($isEdit)
+    <div class="workflow-card"><h2>Person / household movement</h2><p>Current status: {{ $inhabitant->statusLabel() }} · {{ $inhabitant->residenceLabel() }}</p><a class="button secondary-button" href="{{ route('registry.movement',$inhabitant) }}">Edit movement in Resident Registry</a></div>
+    @endif
 
-    <label for="reason">Migration reason / notes</label>
-    <textarea id="reason" name="reason">{{ old('reason') }}</textarea>
-    </x-form-section>
 
     <div class="form-actions civic-sticky-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
         <button type="submit">{{ $isEdit ? 'Save Changes' : 'Create Record' }}</button>

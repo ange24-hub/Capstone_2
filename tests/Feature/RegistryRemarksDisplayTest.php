@@ -46,7 +46,7 @@ class RegistryRemarksDisplayTest extends TestCase
             $this->get(route('barangay.residence.index', ['scope' => $scope]))->assertOk()
                 ->assertDontSee('[Source:')->assertViewHas('residents', fn ($rows) => $rows->total() === 1 && $rows->first()->first_name === $name);
         }
-        $this->get(route('barangay.registry.moved-out'))->assertOk()->assertDontSee('[Source:')->assertViewHas('residents', fn ($rows) => $rows->total() === 0);
+        $this->get(route('barangay.registry.moved-out'))->assertOk()->assertDontSee('[Source:')->assertViewHas('residents', fn ($rows) => $rows->total() === 1);
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertSee('HistoricalPerson');
         $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
         $this->get(route('barangay.rbi-updates.index'))->assertOk()->assertSee('Save Residents');

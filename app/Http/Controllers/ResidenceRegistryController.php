@@ -31,33 +31,7 @@ class ResidenceRegistryController extends Controller
     {
         abort_unless($request->user()->barangay_id === $inhabitant->barangay_id, 403);
         abort_unless($request->user()->barangay->usesResidenceRegistry(), 403);
-        $transfer = $request->input('residence_status') === 'transferred';
-        $validated = $request->validate([
-            'residence_status' => ['required', Rule::in([...array_keys(Inhabitant::residenceLabels()), 'transferred'])],
-            'transfer_destination' => [Rule::requiredIf($transfer), 'nullable', 'string', 'max:255'],
-            'transfer_confirmed' => $transfer ? ['required', 'accepted'] : ['nullable'],
-        ]);
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $inhabitant, $validated, $transfer) {
-            $resident = Inhabitant::whereKey($inhabitant->id)->lockForUpdate()->firstOrFail();
-            abort_unless($resident->status === Inhabitant::STATUS_ACTIVE, 422, 'This resident is no longer active. Refresh the list.');
-            $before = $resident->only(['status', 'residence_status']);
-            $resident->residence_status = $transfer ? Inhabitant::RESIDENCE_ELSEWHERE : $validated['residence_status'];
-            if ($transfer) $resident->status = Inhabitant::STATUS_MIGRATED_OUT;
-            $resident->residence_source = 'Confirmed by barangay staff';
-            $resident->save();
-            if ($transfer) \App\Models\MigrationRecord::create([
-                'inhabitant_id' => $resident->id, 'barangay_id' => $resident->barangay_id, 'type' => 'out',
-                'movement_date' => now()->toDateString(), 'destination' => $validated['transfer_destination'], 'recorded_by' => $request->user()->id,
-            ]);
-            $changes = [];
-            foreach ($before as $field => $value) if ($value !== $resident->$field) $changes[$field] = ['before' => $value, 'after' => $resident->$field];
-            if ($changes) \App\Models\RegistryActivity::create([
-                'barangay_id' => $resident->barangay_id, 'user_id' => $request->user()->id, 'inhabitant_id' => $resident->id,
-                'description' => ($transfer ? 'Transferred resident to '.$validated['transfer_destination'].': ' : 'Updated residence: ').$resident->fullName(),
-                'changes' => $changes,
-            ]);
-        });
-        return back()->with('status', $transfer ? 'Resident transferred to Moved Out and removed from Consolidated RBI.' : 'Current residence updated.');
+        return redirect()->route('registry.movement', $inhabitant)->withErrors(['movement'=>'Review and save residence changes in Resident Registry.']);
     }
 
     public function download(Request $request)

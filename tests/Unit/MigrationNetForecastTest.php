@@ -19,7 +19,7 @@ class MigrationNetForecastTest extends TestCase
     {
         $in = $this->evaluation([5, 2, 8], [4, 4, 6], [3, 3, 3], 2.5);
         $out = $this->evaluation([4, 5, 2], [3, 4, 5], [1, 4, 3], 6.5);
-        $net = (new MigrationNetForecast())->combine($in, $out);
+        $net = (new MigrationNetForecast)->combine($in, $out);
         $this->assertTrue($net['ready']);
         $this->assertSame(-4.0, $net['prediction']);
         $this->assertSame([1, -3, 6], array_column($net['backtest'], 'actual'));
@@ -35,11 +35,19 @@ class MigrationNetForecastTest extends TestCase
         $in = $this->evaluation([1, 1, 1], [1, 1, 1], [1, 1, 1], 1);
         foreach (['unready', 'source', 'horizon', 'targets'] as $problem) {
             $out = $in;
-            if ($problem === 'unready') $out = ['ready' => false, 'required_months' => 18, 'available_months' => 0];
-            if ($problem === 'source') $out['source_end'] = '2026-08';
-            if ($problem === 'horizon') $out['horizon'] = 2;
-            if ($problem === 'targets') $out['backtest'][0]['month'] = '2025-07';
-            $net = (new MigrationNetForecast())->combine($in, $out);
+            if ($problem === 'unready') {
+                $out = ['ready' => false, 'required_months' => 18, 'available_months' => 0];
+            }
+            if ($problem === 'source') {
+                $out['source_end'] = '2026-08';
+            }
+            if ($problem === 'horizon') {
+                $out['horizon'] = 2;
+            }
+            if ($problem === 'targets') {
+                $out['backtest'][0]['month'] = '2025-07';
+            }
+            $net = (new MigrationNetForecast)->combine($in, $out);
             $this->assertFalse($net['ready'], $problem);
             $this->assertArrayNotHasKey('prediction', $net);
         }
@@ -49,10 +57,25 @@ class MigrationNetForecastTest extends TestCase
     {
         $in = $this->evaluation([1, 1, 1], [4, 4, 4], [1, 1, 1], 4);
         $out = $this->evaluation([0, 0, 0], [0, 0, 0], [0, 0, 0], 0);
-        $net = (new MigrationNetForecast())->combine($in, $out);
+        $net = (new MigrationNetForecast)->combine($in, $out);
         $this->assertSame(3.0, $net['mae']);
         $this->assertSame(0.0, $net['baseline_mae']);
         $this->assertSame('worse', $net['baseline_comparison']);
         $this->assertFalse($net['beats_baseline']);
+    }
+
+    public function test_ready_components_without_joint_test_history_do_not_invent_net_accuracy(): void
+    {
+        $in = $this->evaluation([1, 1, 1], [1, 1, 1], [1, 1, 1], 2);
+        $out = $in;
+        $out['prediction'] = 5;
+        $out['backtest'] = [];
+        $net = (new MigrationNetForecast)->combine($in, $out);
+        $this->assertTrue($net['ready']);
+        $this->assertSame(-3.0, $net['prediction']);
+        $this->assertSame([], $net['backtest']);
+        $this->assertNull($net['mae']);
+        $this->assertNull($net['baseline_mae']);
+        $this->assertFalse($net['backtest_ready']);
     }
 }

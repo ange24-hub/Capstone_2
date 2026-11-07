@@ -36,7 +36,7 @@ class SanAntonioRegistryTest extends TestCase
             ->assertOk()->assertSee('ElsewherePerson')->assertDontSee('TransferredPerson');
         $this->get(route('barangay.registry.moved-out'))->assertOk()
             ->assertSee('TransferredPerson')
-            ->assertViewHas('residents', fn ($rows) => $rows->total() === 1 && $rows->first()->first_name === 'TransferredPerson');
+            ->assertViewHas('residents', fn ($rows) => $rows->total() === 2 && $rows->contains('first_name','TransferredPerson') && $rows->contains('first_name','ElsewherePerson'));
         $this->get(route('barangay.registry.active'))->assertOk()
             ->assertSee('ElsewherePerson')->assertDontSee('TransferredPerson');
         $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));

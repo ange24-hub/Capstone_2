@@ -48,7 +48,7 @@
             <div><span>Departures</span><strong>{{ number_format($report['out']) }}</strong></div>
             <div><span>Net change</span><strong>{{ $report['net'] > 0 ? '+' : '' }}{{ number_format($report['net']) }}</strong></div>
         </div>
-        <p class="migration-report-caveat">Based on movement dates. Reporting completeness has not been verified.</p>
+        <p class="migration-report-caveat">Arrivals: reviewed 3-month counts from submitted RBI forms. Departures: dated Moved Out records. Unreviewed or missing arrival periods are not confirmed zeros.</p>
     </div>
 
     @include('reports.migration-tables')

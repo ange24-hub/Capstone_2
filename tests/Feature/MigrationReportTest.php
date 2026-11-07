@@ -12,6 +12,7 @@ use Tests\TestCase;
 class MigrationReportTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\SubmittedArrivalFixture;
 
     public function test_report_filters_by_movement_year_and_barangay_and_matches_dashboard(): void
     {
@@ -25,6 +26,8 @@ class MigrationReportTest extends TestCase
             MigrationRecord::create(['inhabitant_id' => $resident->id, 'barangay_id' => $barangay->id, 'type' => $type, 'movement_date' => $date]);
         }
         $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $this->submittedArrivals($area,$staff,'2026-01',[1,0,0]);
+        $this->submittedArrivals($other,$staff,'2026-01',[1,0,0]);
         $params = ['barangay_id' => $area->id, 'year' => 2026];
         $response = $this->actingAs($staff)->get(route('reports.migration', $params))->assertOk()
             ->assertSee('Print Report')->assertSee('Download PDF')->assertSee('No recorded events')

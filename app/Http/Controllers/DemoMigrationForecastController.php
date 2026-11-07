@@ -9,6 +9,7 @@ class DemoMigrationForecastController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        abort_unless($request->user()->isApproved() && $request->user()->hasRole(\App\Models\User::ROLE_MUNICIPAL_LGU), 403);
         $request->validate(['scenario' => ['nullable', 'in:stable,trend,change']]);
         $scenarios = [
             'stable' => ['key' => 'Demo A - stable', 'title' => 'Stable movement', 'description' => 'Small monthly variations around a steady level.'],

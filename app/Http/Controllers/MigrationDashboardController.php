@@ -15,6 +15,10 @@ class MigrationDashboardController extends Controller
 {
     public function __invoke(Request $request, MigrationForecastReport $forecastReport): View
     {
+        if ($request->routeIs('municipal.prediction-forecast')) {
+            $request->merge(['section' => 'forecast']);
+        }
+        abort_if($request->input('section') === 'forecast' && ! $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU), 403, 'Prediction analytics is available to municipal administrators only.');
         $request->validate([
             'year' => ['nullable', 'integer', 'between:1900,9999'],
             'barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
@@ -57,6 +61,7 @@ class MigrationDashboardController extends Controller
             'inhabitant.household',
         ])
             ->whereYear('movement_date', $selectedYear)
+            ->where('type', MigrationRecord::TYPE_OUT)
             ->when(
                 $selectedBarangayId,
                 fn ($query) => $query->where(
@@ -73,27 +78,14 @@ class MigrationDashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $barangayStats = $records
-            ->groupBy('barangay_id')
-            ->map(function ($items) {
-                $in = $items
-                    ->where('type', MigrationRecord::TYPE_IN)
-                    ->count();
+        $arrivalHistory = app(\App\Services\RbiArrivalReview::class)->history($selectedBarangayId, \Illuminate\Support\Carbon::create($selectedYear, 12, 1), 12);
+        $arrivalByMonth = collect($arrivalHistory['rows'])->keyBy('month');
+        $outByArea = $records->groupBy('barangay_id');
+        $barangayStats = collect($arrivalHistory['coverage'])->map(function ($area) use ($outByArea) {
+            $out = $outByArea->get($area['id'], collect())->count();
 
-                $out = $items
-                    ->where('type', MigrationRecord::TYPE_OUT)
-                    ->count();
-
-                return [
-                    'barangay' => $items->first()->barangay,
-                    'in' => $in,
-                    'out' => $out,
-                    'net' => $in - $out,
-                    'total' => $items->count(),
-                ];
-            })
-            ->sortByDesc('total')
-            ->values();
+            return ['barangay' => Barangay::find($area['id']), 'in' => $area['events'], 'out' => $out, 'net' => $area['events'] - $out, 'total' => $area['events'] + $out];
+        })->filter(fn ($row) => $row['total'] > 0)->sortByDesc('total')->values();
 
         /*
         |--------------------------------------------------------------------------
@@ -108,7 +100,7 @@ class MigrationDashboardController extends Controller
         $monthlyTrend = collect(range(1, 12))
             ->map(function (int $month) use (
                 $recordsByMonth,
-                $selectedYear
+                $selectedYear, $arrivalByMonth
             ): array {
                 $items = $recordsByMonth->get(
                     $month,
@@ -121,9 +113,7 @@ class MigrationDashboardController extends Controller
                         $selectedYear,
                         $month
                     ),
-                    'in' => $items
-                        ->where('type', MigrationRecord::TYPE_IN)
-                        ->count(),
+                    'in' => $arrivalByMonth->get(sprintf('%04d-%02d', $selectedYear, $month))['count'] ?? 0,
                     'out' => $items
                         ->where('type', MigrationRecord::TYPE_OUT)
                         ->count(),
@@ -173,9 +163,7 @@ class MigrationDashboardController extends Controller
 
             'totalInhabitants' => $totalInhabitants,
 
-            'totalIn' => $records
-                ->where('type', MigrationRecord::TYPE_IN)
-                ->count(),
+            'totalIn' => array_sum(array_column($arrivalHistory['rows'], 'count')),
 
             'totalOut' => $records
                 ->where('type', MigrationRecord::TYPE_OUT)

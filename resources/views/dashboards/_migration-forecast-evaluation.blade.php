@@ -1,11 +1,14 @@
 <section class="forecast-series-evaluation" aria-labelledby="forecast-{{ $kind }}-title">
     <h3 id="forecast-{{ $kind }}-title">Actual versus predicted {{ $kind === 'net' ? 'net migration' : $kind }}</h3>
     <div class="forecast-summary-grid">
-        <article><span>{{ $kind === 'net' ? 'Net forecast MAE' : 'Selected model MAE' }}</span><strong>{{ number_format($evaluation['mae'], 2) }}</strong><small>Average absolute error in movement events · lower is better</small></article>
-        <article><span>Moving-average baseline MAE</span><strong>{{ number_format($evaluation['baseline_mae'], 2) }}</strong><small>Same target months and forecast horizon</small></article>
-        <article><span>Evaluation coverage</span><strong>{{ count($evaluation['backtest']) }} months</strong><small>{{ $kind === 'net' ? 'Arrival estimate minus departure estimate' : $evaluation['validation_months'].' earlier validation months used for model selection' }}</small></article>
+        <article><span>{{ $kind === 'net' ? 'Net forecast MAE' : 'Seasonal model MAE' }}</span><strong>{{ $evaluation['mae'] === null ? 'Not measured' : number_format($evaluation['mae'], 2) }}</strong><small>Average absolute error in movement events · lower is better</small></article>
+        <article><span>Moving-average baseline MAE</span><strong>{{ $evaluation['baseline_mae'] === null ? 'Not measured' : number_format($evaluation['baseline_mae'], 2) }}</strong><small>Same target months and forecast horizon</small></article>
+        <article><span>Evaluation coverage</span><strong>{{ count($evaluation['backtest']) }} months</strong><small>{{ $kind === 'net' ? 'Arrival estimate minus departure estimate' : 'Fixed seasonal method; no tuning on test actuals' }}</small></article>
     </div>
-    @if($kind !== 'net')<p class="forecast-note">Selected method: {{ $evaluation['method'] }}.</p>@endif
+    @if($kind !== 'net')<p class="forecast-note">Method: {{ $evaluation['method'] }}. Current fit: {{ $evaluation['fit_start'] }}–{{ $evaluation['source_end'] }}. Reference month for the next estimate: {{ $evaluation['reference_month'] }}.</p>@endif
+    @if(!$evaluation['backtest'])
+        <p class="forecast-note" role="status">Held-out error not measured yet. The forecast has enough training history, but separate test history at this horizon is incomplete. This does not mean zero error.</p>
+    @else
     <p class="forecast-note">{{ match($evaluation['baseline_comparison']) { 'better' => 'The forecast had lower error than the moving-average benchmark on these held-out months.', 'equal' => 'The forecast matched the moving-average benchmark on these held-out months.', default => 'The forecast had higher error than the moving-average benchmark on these held-out months. Review the history before relying on the estimate.' } }} These few test months provide a limited accuracy check, not a guarantee of future performance.</p>
     @php
         $evaluationRows = collect($evaluation['backtest']);
@@ -27,4 +30,5 @@
     <div class="table-wrap"><table><caption class="sr-only">Held-out {{ $kind }} forecast evaluation</caption><thead><tr><th>Target month</th><th>Actual</th><th>Predicted</th><th>Baseline</th><th>Absolute error</th></tr></thead><tbody>
         @foreach($evaluationRows as $row)<tr><td>{{ $row['label'] }}</td><td>{{ $row['actual'] }}</td><td>{{ number_format($row['predicted'], 2) }}</td><td>{{ number_format($row['baseline'], 2) }}</td><td>{{ number_format($row['absolute_error'], 2) }}</td></tr>@endforeach
     </tbody></table></div>
+    @endif
 </section>

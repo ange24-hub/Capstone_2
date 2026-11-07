@@ -47,6 +47,12 @@
             </article>
         </div>
 
+        <section class="workflow-card rbi-entry-summary" aria-labelledby="rbi-classification-title">
+            <h2 id="rbi-classification-title">Entry classifications for arrival analysis</h2><p>Only confirmed in-migration entries with an arrival month can supply reviewed arrival counts. Previous residences that were not recorded remain explicitly marked.</p>
+            <div class="table-wrap"><table><thead><tr><th>Resident</th><th>Entry type</th><th>Previous residence</th><th>Confirmed arrival month</th><th>Exact date (if known)</th></tr></thead><tbody>
+                @forelse($rbiUpdate->rows ?? [] as $row)<tr><td>{{ trim(($row['first_name'] ?? '').' '.($row['last_name'] ?? '')) }}</td><td>{{ App\Support\RbiEntryClassification::labels()[$row['entry_type'] ?? ''] ?? 'Not classified — review monthly form' }}</td><td>{{ ($row['entry_type'] ?? '') === 'in_migration' ? (filter_var($row['previous_residence_unknown'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Not recorded — confirmed in-migrant' : (($row['previous_residence'] ?? '') ?: 'Not recorded')) : '—' }}</td><td>{{ ($row['entry_type'] ?? '') === 'in_migration' ? ($row['arrival_month'] ?? substr($row['arrival_date'] ?? '',0,7)) : '—' }}</td><td>{{ ($row['entry_type'] ?? '') === 'in_migration' ? (($row['arrival_date'] ?? '') ?: 'Day not recorded') : '—' }}</td></tr>@empty<tr><td colspan="5">No resident entries.</td></tr>@endforelse
+            </tbody></table></div>
+        </section>
         <section class="rbi-preview-panel" aria-labelledby="rbi-preview-title">
             <div class="rbi-preview-heading"><h2 id="rbi-preview-title"><x-app-icon name="form" />Excel preview</h2><span>.xlsx</span></div>
             @include('rbi-updates._spreadsheet-preview')

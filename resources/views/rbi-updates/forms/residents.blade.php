@@ -1,4 +1,4 @@
-                <form method="POST" action="{{ $editingReport ? route('barangay.rbi-updates.update', $editingReport) : route('barangay.rbi-updates.store') }}" id="rbi-monthly-form" autocomplete="off">
+                <form method="POST" action="{{ $editingReport ? route('barangay.rbi-updates.update', $editingReport) : route('barangay.rbi-updates.store') }}" id="rbi-monthly-form" data-entry-today="{{ now()->format('Y-m-d') }}" autocomplete="off">
                     @csrf
                     <input type="hidden" name="form_section" value="residents">
                     @if ($editingReport) @method('PUT') @endif
@@ -41,14 +41,17 @@
                                 <div class=" grid gap-6" data-family-members>
                                     @foreach (($family['members'] ?: [[]]) as $member)
                                         @php($currentRowIndex = $rowInputIndex++)
-                                        <article class="member-entry-card" data-member-card>
+                                        <article class="member-entry-card" data-member-card @if(!empty($member['history_record_id'])) id="rbi-history-entry-{{ $member['history_record_id'] }}" @endif>
                                             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                                                 <strong data-member-number>Member {{ $loop->iteration }}</strong>
                                                 <button class="secondary-button" type="button" data-remove-member @disabled(count($family['members']) === 1)>Remove Member</button>
                                             </div>
+                                            @if(!empty($member['history_record_id']))<p class="field-help">History entry #{{ $member['history_record_id'] }} · {{ trim(implode(' ', array_filter([$member['first_name'] ?? '', $member['middle_name'] ?? '', $member['last_name'] ?? '', $member['suffix'] ?? '']))) }}</p>@endif
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_head]" value="{{ $family['household_head'] }}" data-household-head-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_number]" value="{{ $family['household_number'] ?? '' }}" data-household-number-hidden><input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
+                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][history_record_id]" value="{{ $member['history_record_id'] ?? '' }}">
+                                            @include('rbi-updates.forms._entry-classification',['entryTemplate'=>false])
                                             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                                 @foreach ($memberFields as $field => $label)
                                                     <div>

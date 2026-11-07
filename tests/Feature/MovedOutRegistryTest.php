@@ -30,7 +30,7 @@ class MovedOutRegistryTest extends TestCase
         $this->actingAs($other)->delete(route('registry.destroy', $resident), ['return_to' => 'moved-out'])->assertForbidden();
         $this->assertDatabaseHas('inhabitants', ['id' => $resident->id]);
         $this->actingAs($staff)->get(route('barangay.registry.moved-out'))->assertOk()
-            ->assertSee('Delete resident')->assertSee('This cannot be undone.')->assertSee('window.confirm', false);
+            ->assertDontSee('Delete resident')->assertSee('Review in Resident Registry');
         $this->delete(route('registry.destroy', $resident), ['return_to' => 'moved-out'])
             ->assertRedirect(route('barangay.registry.moved-out'))->assertSessionHas('status', 'Resident and linked migration records deleted.');
         $this->assertDatabaseMissing('inhabitants', ['id' => $resident->id]);
@@ -83,21 +83,15 @@ class MovedOutRegistryTest extends TestCase
         ]);
         $this->actingAs($secretary)->get(route('barangay.registry.active'))->assertOk()
             ->assertSee(route('barangay.registry.moved-out'));
-        $payload = ['inhabitant_id' => $resident->id, 'movement_date' => '2026-09-01', 'destination' => 'Manila', 'reason' => 'Work'];
-        $this->post(route('barangay.registry.moved-out.store'), $payload)->assertSessionHasNoErrors()
-            ->assertRedirect(route('barangay.registry.moved-out'));
-        $this->assertSame(Inhabitant::STATUS_MIGRATED_OUT, $resident->fresh()->status);
-        $this->assertDatabaseHas('migration_records', ['inhabitant_id' => $resident->id, 'type' => MigrationRecord::TYPE_OUT, 'destination' => 'Manila', 'recorded_by' => $secretary->id]);
-        $this->get(route('barangay.registry.moved-out'))->assertOk()->assertSee('DepartingResident')->assertSee('Manila')->assertSee('Work');
-        $this->get(route('barangay.registry.active'))->assertOk()->assertDontSee('DepartingResident');
-        $this->post(route('barangay.registry.moved-out.store'), $payload)->assertSessionHasErrors('inhabitant_id');
-        $this->assertDatabaseCount('migration_records', 1);
-
-        $other = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => Barangay::where('name', 'Higosoan')->firstOrFail()->id]);
-        $this->actingAs($other)->get(route('barangay.registry.moved-out'))->assertOk()->assertDontSee('DepartingResident');
-        $this->post(route('barangay.registry.moved-out.store'), $payload)->assertNotFound();
-        $this->assertDatabaseCount('migration_records', 1);
-        $this->assertDatabaseCount('inhabitants', 1);
+        $payload=['action'=>'transferred','scope'=>'person','confirmed'=>1,'movement_date'=>'2026-09-01','destination'=>'Manila','reason'=>'Work','versions'=>[$resident->id=>app(\App\Services\RegistryMovement::class)->version($resident)]];
+        $this->put(route('registry.movement.update',$resident),$payload)->assertSessionHasNoErrors()->assertRedirect(route('barangay.registry.active'));
+        $this->assertSame(Inhabitant::STATUS_MIGRATED_OUT,$resident->fresh()->status);
+        $this->get(route('barangay.registry.moved-out'))->assertSee('DepartingResident')->assertSee('Manila')->assertSee('Work');
+        $this->get(route('barangay.registry.active'))->assertDontSee('DepartingResident');
+        $this->put(route('registry.movement.update',$resident),$payload)->assertSessionHasErrors('versions');
+        $other=User::factory()->create(['role'=>'barangay','barangay_id'=>Barangay::where('name','Higosoan')->value('id')]);
+        $this->actingAs($other)->put(route('registry.movement.update',$resident),$payload)->assertForbidden();
+        $this->assertDatabaseCount('migration_records',1);$this->assertDatabaseCount('inhabitants',1);
     }
 
     public function test_departure_requires_a_date_and_a_barangay_staff_account(): void
@@ -113,7 +107,7 @@ class MovedOutRegistryTest extends TestCase
         $this->actingAs($staff)->get(route('barangay.registry.moved-out'))->assertOk()
             ->assertSee('ImportedDeparture')->assertSee('Not recorded')->assertSee('MOVE TO MANILA');
         $this->actingAs($staff)->post(route('barangay.registry.moved-out.store'), ['inhabitant_id' => 1])
-            ->assertSessionHasErrors('movement_date');
+            ->assertRedirect(route('barangay.registry.active'))->assertSessionHasErrors('movement');
         $residentUser = User::factory()->create(['role' => User::ROLE_RESIDENT, 'barangay_id' => $barangay->id]);
         $this->actingAs($residentUser)->get(route('barangay.registry.moved-out'))->assertForbidden();
         $this->post(route('barangay.registry.moved-out.store'), [])->assertForbidden();

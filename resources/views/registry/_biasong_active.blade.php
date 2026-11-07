@@ -33,7 +33,7 @@
         <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="occupation" :value="$inhabitant->occupation" aria-label="Occupation" /></td>
         <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="remarks" :value="\App\Support\RegistryRemarks::display($inhabitant->remarks)" aria-label="Remarks" /></td>
         <td class="resident-row-number">{{ $inhabitants->firstItem() + $loop->index }}</td>
-        @if($editThroughRbi)<td><a href="{{ route('barangay.rbi-updates.index', ['edit_resident' => $inhabitant->id]) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in RBI Forms">Edit</a></td>@endif
+        @if($editThroughRbi)<td><a href="{{ route('registry.edit', $inhabitant) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in Resident Registry">Edit</a> <a href="{{ route('registry.movement', $inhabitant) }}">Movement</a></td>@endif
         <td class="rbi-row-save" hidden><form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">@csrf @method('PUT')<input type="hidden" name="source" value="BIASONG.xlsx"><input type="hidden" name="barangay_id" value="{{ $inhabitant->barangay_id }}"><input type="hidden" name="household_number" value="{{ $inhabitant->household->household_number }}"><input type="hidden" name="address" value="{{ $inhabitant->household->address }}"><input type="hidden" name="status" value="{{ $inhabitant->status }}"></form></td>
     </tr>
 @endforeach
