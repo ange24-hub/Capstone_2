@@ -9,29 +9,29 @@
         --portal-action:#345b82 !important;
         --portal-action-hover:#294c70 !important;
         --portal-accent:#93aec8 !important;
-        --portal-text:#263b50 !important;
-        --portal-muted:#516477 !important;
+        --portal-text:#273444 !important;
+        --portal-muted:#526174 !important;
         --portal-line:#d3dde7 !important;
-        --portal-surface:#f4f7fa !important;
-        --civic-canvas:#f4f7fa !important;
+        --portal-surface:#f5f6f8 !important;
+        --civic-canvas:#f5f6f8 !important;
         --civic-surface:#fff !important;
         --civic-subtle:#edf2f7 !important;
         --civic-primary:#345b82 !important;
         --civic-primary-soft:#e7eef6 !important;
-        --civic-ink:#263b50 !important;
-        --civic-text:#334b62 !important;
-        --civic-muted:#516477 !important;
+        --civic-ink:#273444 !important;
+        --civic-text:#334155 !important;
+        --civic-muted:#526174 !important;
         --civic-border:#d3dde7 !important;
         --to-primary:#345b82 !important;
         --to-accent:#7898b6 !important;
         --to-tint:#edf2f7 !important;
-        --to-canvas:#f4f7fa !important;
+        --to-canvas:#f5f6f8 !important;
         --to-surface:#fff !important;
-        --to-ink:#263b50 !important;
-        --to-muted:#516477 !important;
+        --to-ink:#273444 !important;
+        --to-muted:#526174 !important;
         --to-line:#d3dde7 !important;
     }
-    .municipal-ui :is(.app-main,.app-content,.public-content,.app-footer) { background:#f4f7fa !important; color:#334b62 !important; }
+    .municipal-ui :is(.app-main,.app-content,.public-content,.app-footer) { background:#f5f6f8 !important; color:#334155 !important; }
     .municipal-ui :is(.app-header,.public-site-header) { background:#fff !important; border-color:#d3dde7 !important; }
 
     /* All three roles share the same moderate navy navigation. */
@@ -50,20 +50,40 @@
 
     /* Page headings for records, dashboards, payments, GIS and report screens. */
     .municipal-ui #main-content :is(.dashboard-page-header,.page-head,.government-page-heading,.profile-page-heading,.profile-heading,.municipal-hero,.payment-history-header,.gis-page-header,.rbi-report-header,.population-report-header):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) {
-        background:linear-gradient(115deg,#e4edf6,#f1f5f9) !important;
-        border-color:#cad8e6 !important;
+        background:linear-gradient(115deg,#edf2f7,#fafbfd) !important;
+        border-color:#d6dfe8 !important;
     }
-    .municipal-ui #main-content :is(.dashboard-page-header,.page-head,.government-page-heading,.profile-page-heading,.profile-heading,.municipal-hero,.payment-history-header,.gis-page-header,.rbi-report-header,.population-report-header) :is(h1,h2,p,.dashboard-eyebrow,.page-kicker,.government-eyebrow,.municipal-eyebrow,.profile-eyebrow,.rbi-report-eyebrow,.population-report-eyebrow):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { color:#2e4e70 !important; }
+    .municipal-ui #main-content :is(.dashboard-page-header,.page-head,.government-page-heading,.profile-page-heading,.profile-heading,.municipal-hero,.payment-history-header,.gis-page-header,.rbi-report-header,.population-report-header) :is(h1,h2,.dashboard-eyebrow,.page-kicker,.government-eyebrow,.municipal-eyebrow,.profile-eyebrow,.rbi-report-eyebrow,.population-report-eyebrow):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { color:#2e4e70 !important; }
     .municipal-ui #main-content :is(.dashboard-context-card,.overview-context,.overview-context-date,.directory-summary-metrics,.municipal-latest-received,.profile-account-card) { background:#edf2f7 !important; border-color:#d3dde7 !important; color:#334b62 !important; }
 
     .municipal-ui #main-content :is(.dashboard-card,.workflow-card,.government-content-card,.government-side-card,.government-stat-card,.profile-section,.municipal-directory-card,.municipal-approval-item,.decision-card,.resident-request-card,.payment-history-card,.population-report-section,.gis-map-card,.gis-tool-card,.gis-legend,.gis-physical-profile,.migration-forecast-card,.registry-workspace,.rbi-history-card,.brgy-work-card,.brgy-quick-links,.overview-tools,.auth-panel,.service-card):not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { background:#fff !important; border-color:#d3dde7 !important; }
-    .municipal-ui #main-content :is(.government-card-header,.dashboard-card-header,.profile-section-heading,.registration-section-head,.rbi-history-header,.gis-map-toolbar,.moved-out-card-heading,.population-report-section > h2) { background:#edf2f7 !important; color:#2e4e70 !important; border-color:#d3dde7 !important; }
+    .municipal-ui #main-content :is(.government-card-header,.dashboard-card-header,.profile-section-heading,.registration-section-head,.rbi-history-header,.gis-map-toolbar,.moved-out-card-heading,.population-report-section > h2) { background:#f8fafc !important; color:#273444 !important; border-color:#d3dde7 !important; }
     .municipal-ui #main-content .brgy-work-card > header { background:transparent !important; }
     .municipal-ui #main-content :is(.workspace-heading-emblem,.rbi-report-emblem,.gis-heading-icon,.profile-avatar,.service-icon,.brgy-tool-icon) { background:#e7eef6 !important; border-color:#cad8e6 !important; color:#345b82 !important; }
 
     /* Neutral statistics and launchers use navy; semantic states retain their colors. */
-    .municipal-ui .metric-card:not(.metric-warning,.metric-success,.metric-danger) { --metric-surface:#edf2f7; --metric-border:#cad8e6; --metric-accent:#6789aa; background:#edf2f7 !important; border-color:#cad8e6 !important; border-top-color:#6789aa !important; }
-    .municipal-ui :is(.gis-metric,.rbi-report-metric):not(.rbi-metric-status,.rbi-metric-submitted) { background:#edf2f7 !important; border-color:#cad8e6 !important; border-top-color:#6789aa !important; }
+    .municipal-ui .metric-card:not(.metric-warning,.metric-success,.metric-danger) { --metric-surface:#fff; --metric-border:#d6dfe8; --metric-accent:#52799b; background:#fff !important; border-color:#d6dfe8 !important; border-top-color:#52799b !important; }
+    .municipal-ui :is(.gis-metric,.rbi-report-metric):not(.rbi-metric-status,.rbi-metric-submitted) { background:#fff !important; border-color:#d6dfe8 !important; border-top-color:#52799b !important; }
+    .municipal-ui .metric-card.metric-warning { background:#fffcf5 !important; border-color:#e6d8b7 !important; border-top-color:#ad7d2b !important; }
+    .municipal-ui .metric-card.metric-success { background:#f7fbf9 !important; border-color:#ccdfd5 !important; border-top-color:#477b67 !important; }
+    .municipal-ui .metric-card.metric-danger { background:#fff8f8 !important; border-color:#ebcaca !important; border-top-color:#b83c3c !important; }
+    .municipal-ui .metric-card div > span { color:#334155 !important; }
+    .municipal-ui .metric-card strong { color:#263e58 !important; }
+    .municipal-ui .metric-card small { color:#526174 !important; }
+    .municipal-ui .metric-card .metric-icon { background:#f8fafc !important; border-color:#edf1f5 !important; }
+
+    /* Keep body copy neutral so navy identifies headings and actions. */
+    .municipal-ui #main-content :is(.dashboard-page-header,.page-head,.government-page-heading,.profile-page-heading,.profile-heading,.municipal-hero,.payment-history-header,.gis-page-header,.rbi-report-header,.population-report-header) p:not(:where(.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { color:#526174 !important; }
+    .municipal-ui #main-content .admin-section-heading h2 { color:#273444 !important; }
+    .municipal-ui #main-content .admin-section-heading :is(p,span) { color:#526174 !important; }
+    .municipal-ui #main-content :is(.brgy-work-card,.overview-tools,.brgy-quick-links,.overview-report-history,.brgy-office-summary) { background:#fff !important; border-color:#d6dfe8 !important; }
+    .municipal-ui #main-content :is(.brgy-work-card > header h2,.overview-tools > h2,.brgy-task-copy strong,.brgy-quick-links strong,.brgy-latest-report > strong) { color:#273444 !important; }
+    .municipal-ui #main-content :is(.brgy-task-copy small,.brgy-latest-report > span:not(.civic-status),.brgy-report-counts span) { color:#526174 !important; }
+    .municipal-ui #main-content .brgy-report-counts > div { background:#f8fafc !important; border-color:#e2e8f0 !important; }
+    .municipal-ui #main-content :is(.brgy-report-counts strong,.brgy-task-count) { color:#263e58 !important; }
+    .municipal-ui #main-content :is(.brgy-task-list > a,.brgy-quick-links > a):hover { background:#f1f5f9 !important; }
+    .municipal-ui #main-content :is(.community-analytics,.population-operations) { background:#fff !important; border-color:#d6dfe8 !important; }
+    .municipal-ui #main-content .population-footer { background:#f8fafc !important; color:#526174 !important; border-color:#d6dfe8 !important; }
     .municipal-ui :is(.workspace-launcher,.municipal-shortcuts) > a,
     .municipal-ui :is(.rbi-history-sections,.migration-section-nav,.rbi-subpages) > a,
     .municipal-ui .population-category-link { background:#edf2f7 !important; color:#345b82 !important; border-color:#b6c8da !important; }
@@ -85,7 +105,7 @@
 
     .municipal-ui :is(.app-content,.public-content) :is(button,.button):not(:where(.secondary-button,.outline-button,.danger-button,.password-toggle,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *,.rbi-dropdown *)) { background:#345b82 !important; color:#fff !important; border-color:#345b82 !important; }
     .municipal-ui :is(.app-content,.public-content) :is(button,.button):hover:not(:disabled):not(:where(.secondary-button,.outline-button,.danger-button,.password-toggle,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *,.rbi-dropdown *)) { background:#294c70 !important; border-color:#294c70 !important; }
-    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.password-toggle) { background:#edf2f7 !important; color:#345b82 !important; border-color:#aebfd0 !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.password-toggle) { background:#fff !important; color:#345b82 !important; border-color:#aebfd0 !important; }
     .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.password-toggle):hover { background:#dfe9f3 !important; color:#294c70 !important; }
 
     /* Public account pages and assistant share the same palette. */
