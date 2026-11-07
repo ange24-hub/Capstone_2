@@ -23,6 +23,6 @@
             </p>
         </article>
     @empty
-        <x-empty-state title="No requests yet" description="Your first document request will appear here." icon="document"><a class="button" href="{{ route('resident.document-requests.create') }}">Request a document</a></x-empty-state>
+        <x-empty-state title="No requests yet" description="Choose Request a document above to get started. Your requests will appear here." icon="document" />
     @endforelse
 </section>

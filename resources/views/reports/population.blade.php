@@ -5,7 +5,7 @@
     <header class="population-report-header">
         <div class="population-report-heading">
             <span class="population-report-eyebrow">Registry reports</span>
-            <h1 id="population-report-title">{{ $reportTitle }}</h1>
+            <h1 id="population-report-title"><x-portal-sticker name="users" /> {{ $reportTitle }}</h1>
             @include('reports._jurisdiction')
         </div>
         <div class="population-report-actions">
@@ -34,6 +34,7 @@
                         <a class="population-category-link" href="{{ route('reports.population', array_filter(['barangay_id' => $selectedBarangayId, 'section' => $key])) }}" @if($selectedSection === $key) aria-current="page" @endif>
                             <span class="population-category-icon"><x-app-icon :name="$icon" /></span>
                             <span>{{ $sectionLabels[$key] }}</span>
+                            <span class="population-category-arrow" aria-hidden="true"><x-app-icon name="arrow-right" /></span>
                         </a>
                     @endforeach
                 </div>

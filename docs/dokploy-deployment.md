@@ -77,6 +77,18 @@ Uploads, receipts, signatures, sessions, and file caches live in the `app_storag
 
 The application currently uses synchronous queues and has no scheduled jobs, so this deployment does not require a queue worker or scheduler.
 
+### Password reset email troubleshooting
+
+Run this inside the deployed **app** container to test its active SMTP connection and authentication without sending email or exposing credentials:
+
+```sh
+gosu www-data php artisan sbispgm:mail-check
+```
+
+The local Laragon `.env` does not configure the online container. Update mail variables in the Dokploy service environment and redeploy so Compose passes them into the application and the startup script rebuilds the configuration cache. For Gmail use `MAIL_HOST=smtp.gmail.com`, `MAIL_PORT=587`, `MAIL_ENCRYPTION=tls`, your full Gmail address as `MAIL_USERNAME` and `MAIL_FROM_ADDRESS`, and a Google App Password as `MAIL_PASSWORD`. Never commit this password or paste it into logs or chat.
+
+After the check passes, request a reset using an email registered in the **online** database and check Spam/Junk. The public response intentionally does not disclose whether an account exists or whether delivery succeeded. A failed send is recorded as `Password reset notification could not be delivered.` in the application log without the SMTP transcript. Wait at least one minute before retrying: the password broker also throttles requests. SMTP authentication success alone does not prove inbox delivery.
+
 ## 5. Move an existing installation
 
 For existing records, transfer a reviewed MySQL dump and the matching contents of `storage/app` privately. Keep the source `APP_KEY` and approved document fee values. Put the application in maintenance mode while migrating data and files; do not run the fresh-install seed/admin workflow over an imported installation without reviewing its existing accounts.

@@ -1,0 +1,13 @@
+Use Case Diagram
+
+The figure presents the use case diagram of the developed SB-ISPGM system for the Municipality of Tomas Oppus. It identifies three actors: the Resident, Barangay Secretary, and Municipal DILG User. The rectangle represents the system boundary, the ovals represent the business functions offered by the system, and the solid lines indicate which actors participate in each function. These connections describe user responsibilities and access rather than the sequence of operations.
+
+The Resident interacts with the system to request barangay documents, submit payment evidence, track document request status, and communicate concerns and replies. These functions allow residents to submit service requirements and monitor their transactions. Payment evidence is submitted for verification and does not itself execute a payment transfer.
+
+The Barangay Secretary performs the operational functions of the barangay. These include reviewing resident applications, maintaining household and resident records, preparing and submitting Registry of Barangay Inhabitants (RBI) records, and recording migration events and verifying monthly migration history. The secretary also processes document requests, reviews payment evidence, and responds to concerns and updates their status. Access to these activities is restricted according to the user's assigned barangay and permissions.
+
+The Municipal DILG User performs municipal oversight functions, including reviewing secretary applications, managing authorized barangay configuration, and reviewing submitted RBI records and municipal summaries. These functions allow authorized municipal personnel to monitor barangay submissions and administer the settings and approvals assigned to their role.
+
+The Barangay Secretary and Municipal DILG User share access to authorized reports, geographic maps, and migration forecasts and evaluation results. The information available remains subject to each user's access scope. Migration forecasts require sufficient verified monthly historical data; access to the forecasting feature does not guarantee that a forecast is available for every selected period or barangay.
+
+Protected business functions require authentication and appropriate permissions, while resident and secretary accounts require approval before using protected services. Common registration, login, logout, and password-recovery interactions are omitted from the diagram to keep its focus on the system's business functions. Unlike a flowchart, the use case diagram does not describe the order in which these functions must be performed.

@@ -6,6 +6,9 @@
    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
   }
   .municipal-ui :is(.metric-card,.workflow-card,.dashboard-card,.workspace-launcher > a,.municipal-shortcuts > a) { transition: border-color 180ms ease, box-shadow 180ms ease !important; }
+  .municipal-ui .rbi-forms-workspace .rbi-subpages > a { transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important; }
+  .municipal-ui .rbi-forms-workspace .rbi-subpages > a:hover { transform: translateY(-2px); }
+  .municipal-ui .rbi-forms-workspace .rbi-subpages > a:active { transform: translateY(0); }
   .municipal-ui #app-sidebar { transition: transform 200ms ease !important; }
   .municipal-ui .sidebar-backdrop { transition: opacity 200ms ease, visibility 200ms ease !important; }
   .municipal-ui :is(.app-content,.portal-login-layout,.civic-home-hero) { animation: portal-fade 180ms ease-out !important; }
@@ -17,6 +20,7 @@
  }
  @media screen and (prefers-reduced-motion: reduce) {
   .municipal-ui *, .municipal-ui *::before, .municipal-ui *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; translate: none !important; rotate: none !important; scale: none !important; }
+  .municipal-ui .rbi-forms-workspace .rbi-subpages > a { transform: none !important; }
  }
 }
 @keyframes portal-fade { from { opacity: .7; } to { opacity: 1; } }

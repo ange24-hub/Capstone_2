@@ -9,7 +9,7 @@
     <section class="gis-workspace">
         <header class="gis-page-header">
             <div class="gis-heading">
-                <span class="gis-heading-icon"><x-app-icon name="map" /></span>
+                <span class="gis-heading-icon gis-sticker" aria-hidden="true"><x-portal-sticker name="map" /></span>
                 <div>
                     <span class="gis-eyebrow">Spatial visualization</span>
                     <h1>GIS Mapping</h1>
@@ -42,19 +42,19 @@
 
         <div class="gis-metrics" aria-label="Map statistics">
             <div class="gis-metric gis-metric-blue">
-                <span class="gis-metric-icon"><x-app-icon name="home" /></span>
+                <span class="gis-metric-icon gis-sticker" aria-hidden="true"><x-portal-sticker name="home" /></span>
                 <div><span class="gis-metric-label">Mapped households</span><strong>{{ number_format($householdCount) }}</strong><small>With saved coordinates</small></div>
             </div>
             <div class="gis-metric gis-metric-teal">
-                <span class="gis-metric-icon"><x-app-icon name="users" /></span>
+                <span class="gis-metric-icon gis-sticker" aria-hidden="true"><x-portal-sticker name="users" /></span>
                 <div><span class="gis-metric-label">Mapped population</span><strong>{{ number_format($populationCount) }}</strong><small>Residents in mapped households</small></div>
             </div>
             <div class="gis-metric gis-metric-violet">
-                <span class="gis-metric-icon"><x-app-icon name="map" /></span>
+                <span class="gis-metric-icon gis-sticker" aria-hidden="true"><x-portal-sticker name="map" /></span>
                 <div><span class="gis-metric-label">Barangays shown</span><strong>{{ number_format($barangayCount) }}</strong><small>Boundaries on this map</small></div>
             </div>
             <div class="gis-metric gis-metric-amber">
-                <span class="gis-metric-icon"><x-app-icon name="building" /></span>
+                <span class="gis-metric-icon gis-sticker" aria-hidden="true"><x-portal-sticker name="building" /></span>
                 <div><span class="gis-metric-label">Building references</span><strong>{{ number_format($sourceBuildingCount) }}</strong><small>From the supplied map layer</small></div>
             </div>
         </div>

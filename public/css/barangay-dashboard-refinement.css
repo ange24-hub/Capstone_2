@@ -1,4 +1,4 @@
-/* First layer: this dashboard's visual rules precede the shared important theme. */
+/* Dashboard refinements; scoped portal rules below override shared card accents. */
 @layer barangay-dashboard-refinement {
 @media screen {
     html.municipal-ui body.role-barangay.dashboard-workspace .app-shell,
@@ -117,6 +117,82 @@
         html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard > .dashboard-page-header { padding:20px !important; }
         html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions { width:100%; }
         html.municipal-ui body.role-barangay.dashboard-workspace #main-content .barangay-dashboard .dashboard-header-actions .button { flex:1 1 170px; }
+    }
+}
+}
+
+/* Quiet treatment for the two operational cards, within the shared portal layer. */
+@layer portal {
+@media screen {
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-work-card {
+        padding:20px !important;
+        background:#fff !important;
+        border:1px solid #e0e5eb !important;
+        border-radius:10px !important;
+        box-shadow:none !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-work-card > header {
+        background:transparent !important;
+        border:0 !important;
+        padding:0 !important;
+        margin:0 0 16px !important;
+        gap:12px !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-work-card > header h2 {
+        color:#172b45 !important;
+        font-size:17px !important;
+        font-weight:700 !important;
+        line-height:1.4 !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-text-link {
+        font-size:13px !important;
+        font-weight:700 !important;
+        color:#244b83 !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-report-counts {
+        background:transparent !important;
+        padding:0 0 16px !important;
+        gap:20px !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-report-counts > div {
+        background:transparent !important;
+        border:0 !important;
+        border-radius:0 !important;
+        padding:0 !important;
+        gap:8px !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-report-counts > div + div {
+        border-left:1px solid #e6eaf0 !important;
+        padding-left:20px !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace :is(.brgy-report-counts strong,.brgy-task-count) {
+        color:#172b45 !important;
+        font-size:20px !important;
+        font-weight:700 !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-report-counts span {
+        color:#334155 !important;
+        font-size:14px !important;
+        font-weight:600 !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace :is(.brgy-task-copy strong,.brgy-latest-report > strong) {
+        color:#172b45 !important;
+        font-size:14px !important;
+        font-weight:700 !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace :is(.brgy-task-copy small,.brgy-latest-report > span:not(.civic-status)) {
+        color:#475569 !important;
+        font-size:13px !important;
+        font-weight:500 !important;
+    }
+    .municipal-ui #main-content .barangay-dashboard .brgy-workspace .brgy-status-pill {
+        color:#334155 !important;
+        background:#f2f4f7 !important;
+        border:1px solid #e6eaf0 !important;
+        border-radius:6px !important;
+        padding:3px 8px !important;
+        font-size:12px !important;
+        font-weight:700 !important;
     }
 }
 }

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1690" viewBox="0 0 1440 1690" role="img" aria-labelledby="title desc">
+<title id="title">RBIM System Architecture</title>
+<desc id="desc">Residents, barangay secretaries and municipal LGU staff use browser clients. Residents can also use the Android client. HTTPS connects clients to the Laravel application through Traefik and Apache. Application modules access MySQL and file storage through services. Supporting connections include SMTP, browser map tiles and optional private Ollama.</desc>
+<defs><marker id="end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#557084"/></marker></defs>
+<rect width="100%" height="100%" fill="white"/>
+<rect x="20" y="20" width="1400" height="322" rx="16" fill="#F5F8FB" stroke="#244563" stroke-width="2"/>
+<rect x="20" y="438" width="1400" height="720" rx="16" fill="#F7F9FB" stroke="#244563" stroke-width="2"/>
+<rect x="20" y="1230" width="1400" height="270" rx="16" fill="#F0F7F5" stroke="#557B72" stroke-width="2"/>
+<rect x="20" y="1540" width="1400" height="134" rx="16" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="48" y="66" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#244563" text-anchor="start">CLIENT AND PRESENTATION TIER</text>
+<rect x="48" y="96" width="430" height="132" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="263.0" y="135" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Residents</text>
+<text x="263.0" y="172" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Web browser or Android app</text>
+<text x="263.0" y="202" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Requests, payments and concerns</text>
+<rect x="505" y="96" width="430" height="132" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="720.0" y="135" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Barangay Secretaries</text>
+<text x="720.0" y="172" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Web browser</text>
+<text x="720.0" y="202" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Registry, RBI and local operations</text>
+<rect x="962" y="96" width="430" height="132" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="1177.0" y="135" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Municipal LGU Staff</text>
+<text x="1177.0" y="172" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Web browser</text>
+<text x="1177.0" y="202" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Approvals and municipal monitoring</text>
+<text x="720" y="273" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#182B3C" text-anchor="middle">Browser UI: Blade, HTML, CSS, JavaScript and Leaflet</text>
+<text x="720" y="312" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#4B6072" text-anchor="middle">Staff offline capture: IndexedDB with authorized synchronization when online</text>
+<path d="M 720 362 L 720 418" fill="none" stroke="#557084" stroke-width="2.5" marker-end="url(#end)" marker-start="url(#end)"/>
+<text x="748" y="399" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#4B6072" text-anchor="start">HTTPS requests and responses</text>
+<text x="48" y="484" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#244563" text-anchor="start">APPLICATION TIER</text>
+<text x="1392" y="484" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#4B6072" text-anchor="end">Laravel MVC application</text>
+<rect x="48" y="510" width="1344" height="74" rx="12" fill="#E5EDF5" stroke="#244563" stroke-width="2"/>
+<text x="720" y="556" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#182B3C" text-anchor="middle">Traefik HTTPS routing  /  Apache web server and PHP</text>
+<path d="M 720 584 L 720 620" fill="none" stroke="#557084" stroke-width="2.5" marker-end="url(#end)" marker-start="url(#end)"/>
+<rect x="48" y="620" width="1344" height="90" rx="12" fill="#FFFFFF" stroke="#244563" stroke-width="2"/>
+<text x="720" y="657" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#182B3C" text-anchor="middle">Laravel routing and access control</text>
+<text x="720" y="692" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Sessions and Sanctum tokens | Roles and approvals | Barangay and owner scope | Validation</text>
+<path d="M 720 710 L 720 746" fill="none" stroke="#557084" stroke-width="2.5" marker-end="url(#end)" marker-start="url(#end)"/>
+<rect x="48" y="746" width="430" height="138" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="263.0" y="785" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Registry and RBI</text>
+<text x="263.0" y="822" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Households and resident records</text>
+<text x="263.0" y="852" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Monthly forms and consolidation</text>
+<rect x="505" y="746" width="430" height="138" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="720.0" y="785" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Requests and Payments</text>
+<text x="720.0" y="822" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Certificates and fee tracking</text>
+<text x="720.0" y="852" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Staff payment verification</text>
+<rect x="962" y="746" width="430" height="138" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="1177.0" y="785" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Resident Concerns</text>
+<text x="1177.0" y="822" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Submissions and follow-ups</text>
+<text x="1177.0" y="852" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Barangay staff handling</text>
+<rect x="48" y="910" width="430" height="138" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="263.0" y="949" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">GIS and Offline Sync</text>
+<text x="263.0" y="986" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Saved coordinates and GIS layers</text>
+<text x="263.0" y="1016" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Authorized household syncing</text>
+<rect x="505" y="910" width="430" height="138" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="720.0" y="949" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Reports and Forecasting</text>
+<text x="720.0" y="986" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Population and migration reports</text>
+<text x="720.0" y="1016" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Verified forecasts and exports</text>
+<rect x="962" y="910" width="430" height="138" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="1177.0" y="949" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Database Assistant</text>
+<text x="1177.0" y="986" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Scoped English and Cebuano queries</text>
+<text x="1177.0" y="1016" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">FAQ and record-based answers</text>
+<path d="M 720 1048 L 720 1080" fill="none" stroke="#557084" stroke-width="2.5" marker-end="url(#end)" marker-start="url(#end)"/>
+<rect x="48" y="1080" width="1344" height="52" rx="12" fill="#E5EDF5" stroke="#244563" stroke-width="2"/>
+<text x="720" y="1115" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#182B3C" text-anchor="middle">Application services and Eloquent ORM</text>
+<path d="M 720 1132 L 720 1190 L 377 1190 L 377 1295" fill="none" stroke="#557084" stroke-width="2.5" marker-end="url(#end)" marker-start="url(#end)"/>
+<path d="M 720 1190 L 1063 1190 L 1063 1295" fill="none" stroke="#557084" stroke-width="2.5" marker-end="url(#end)" marker-start="url(#end)"/>
+<text x="48" y="1274" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#315E52" text-anchor="start">DATA TIER</text>
+<rect x="48" y="1295" width="658" height="172" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="377.0" y="1334" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">MySQL Database</text>
+<text x="377.0" y="1371" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Users, households and inhabitants</text>
+<text x="377.0" y="1401" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">RBI forms, migration and verifications</text>
+<text x="377.0" y="1431" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Requests, payments, concerns and logs</text>
+<rect x="734" y="1295" width="658" height="172" rx="12" fill="#FFFFFF" stroke="#9FB0BE" stroke-width="2"/>
+<text x="1063.0" y="1334" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#182B3C" text-anchor="middle">Application File Storage</text>
+<text x="1063.0" y="1371" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Private receipts, signatures and attachments</text>
+<text x="1063.0" y="1401" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Public uploads, sessions and caches</text>
+<text x="1063.0" y="1431" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#182B3C" text-anchor="middle">Persistent application storage volume</text>
+<text x="48" y="1580" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#244563" text-anchor="start">SUPPORTING CONNECTIONS</text>
+<text x="48" y="1620" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#182B3C" text-anchor="start">Application -&gt; SMTP email</text>
+<text x="48" y="1653" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#4B6072" text-anchor="start">Account recovery messages</text>
+<text x="507" y="1620" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#182B3C" text-anchor="start">Browser -&gt; Map tiles</text>
+<text x="507" y="1653" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#4B6072" text-anchor="start">OpenStreetMap and Esri imagery</text>
+<rect x="952" y="1595" width="440" height="67" rx="12" fill="#FAFAFA" stroke="#9FB0BE" stroke-width="2" stroke-dasharray="8 5"/>
+<text x="1172" y="1623" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#182B3C" text-anchor="middle">Assistant &lt;-&gt; Optional Ollama</text>
+<text x="1172" y="1651" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#4B6072" text-anchor="middle">Private language interpretation</text>
+</svg>

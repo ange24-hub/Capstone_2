@@ -1,0 +1,84 @@
+/* Targeted spacing and type adjustments, separate from the color palette. */
+@layer portal {
+@media screen {
+    html.municipal-ui #main-content .registry-workspace { gap:14px !important; }
+    html.municipal-ui #main-content .registry-workspace .registry-scope-actions {
+        padding:0 !important; margin:0 !important; gap:10px !important;
+        border:0 !important; background:transparent !important;
+    }
+    html.municipal-ui #main-content .registry-workspace .registry-residence-note {
+        margin:0 !important; padding:0 !important; font-size:14px !important; line-height:1.5 !important;
+    }
+    html.municipal-ui #main-content .registry-workspace .registry-print-options {
+        margin:0 !important; padding:8px 12px !important; min-height:0 !important;
+    }
+    html.municipal-ui #main-content .registry-print-options summary { font-size:15px !important; line-height:1.5 !important; }
+    html.municipal-ui #main-content .registry-workspace .registry-records-card { padding:18px !important; }
+    html.municipal-ui #main-content .registry-records-heading {
+        display:grid !important; grid-template-columns:minmax(0,1fr) auto !important;
+        align-items:center !important; gap:12px 20px !important;
+        padding:0 0 14px !important; margin:0 0 14px !important;
+        min-height:0 !important;
+    }
+    html.municipal-ui #main-content .registry-records-heading h2 {
+        margin:0 0 6px !important; font-size:22px !important; font-weight:700 !important; line-height:1.35 !important;
+    }
+    html.municipal-ui #main-content .registry-records-heading p {
+        margin:0 !important; font-size:16px !important; line-height:1.5 !important;
+    }
+    html.municipal-ui #main-content .registry-records-filter {
+        display:flex !important; flex-wrap:wrap !important; align-items:center !important;
+        gap:8px !important; padding:0 !important; margin:0 !important;
+        width:auto !important; max-width:440px !important;
+        border:0 !important; background:transparent !important; box-shadow:none !important;
+    }
+    html.municipal-ui #main-content .registry-records-filter :is(input[type=search],select) {
+        flex:1 1 240px !important; width:260px !important; min-width:0 !important;
+        max-width:100% !important; min-height:44px !important; margin:0 !important;
+        padding:9px 12px !important; font-size:16px !important;
+    }
+    html.municipal-ui #main-content .registry-records-filter button {
+        flex:0 0 auto !important; width:auto !important; min-height:44px !important;
+        margin:0 !important; padding:9px 16px !important; font-size:15px !important;
+    }
+    html.municipal-ui .portal-login-layout {
+        width:min(760px,calc(100% - 40px)) !important;
+        margin:28px auto !important;
+        grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr) !important;
+    }
+    html.municipal-ui .portal-login-layout .portal-login-intro { padding:26px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-form {
+        padding:26px !important; margin:0 !important; min-height:0 !important;
+        border:0 !important; box-shadow:none !important;
+    }
+    html.municipal-ui .portal-login-layout .portal-login-seal { width:64px !important; height:64px !important; margin:22px 0 14px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-intro h2 { font-size:28px !important; margin:0 0 6px !important; line-height:1.2 !important; }
+    html.municipal-ui .portal-login-layout .portal-login-location { font-size:14px !important; margin:0 0 14px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-description { font-size:15px !important; line-height:1.5 !important; margin:0 0 12px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-features { font-size:13px !important; gap:5px !important; margin:0 0 12px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-label,
+    html.municipal-ui .portal-login-layout .portal-login-footnote { font-size:11px !important; }
+    html.municipal-ui .portal-login-layout .portal-services-illustration { width:100% !important; max-width:240px !important; height:130px !important; object-fit:contain !important; margin:0 auto 12px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-form h1 { font-size:28px !important; margin:6px 0 10px !important; }
+    html.municipal-ui .portal-login-layout .auth-copy { font-size:15px !important; line-height:1.5 !important; margin:0 0 20px !important; }
+    html.municipal-ui .portal-login-layout .portal-login-form :is(label,input:not([type=checkbox]),button) { font-size:16px !important; }
+    html.municipal-ui .portal-login-layout .form-footer { margin:18px 0 0 !important; padding-top:14px !important; font-size:14px !important; }
+    html.municipal-ui .portal-login-layout .auth-help-link { margin:6px 0 14px !important; font-size:14px !important; }
+    @media (max-width:1000px) {
+        html.municipal-ui #main-content .registry-records-heading { grid-template-columns:minmax(0,1fr) !important; }
+        html.municipal-ui #main-content .registry-records-filter { width:100% !important; max-width:520px !important; }
+    }
+    @media (max-width:760px) {
+        html.municipal-ui .portal-login-layout { width:calc(100% - 28px) !important; max-width:460px !important; margin:20px auto !important; grid-template-columns:minmax(0,1fr) !important; }
+        html.municipal-ui .portal-login-layout :is(.portal-login-intro,.portal-login-form) { padding:22px !important; }
+        html.municipal-ui .portal-login-layout .portal-login-seal { width:56px !important; height:56px !important; margin:0 !important; }
+        html.municipal-ui .portal-login-layout .portal-login-intro h2 { font-size:25px !important; }
+        html.municipal-ui .portal-login-layout .portal-login-location { margin:0 !important; }
+        html.municipal-ui .portal-login-layout .portal-login-description { margin:12px 0 0 !important; }
+        html.municipal-ui .portal-login-layout .portal-services-illustration { grid-column:1 / -1 !important; height:90px !important; margin:12px auto 0 !important; }
+    }
+    @media (max-width:420px) {
+        html.municipal-ui #main-content .registry-records-filter input[type=search] { flex-basis:170px !important; width:170px !important; }
+    }
+}
+}

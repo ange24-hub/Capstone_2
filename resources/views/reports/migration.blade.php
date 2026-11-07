@@ -12,7 +12,7 @@
     <header class="population-report-header migration-report-header">
         <div class="population-report-heading">
             <span class="population-report-eyebrow">Registry reports</span>
-            <h1 id="migration-report-title">Monthly Migration Report <span class="migration-report-year">{{ $selectedYear }}</span></h1>
+            <h1 id="migration-report-title"><x-portal-sticker name="trend" /> Monthly Migration Report <span class="migration-report-year">{{ $selectedYear }}</span></h1>
             <p class="migration-report-scope">{{ $report['scopeLabel'] }} <span aria-hidden="true">&middot;</span> {{ str_starts_with($report['scopeLabel'], 'Barangay ') ? 'Tomas Oppus, Southern Leyte' : 'Southern Leyte' }} <span aria-hidden="true">&middot;</span> Region VIII</p>
             <div class="migration-report-print-jurisdiction">@include('reports._jurisdiction')</div>
         </div>

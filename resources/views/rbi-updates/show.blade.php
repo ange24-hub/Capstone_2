@@ -9,7 +9,7 @@
     <section class="rbi-report-view rbi-report-detail" aria-labelledby="rbi-report-title">
         <header class="rbi-report-header">
             <div class="rbi-report-heading">
-                <span class="rbi-report-emblem" aria-hidden="true"><x-app-icon name="document" /></span>
+                <span class="rbi-report-emblem" aria-hidden="true"><x-portal-sticker name="document" /></span>
                 <div>
                     <span class="rbi-report-eyebrow">RBI Monthly Form</span>
                     <h1 id="rbi-report-title">Monthly RBI report</h1>

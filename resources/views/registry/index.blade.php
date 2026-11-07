@@ -69,8 +69,8 @@
         </div>
         @endunless
 
-        <div class="workflow-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
-            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
+        <div class="workflow-card registry-records-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
+            <div class="workflow-head registry-records-heading flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <h2 class="section-title text-lg font-semibold text-slate-900">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
                     <p>@if ($editThroughRbi) {{ number_format($inhabitants->total()) }} records found. Click Edit to make corrections in RBI Forms. Saved changes appear here automatically. @elseif ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
@@ -82,7 +82,7 @@
                         </div>
                     @endif
                 </div>
-                <form class="toolbar compact-toolbar flex flex-wrap items-end gap-3" method="GET" action="{{ route($registryFilterRoute) }}">
+                <form class="toolbar compact-toolbar registry-records-filter flex flex-wrap items-end gap-3" method="GET" action="{{ route($registryFilterRoute) }}">
                     @if (request('source') && ! $isDedicatedRegistryPage)<input type="hidden" name="source" value="{{ request('source') }}">@endif
                     @if (request('sheet') && ! $isDedicatedRegistryPage)<input type="hidden" name="sheet" value="{{ request('sheet') }}">@endif
                     @unless($isDedicatedRegistryPage)<select name="barangay_id" aria-label="Filter by barangay">

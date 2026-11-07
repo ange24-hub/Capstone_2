@@ -12,7 +12,7 @@
         <section class="workflow-card report-history rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="report-history" aria-labelledby="report-history-heading">
             <div class="rbi-history-header">
                 <div>
-                    <h2 id="report-history-heading" class="section-title text-lg font-semibold text-slate-900">Monthly RBI Form History</h2>
+                    <h2 id="report-history-heading" class="section-title text-lg font-semibold text-slate-900"><x-portal-sticker name="document" /> Monthly RBI Form History</h2>
                     <p>Open, update, or submit each month's RBI form.</p>
                 </div>
                 @if($reportHistoryPage->total() > 0)
@@ -31,7 +31,7 @@
                         <article class="rbi-history-card">
                             <div class="rbi-history-card-main">
                                 <div class="rbi-history-month">
-                                    <span class="rbi-history-month-icon" aria-hidden="true"><x-app-icon name="calendar" /></span>
+                                    <span class="rbi-history-month-icon" aria-hidden="true"><x-portal-sticker name="document" /></span>
                                     <div><h3>{{ optional($report->reporting_month)->format('F Y') ?: 'Month not set' }}</h3></div>
                                 </div>
                                 <x-status-badge :status="$report->status">{{ $report->statusLabel() }}</x-status-badge>

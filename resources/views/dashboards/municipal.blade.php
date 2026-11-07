@@ -13,7 +13,7 @@
         <header class="municipal-hero">
             <div class="municipal-hero-copy">
                 <span class="municipal-eyebrow">Municipal Administration <span aria-hidden="true">/</span> Tomas Oppus</span>
-                <h1 id="municipal-dashboard-title">Municipal overview</h1>
+                <h1 id="municipal-dashboard-title"><x-portal-sticker name="building" /> Municipal overview</h1>
                 <p>A view of barangay reporting, account approvals, and population movement.</p>
             </div>
             <div class="municipal-hero-actions">

@@ -7,10 +7,11 @@
             <span class="seal-crop portal-login-seal"><img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal"></span>
             <h2 id="portal-login-title">Tomas Oppus</h2>
             <p class="portal-login-location">Southern Leyte, Philippines</p>
-            <p class="portal-login-description">Registry of Barangay Inhabitants<br>Management System</p>
+            <p class="portal-login-description">Registry of Barangay Inhabitants<br> Management System</p>
             <div class="portal-login-features">
                 <span>Resident records</span><span>Document requests</span><span>Barangay reports</span>
             </div>
+            <img class="portal-services-illustration" src="{{ asset('images/civic-services-sticker.png') }}" alt="" width="1536" height="1024" loading="lazy" decoding="async">
             <span class="portal-login-footnote">Official municipal portal</span>
         </aside>
     <section class="panel auth-panel portal-login-form rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">

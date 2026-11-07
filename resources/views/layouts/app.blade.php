@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
-    <style>@layer print-overrides, portal, civic, workspace-headers, theme, base, components, utilities;</style>
+    <style>@layer print-overrides, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">
     @if(request()->routeIs('barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">

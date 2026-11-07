@@ -30,7 +30,6 @@
 
         <nav class="workspace-launcher" aria-label="Resident service shortcuts">
             <a href="{{ route('resident.document-requests.create') }}"><span class="workspace-launcher-icon"><x-app-icon name="form" /></span><span><strong>Request a document</strong><em>Choose a document and submit its purpose</em></span><x-app-icon name="arrow-right" /></a>
-            <a href="{{ route('resident.document-requests.index') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><strong>My requests</strong><em>Check status and payment</em></span><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('resident.document-payments.history') }}"><span class="workspace-launcher-icon"><x-app-icon name="document" /></span><span><strong>Payment history</strong><em>View previous payments</em></span><x-app-icon name="arrow-right" /></a>
         </nav>
 

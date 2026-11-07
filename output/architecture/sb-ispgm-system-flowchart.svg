@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="3710" viewBox="0 0 3000 3710"><rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="none" stroke="#617184" stroke-width="1.6"/></marker></defs>
+<ellipse cx="1500.0" cy="255.0" rx="150.0" ry="40.0" fill="#E7F5ED" stroke="#4D916D" stroke-width="2.5"/>
+<text x="1500.0" y="255.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">START</text>
+<rect x="1220.0" y="340.0" width="560" height="100" fill="#F2F6FB" stroke="#6482A5" stroke-width="2.5"/>
+<text x="1500.0" y="390.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Open the system</text>
+<polygon points="1500.0,475.0 1715.0,565.0 1500.0,655.0 1285.0,565.0" fill="#FFF6D8" stroke="#B99535" stroke-width="2.5"/>
+<text x="1500.0" y="547.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Existing</text><text x="1500.0" y="582.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">account?</text>
+<polygon points="1210.0,707.5 1825.0,707.5 1790.0,822.5 1175.0,822.5" fill="#EDF5FF" stroke="#4882BC" stroke-width="2.5"/>
+<text x="1500.0" y="746.7" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Enter email / user ID</text><text x="1500.0" y="783.3" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">and password</text>
+<rect x="175.0" y="675.0" width="670" height="180" fill="#F0F6FC" stroke="#6482A5" stroke-width="2.5"/>
+<text x="510.0" y="729.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Complete validated registration</text><text x="510.0" y="765.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Resident or Barangay Secretary</text><text x="510.0" y="800.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Create pending account and sign in</text>
+<polygon points="1500.0,885.0 1715.0,975.0 1500.0,1065.0 1285.0,975.0" fill="#FFF6D8" stroke="#B99535" stroke-width="2.5"/>
+<text x="1500.0" y="957.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Credentials</text><text x="1500.0" y="992.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">valid?</text>
+<rect x="2140.0" y="917.5" width="620" height="115" fill="#FFF0EE" stroke="#B96D62" stroke-width="2.5"/>
+<text x="2450.0" y="956.7" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Display login error</text><text x="2450.0" y="993.3" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Retry login</text>
+<rect x="1220.0" y="1082.5" width="560" height="95" fill="#F2F6FB" stroke="#6482A5" stroke-width="2.5"/>
+<text x="1500.0" y="1130.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Create authenticated session</text>
+<polygon points="1500.0,1212.5 1795.0,1310.0 1500.0,1407.5 1205.0,1310.0" fill="#FFF6D8" stroke="#B99535" stroke-width="2.5"/>
+<text x="1500.0" y="1292.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Approved account</text><text x="1500.0" y="1327.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">or Municipal DILG?</text>
+<rect x="2115.0" y="1220.0" width="650" height="130" fill="#FFF0EE" stroke="#B96D62" stroke-width="2.5"/>
+<text x="2440.0" y="1267.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Display pending / rejected status</text><text x="2440.0" y="1302.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Protected services unavailable</text>
+<rect x="2225.0" y="1417.5" width="430" height="85" fill="#F2F6FB" stroke="#6482A5" stroke-width="2.5"/>
+<text x="2440.0" y="1460.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Log out / close session</text>
+<ellipse cx="2825.0" cy="1460.0" rx="95.0" ry="37.5" fill="#F0F2F5" stroke="#748498" stroke-width="2.5"/>
+<text x="2825.0" y="1460.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">END</text>
+<ellipse cx="1500.0" cy="1510.0" rx="32.5" ry="32.5" fill="#FFFFFF" stroke="#6482A5" stroke-width="2.5"/>
+<text x="1500.0" y="1510.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">A</text>
+<polygon points="1500.0,1570.0 1715.0,1650.0 1500.0,1730.0 1285.0,1650.0" fill="#FFF6D8" stroke="#B99535" stroke-width="2.5"/>
+<text x="1500.0" y="1650.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">User role?</text>
+<rect x="130.0" y="1805.0" width="740" height="110" fill="#EDF5FF" stroke="#4882BC" stroke-width="2.5"/>
+<text x="500.0" y="1860.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="31" font-weight="700" fill="#243447">Resident Dashboard</text>
+<rect x="105.0" y="1980.0" width="790" height="260" fill="#EDF5FF" stroke="#4882BC" stroke-width="2.5"/>
+<text x="500.0" y="2056.93" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Choose a resident service</text><text x="500.0" y="2092.31" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Submit document requests / receipts</text><text x="500.0" y="2127.69" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Submit concerns and replies</text><text x="500.0" y="2163.07" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Track requests and concern updates</text>
+<rect x="1130.0" y="1805.0" width="740" height="110" fill="#EFF8EE" stroke="#639560" stroke-width="2.5"/>
+<text x="1500.0" y="1860.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="31" font-weight="700" fill="#243447">Barangay Secretary Dashboard</text>
+<rect x="1105.0" y="1980.0" width="790" height="260" fill="#EFF8EE" stroke="#639560" stroke-width="2.5"/>
+<text x="1500.0" y="2039.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Choose a barangay task</text><text x="1500.0" y="2074.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Review resident applications</text><text x="1500.0" y="2110.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Manage households, RBI and migration</text><text x="1500.0" y="2145.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Review requests, payments and concerns</text><text x="1500.0" y="2180.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">View maps, reports and forecasts</text>
+<rect x="2130.0" y="1805.0" width="740" height="110" fill="#F4EEFC" stroke="#9270B1" stroke-width="2.5"/>
+<text x="2500.0" y="1860.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="31" font-weight="700" fill="#243447">Municipal DILG Dashboard</text>
+<rect x="2105.0" y="1980.0" width="790" height="260" fill="#F4EEFC" stroke="#9270B1" stroke-width="2.5"/>
+<text x="2500.0" y="2039.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Choose a municipal task</text><text x="2500.0" y="2074.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Review secretary applications</text><text x="2500.0" y="2110.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Manage barangay configuration</text><text x="2500.0" y="2145.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Review RBI / municipal summaries</text><text x="2500.0" y="2180.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">View maps, reports and forecasts</text>
+<rect x="1090.0" y="2335.0" width="820" height="110" fill="#F2F6FB" stroke="#6482A5" stroke-width="2.5"/>
+<text x="1500.0" y="2371.7" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Check permissions, record scope</text><text x="1500.0" y="2408.3" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">and submitted information</text>
+<polygon points="1500.0,2490.0 1775.0,2580.0 1500.0,2670.0 1225.0,2580.0" fill="#FFF6D8" stroke="#B99535" stroke-width="2.5"/>
+<text x="1500.0" y="2562.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Request allowed</text><text x="1500.0" y="2597.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">and input valid?</text>
+<rect x="2175.0" y="2520.0" width="650" height="120" fill="#FFF0EE" stroke="#B96D62" stroke-width="2.5"/>
+<text x="2500.0" y="2562.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Display access or validation error</text><text x="2500.0" y="2597.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Correct input / choose another task</text>
+<ellipse cx="2500.0" cy="2740.0" rx="32.5" ry="32.5" fill="#FFFFFF" stroke="#6482A5" stroke-width="2.5"/>
+<text x="2500.0" y="2740.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">A</text>
+<rect x="1075.0" y="2730.0" width="850" height="140" fill="#F2F6FB" stroke="#6482A5" stroke-width="2.5"/>
+<text x="1500.0" y="2765.84" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Execute the permitted operation</text><text x="1500.0" y="2800.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Read / update records as required</text><text x="1500.0" y="2834.16" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Generate requested reports or eligible forecasts</text>
+<polygon points="1110.0,2960.0 1925.0,2960.0 1890.0,3080.0 1075.0,3080.0" fill="#EDF5FF" stroke="#4882BC" stroke-width="2.5"/>
+<text x="1500.0" y="3002.31" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Display result, status or report</text><text x="1500.0" y="3037.69" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#243447">Show data limitations when applicable</text>
+<polygon points="1500.0,3145.0 1725.0,3230.0 1500.0,3315.0 1275.0,3230.0" fill="#FFF6D8" stroke="#B99535" stroke-width="2.5"/>
+<text x="1500.0" y="3230.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Another task?</text>
+<ellipse cx="850.0" cy="3230.0" rx="32.5" ry="32.5" fill="#FFFFFF" stroke="#6482A5" stroke-width="2.5"/>
+<text x="850.0" y="3230.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">A</text>
+<rect x="1190.0" y="3352.5" width="620" height="95" fill="#F2F6FB" stroke="#6482A5" stroke-width="2.5"/>
+<text x="1500.0" y="3400.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">Log out and invalidate session</text>
+<ellipse cx="1500.0" cy="3530.0" rx="150.0" ry="40.0" fill="#E7F5ED" stroke="#4D916D" stroke-width="2.5"/>
+<text x="1500.0" y="3530.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#243447">END</text>
+<polyline points="1500,295 1500,340" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,440 1500,475" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,655 1500,707.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1545" y="683.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Yes</text>
+<polyline points="1285,565 510,565 510,675" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1000" y="535.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">No</text>
+<polyline points="1500,822.5 1500,885" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1715,975 2140,975" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1910" y="945.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">No</text>
+<polyline points="2760,975 2870,975 2870,765 1825,765" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,1065 1500,1082.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1550" y="1076.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Yes</text>
+<polyline points="1500,1177.5 1500,1212.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="510,855 510,1310 1205,1310" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="810" y="1280.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Automatically signed in</text>
+<polyline points="1795,1310 2040,1310 2040,1285 2115,1285" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1950" y="1275.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">No</text>
+<polyline points="2440,1350 2440,1417.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="2655,1460 2730,1460" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,1407.5 1500,1477.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1550" y="1440.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Yes</text>
+<polyline points="1500,1542.5 1500,1570" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="500,1915 500,1980" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,1915 1500,1980" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="2500,1915 2500,1980" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1285,1650 500,1650 500,1805" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="830" y="1620.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Resident</text>
+<polyline points="1500,1730 1500,1805" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1660" y="1770.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Barangay Secretary</text>
+<polyline points="1715,1650 2500,1650 2500,1805" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="2110" y="1620.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Municipal DILG</text>
+<polyline points="500,2240 500,2290 1500,2290 1500,2335" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="2500,2240 2500,2290 1500,2290 1500,2335" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,2240 1500,2335" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,2445 1500,2490" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1775,2580 2175,2580" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1950" y="2550.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">No</text>
+<polyline points="2500,2640 2500,2707.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,2670 1500,2730" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1550" y="2700.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Yes</text>
+<polyline points="1500,2870 1500,2960" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1500,3080 1500,3145" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="1275,3230 882.5,3230" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1070" y="3195.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">Yes</text>
+<polyline points="1500,3315 1500,3352.5" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1550" y="3335.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#243447">No</text>
+<polyline points="1500,3447.5 1500,3490" fill="none" stroke="#617184" stroke-width="2" marker-end="url(#a)"/>
+<text x="1500" y="65.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="49" font-weight="700" fill="#243447">SYSTEM FLOWCHART</text>
+<text x="1500" y="120.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="29" font-weight="400" fill="#243447">SB-ISPGM / RBIM | Municipality of Tomas Oppus</text>
+<text x="1500" y="165.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Access, approval, role-based services and task completion</text>
+<text x="2500" y="2800.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="24" font-weight="400" fill="#243447">Return to the appropriate dashboard</text>
+<text x="850" y="3290.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="24" font-weight="400" fill="#243447">Return to the appropriate dashboard</text>
+<text x="850" y="1005.36" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="24" font-weight="400" fill="#243447">Registration applies to Residents and Secretaries.</text><text x="850" y="1034.64" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="24" font-weight="400" fill="#243447">Municipal DILG accounts are provisioned separately.</text>
+<text x="500" y="1444.75" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Approval: Residents - Barangay Secretary</text><text x="500" y="1475.25" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Secretaries - Municipal DILG</text>
+<text x="500" y="2444.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Select one task at a time.</text><text x="500" y="2475.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">The task lists are menu options,</text><text x="500" y="2505.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">not mandatory sequential steps.</text>
+<text x="500" y="2819.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Forecasts require sufficient verified</text><text x="500" y="2850.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">monthly migration history.</text><text x="500" y="2880.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Otherwise, the system shows data limitations.</text>
+<text x="1500" y="3620.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">Oval: start/end | Rectangle: action | Diamond: decision | Parallelogram: input/output | A: return connector</text>
+<text x="1500" y="3670.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#243447">Overview of normal system use. Registration validation and specialist service workflows are summarized.</text>
+</svg>

@@ -1,0 +1,315 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1315" viewBox="0 0 1920 1315" role="img" aria-labelledby="title desc">
+<title id="title">Architectural Design of the Developed RBIM System</title>
+<desc id="desc">Six colored layers show presentation clients, Laravel application modules, native PHP forecasting, supporting services, MySQL and persistent files, and configured VPS deployment. HTTPS connects clients to the application. A separate Eloquent path links the application to storage. Optional Ollama is shown with a dashed border.</desc>
+<rect width="100%" height="100%" fill="white"/>
+<text x="960" y="43" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#213140" text-anchor="middle">Architectural Design of the Developed System</text>
+<text x="960" y="75" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#526474" text-anchor="middle">RBIM | Municipality of Tomas Oppus</text>
+<rect x="45" y="100" width="1830" height="170" rx="11" fill="#F1F7FE" stroke="#135BAC" stroke-width="1.6"/>
+<rect x="45" y="100" width="75" height="170" rx="10" fill="#135BAC" stroke="#135BAC" stroke-width="1.6"/>
+<rect x="105" y="101" width="15" height="168" rx="0" fill="#135BAC" stroke="#135BAC" stroke-width="1.6"/>
+<circle cx="82" cy="185.0" r="21" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="82" y="194.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#135BAC" text-anchor="middle">1</text>
+<path d="M 335 100 L 335 270" fill="none" stroke="#135BAC" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225" y="179.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#135BAC" text-anchor="middle">PRESENTATION</text>
+<text x="225" y="209.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#135BAC" text-anchor="middle">LAYER</text>
+<circle cx="420.0" cy="144.65" r="7.6499999999999995" fill="none" stroke="#135BAC" stroke-width="2.55"/>
+<path d="M 403.0 173.55 L 404.7 162.5 L 412.35 156.55 L 427.65 156.55 L 435.3 162.5 L 437.0 173.55 L 403.0 173.55" fill="none" stroke="#135BAC" stroke-width="2.55" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="468" y="145" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#213140" text-anchor="start">Resident Portal</text>
+<text x="468" y="176" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#213140" text-anchor="start">Web browser or Android app</text>
+<rect x="883.75" y="136.15" width="42.5" height="28.9" rx="2.55" fill="none" stroke="#135BAC" stroke-width="2.55"/>
+<path d="M 905.0 165.05 L 905.0 174.4 L 893.1 174.4 L 916.9 174.4" fill="none" stroke="#135BAC" stroke-width="2.55" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 892.25 155.7 L 892.25 149.75 L 900.75 149.75 L 900.75 155.7 L 909.25 155.7 L 909.25 143.8 L 917.75 143.8 L 917.75 155.7" fill="none" stroke="#135BAC" stroke-width="2.55" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="953" y="145" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#213140" text-anchor="start">Barangay Secretary</text>
+<text x="953" y="176" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#213140" text-anchor="start">Barangay dashboard</text>
+<rect x="1368.75" y="136.15" width="42.5" height="28.9" rx="2.55" fill="none" stroke="#135BAC" stroke-width="2.55"/>
+<path d="M 1390.0 165.05 L 1390.0 174.4 L 1378.1 174.4 L 1401.9 174.4" fill="none" stroke="#135BAC" stroke-width="2.55" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1377.25 155.7 L 1377.25 149.75 L 1385.75 149.75 L 1385.75 155.7 L 1394.25 155.7 L 1394.25 143.8 L 1402.75 143.8 L 1402.75 155.7" fill="none" stroke="#135BAC" stroke-width="2.55" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1438" y="145" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#213140" text-anchor="start">Municipal LGU</text>
+<text x="1438" y="176" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#213140" text-anchor="start">Municipal dashboard</text>
+<rect x="370" y="214" width="1465" height="39" rx="8" fill="#E5EFFB" stroke="#A7C7E9" stroke-width="1.6"/>
+<text x="1102" y="240" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#213140" text-anchor="middle">Laravel Blade | HTML and CSS | JavaScript | Leaflet | Resident Android client through HTTPS API</text>
+<path d="M 1100 274 L 1100 291" fill="none" stroke="#135BAC" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1100,291 1104.0,284.0 1096.0,284.0" fill="#135BAC"/>
+<polygon points="1100,274 1096.0,281.0 1104.0,281.0" fill="#135BAC"/>
+<text x="1127" y="287" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" fill="#135BAC" text-anchor="start">HTTPS requests and responses</text>
+<rect x="45" y="300" width="1830" height="186" rx="11" fill="#F2FAF3" stroke="#287C3B" stroke-width="1.6"/>
+<rect x="45" y="300" width="75" height="186" rx="10" fill="#287C3B" stroke="#287C3B" stroke-width="1.6"/>
+<rect x="105" y="301" width="15" height="184" rx="0" fill="#287C3B" stroke="#287C3B" stroke-width="1.6"/>
+<circle cx="82" cy="393.0" r="21" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="82" y="402.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#287C3B" text-anchor="middle">2</text>
+<path d="M 335 300 L 335 486" fill="none" stroke="#287C3B" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225" y="387.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#287C3B" text-anchor="middle">APPLICATION</text>
+<text x="225" y="417.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#287C3B" text-anchor="middle">LAYER</text>
+<text x="1102" y="334" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#287C3B" text-anchor="middle">Laravel Backend</text>
+<rect x="370" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<path d="M 397.0 370.0 L 409.32 375.6 L 407.64 388.48 L 402.6 395.2 L 397.0 399.12 L 391.4 395.2 L 386.36 388.48 L 384.68 375.6 L 397.0 370.0" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 391.4 384.0 L 395.88 388.48 L 403.72 378.4" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="420" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Access</text>
+<text x="420" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Control</text>
+<rect x="555" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<circle cx="576.4" cy="378.4" r="4.48" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<circle cx="588.72" cy="376.72" r="3.9200000000000004" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<path d="M 566.32 396.88 L 568.0 388.48 L 573.6 385.12 L 579.2 385.12 L 584.8 388.48 L 586.48 396.88" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 585.36 384.56 L 591.52 384.56 L 597.12 388.48 L 597.68 396.88" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="605" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Residents</text>
+<text x="605" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">and RBI</text>
+<rect x="740" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<path d="M 756.92 370.0 L 770.92 370.0 L 778.76 377.84 L 778.76 398.0 L 756.92 398.0 L 756.92 370.0" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 770.92 370.0 L 770.92 377.84 L 778.76 377.84" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 761.4 384.0 L 773.72 384.0" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 761.4 389.6 L 773.72 389.6" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 761.4 394.64 L 773.72 394.64" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="790" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Document</text>
+<text x="790" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Requests</text>
+<rect x="925" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<rect x="937.44" y="374.48" width="29.120000000000005" height="20.160000000000004" rx="1.6800000000000002" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<path d="M 937.44 380.64 L 966.56 380.64" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 942.48 388.48 L 949.2 388.48" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="960.96" cy="392.96" r="6.720000000000001" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<path d="M 957.6 392.96 L 960.4 395.76 L 964.88 390.16" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="975" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Payment</text>
+<text x="975" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Review</text>
+<rect x="1110" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<path d="M 1122.44 372.24 L 1151.56 372.24 L 1151.56 390.72 L 1140.92 390.72 L 1133.08 398.0 L 1133.08 390.72 L 1122.44 390.72 L 1122.44 372.24" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1129.72" cy="381.2" r="1.12" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<circle cx="1137.0" cy="381.2" r="1.12" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<circle cx="1144.28" cy="381.2" r="1.12" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<text x="1160" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Concern</text>
+<text x="1160" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Handling</text>
+<rect x="1295" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<path d="M 1306.88 373.36 L 1316.4 370.0 L 1327.6 373.36 L 1337.12 370.0 L 1337.12 395.2 L 1327.6 398.56 L 1316.4 395.2 L 1306.88 398.56 L 1306.88 373.36" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1316.4 370.0 L 1316.4 395.2" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1327.6 373.36 L 1327.6 398.56" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1323.68" cy="383.44" r="3.9200000000000004" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<path d="M 1320.32 386.8 L 1323.68 392.4 L 1327.04 386.8" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1345" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">GIS and</text>
+<text x="1345" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Offline Sync</text>
+<rect x="1480" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<path d="M 1492.44 370.0 L 1492.44 397.44 L 1522.12 397.44" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1496.92 389.6 L 1504.76 384.0 L 1510.36 387.92 L 1520.44 375.6" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1513.72 375.6 L 1520.44 375.6 L 1520.44 382.32" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1530" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Reports and</text>
+<text x="1530" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Exports</text>
+<rect x="1665" y="348" width="170" height="100" rx="8" fill="#FFFFFF" stroke="#BCD6C2" stroke-width="1.6"/>
+<circle cx="1693.12" cy="384.0" r="12.88" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002"/>
+<path d="M 1693.12 376.72 L 1693.12 384.56 L 1700.4 388.48" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1675.2 376.16 L 1680.8 376.16 L 1680.8 370.0" fill="none" stroke="#287C3B" stroke-width="1.6800000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1715" y="379" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">Activity</text>
+<text x="1715" y="405" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#213140" text-anchor="start">History</text>
+<text x="1102" y="473" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#213140" text-anchor="middle">Controllers and services | Sessions and Sanctum tokens | Roles, approvals and scoped record access</text>
+<path d="M 1100 490 L 1100 510" fill="none" stroke="#6441AC" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1100,510 1104.0,503.0 1096.0,503.0" fill="#6441AC"/>
+<polygon points="1100,490 1096.0,497.0 1104.0,497.0" fill="#6441AC"/>
+<text x="1127" y="505" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" fill="#6441AC" text-anchor="start">Verified monthly counts / forecast results</text>
+<rect x="45" y="520" width="1830" height="170" rx="11" fill="#F6F3FC" stroke="#6441AC" stroke-width="1.6"/>
+<rect x="45" y="520" width="75" height="170" rx="10" fill="#6441AC" stroke="#6441AC" stroke-width="1.6"/>
+<rect x="105" y="521" width="15" height="168" rx="0" fill="#6441AC" stroke="#6441AC" stroke-width="1.6"/>
+<circle cx="82" cy="605.0" r="21" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="82" y="614.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#6441AC" text-anchor="middle">3</text>
+<path d="M 335 520 L 335 690" fill="none" stroke="#6441AC" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225" y="584.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#6441AC" text-anchor="middle">ANALYTICS AND</text>
+<text x="225" y="614.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#6441AC" text-anchor="middle">FORECASTING</text>
+<text x="225" y="644.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#6441AC" text-anchor="middle">LAYER</text>
+<text x="1102" y="553" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#6441AC" text-anchor="middle">Native PHP Forecasting Engine</text>
+<rect x="370" y="570" width="277" height="72" rx="8" fill="#FFFFFF" stroke="#CBBCE7" stroke-width="1.6"/>
+<path d="M 384.75 593.74 L 387.6 596.59 L 392.16 590.32" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 396.72 593.74 L 413.25 593.74" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 384.75 604.0 L 387.6 606.85 L 392.16 600.58" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 396.72 604.0 L 413.25 604.0" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 384.75 614.26 L 387.6 617.11 L 392.16 610.84" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 396.72 614.26 L 413.25 614.26" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="433" y="597" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">Verified monthly</text>
+<text x="433" y="624" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">history</text>
+<path d="M 650 606 L 661 606" fill="none" stroke="#6441AC" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="661,606 654.0,602.0 654.0,610.0" fill="#6441AC"/>
+<rect x="666" y="570" width="277" height="72" rx="8" fill="#FFFFFF" stroke="#CBBCE7" stroke-width="1.6"/>
+<circle cx="682.46" cy="594.31" r="3.42" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="707.54" cy="594.31" r="3.42" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="695.0" cy="604.0" r="3.42" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="682.46" cy="615.4" r="3.42" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="707.54" cy="615.4" r="3.42" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<path d="M 685.31 596.59 L 695.0 604.0" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 704.69 596.59 L 695.0 604.0" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 685.31 612.55 L 695.0 604.0" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 704.69 612.55 L 695.0 604.0" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="729" y="597" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">Time-series</text>
+<text x="729" y="624" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">model candidates</text>
+<path d="M 946 606 L 957 606" fill="none" stroke="#6441AC" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="957,606 950.0,602.0 950.0,610.0" fill="#6441AC"/>
+<rect x="962" y="570" width="277" height="72" rx="8" fill="#FFFFFF" stroke="#CBBCE7" stroke-width="1.6"/>
+<rect x="976.75" y="592.03" width="28.499999999999996" height="25.65" rx="1.71" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<path d="M 976.75 600.01 L 1005.25 600.01" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 983.59 588.04 L 983.59 595.45" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 998.41 588.04 L 998.41 595.45" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="983.59" cy="605.71" r="1.026" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="983.59" cy="611.98" r="1.026" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="991.0" cy="605.71" r="1.026" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="991.0" cy="611.98" r="1.026" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="998.41" cy="605.71" r="1.026" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="998.41" cy="611.98" r="1.026" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<text x="1025" y="597" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">Chronological</text>
+<text x="1025" y="624" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">validation</text>
+<path d="M 1242 606 L 1253 606" fill="none" stroke="#6441AC" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1253,606 1246.0,602.0 1246.0,610.0" fill="#6441AC"/>
+<rect x="1258" y="570" width="277" height="72" rx="8" fill="#FFFFFF" stroke="#CBBCE7" stroke-width="1.6"/>
+<path d="M 1272.18 589.75 L 1272.18 617.68 L 1302.39 617.68" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1276.74 609.7 L 1284.72 604.0 L 1290.42 607.99 L 1300.68 595.45" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1293.84 595.45 L 1300.68 595.45 L 1300.68 602.29" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1321" y="597" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">MAE and baseline</text>
+<text x="1321" y="624" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">comparison</text>
+<path d="M 1538 606 L 1549 606" fill="none" stroke="#6441AC" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1549,606 1542.0,602.0 1542.0,610.0" fill="#6441AC"/>
+<rect x="1554" y="570" width="277" height="72" rx="8" fill="#FFFFFF" stroke="#CBBCE7" stroke-width="1.6"/>
+<circle cx="1577.3" cy="598.3" r="4.56" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<circle cx="1589.84" cy="596.59" r="3.9899999999999998" fill="none" stroke="#6441AC" stroke-width="1.71"/>
+<path d="M 1567.04 617.11 L 1568.75 608.56 L 1574.45 605.14 L 1580.15 605.14 L 1585.85 608.56 L 1587.56 617.11" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1586.42 604.57 L 1592.69 604.57 L 1598.39 608.56 L 1598.96 617.11" fill="none" stroke="#6441AC" stroke-width="1.71" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1617" y="597" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">Arrivals, departures</text>
+<text x="1617" y="624" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="start">and net migration</text>
+<text x="1102" y="674" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Last-month baseline | Moving average | Exponential smoothing | Holt trend | Verified history required</text>
+<rect x="45" y="725" width="1830" height="140" rx="11" fill="#FFF8ED" stroke="#CD7310" stroke-width="1.6"/>
+<rect x="45" y="725" width="75" height="140" rx="10" fill="#CD7310" stroke="#CD7310" stroke-width="1.6"/>
+<rect x="105" y="726" width="15" height="138" rx="0" fill="#CD7310" stroke="#CD7310" stroke-width="1.6"/>
+<circle cx="82" cy="795.0" r="21" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="82" y="804.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#CD7310" text-anchor="middle">4</text>
+<path d="M 335 725 L 335 865" fill="none" stroke="#CD7310" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225" y="789.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#CD7310" text-anchor="middle">SUPPORTING</text>
+<text x="225" y="819.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#CD7310" text-anchor="middle">SERVICES LAYER</text>
+<rect x="370" y="745" width="352" height="98" rx="8" fill="#FFFFFF" stroke="#DFBC89" stroke-width="1.6"/>
+<rect x="383.2" y="770.6" width="33.6" height="24.0" rx="1.7999999999999998" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<path d="M 383.2 770.6 L 400.0 783.8 L 416.8 770.6" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 383.2 794.6 L 394.6 783.2" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 416.8 794.6 L 405.4 783.2" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="434" y="778" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#213140" text-anchor="start">SMTP Email</text>
+<text x="546" y="823" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" fill="#213140" text-anchor="middle">Account recovery messages</text>
+<rect x="740" y="745" width="352" height="98" rx="8" fill="#FFFFFF" stroke="#DFBC89" stroke-width="1.6"/>
+<circle cx="770.0" cy="782.0" r="15.6" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<ellipse cx="770" cy="782" rx="7.199999999999999" ry="15.6" fill="none" stroke="#CD7310" stroke-width="1.5"/>
+<path d="M 754.4 782.0 L 785.6 782.0" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 756.8 774.2 L 783.2 774.2" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 756.8 789.8 L 783.2 789.8" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="804" y="778" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#213140" text-anchor="start">Map Tile Services</text>
+<text x="916" y="823" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" fill="#213140" text-anchor="middle">Browser loads OSM / Esri tiles</text>
+<rect x="1110" y="745" width="352" height="98" rx="8" fill="#FFFFFF" stroke="#DFBC89" stroke-width="1.6"/>
+<path d="M 1124.4 769.4 L 1155.6 769.4 L 1155.6 789.2 L 1144.2 789.2 L 1135.8 797.0 L 1135.8 789.2 L 1124.4 789.2 L 1124.4 769.4" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1132.2" cy="779.0" r="1.2" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<circle cx="1140.0" cy="779.0" r="1.2" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<circle cx="1147.8" cy="779.0" r="1.2" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<text x="1174" y="778" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#213140" text-anchor="start">Database Assistant</text>
+<text x="1286" y="823" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" fill="#213140" text-anchor="middle">Scoped English / Cebuano answers</text>
+<rect x="1480" y="745" width="352" height="98" rx="8" fill="#FFFFFF" stroke="#DFBC89" stroke-width="1.6" stroke-dasharray="7 5"/>
+<circle cx="1496.8" cy="771.8" r="3.5999999999999996" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<circle cx="1523.2" cy="771.8" r="3.5999999999999996" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<circle cx="1510.0" cy="782.0" r="3.5999999999999996" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<circle cx="1496.8" cy="794.0" r="3.5999999999999996" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<circle cx="1523.2" cy="794.0" r="3.5999999999999996" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998"/>
+<path d="M 1499.8 774.2 L 1510.0 782.0" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1520.2 774.2 L 1510.0 782.0" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1499.8 791.0 L 1510.0 782.0" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1520.2 791.0 L 1510.0 782.0" fill="none" stroke="#CD7310" stroke-width="1.7999999999999998" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1544" y="778" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#213140" text-anchor="start">Optional Ollama</text>
+<text x="1656" y="823" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" fill="#213140" text-anchor="middle">Private question interpretation</text>
+<rect x="45" y="900" width="1830" height="164" rx="11" fill="#EFFAFA" stroke="#008691" stroke-width="1.6"/>
+<rect x="45" y="900" width="75" height="164" rx="10" fill="#008691" stroke="#008691" stroke-width="1.6"/>
+<rect x="105" y="901" width="15" height="162" rx="0" fill="#008691" stroke="#008691" stroke-width="1.6"/>
+<circle cx="82" cy="982.0" r="21" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="82" y="991.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#008691" text-anchor="middle">5</text>
+<path d="M 335 900 L 335 1064" fill="none" stroke="#008691" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225" y="976.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#008691" text-anchor="middle">DATA</text>
+<text x="225" y="1006.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#008691" text-anchor="middle">LAYER</text>
+<text x="1102" y="934" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#008691" text-anchor="middle">MySQL Database and Persistent File Storage</text>
+<circle cx="488.0" cy="970.74" r="5.94" fill="none" stroke="#008691" stroke-width="1.98"/>
+<path d="M 474.8 993.18 L 476.12 984.6 L 482.06 979.98 L 493.94 979.98 L 499.88 984.6 L 501.2 993.18 L 474.8 993.18" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="488" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Accounts and</text>
+<text x="488" y="1046" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">access records</text>
+<circle cx="727.4" cy="971.4" r="5.28" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="741.92" cy="969.42" r="4.62" fill="none" stroke="#008691" stroke-width="1.98"/>
+<path d="M 715.52 993.18 L 717.5 983.28 L 724.1 979.32 L 730.7 979.32 L 737.3 983.28 L 739.28 993.18" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 737.96 978.66 L 745.22 978.66 L 751.82 983.28 L 752.48 993.18" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="734" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Households</text>
+<text x="734" y="1046" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">and RBI records</text>
+<rect x="963.5" y="964.14" width="33.0" height="29.700000000000003" rx="1.98" fill="none" stroke="#008691" stroke-width="1.98"/>
+<path d="M 963.5 973.38 L 996.5 973.38" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 971.42 959.52 L 971.42 968.1" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 988.58 959.52 L 988.58 968.1" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="971.42" cy="979.98" r="1.1880000000000002" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="971.42" cy="987.24" r="1.1880000000000002" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="980.0" cy="979.98" r="1.1880000000000002" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="980.0" cy="987.24" r="1.1880000000000002" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="988.58" cy="979.98" r="1.1880000000000002" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="988.58" cy="987.24" r="1.1880000000000002" fill="none" stroke="#008691" stroke-width="1.98"/>
+<text x="980" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Migration and</text>
+<text x="980" y="1046" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">verified periods</text>
+<rect x="1208.84" y="966.78" width="34.32" height="23.76" rx="1.98" fill="none" stroke="#008691" stroke-width="1.98"/>
+<path d="M 1208.84 974.04 L 1243.16 974.04" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1214.78 983.28 L 1222.7 983.28" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1236.56" cy="988.56" r="7.92" fill="none" stroke="#008691" stroke-width="1.98"/>
+<path d="M 1232.6 988.56 L 1235.9 991.86 L 1241.18 985.26" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1226" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Requests and</text>
+<text x="1226" y="1046" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">payment records</text>
+<path d="M 1454.84 964.14 L 1489.16 964.14 L 1489.16 985.92 L 1476.62 985.92 L 1467.38 994.5 L 1467.38 985.92 L 1454.84 985.92 L 1454.84 964.14" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1463.42" cy="974.7" r="1.32" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="1472.0" cy="974.7" r="1.32" fill="none" stroke="#008691" stroke-width="1.98"/>
+<circle cx="1480.58" cy="974.7" r="1.32" fill="none" stroke="#008691" stroke-width="1.98"/>
+<text x="1472" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Concerns and</text>
+<text x="1472" y="1046" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">activity logs</text>
+<path d="M 1699.52 968.1 L 1714.04 968.1 L 1718.0 962.82 L 1735.16 962.82 L 1735.16 992.52 L 1699.52 992.52 L 1699.52 968.1" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1699.52 974.04 L 1735.16 974.04" fill="none" stroke="#008691" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1718" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">Receipts, signatures</text>
+<text x="1718" y="1046" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#213140" text-anchor="middle">and attachments</text>
+<path d="M 370 465 L 352 465 L 352 882 L 1100 882 L 1100 896" fill="none" stroke="#008691" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1100,896 1104.0,889.0 1096.0,889.0" fill="#008691"/>
+<polygon points="370,465 363.0,461.0 363.0,469.0" fill="#008691"/>
+<text x="1127" y="888" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#008691" text-anchor="start">Eloquent reads and writes / protected file access</text>
+<path d="M 1879 398 L 1896 398 L 1896 795 L 1879 795" fill="none" stroke="#CD7310" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 5"/>
+<polygon points="1879,795 1886.0,799.0 1886.0,791.0" fill="#CD7310"/>
+<polygon points="1879,398 1886.0,402.0 1886.0,394.0" fill="#CD7310"/>
+<rect x="45" y="1099" width="1830" height="154" rx="11" fill="#FFFBEE" stroke="#B18A0B" stroke-width="1.6"/>
+<rect x="45" y="1099" width="75" height="154" rx="10" fill="#B18A0B" stroke="#B18A0B" stroke-width="1.6"/>
+<rect x="105" y="1100" width="15" height="152" rx="0" fill="#B18A0B" stroke="#B18A0B" stroke-width="1.6"/>
+<circle cx="82" cy="1176.0" r="21" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="82" y="1185.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#B18A0B" text-anchor="middle">6</text>
+<path d="M 335 1099 L 335 1253" fill="none" stroke="#B18A0B" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="225" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#B18A0B" text-anchor="middle">DEPLOYMENT</text>
+<text x="225" y="1200.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#B18A0B" text-anchor="middle">LAYER</text>
+<text x="1102" y="1131" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#B18A0B" text-anchor="middle">Configured VPS Deployment</text>
+<circle cx="478.9" cy="1157.0" r="3.9000000000000004" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<circle cx="478.9" cy="1183.65" r="3.9000000000000004" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<circle cx="501.0" cy="1158.95" r="3.9000000000000004" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<path d="M 478.9 1160.9 L 478.9 1179.75" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 478.9 1174.55 L 491.9 1174.55 L 501.0 1167.4 L 501.0 1162.85" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="488" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="middle">GitHub Source</text>
+<path d="M 726.2 1157.65 L 715.8 1170.0 L 726.2 1182.35" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 741.8 1157.65 L 752.2 1170.0 L 741.8 1182.35" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 737.25 1153.75 L 730.75 1186.25" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="734" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="middle">Dokploy Builds</text>
+<rect x="959.2" y="1152.45" width="11.700000000000001" height="11.700000000000001" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<rect x="974.15" y="1152.45" width="11.700000000000001" height="11.700000000000001" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<rect x="989.1" y="1152.45" width="11.700000000000001" height="11.700000000000001" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<rect x="959.2" y="1168.7" width="11.700000000000001" height="11.700000000000001" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<rect x="974.15" y="1168.7" width="11.700000000000001" height="11.700000000000001" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<rect x="989.1" y="1168.7" width="11.700000000000001" height="11.700000000000001" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<text x="980" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="middle">Docker Containers</text>
+<path d="M 1226.0 1153.75 L 1240.3 1160.25 L 1238.35 1175.2 L 1232.5 1183.0 L 1226.0 1187.55 L 1219.5 1183.0 L 1213.65 1175.2 L 1211.7 1160.25 L 1226.0 1153.75" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1219.5 1170.0 L 1224.7 1175.2 L 1233.8 1163.5" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1226" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="middle">Traefik HTTPS</text>
+<rect x="1453.8" y="1151.15" width="36.4" height="10.4" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<circle cx="1460.3" cy="1155.7" r="0.9750000000000001" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<path d="M 1473.3 1155.7 L 1483.7 1155.7" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1453.8" y="1165.45" width="36.4" height="10.4" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<circle cx="1460.3" cy="1170.0" r="0.9750000000000001" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<path d="M 1473.3 1170.0 L 1483.7 1170.0" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1453.8" y="1179.75" width="36.4" height="10.4" rx="1.9500000000000002" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<circle cx="1460.3" cy="1184.3" r="0.9750000000000001" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<path d="M 1473.3 1184.3 L 1483.7 1184.3" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1472" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="middle">Apache and PHP</text>
+<ellipse cx="1718" cy="1158.3" rx="16.25" ry="5.8500000000000005" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<path d="M 1701.75 1158.3 L 1701.75 1182.35" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1734.25 1158.3 L 1734.25 1182.35" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="1718" cy="1170.0" rx="16.25" ry="5.8500000000000005" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<ellipse cx="1718" cy="1182.35" rx="16.25" ry="5.8500000000000005" fill="none" stroke="#B18A0B" stroke-width="1.9500000000000002"/>
+<text x="1718" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#213140" text-anchor="middle">Persistent Volumes</text>
+<text x="1102" y="1238" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" fill="#213140" text-anchor="middle">Hostinger VPS configuration | App and MySQL containers | Private networks | Optional Ollama container</text>
+<text x="960" y="1287" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#213140" text-anchor="middle">Figure 1. Architectural design of the developed RBIM system.</text>
+<text x="960" y="1310" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#526474" text-anchor="middle">Dashed path: supporting-service connection. Dashed box: optional component. Deployment hosts the application and data tiers.</text>
+</svg>

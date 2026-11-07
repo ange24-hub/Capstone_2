@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1020" viewBox="0 0 1400 1020"><rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9" fill="none" stroke="#617184" stroke-width="1.6"/></marker></defs>
+<rect x="80" y="190" width="360" height="110" rx="24" fill="#EFF5FC" stroke="#668BB5" stroke-width="2.5"/>
+<text x="260.0" y="228.53" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Resident Portal</text><text x="260.0" y="261.47" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Web / Android</text>
+<rect x="520" y="190" width="360" height="110" rx="24" fill="#EFF5FC" stroke="#668BB5" stroke-width="2.5"/>
+<text x="700.0" y="228.53" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Barangay Secretary</text><text x="700.0" y="261.47" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Dashboard</text>
+<rect x="960" y="190" width="360" height="110" rx="24" fill="#EFF5FC" stroke="#668BB5" stroke-width="2.5"/>
+<text x="1140.0" y="228.53" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Municipal DILG</text><text x="1140.0" y="261.47" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Dashboard</text>
+<rect x="360" y="450" width="680" height="210" rx="24" fill="#EFF8F5" stroke="#649B88" stroke-width="2.5"/>
+<text x="700.0" y="503.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Laravel Application</text><text x="700.0" y="537.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447"></text><text x="700.0" y="572.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Access control, records and services</text><text x="700.0" y="606.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#243447">Reports, maps and forecasting</text>
+<rect x="240" y="810" width="400" height="110" rx="24" fill="#F5F6F8" stroke="#8B99AA" stroke-width="2.5"/>
+<text x="440.0" y="848.53" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">MySQL Database</text><text x="440.0" y="881.47" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">System records</text>
+<rect x="760" y="810" width="400" height="110" rx="24" fill="#F5F6F8" stroke="#8B99AA" stroke-width="2.5"/>
+<text x="960.0" y="848.53" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">File Storage</text><text x="960.0" y="881.47" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#243447">Receipts and attachments</text>
+<polyline points="260,300 260,370 500,370 500,450" fill="none" stroke="#617184" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<polyline points="700,300 700,450" fill="none" stroke="#617184" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<polyline points="1140,300 1140,370 900,370 900,450" fill="none" stroke="#617184" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<polyline points="540,660 540,730 440,730 440,810" fill="none" stroke="#617184" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<polyline points="860,660 860,730 960,730 960,810" fill="none" stroke="#617184" stroke-width="2" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="700" y="65.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="40" font-weight="700" fill="#243447">Design of the Software</text>
+<text x="700" y="115.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="25" font-weight="400" fill="#243447">SB-ISPGM System</text>
+<text x="700" y="980.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#243447">Figure. Simplified software design of the developed system.</text>
+</svg>

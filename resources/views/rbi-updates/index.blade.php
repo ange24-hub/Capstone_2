@@ -46,7 +46,7 @@
         <div class="rbi-report-view rbi-workspace-overview">
             <header class="rbi-report-header">
                 <div class="rbi-report-heading">
-                    <span class="rbi-report-emblem" aria-hidden="true"><x-app-icon name="document" /></span>
+                    <span class="rbi-report-emblem" aria-hidden="true"><x-portal-sticker name="document" /></span>
                     <div>
                         <span class="rbi-report-eyebrow">RBI Monthly Form</span>
                         <h1>{{ $rbiSection === 'history' ? 'Report history' : ($rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Add residents') }}</h1>
@@ -84,7 +84,6 @@
             <a href="#monthly-report"><span>01</span> Monthly report</a>
             <a href="#{{ $rbiSection === 'deceased' ? 'deceased-section' : 'family-section' }}"><span>02</span> {{ $rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Family members' }}</a>
             <a href="#certification-section"><span>03</span> Certification</a>
-            <a href="{{ route('barangay.rbi-updates.history') }}"><span>04</span> Report history</a>
         </nav>
         @endif
         @if (session('status'))

@@ -8,7 +8,7 @@
 <section class="payment-history-page" aria-labelledby="payment-history-title">
     <div class="dashboard-card payment-history-header rounded-xl border border-slate-200 bg-white p-5 mb-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <div><h1 id="payment-history-title" class="text-2xl font-bold">{{ $secretary ? 'Barangay payment history' : 'My payment history' }}</h1>
+            <div><h1 id="payment-history-title" class="text-2xl font-bold"><x-portal-sticker name="document" /> {{ $secretary ? 'Barangay payment history' : 'My payment history' }}</h1>
             <p class="text-sm text-slate-600">GCash submissions and reviews, and payments received in person. Pending or rejected entries are not confirmed payments.</p></div>
             <a class="button secondary-button" href="{{ route($secretary ? 'barangay.document-requests.index' : 'resident.document-requests.index') }}">Document requests</a>
         </div>

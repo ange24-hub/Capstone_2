@@ -7,7 +7,7 @@
 @section('content')
 <section class="staff-profile profile-workspace" aria-labelledby="profile-title">
     <header class="profile-heading">
-        <div><span class="profile-eyebrow">Account settings</span><h1 id="profile-title">My Profile</h1><p>Manage your personal details and account security.</p></div>
+        <div><span class="profile-eyebrow">Account settings</span><h1 id="profile-title"><x-portal-sticker name="shield" /> My Profile</h1><p>Manage your personal details and account security.</p></div>
         <a class="profile-dashboard-link" href="{{ route('dashboard') }}"><x-app-icon name="home" /> Back to dashboard</a>
     </header>
     @if(session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status">{{ session('status') }}</div>@endif

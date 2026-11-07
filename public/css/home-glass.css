@@ -15,18 +15,18 @@
     }
     .civic-home-hero .civic-home-pattern { opacity: .55; }
     html.municipal-ui .home-hero-layout { max-width: 1180px !important; width: 100% !important; grid-template-columns: minmax(0, 1fr) 280px !important; gap: 48px !important; padding: 40px 28px !important; }
-    html.municipal-ui .home-hero-copy > p:first-child { margin: 0 0 14px !important; font-size: 10px !important; letter-spacing: .12em !important; }
+    html.municipal-ui .home-hero-copy > p:first-child { margin: 0 0 14px !important; font-size: 13px !important; letter-spacing: .12em !important; }
     html.municipal-ui .civic-home #home-title { margin: 0 !important; max-width: 660px !important; font-family: inherit !important; font-size: clamp(27px, 2.6vw, 36px) !important; line-height: 1.2 !important; font-weight: 700 !important; letter-spacing: -.03em !important; color: #fff !important; }
     html.municipal-ui .home-title-secondary { display: block; margin-top: 10px; font-size: clamp(18px, 1.7vw, 23px) !important; font-weight: 500 !important; line-height: 1.4 !important; letter-spacing: -.01em !important; color: #e7cc86 !important; }
-    html.municipal-ui .home-hero-copy > h1 + p { margin-top: 18px !important; max-width: 620px !important; font-size: 14px !important; line-height: 1.7 !important; color: #dae7ef !important; }
+    html.municipal-ui .home-hero-copy > h1 + p { margin-top: 18px !important; max-width: 620px !important; font-size: 16px !important; line-height: 1.7 !important; color: #dae7ef !important; }
     html.municipal-ui .home-hero-actions { margin-top: 22px !important; gap: 10px !important; }
     html.municipal-ui .home-hero-actions a { min-height: 42px !important; padding: 10px 16px !important; font-size: 13px !important; }
-    html.municipal-ui .home-hero-trust { margin-top: 22px !important; gap: 10px 18px !important; padding: 12px 14px !important; font-size: 11px !important; }
+    html.municipal-ui .home-hero-trust { margin-top: 22px !important; gap: 10px 18px !important; padding: 12px 14px !important; font-size: 13px !important; }
     html.municipal-ui .civic-home-seal { width: 152px !important; height: 152px !important; flex: 0 0 152px !important; border-width: 4px !important; }
     html.municipal-ui .civic-home-identity { flex-direction: column !important; gap: 18px !important; text-align: center !important; }
     html.municipal-ui .civic-home-identity > div:last-child { margin: 0 !important; }
     html.municipal-ui .civic-home-identity strong { font-family: inherit !important; font-size: 23px !important; }
-    html.municipal-ui .civic-home-identity p { font-size: 11px !important; }
+    html.municipal-ui .civic-home-identity p { font-size: 13px !important; }
     html.municipal-ui .civic-home-identity::before, html.municipal-ui .civic-home-identity::after { display: none !important; }
     html.municipal-ui .civic-home > section:not(.civic-home-hero) { max-width: 1180px !important; margin-inline: auto !important; }
     html.municipal-ui .civic-home > section[aria-label="Online service shortcuts"] { margin-top: 20px !important; padding-inline: 28px !important; }
@@ -44,18 +44,18 @@
     }
     html.municipal-ui .home-section-eyebrow { display: block; color: #315f92; font-size: 11px; font-weight: 700; letter-spacing: .14em; line-height: 1.6; text-transform: uppercase; }
     html.municipal-ui .civic-home #home-registration-title { margin: 14px 0 0 !important; max-width: 420px; color: #17344e !important; font-size: clamp(26px, 2.4vw, 32px) !important; font-weight: 700 !important; line-height: 1.25 !important; letter-spacing: -.03em !important; }
-    html.municipal-ui .home-registration-description { margin: 16px 0 0 !important; max-width: 430px; color: #587087 !important; font-size: 14px; line-height: 1.8 !important; }
+    html.municipal-ui .home-registration-description { margin: 16px 0 0 !important; max-width: 430px; color: #465d70 !important; font-size: 14px; line-height: 1.8 !important; }
     html.municipal-ui .home-verification-note { display: flex; align-items: flex-start; gap: 12px; margin-top: 24px; padding: 16px !important; border: 1px solid #dae6f0 !important; border-radius: 12px; background: #eef4fa; }
     html.municipal-ui .home-verification-icon { display: flex; flex: 0 0 36px; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: #fff; color: #315f92; }
     html.municipal-ui .home-verification-note strong { display: block; color: #234865; font-size: 12px; font-weight: 700; }
-    html.municipal-ui .home-verification-note p { margin: 4px 0 0 !important; color: #587087 !important; font-size: 12px; line-height: 1.7 !important; }
+    html.municipal-ui .home-verification-note p { margin: 4px 0 0 !important; color: #465d70 !important; font-size: 12px; line-height: 1.7 !important; }
     html.municipal-ui .home-registration-steps { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
     html.municipal-ui .home-registration-step { position: relative; display: flex; align-items: flex-start; gap: 16px; padding: 20px !important; border: 1px solid #dfe8f1 !important; border-radius: 14px; background: #fff; box-shadow: 0 3px 12px #173e5304; }
     html.municipal-ui .home-registration-step:not(:last-child)::after { content: ''; position: absolute; left: 41px; bottom: -15px; width: 2px; height: 14px; background: #cbdbea; }
     html.municipal-ui .home-step-number { display: flex; flex: 0 0 42px; align-items: center; justify-content: center; width: 42px; height: 42px; border: 1px solid #d8e6f3; border-radius: 12px; color: #315f92; background: #eef4fa; font-size: 13px; font-weight: 700; }
     html.municipal-ui .home-registration-step > div { min-width: 0; }
     html.municipal-ui .civic-home .home-registration-step h3 { margin: 1px 0 0 !important; color: #17344e !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.5; }
-    html.municipal-ui .home-registration-step p { margin: 6px 0 0 !important; color: #587087 !important; font-size: 13px; line-height: 1.7 !important; }
+    html.municipal-ui .home-registration-step p { margin: 6px 0 0 !important; color: #465d70 !important; font-size: 13px; line-height: 1.7 !important; }
     html.municipal-ui .civic-home .home-register { padding: 0 28px 48px !important; }
     html.municipal-ui .home-register-card { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 28px 36px !important; border: 1px solid #244a65 !important; border-radius: 18px; background: linear-gradient(115deg, #17344e, #244d68); box-shadow: 0 8px 24px #173e5310; }
     html.municipal-ui .home-register-card .home-section-eyebrow { color: #e7cc86; }

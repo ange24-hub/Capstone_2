@@ -68,6 +68,7 @@ class AuthController extends Controller
     public function sendPasswordResetLink(Request $request): RedirectResponse
     {
         $credentials = $request->validate(['email' => ['required', 'email']]);
+        $credentials['email'] = Str::lower(trim($credentials['email']));
 
         // Keep the response identical for known and unknown emails to prevent account discovery.
         try {
@@ -75,11 +76,12 @@ class AuthController extends Controller
         } catch (\Throwable $exception) {
             Log::warning('Password reset notification could not be delivered.', [
                 'exception' => $exception::class,
-                'message' => $exception->getMessage(),
+                // SMTP exceptions may contain account details or server transcripts.
+                'diagnostic' => 'Run php artisan sbispgm:mail-check on the application server.',
             ]);
         }
 
-        return back()->with('status', 'If an account uses that email address, a password reset link has been sent.');
+        return back()->with('status', 'Request received. If this email is registered and email delivery is available, you should receive a reset link. Check Spam/Junk. If it does not arrive, wait one minute before retrying or contact your administrator.');
     }
 
     public function showResetPassword(Request $request, string $token): View
@@ -97,6 +99,7 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
+        $credentials['email'] = Str::lower(trim($credentials['email']));
 
         $status = Password::reset($credentials, function (User $user, string $password): void {
             $user->forceFill([
