@@ -448,10 +448,10 @@
   .municipal-ui .municipal-hero-actions a:hover { filter: none !important; box-shadow: 0 0 0 3px #2866a018 !important; }
   .municipal-ui .public-nav a[aria-current=page] { box-shadow: inset 0 -3px var(--portal-accent) !important; }
   .municipal-ui .auth-panel { border: 1px solid var(--portal-line) !important; border-radius: 12px !important; box-shadow: 0 8px 30px #102a4308 !important; }
-  .portal-password-control { position: relative; min-width: 0; width: 100%; }
+  .portal-password-control { position: relative !important; min-width: 0; width: 100%; }
   .password-control-current { max-width: 360px; }
   .municipal-ui :is(.app-content,.public-content) .portal-password-control input { width: 100% !important; min-height: 48px !important; margin: 0 !important; padding-right: 104px !important; }
-  .municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle { display: inline-flex !important; align-items: center; justify-content: center; gap: 6px !important; position: absolute; inset: 2px 2px 2px auto; min-width: 88px; min-height: 44px !important; margin: 0 !important; padding: 6px 10px !important; background: #edf4ff !important; border: 0 !important; color: var(--portal-navy) !important; font-size: 13px !important; cursor: pointer; }
+  html.municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; position: absolute !important; inset: 2px 2px 2px auto !important; width: 88px !important; min-width: 0 !important; max-width: none !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 6px 10px !important; border: 0 !important; border-radius: 6px !important; box-shadow: none !important; transform: none !important; font-size: 14px !important; line-height: 1 !important; font-weight: 600 !important; white-space: nowrap !important; cursor: pointer; }
   .municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle[hidden] { display: none !important; }
   .municipal-ui .password-toggle .app-icon { width: 18px !important; height: 18px !important; }
   .municipal-ui :is(.app-content,.public-content) .portal-password-control .password-toggle:hover { background: #e0eaf3 !important; color: var(--portal-navy) !important; }

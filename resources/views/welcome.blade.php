@@ -28,17 +28,15 @@
                 </div>
             </div>
             <aside class="landing-community" aria-label="Tomas Oppus resident services">
-                <div class="landing-community-header">
-                    <span class="landing-seal"><img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal" width="64" height="64"></span>
-                    <div><span class="landing-small-label">Municipal Government</span><strong>Tomas Oppus</strong><span>Southern Leyte, Philippines</span></div>
-                    <span class="landing-community-mark" aria-hidden="true"><x-app-icon name="shield" /></span>
-                </div>
                 <div class="landing-illustration">
                     <div class="landing-illustration-caption"><span class="landing-small-label">Built around our community</span><h2>Local services.<br>A little closer.</h2></div>
                     <img src="{{ asset('images/civic-services-sticker.png') }}" alt="" width="1536" height="1024" decoding="async" fetchpriority="high">
-                    <span class="landing-illustration-tag"><x-app-icon name="location" /> Serving 29 barangays</span>
                 </div>
-                <div class="landing-community-footer"><span class="landing-check"><x-app-icon name="check" /></span><div><strong>A simpler way to get started</strong><span>Register. Get verified. Access services.</span></div></div>
+                <ul class="landing-service-highlights" aria-label="Resident services">
+                    <li><x-app-icon name="document" /><span>Documents</span></li>
+                    <li><x-app-icon name="clock" /><span>Request updates</span></li>
+                    <li><x-app-icon name="users" /><span>Resident concerns</span></li>
+                </ul>
             </aside>
         </div>
     </section>

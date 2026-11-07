@@ -105,8 +105,11 @@
 
     .municipal-ui :is(.app-content,.public-content) :is(button,.button):not(:where(.secondary-button,.outline-button,.danger-button,.password-toggle,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *,.rbi-dropdown *)) { background:#345b82 !important; color:#fff !important; border-color:#345b82 !important; }
     .municipal-ui :is(.app-content,.public-content) :is(button,.button):hover:not(:disabled):not(:where(.secondary-button,.outline-button,.danger-button,.password-toggle,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *,.rbi-dropdown *)) { background:#294c70 !important; border-color:#294c70 !important; }
-    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.password-toggle) { background:#fff !important; color:#345b82 !important; border-color:#aebfd0 !important; }
-    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button,.password-toggle):hover { background:#dfe9f3 !important; color:#294c70 !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button) { background:#fff !important; color:#345b82 !important; border-color:#aebfd0 !important; }
+    .municipal-ui :is(.app-content,.public-content) :is(.secondary-button,.outline-button):hover { background:#dfe9f3 !important; color:#294c70 !important; }
+    .municipal-ui :is(.app-content,.public-content) .password-toggle { background:transparent !important; color:#345b82 !important; }
+    .municipal-ui :is(.app-content,.public-content) .password-toggle:hover { background:#edf2f7 !important; color:#294c70 !important; }
+    .municipal-ui :is(.app-content,.public-content) .password-toggle:focus-visible { outline:2px solid #345b82 !important; outline-offset:-2px !important; }
 
     /* Public account pages and assistant share the same palette. */
     .municipal-ui :is(.portal-login-intro,.registration-guide) { background:linear-gradient(120deg,#365978,#466b8e) !important; border-color:#91abc5 !important; }
