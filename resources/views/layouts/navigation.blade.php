@@ -9,7 +9,7 @@
             'Reports' => [
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
-                ['migration.dashboard', 'migration.dashboard', 'trend', 'Migration trends'],
+                ['migration.dashboard', 'migration.*', 'trend', 'Migration trends'],
                 ['concerns.summary', 'concerns.*', 'users', 'Concern summary'],
             ],
             'Maps' => [['spatial.index', 'spatial.index', 'map', 'Household map']],
@@ -34,7 +34,7 @@
             'Reports' => [
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
-                ['migration.dashboard', 'migration.dashboard', 'trend', 'Migration trends'],
+                ['migration.dashboard', 'migration.*', 'trend', 'Migration trends'],
             ],
             'Maps & surveys' => [
                 ['spatial.index', 'spatial.index', 'map', 'Household map'],

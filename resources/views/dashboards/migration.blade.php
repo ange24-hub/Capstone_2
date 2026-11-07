@@ -29,6 +29,7 @@
             @foreach (['trends' => 'Trends', 'forecast' => 'Forecast', 'events' => 'Recent events'] as $section => $label)
                 <a href="{{ route('migration.dashboard', array_filter(['year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'section' => $section], fn ($value) => $value !== null)) }}" @if($migrationSection === $section) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
+            <a href="{{ route('migration.demo') }}">Demo prediction analysis</a>
         </nav>
 
         <form class="migration-filters" method="GET" action="{{ route('migration.dashboard') }}" aria-label="Migration filters">

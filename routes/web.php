@@ -308,6 +308,10 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('migration.dashboard');
 
+    Route::get('/migration-monitoring/demo', \App\Http\Controllers\DemoMigrationForecastController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
+        ->name('migration.demo');
+
     Route::post('/migration-monitoring/reporting-periods', [\App\Http\Controllers\MigrationReportingPeriodController::class, 'store'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('migration.reporting-periods.store');

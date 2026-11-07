@@ -48,6 +48,18 @@ The audit is read-only and outputs aggregate coverage, excluded demo totals and 
 
 ## Validation
 
+### Separate synthetic training experiment
+
+Run `php scripts/train-demo-forecast.php` to fit and evaluate the same PHP forecasting engine using a reproducible, explicitly synthetic dataset. This standalone runner does not bootstrap Laravel, access the database, confirm reporting periods, update the legacy Python artifact, or change live forecasts.
+
+Each run creates a new private `storage/app/forecast-demo/` folder containing 108 monthly rows (three fictional scenarios, 36 months each), evaluation metrics, held-out predictions, a JSON result manifest with checksums, and a readable report. Scenarios cover stable counts, a gradual trend, and an abrupt change. A fixed seed makes comparisons reproducible; the counts are not estimated from actual residents.
+
+The experiment selects methods using earlier rolling validation at the dashboard's four-month selection horizon. It evaluates July–September 2026 targets at a three-month horizon, using April–June 2026 training cutoffs respectively. It then refits on all 36 months for a December 2026 synthetic forecast. The final three target actuals never choose the model. The in-memory completeness flags are simulation inputs, not staff attestations, and are never stored in the reporting database.
+
+Read test MAE alongside the moving-average baseline and retain worse/equal results. MAE measures error in event counts, not an accuracy percentage. These three held-out targets per scenario demonstrate the workflow only; they cannot establish performance on actual barangay data. Do not import the demo CSV as verified production records.
+
+Approved barangay and municipal staff can open **Migration trends → Demo prediction analysis** (`/migration-monitoring/demo`). This separate read-only page shows the saved experiment at `resources/demo/migration-forecast.json`, with scenario tabs, clearly labeled synthetic actual-versus-predicted graphs, moving-average comparisons, signed net forecasts, and exact test values. The December 2026 target is a fixed experiment date, not a live next-month estimate. Real records and reporting confirmations are never read or modified by the demo controller. Screenshots should retain the **DEMO DATA ONLY** banner and graph legend. To update the displayed experiment, rerun the script and explicitly review/copy its JSON result into that resource; deployment never runs training automatically.
+
 `MigrationForecastEngineTest` checks held-out leakage, trend fitting, known zeros, chronological continuity and MAE arithmetic. `MigrationNetForecastTest` verifies signed net arithmetic, matched targets and independently measured net errors, including worse-than-baseline results. `NetMigrationForecastTest` exercises joint readiness, atomic dual-fingerprint confirmation, arrival changes, duplicates, synthetic exclusion, municipal completeness, English/Bisaya answers and preservation of old checks on upgrade. `VerifiedMigrationForecastTest` retains departure compatibility and quarterly rollover coverage. The existing dashboard/report tests still protect role and year filters. Model accuracy on fixture data is not evidence of accuracy on real barangay records.
 
 Evaluation follows the time-ordered validation principles in [Forecasting: Principles and Practice](https://otexts.com/fpp3/tscv.html).

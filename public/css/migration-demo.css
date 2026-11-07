@@ -1,0 +1,52 @@
+@layer portal {
+    #demo-analysis { display:grid !important; gap:16px !important; max-width:1500px !important; margin:0 auto !important; color:#273444 !important; }
+    #demo-analysis * { box-sizing:border-box !important; }
+    #demo-analysis :is(h1,h2,h3,p) { margin:0 !important; }
+    #demo-analysis .demo-heading { display:flex !important; justify-content:space-between !important; align-items:center !important; flex-wrap:wrap !important; gap:16px !important; }
+    #demo-analysis h1 { font-size:28px !important; line-height:1.2 !important; margin:5px 0 7px !important; }
+    #demo-analysis h2 { font-size:18px !important; line-height:1.4 !important; }
+    #demo-analysis h3 { font-size:18px !important; }
+    #demo-analysis p { font-size:14px !important; line-height:1.55 !important; color:#526174 !important; }
+    #demo-analysis .demo-eyebrow { font-size:11px !important; font-weight:700 !important; color:#345b82 !important; text-transform:uppercase !important; letter-spacing:.1em !important; }
+    #demo-analysis .demo-notice { display:flex !important; gap:12px !important; flex-wrap:wrap !important; align-items:center !important; background:#fff8e9 !important; border:1px solid #e4cf9d !important; border-radius:9px !important; padding:11px 15px !important; font-size:13px !important; color:#6c4d16 !important; }
+    #demo-analysis .demo-notice strong { font-size:12px !important; letter-spacing:.04em !important; color:#6c4d16 !important; }
+    #demo-analysis .demo-scenarios { display:flex !important; flex-wrap:wrap !important; gap:8px !important; }
+    #demo-analysis .demo-scenarios a { display:inline-flex !important; align-items:center !important; min-height:42px !important; padding:9px 16px !important; border:1px solid #cbd5e1 !important; border-radius:8px !important; background:#fff !important; color:#345b82 !important; font-size:14px !important; font-weight:600 !important; text-decoration:none !important; }
+    #demo-analysis .demo-scenarios a[aria-current=page] { background:#345b82 !important; color:#fff !important; border-color:#345b82 !important; }
+    #demo-analysis .demo-scenarios a:focus-visible { outline:3px solid #b56819 !important; outline-offset:3px !important; }
+    #demo-analysis .demo-scenario-heading { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:12px !important; flex-wrap:wrap !important; }
+    #demo-analysis .demo-scenario-heading > span { font-size:12px !important; color:#526174 !important; }
+    #demo-analysis :is(.demo-forecast-grid,.demo-chart-grid) { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:14px !important; }
+    #demo-analysis .demo-forecast-grid article { display:grid !important; gap:4px !important; padding:15px 18px !important; background:#fff !important; border:1px solid #d6dfe8 !important; border-top:3px solid #52799b !important; border-radius:10px !important; }
+    #demo-analysis .demo-forecast-grid span { font-size:14px !important; color:#334155 !important; }
+    #demo-analysis .demo-forecast-grid strong { font-size:28px !important; line-height:1.2 !important; color:#263e58 !important; }
+    #demo-analysis .demo-forecast-grid small { font-size:12px !important; color:#526174 !important; }
+    #demo-analysis .demo-chart-heading { margin-top:5px !important; }
+    #demo-analysis .demo-legend { display:flex !important; flex-wrap:wrap !important; gap:12px 22px !important; font-size:12px !important; color:#334155 !important; }
+    #demo-analysis .demo-legend span { display:flex !important; gap:7px !important; align-items:center !important; }
+    #demo-analysis .demo-legend i { width:23px !important; height:0 !important; border-top:3px solid #345b82 !important; }
+    #demo-analysis .demo-legend .demo-line-predicted { border-color:#b56819 !important; }
+    #demo-analysis .demo-legend .demo-line-baseline { border-color:#64748b !important; border-top-style:dashed !important; }
+    #demo-analysis .demo-chart-card { min-width:0 !important; padding:18px !important; border:1px solid #d6dfe8 !important; border-radius:12px !important; background:#fff !important; }
+    #demo-analysis .demo-model-name { font-size:12px !important; min-height:38px !important; margin-top:4px !important; }
+    #demo-analysis svg { display:block !important; width:100% !important; height:auto !important; margin:8px 0 !important; overflow:visible !important; }
+    #demo-analysis svg text { font-family:Arial,sans-serif !important; font-size:13px !important; fill:#526174 !important; }
+    #demo-analysis svg .demo-axis-label { font-size:11px !important; }
+    #demo-analysis .demo-errors { display:grid !important; grid-template-columns:1fr 1fr !important; gap:10px !important; border-top:1px solid #e2e8f0 !important; padding-top:12px !important; }
+    #demo-analysis .demo-errors div { display:grid !important; gap:3px !important; }
+    #demo-analysis .demo-errors span { font-size:12px !important; color:#526174 !important; }
+    #demo-analysis .demo-errors strong { font-size:21px !important; color:#273444 !important; }
+    #demo-analysis .demo-comparison { margin-top:10px !important; font-size:12px !important; font-weight:600 !important; color:#7c4c16 !important; }
+    #demo-analysis .demo-comparison[data-comparison=better] { color:#28664c !important; }
+    #demo-analysis .demo-comparison[data-comparison=equal] { color:#526174 !important; }
+    #demo-analysis .demo-detail-card { padding:20px !important; border:1px solid #d6dfe8 !important; border-radius:12px !important; background:#fff !important; }
+    #demo-analysis .demo-detail-card .table-wrap { margin-top:14px !important; }
+    #demo-analysis table { width:100% !important; border-collapse:collapse !important; }
+    #demo-analysis :is(th,td) { padding:10px 12px !important; font-size:13px !important; text-align:left !important; white-space:nowrap !important; }
+    #demo-analysis tbody th { background:#fff !important; color:#334155 !important; }
+    #demo-analysis .demo-method { padding:18px 20px !important; background:#edf2f7 !important; border-radius:10px !important; }
+    #demo-analysis .demo-method p { margin-top:8px !important; }
+    #demo-analysis .demo-method > span { display:block !important; margin-top:12px !important; font-size:12px !important; font-weight:600 !important; color:#345b82 !important; }
+    @media(max-width:1100px) { #demo-analysis .demo-chart-grid { grid-template-columns:1fr !important; } #demo-analysis svg { max-width:620px !important; margin-inline:auto !important; } }
+    @media(max-width:600px) { #demo-analysis .demo-forecast-grid { grid-template-columns:1fr !important; } #demo-analysis h1 { font-size:24px !important; } }
+}

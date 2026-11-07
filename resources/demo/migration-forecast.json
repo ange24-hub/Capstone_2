@@ -1,0 +1,441 @@
+{
+    "data_source": "SYNTHETIC_DEMO_ONLY",
+    "seed": 20261106,
+    "warning": "Simulation results only. Not actual barangay data and not evidence of real-world accuracy.",
+    "database_access": false,
+    "production_model_changed": false,
+    "source_start": "2023-10",
+    "source_end": "2026-09",
+    "target_month": "2026-12",
+    "months_per_scenario": 36,
+    "scenarios": 3,
+    "dataset_rows": 108,
+    "methodology": {
+        "candidate_methods": [
+            "last_month",
+            "moving_average_3",
+            "smoothing_0.2",
+            "smoothing_0.5",
+            "smoothing_0.8",
+            "holt_0.3_0.1",
+            "holt_0.6_0.2"
+        ],
+        "selection_horizon_months": 4,
+        "evaluation_horizon_months": 3,
+        "selection_validation_targets": "2024-07 through 2026-03",
+        "selection_data_ends": "2026-03",
+        "held_out_targets": [
+            "2026-07",
+            "2026-08",
+            "2026-09"
+        ],
+        "test_training_cutoffs": [
+            "2026-04",
+            "2026-05",
+            "2026-06"
+        ],
+        "description": "Earlier rolling validation selects the method; final three targets are held out. Each test forecast uses only data available at its origin. The future demo estimate is then refitted through September.",
+        "baseline": "Recursive 3-month moving average; net baseline subtracts departure baseline from arrival baseline.",
+        "mae_units": "Movement events per month. Lower is better. Not an accuracy percentage."
+    },
+    "engine_sha256": "2a830c9589e7182f834f62f27eeea7780cb6ecf3f15858cde1398e144a11c781",
+    "dataset_sha256": "d4471562fb09bcc8bc582c183e3edab93b2d7a45be8fc9474e307661e9fb8cd9",
+    "results": {
+        "Demo A - stable": {
+            "arrivals": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 12.739284988318104,
+                "method_key": "smoothing_0.5",
+                "method": "Exponential smoothing (α=0.5)",
+                "validation_mae": 2.293,
+                "mae": 1.8,
+                "baseline_mae": 1.605,
+                "beats_baseline": false,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 12,
+                        "predicted": 13.657119626179338,
+                        "baseline": 13.370370370370372,
+                        "absolute_error": 1.6571196261793375
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 12,
+                        "predicted": 14.828559813089669,
+                        "baseline": 14.814814814814817,
+                        "absolute_error": 2.8285598130896688
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 13,
+                        "predicted": 13.914279906544834,
+                        "baseline": 13.629629629629628,
+                        "absolute_error": 0.9142799065448344
+                    }
+                ],
+                "baseline_comparison": "worse",
+                "validation_months": 23,
+                "source_start": "2023-10",
+                "source_end": "2026-09",
+                "horizon": 3,
+                "selection_horizon": 4,
+                "selection_validation_mae": 1.697,
+                "selection_validation_months": 21
+            },
+            "departures": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 11.631618848516425,
+                "method_key": "smoothing_0.2",
+                "method": "Exponential smoothing (α=0.2)",
+                "validation_mae": 1.555,
+                "mae": 0.683,
+                "baseline_mae": 0.383,
+                "beats_baseline": false,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 11,
+                        "predicted": 11.200985255482248,
+                        "baseline": 10.85185185185185,
+                        "absolute_error": 0.200985255482248
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 13,
+                        "predicted": 11.760788204385799,
+                        "baseline": 12.777777777777779,
+                        "absolute_error": 1.2392117956142013
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 11,
+                        "predicted": 11.60863056350864,
+                        "baseline": 11.777777777777779,
+                        "absolute_error": 0.6086305635086404
+                    }
+                ],
+                "baseline_comparison": "worse",
+                "validation_months": 23,
+                "source_start": "2023-10",
+                "source_end": "2026-09",
+                "horizon": 3,
+                "selection_horizon": 4,
+                "selection_validation_mae": 1.638,
+                "selection_validation_months": 21
+            },
+            "net": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 1.1076661398016796,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 1,
+                        "predicted": 2.4561343706970895,
+                        "baseline": 2.5185185185185226,
+                        "absolute_error": 1.4561343706970895
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": -1,
+                        "predicted": 3.06777160870387,
+                        "baseline": 2.037037037037038,
+                        "absolute_error": 4.06777160870387
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 2,
+                        "predicted": 2.305649343036194,
+                        "baseline": 1.8518518518518494,
+                        "absolute_error": 0.30564934303619395
+                    }
+                ],
+                "mae": 1.943,
+                "baseline_mae": 1.568,
+                "beats_baseline": false,
+                "baseline_comparison": "worse",
+                "source_end": "2026-09",
+                "horizon": 3
+            }
+        },
+        "Demo B - gradual trend": {
+            "arrivals": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 32.19596277032603,
+                "method_key": "holt_0.6_0.2",
+                "method": "Holt linear trend (α=0.6, β=0.2)",
+                "validation_mae": 2.405,
+                "mae": 2.862,
+                "baseline_mae": 1.148,
+                "beats_baseline": false,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 29,
+                        "predicted": 33.08638243712727,
+                        "baseline": 30,
+                        "absolute_error": 4.08638243712727
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 31,
+                        "predicted": 34.62098649924829,
+                        "baseline": 31.185185185185187,
+                        "absolute_error": 3.620986499248289
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 31,
+                        "predicted": 30.1203097441869,
+                        "baseline": 28.740740740740744,
+                        "absolute_error": 0.8796902558130988
+                    }
+                ],
+                "baseline_comparison": "worse",
+                "validation_months": 23,
+                "source_start": "2023-10",
+                "source_end": "2026-09",
+                "horizon": 3,
+                "selection_horizon": 4,
+                "selection_validation_mae": 3.01,
+                "selection_validation_months": 21
+            },
+            "departures": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 19.074074074074076,
+                "method_key": "moving_average_3",
+                "method": "3-month moving average",
+                "validation_mae": 2.531,
+                "mae": 1.333,
+                "baseline_mae": 1.333,
+                "beats_baseline": false,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 16,
+                        "predicted": 16.037037037037035,
+                        "baseline": 16.037037037037035,
+                        "absolute_error": 0.03703703703703454
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 21,
+                        "predicted": 17.370370370370367,
+                        "baseline": 17.370370370370367,
+                        "absolute_error": 3.6296296296296333
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 19,
+                        "predicted": 19.333333333333332,
+                        "baseline": 19.333333333333332,
+                        "absolute_error": 0.33333333333333215
+                    }
+                ],
+                "baseline_comparison": "equal",
+                "validation_months": 23,
+                "source_start": "2023-10",
+                "source_end": "2026-09",
+                "horizon": 3,
+                "selection_horizon": 4,
+                "selection_validation_mae": 2.444,
+                "selection_validation_months": 21
+            },
+            "net": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 13.12188869625195,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 13,
+                        "predicted": 17.049345400090235,
+                        "baseline": 13.962962962962965,
+                        "absolute_error": 4.049345400090235
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 10,
+                        "predicted": 17.250616128877923,
+                        "baseline": 13.81481481481482,
+                        "absolute_error": 7.2506161288779225
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 12,
+                        "predicted": 10.786976410853569,
+                        "baseline": 9.407407407407412,
+                        "absolute_error": 1.213023589146431
+                    }
+                ],
+                "mae": 4.171,
+                "baseline_mae": 2.457,
+                "beats_baseline": false,
+                "baseline_comparison": "worse",
+                "source_end": "2026-09",
+                "horizon": 3
+            }
+        },
+        "Demo C - abrupt change": {
+            "arrivals": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 9.176758129440714,
+                "method_key": "smoothing_0.5",
+                "method": "Exponential smoothing (α=0.5)",
+                "validation_mae": 1.766,
+                "mae": 11.633,
+                "baseline_mae": 11.926,
+                "beats_baseline": true,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 10,
+                        "predicted": 18.656260142102838,
+                        "baseline": 18.85185185185185,
+                        "absolute_error": 8.656260142102838
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 4,
+                        "predicted": 19.82813007105142,
+                        "baseline": 20.11111111111111,
+                        "absolute_error": 15.828130071051419
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 9,
+                        "predicted": 19.41406503552571,
+                        "baseline": 19.814814814814813,
+                        "absolute_error": 10.41406503552571
+                    }
+                ],
+                "baseline_comparison": "better",
+                "validation_months": 23,
+                "source_start": "2023-10",
+                "source_end": "2026-09",
+                "horizon": 3,
+                "selection_horizon": 4,
+                "selection_validation_mae": 1.52,
+                "selection_validation_months": 21
+            },
+            "departures": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": 17.103676541958755,
+                "method_key": "smoothing_0.2",
+                "method": "Exponential smoothing (α=0.2)",
+                "validation_mae": 2.208,
+                "mae": 14.676,
+                "baseline_mae": 14.605,
+                "beats_baseline": false,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": 26,
+                        "predicted": 10.431630071895615,
+                        "baseline": 11.666666666666666,
+                        "absolute_error": 15.568369928104385
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": 21,
+                        "predicted": 9.745304057516492,
+                        "baseline": 8.85185185185185,
+                        "absolute_error": 11.254695942483508
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": 27,
+                        "predicted": 9.796243246013194,
+                        "baseline": 9.666666666666666,
+                        "absolute_error": 17.203756753986806
+                    }
+                ],
+                "baseline_comparison": "worse",
+                "validation_months": 23,
+                "source_start": "2023-10",
+                "source_end": "2026-09",
+                "horizon": 3,
+                "selection_horizon": 4,
+                "selection_validation_mae": 2.123,
+                "selection_validation_months": 21
+            },
+            "net": {
+                "ready": true,
+                "required_months": 16,
+                "available_months": 36,
+                "prediction": -7.926918412518042,
+                "backtest": [
+                    {
+                        "month": "2026-07",
+                        "label": "Jul 2026",
+                        "actual": -16,
+                        "predicted": 8.224630070207223,
+                        "baseline": 7.185185185185185,
+                        "absolute_error": 24.224630070207223
+                    },
+                    {
+                        "month": "2026-08",
+                        "label": "Aug 2026",
+                        "actual": -17,
+                        "predicted": 10.082826013534927,
+                        "baseline": 11.259259259259261,
+                        "absolute_error": 27.082826013534927
+                    },
+                    {
+                        "month": "2026-09",
+                        "label": "Sep 2026",
+                        "actual": -18,
+                        "predicted": 9.617821789512515,
+                        "baseline": 10.148148148148147,
+                        "absolute_error": 27.617821789512515
+                    }
+                ],
+                "mae": 26.308,
+                "baseline_mae": 26.531,
+                "beats_baseline": true,
+                "baseline_comparison": "better",
+                "source_end": "2026-09",
+                "horizon": 3
+            }
+        }
+    }
+}
