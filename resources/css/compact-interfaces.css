@@ -1,6 +1,37 @@
 /* Targeted spacing and type adjustments, separate from the color palette. */
 @layer portal {
 @media screen {
+    /* A narrower registration card without shrinking the form text. */
+    html.municipal-ui #main-content .registration-page { padding:20px 16px 28px !important; }
+    html.municipal-ui #main-content .registration-layout {
+        width:min(780px,100%) !important; gap:0 !important; margin:0 auto !important;
+    }
+    html.municipal-ui #main-content .registration-guide { padding:16px 22px !important; gap:12px !important; }
+    html.municipal-ui #main-content .registration-card { padding:20px 22px !important; }
+    html.municipal-ui #main-content .registration-card-head { margin-bottom:14px !important; }
+    html.municipal-ui #main-content .registration-card-head h2 { font-size:24px !important; line-height:1.3 !important; }
+    html.municipal-ui #main-content .registration-card-head p { font-size:15px !important; line-height:1.5 !important; margin:4px 0 0 !important; }
+    html.municipal-ui #main-content .registration-form { gap:12px !important; }
+    html.municipal-ui #main-content .registration-section { padding:12px !important; }
+    html.municipal-ui #main-content .registration-section-head { padding:8px 10px !important; margin-bottom:6px !important; }
+    html.municipal-ui #main-content .registration-fields { gap:10px 14px !important; }
+    html.municipal-ui #main-content .registration-fields .field-group label,
+    html.municipal-ui #main-content .account-type-fieldset legend,
+    html.municipal-ui #main-content .registration-section-head > span { font-size:14px !important; font-weight:600 !important; }
+    html.municipal-ui #main-content .registration-fields :is(input,select) { font-size:16px !important; min-height:44px !important; padding:9px 12px !important; }
+    html.municipal-ui #main-content .registration-fields .portal-password-control input { padding-right:104px !important; }
+    html.municipal-ui #main-content .account-type-option { padding:10px !important; }
+    html.municipal-ui #main-content .account-type-option :is(.required-mark,.civic-required) { position:absolute !important; top:6px !important; right:8px !important; margin:0 !important; }
+    html.municipal-ui #main-content .account-type-option strong { font-size:14px !important; }
+    html.municipal-ui #main-content :is(.account-type-option small,.registration-section-head small,.registration-fields .field-group small,.registration-approval-note) { font-size:13px !important; line-height:1.5 !important; }
+    html.municipal-ui #main-content .registration-submit { font-size:15px !important; min-height:44px !important; }
+    html.municipal-ui #main-content .registration-card .form-footer { margin-top:14px !important; padding-top:12px !important; font-size:14px !important; }
+    @media (max-width:640px) {
+        html.municipal-ui #main-content .registration-page { padding:14px 10px 24px !important; }
+        html.municipal-ui #main-content :is(.registration-guide,.registration-card) { padding:16px !important; }
+        html.municipal-ui #main-content .registration-section { padding:10px !important; }
+        html.municipal-ui #main-content .registration-section-head { flex-wrap:wrap !important; gap:4px !important; }
+    }
     html.municipal-ui #main-content .registry-workspace { gap:14px !important; }
     html.municipal-ui #main-content .registry-workspace .registry-scope-actions {
         padding:0 !important; margin:0 !important; gap:10px !important;
