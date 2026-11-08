@@ -51,6 +51,7 @@
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_number]" value="{{ $family['household_number'] ?? '' }}" data-household-number-hidden><input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][history_record_id]" value="{{ $member['history_record_id'] ?? '' }}">
+                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][source_row_id]" value="{{ $member['source_row_id'] ?? '' }}">
                                             @include('rbi-updates.forms._entry-classification',['entryTemplate'=>false])
                                             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                                 @foreach ($memberFields as $field => $label)

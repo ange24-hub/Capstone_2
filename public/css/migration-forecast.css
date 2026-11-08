@@ -11,6 +11,9 @@
 .forecast-unavailable { border-color: #e6d8b6; background: #fffbef; color: #705724; }
 .forecast-note { margin: 12px 0; color: #526579; font-size: 13px; line-height: 1.6; }
 .forecast-overview [data-forecast-schedule] { padding-left: 12px; border-left: 3px solid #c5dae7; }
+.forecast-source-period { margin: 10px 0; }
+.forecast-info { padding-top: 10px; border-top: 1px solid #dce4eb; }
+.forecast-info > summary { color: #345b82; font-size: 14px; font-weight: 650; }
 .forecast-start { margin: 18px 0 0; padding: 22px; border-radius: 10px; background: #f1f6fa; color: #244765; }
 .forecast-start strong { font-size: 19px; }
 .forecast-start p { margin-bottom: 0; }

@@ -24,6 +24,7 @@ class BarangayNavigationTest extends TestCase
                 $this->assertStringContainsString('href="'.route($route).'"', $match[0], $barangay->name);
             }
             $this->assertStringNotContainsString('<span>New Inhabitants</span>', $match[0]);
+            $response->assertDontSee('Prediction analytics')->assertDontSee(route('municipal.prediction-forecast'));
             $response->assertSee('href="'.route('barangay.rbi-updates.index').'">Open forms', false);
         }
     }

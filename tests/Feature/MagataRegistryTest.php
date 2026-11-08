@@ -28,7 +28,8 @@ class MagataRegistryTest extends TestCase
         $this->actingAs($secretary)->get(route('barangay.registry.active'))
             ->assertOk()->assertViewHas('registryHouseholdCount', 1)->assertSee('AwayResident');
         $this->get(route('barangay.registry.moved-out'))->assertOk()
-            ->assertViewHas('residents', fn ($residents) => $residents->total() === 0);
+            ->assertViewHas('residents', fn ($residents) => $residents->total() === 1)->assertSee('AwayResident');
+        $this->assertDatabaseCount('migration_records',0);
     }
 
     public function test_magata_has_workbook_pages_and_can_save_monthly_families(): void

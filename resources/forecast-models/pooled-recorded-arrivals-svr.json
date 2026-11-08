@@ -1,0 +1,222 @@
+{
+  "format": "rbim.pooled_recorded_arrivals_rbf_svr.v1",
+  "run": "pooled-actual-review-20261108",
+  "target": "existing_classified_arrival_entries_in_observed_source_month",
+  "exported_at": "2026-11-08T21:20:31.937033+00:00",
+  "source_sha256": "fbd701b1679f10f665716cf9ff88aec904f4c1c9735fc307e8ab53faf79c1245",
+  "source_fingerprint": "f1c23689497337a124cd774e9546a45bb647bf9dd81fd2d4f406cc0a40ed3498",
+  "refit_model_sha256": "d11df2a4a3f7079e3fee8bc8eca0f19b6b94bc454860ace7e072b641bc70f75c",
+  "numeric_features": [
+    "month_sin",
+    "month_cos",
+    "previous_observed",
+    "previous_missing",
+    "gap_months"
+  ],
+  "area_categories": [
+    "10",
+    "5"
+  ],
+  "areas": [
+    {
+      "id": 5,
+      "name": "Cabascan",
+      "last_observed_month": "2021-06",
+      "last_observed_count": 1
+    },
+    {
+      "id": 10,
+      "name": "Cawayan",
+      "last_observed_month": "2021-09",
+      "last_observed_count": 2
+    }
+  ],
+  "training": {
+    "rows": 12,
+    "start": "2020-07",
+    "end": "2021-09",
+    "parameters": {
+      "svr__C": 10.0,
+      "svr__epsilon": 1.0,
+      "svr__gamma": 0.1
+    },
+    "max_observed_gap_months": 3.0
+  },
+  "scaler": {
+    "mean": [
+      0.03050211698203653,
+      -0.19716878364870324,
+      1.5833333333333333,
+      0.16666666666666666,
+      1.4166666666666667
+    ],
+    "scale": [
+      0.6447761530378437,
+      0.7378738402246173,
+      2.099933861392359,
+      0.3726779962499649,
+      0.9537935951882998
+    ]
+  },
+  "svr": {
+    "gamma": 0.1,
+    "intercept": 1.5351329812791725,
+    "support_vectors": [
+      [
+        -0.8227694440661171,
+        -0.9064647419023933,
+        -0.7539920006259178,
+        2.2360679774997902,
+        -1.4852968963237645,
+        0.0,
+        1.0
+      ],
+      [
+        -0.8227694440661181,
+        1.4408888477595208,
+        -0.7539920006259178,
+        -0.447213595499958,
+        0.6115928396627265,
+        0.0,
+        1.0
+      ],
+      [
+        -0.047306521555313355,
+        1.6224572798031047,
+        -0.7539920006259178,
+        -0.447213595499958,
+        -0.43685202833051906,
+        0.0,
+        1.0
+      ],
+      [
+        1.2958346596192476,
+        -0.4104105605087059,
+        0.1984189475331363,
+        -0.447213595499958,
+        1.660037707655972,
+        0.0,
+        1.0
+      ],
+      [
+        0.7281564009554914,
+        -0.9064647419023931,
+        -0.27778652654639074,
+        -0.447213595499958,
+        -0.43685202833051906,
+        0.0,
+        1.0
+      ],
+      [
+        0.7281564009554914,
+        -0.9064647419023931,
+        0.6746244216126633,
+        -0.447213595499958,
+        0.6115928396627265,
+        1.0,
+        0.0
+      ],
+      [
+        -0.047306521555312786,
+        -1.0880331739459765,
+        0.1984189475331363,
+        -0.447213595499958,
+        -0.43685202833051906,
+        1.0,
+        0.0
+      ],
+      [
+        -1.5982323665769218,
+        0.26721205292856376,
+        -0.7539920006259178,
+        -0.447213595499958,
+        1.660037707655972,
+        1.0,
+        0.0
+      ]
+    ],
+    "dual_coefficients": [
+      -1.6413556014477761,
+      -7.470323126015001,
+      5.511608142108961,
+      -2.2661228489366474,
+      10.0,
+      0.07214106909710453,
+      -7.353197196277597,
+      3.147249561470954
+    ]
+  },
+  "historical_evaluation": {
+    "mae": 1.9333251467993713,
+    "rmse": 2.5933405363292956,
+    "test_rows": 5,
+    "applies_to_future_forecast_accuracy": false
+  },
+  "future_accuracy": {
+    "mae": null,
+    "rmse": null
+  },
+  "inference_contract": "Fixed observed inputs, no recursive predictions or gap filling; conditional on no intervening eligible observations. Covered barangays only.",
+  "parity_cases": [
+    {
+      "month": "2021-10",
+      "area_id": 5,
+      "raw_prediction": 0.43105269558168
+    },
+    {
+      "month": "2021-10",
+      "area_id": 10,
+      "raw_prediction": 0.5976987299572714
+    },
+    {
+      "month": "2021-11",
+      "area_id": 5,
+      "raw_prediction": 0.6327743852233205
+    },
+    {
+      "month": "2021-11",
+      "area_id": 10,
+      "raw_prediction": 0.561209865767732
+    },
+    {
+      "month": "2021-12",
+      "area_id": 5,
+      "raw_prediction": 0.9920414384467492
+    },
+    {
+      "month": "2021-12",
+      "area_id": 10,
+      "raw_prediction": 0.5594741100970908
+    },
+    {
+      "month": "2026-12",
+      "area_id": 5,
+      "raw_prediction": 1.5351329812791725
+    },
+    {
+      "month": "2026-12",
+      "area_id": 10,
+      "raw_prediction": 1.5351329812791725
+    },
+    {
+      "month": "2027-01",
+      "area_id": 5,
+      "raw_prediction": 1.5351329812791725
+    },
+    {
+      "month": "2027-01",
+      "area_id": 10,
+      "raw_prediction": 1.5351329812791725
+    },
+    {
+      "month": "2027-02",
+      "area_id": 5,
+      "raw_prediction": 1.5351329812791725
+    },
+    {
+      "month": "2027-02",
+      "area_id": 10,
+      "raw_prediction": 1.5351329812791725
+    }
+  ]
+}

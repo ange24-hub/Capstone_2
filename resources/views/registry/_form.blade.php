@@ -160,6 +160,7 @@
     <label for="complete_address">Complete address</label><input id="complete_address" name="complete_address" value="{{ old('complete_address', $inhabitant->complete_address ?? '') }}">
     <label for="remarks">RBI remarks / other information</label>
     <textarea id="remarks" name="remarks">{{ old('remarks', \App\Support\RegistryRemarks::display($inhabitant->remarks ?? null)) }}</textarea>
+    <small>Another location in remarks marks the resident Moved Out while keeping them in Consolidated. Transferred notes archive the registration from Consolidated. Confirm the actual departure date in Movement to include it in monthly migration counts.</small>
     </x-form-section>
 
     @if($isEdit)

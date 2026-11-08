@@ -81,7 +81,7 @@ class RbiArrivalPeriodController extends Controller
                 'changes' => ['record_type' => 'rbi_arrival_period', 'before' => $before, 'after' => $saved->getAttributes()]]);
         });
 
-        return back()->with('status', 'Three-month arrival counts saved. In-migration analytics now uses these reviewed submitted RBI counts.');
+        return back()->with('status', 'Three-month arrival review saved. The live forecast groups classified RBI entries by their first save month.');
     }
 
     public function reopen(Request $request)

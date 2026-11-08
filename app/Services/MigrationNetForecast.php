@@ -35,6 +35,8 @@ class MigrationNetForecast
         return ['ready' => true, 'required_months' => $unavailable['required_months'], 'available_months' => $unavailable['available_months'],
             'prediction' => $arrivals['prediction'] - $departures['prediction'], 'backtest' => $rows,
             'mae' => $mae === null ? null : round($mae, 3), 'baseline_mae' => $baselineMae === null ? null : round($baselineMae, 3),
+            'rmse' => $rows ? sqrt(array_sum(array_map(fn ($row) => ($row['actual'] - $row['predicted']) ** 2, $rows)) / count($rows)) : null,
+            'baseline_rmse' => $rows ? sqrt(array_sum(array_map(fn ($row) => ($row['actual'] - $row['baseline']) ** 2, $rows)) / count($rows)) : null,
             'backtest_ready' => $rows !== [], 'beats_baseline' => $mae === null ? null : $mae < $baselineMae - 1e-9,
             'baseline_comparison' => $mae === null ? 'not_evaluated' : (abs($mae - $baselineMae) < 1e-9 ? 'equal' : ($mae < $baselineMae ? 'better' : 'worse')),
             'source_end' => $arrivals['source_end'], 'horizon' => $arrivals['horizon']];

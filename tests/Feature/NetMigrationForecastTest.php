@@ -78,7 +78,7 @@ class NetMigrationForecastTest extends TestCase
             ->assertViewHas('predictedNetMigration', 2.0)->assertViewHas('predictionMonthLabel', 'December 2026')
             ->assertViewHas('forecastNetEvaluation', fn ($net) => $net['mae'] === 0.0 && count($net['backtest']) === 3)
             ->assertSee('Actual versus predicted arrivals')->assertSee('Actual versus predicted departures')
-            ->assertSee('Actual versus predicted net migration')->assertSee('Open submitted RBI 3-month arrival review')
+            ->assertSee('Actual versus predicted net migration')->assertSee('Open RBI report history')
             ->assertDontSee('Private Identity');
         Http::assertNothingSent();
     }
@@ -96,32 +96,35 @@ class NetMigrationForecastTest extends TestCase
         $this->assertSame(-2.0, app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
     }
 
-    public function test_departure_only_confirmations_never_verify_arrivals_or_produce_net(): void
+    public function test_saved_classified_rbi_arrivals_do_not_require_the_old_three_month_review(): void
     {
         $staff = $this->staff();
         $this->seedHistory($staff, 3, 1, false);
         $report = app(MigrationForecastReport::class)->build($staff->barangay_id);
         $this->assertSame(1.0, $report['predictedOutMigration']);
-        $this->assertNull($report['predictedInMigration']);
-        $this->assertNull($report['predictedNetMigration']);
-        $this->assertFalse($this->source($staff, 'in')['verified']);
+        $this->assertSame(3.0, $report['predictedInMigration']);
+        $this->assertSame(2.0, $report['predictedNetMigration']);
+        $this->assertTrue($this->source($staff, 'in')['verified']);
         $this->actingAs(User::factory()->create(['role' => 'municipal_lgu']))->postJson(route('assistant.chat'), ['message' => 'Predict net migration next month in Looc', 'language' => 'en'])
-            ->assertOk()->assertJsonMissingPath('facts.predicted_net_migration')->assertSee('Insufficient verified records');
+            ->assertOk()->assertJsonPath('facts.predicted_net_migration', 2);
     }
 
-    public function test_arrival_changes_invalidate_net_and_joint_reverification_and_reopening_are_audited(): void
+    public function test_rbi_classification_changes_refresh_the_source_without_a_period_review(): void
     {
         $staff=$this->staff();$this->seedHistory($staff);
         $saved=\App\Models\BarangayRbiUpdate::where('barangay_name',$staff->barangay->name)->whereDate('reporting_month','2026-09-01')->firstOrFail();
         $rows=$saved->rows;$rows[]=['first_name'=>'ExtraArrival','last_name'=>'Example','birth_date'=>'1990-01-01','entry_type'=>'in_migration','previous_residence'=>'Cebu','arrival_date'=>'2026-09-20'];$saved->update(['rows'=>$rows]);
         $report=app(MigrationForecastReport::class)->build($staff->barangay_id);
-        $this->assertNull($report['predictedInMigration']);$this->assertNull($report['predictedNetMigration']);$this->assertSame(1.0,$report['predictedOutMigration']);
-        $period=collect(app(\App\Services\RbiArrivalReview::class)->periods($staff->barangay))->last();
-        $this->actingAs($staff)->post(route('rbi.arrivals.store'),['start_month'=>$period['start'],'fingerprint'=>$period['fingerprint'],'counts'=>array_column($period['months'],'eligible','month'),'confirmed'=>1])->assertSessionHasNoErrors();
-        $this->assertNotNull(app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
-        $this->post(route('rbi.arrivals.reopen'),['start_month'=>$period['start']])->assertSessionHasNoErrors();
-        $this->assertFalse($this->source($staff,'in')['verified']);$this->assertTrue($this->source($staff,'out')['verified']);
-        $this->assertDatabaseCount('registry_activities',2);
+        $this->assertSame(4, $this->source($staff, 'in')['count']);
+        $this->assertSame(3.0, $report['predictedInMigration']);
+        $rows[count($rows) - 1]['entry_type'] = '';
+        $saved->update(['rows' => $rows]);
+        $this->assertFalse($this->source($staff, 'in')['verified']);
+        $this->assertNull(app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
+        $rows[count($rows) - 1]['entry_type'] = 'in_migration';
+        $saved->update(['rows' => $rows]);
+        $this->assertTrue($this->source($staff, 'in')['verified']);
+        $this->assertSame(2.0, app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
     }
 
     public function test_joint_confirmation_requires_both_fingerprints_and_is_atomic_for_stale_arrivals(): void
@@ -142,7 +145,7 @@ class NetMigrationForecastTest extends TestCase
         $this->event($person,'in','2026-09-02',MigrationForecastHistory::DEMO_MARKER);
         $source=$this->source($staff,'in');
         $this->assertSame(0,$source['count']);$this->assertFalse($source['verified']);
-        $this->assertSame('submitted_rbi_arrival_periods',app(MigrationForecastHistory::class)->build($staff->barangay_id,Carbon::parse('2026-09-01'),1,'in')['source']);
+        $this->assertSame('classified_rbi_first_save_dates',app(MigrationForecastHistory::class)->build($staff->barangay_id,Carbon::parse('2026-09-01'),1,'in')['source']);
     }
 
     public function test_municipal_net_requires_arrival_confirmation_from_every_barangay(): void

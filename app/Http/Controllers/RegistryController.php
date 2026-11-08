@@ -113,7 +113,7 @@ class RegistryController extends Controller
             ->orderBy('household_id')
             ->orderBy('id');
 
-        $isActiveHousehold = $request->filled('source')
+        $isActiveHousehold = ($request->filled('source') || $isBarangaySecretary)
             && ! in_array($request->input('sheet'), ['deceased', 'new-inhabitants'], true);
         if ($isActiveHousehold) {
             $query->where('status', Inhabitant::STATUS_ACTIVE);

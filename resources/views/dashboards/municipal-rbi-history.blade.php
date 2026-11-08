@@ -8,7 +8,7 @@
         <div><span class="history-eyebrow">Municipal administration · All barangays</span><h1 id="rbi-history-title">RBI report history</h1><p>Review the recorded reporting months and resident entry classifications for each barangay.</p></div>
         <a class="button secondary-button" href="{{ route('municipal.prediction-forecast') }}">Prediction analytics</a>
     </header>
-    <p>Imported history and saved monthly forms are listed for review. Drafts and unclassified entries require review and submission before they can support verified arrival counts. Opening this page does not submit or verify reports.</p>
+    <p>Imported history and saved monthly forms are listed for review. Classified in-migration entries in saved forms feed the forecast by first-save month, including drafts. Unclassified entries need review. The separate three-month arrival check uses submitted forms.</p>
     <div class="history-metrics">
         <article><span>Barangays</span><strong>{{ $history['area_count'] }}</strong><small>All configured barangays</small></article>
         <article><span>Imported history entries</span><strong>{{ number_format(array_sum(array_column($history['coverage'], 'history_entries'))) }}</strong><small>Matched against saved forms during review</small></article>

@@ -1,11 +1,20 @@
 <section class="forecast-series-evaluation" aria-labelledby="forecast-{{ $kind }}-title">
     <h3 id="forecast-{{ $kind }}-title">Actual versus predicted {{ $kind === 'net' ? 'net migration' : $kind }}</h3>
     <div class="forecast-summary-grid">
-        <article><span>{{ $kind === 'net' ? 'Net forecast MAE' : 'Seasonal model MAE' }}</span><strong>{{ $evaluation['mae'] === null ? 'Not measured' : number_format($evaluation['mae'], 2) }}</strong><small>Average absolute error in movement events · lower is better</small></article>
+        <article><span>{{ $kind === 'net' ? 'Net forecast MAE' : ($evaluation['method_key'] === 'seasonal_naive_12' ? 'Seasonal model MAE' : 'Model MAE') }}</span><strong>{{ $evaluation['mae'] === null ? 'Not measured' : number_format($evaluation['mae'], 2) }}</strong><small>Average absolute error in movement events · lower is better</small></article>
+        <article><span>Model RMSE</span><strong>{{ $evaluation['rmse'] === null ? 'Not measured' : number_format($evaluation['rmse'], 2) }}</strong><small>Larger misses receive more weight · lower is better</small></article>
         <article><span>Moving-average baseline MAE</span><strong>{{ $evaluation['baseline_mae'] === null ? 'Not measured' : number_format($evaluation['baseline_mae'], 2) }}</strong><small>Same target months and forecast horizon</small></article>
-        <article><span>Evaluation coverage</span><strong>{{ count($evaluation['backtest']) }} months</strong><small>{{ $kind === 'net' ? 'Arrival estimate minus departure estimate' : 'Fixed seasonal method; no tuning on test actuals' }}</small></article>
+        <article><span>Moving-average baseline RMSE</span><strong>{{ $evaluation['baseline_rmse'] === null ? 'Not measured' : number_format($evaluation['baseline_rmse'], 2) }}</strong><small>Same target months and forecast horizon</small></article>
+        <article><span>Evaluation coverage</span><strong>{{ count($evaluation['backtest']) }} months</strong><small>{{ $kind === 'net' ? 'Arrival estimate minus departure estimate' : 'No model selection on test actuals' }}</small></article>
     </div>
-    @if($kind !== 'net')<p class="forecast-note">Method: {{ $evaluation['method'] }}. Current fit: {{ $evaluation['fit_start'] }}–{{ $evaluation['source_end'] }}. Reference month for the next estimate: {{ $evaluation['reference_month'] }}.</p>@endif
+    @if($kind !== 'net')
+        <p class="forecast-note">Method: {{ $evaluation['method'] }}. Current fit: {{ $evaluation['fit_start'] }}–{{ $evaluation['source_end'] }}.@if($evaluation['reference_month']) Reference month for the next estimate: {{ $evaluation['reference_month'] }}.@endif</p>
+        @if($evaluation['selection_ready'])
+            <p class="forecast-note">Selected on {{ $evaluation['validation_months'] }} earlier validation targets through {{ $evaluation['selection_through'] }} at a {{ $evaluation['selection_horizon'] }}-month horizon. Validation MAE {{ number_format($evaluation['validation_mae'], 2) }}, RMSE {{ number_format($evaluation['validation_rmse'], 2) }}. Seasonal fallback on the same final test months: MAE {{ number_format($evaluation['seasonal_mae'], 2) }}, RMSE {{ number_format($evaluation['seasonal_rmse'], 2) }}. A validation improvement can still perform worse on the test months.</p>
+        @else
+            <p class="forecast-note">Seasonal fallback retained: {{ $evaluation['selection_required_months'] }} consecutive verified months are needed for separate model selection and testing at this horizon.</p>
+        @endif
+    @endif
     @if(!$evaluation['backtest'])
         <p class="forecast-note" role="status">Held-out error not measured yet. The forecast has enough training history, but separate test history at this horizon is incomplete. This does not mean zero error.</p>
     @else

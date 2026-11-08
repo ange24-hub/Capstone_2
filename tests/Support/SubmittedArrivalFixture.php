@@ -19,7 +19,10 @@ trait SubmittedArrivalFixture
             for ($j = 0; $j < $count; $j++) {
                 $rows[] = ['first_name' => 'Fixture-'.$area->id.'-'.$month.'-'.$j, 'last_name' => 'Arrival', 'birth_date' => '1990-01-01', 'entry_type' => 'in_migration', 'previous_residence' => 'Cebu', 'arrival_date' => $month.'-01'];
             }
-            BarangayRbiUpdate::create(['barangay_user_id' => $staff->id, 'barangay_name' => $area->name, 'reporting_month' => $month.'-01', 'rows' => $rows, 'status' => 'submitted', 'submitted_at' => now()]);
+            $savedAt = Carbon::createFromFormat('!Y-m', $month)->addDays(10);
+            $report = BarangayRbiUpdate::create(['barangay_user_id' => $staff->id, 'barangay_name' => $area->name, 'reporting_month' => $month.'-01', 'rows' => $rows, 'status' => 'submitted', 'submitted_at' => now()]);
+            $report->timestamps = false;
+            $report->forceFill(['created_at' => $savedAt, 'updated_at' => $savedAt])->saveQuietly();
         }
         if ($review) {
             $this->reviewArrivals($area, $staff);

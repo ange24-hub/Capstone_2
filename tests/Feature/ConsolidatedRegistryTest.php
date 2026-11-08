@@ -34,7 +34,7 @@ class ConsolidatedRegistryTest extends TestCase
                 ->assertViewHas('inhabitants', fn ($records) => $records->total() === 1);
         }
         $this->assertDatabaseCount('inhabitants', 3);
-        $this->get(route('registry.index'))->assertOk()->assertSee('ArchivedResident')->assertSee('DepartedResident');
+        $this->get(route('registry.index'))->assertOk()->assertSee('ConsolidatedResident')->assertDontSee('ArchivedResident')->assertDontSee('DepartedResident');
     }
 
     public function test_registry_page_keeps_pagination_without_a_resident_number_column(): void

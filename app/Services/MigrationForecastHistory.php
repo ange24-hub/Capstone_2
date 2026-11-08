@@ -16,7 +16,7 @@ class MigrationForecastHistory
     public function build(?int $barangayId, Carbon $end, int $months = 36, string $type = MigrationRecord::TYPE_OUT): array
     {
         if (! in_array($type, [MigrationRecord::TYPE_IN, MigrationRecord::TYPE_OUT], true)) throw new \InvalidArgumentException('Use arrival or departure events.');
-        if ($type === MigrationRecord::TYPE_IN) return app(RbiArrivalReview::class)->history($barangayId,$end,$months);
+        if ($type === MigrationRecord::TYPE_IN) return app(RbiSavedArrivalHistory::class)->build($barangayId, $end, $months);
         $arrival = $type === MigrationRecord::TYPE_IN;
         $countField = $arrival ? 'in_count' : 'out_count';
         $fingerprintField = $arrival ? 'in_source_fingerprint' : 'source_fingerprint';

@@ -157,6 +157,7 @@
             <input type="hidden" data-row-field="household_head" data-household-head-hidden>
             <input type="hidden" data-row-field="household_number" data-household-number-hidden><input type="hidden" data-row-field="household_id" data-household-id-hidden>
             <input type="hidden" data-row-field="inhabitant_id">
+            <input type="hidden" data-row-field="source_row_id">
             @include('rbi-updates.forms._entry-classification',['entryTemplate'=>true])
             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                 @foreach ($memberFields as $field => $label)

@@ -48,9 +48,10 @@ class RbiArrivalPeriodTest extends TestCase
         $before = app(MigrationForecastHistory::class)->build($area->id, Carbon::parse('2026-04-01'), 3, 'in');
         $this->assertCount(0, $before['consecutive']);
         $this->actingAs($staff)->post(route('rbi.arrivals.store'), $this->payload($area))->assertSessionHasNoErrors();
-        $after = app(MigrationForecastHistory::class)->build($area->id, Carbon::parse('2026-04-01'), 3, 'in');
+        $after = $service->history($area->id, Carbon::parse('2026-04-01'), 3);
         $this->assertSame([1, 1, 0], array_column($after['rows'], 'count'));
         $this->assertCount(3, $after['consecutive']);
+        $this->assertSame('classified_rbi_first_save_dates', app(MigrationForecastHistory::class)->build($area->id, Carbon::parse('2026-04-01'), 3, 'in')['source']);
         $this->assertDatabaseCount('migration_records', 0);
         $this->get(route('rbi.arrivals.index'))->assertOk()->assertSee('2 confirmed arrivals');
         $reports[0]->update(['rows' => [['first_name' => 'Changed', 'last_name' => 'Source']]]);

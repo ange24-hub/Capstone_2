@@ -55,7 +55,7 @@ class MigrationTrendsNavigationTest extends TestCase
         $this->actingAs($secretary)->get(route('migration.dashboard'))
             ->assertOk()->assertSee('Migration Trends')->assertDontSee('Forecast Readiness');
         $this->get(route('analysis.forecast-readiness', ['barangay_id' => $area->id + 1]))
-            ->assertRedirect(route('migration.dashboard'));
+            ->assertForbidden();
     }
 
     public function test_old_link_keeps_role_access_and_assistant_points_to_migration_trends(): void

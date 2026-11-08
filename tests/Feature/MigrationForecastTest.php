@@ -30,11 +30,11 @@ class MigrationForecastTest extends TestCase
         $this->event($this->person($other), '2026-02-01');
         Http::fake(['*/predict' => Http::response(['predicted_next_month_out_migration' => 4.2])]);
         $this->actingAs($user)->get(route('migration.dashboard', ['barangay_id' => $other->id]))
-            ->assertOk()->assertViewHas('currentMonthOut', 1)
-            ->assertViewHas('previousMonthOut', 1)
-            ->assertViewHas('sourceMonthLabel', 'December 2025')
-            ->assertViewHas('predictionMonthLabel', 'April 2026')
-            ->assertViewHas('predictedOutMigration', null);
+            ->assertOk()->assertViewHas('selectedBarangayId', $area->id)
+            ->assertViewHas('totalOut', 4)
+            ->assertViewMissing('forecastEvaluation')
+            ->assertViewMissing('predictedOutMigration')
+            ->assertDontSee('Prediction analytics');
         Http::assertNothingSent();
     }
 

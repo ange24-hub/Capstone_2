@@ -7,11 +7,11 @@
     $futureY = fn ($value) => 185 - ($value - $futureMin) / $futureRange * 140;
 @endphp
 <section class="dashboard-card migration-forecast-card" aria-labelledby="seasonal-future-title">
-    <header class="dashboard-card-header"><div><h2 id="seasonal-future-title">Next six monthly estimates</h2><p>Seasonal naive · source cutoff {{ $sourceMonthLabel }} · forecasts only</p></div></header>
-    <p class="forecast-note">Each target repeats its reference month from the previous year. Counts come from the verified records in the selected scope. Target actuals do not enter their own forecasts. Historical error checks below use the first target's {{ $forecastHorizon }}-month horizon; later targets have no separately displayed error score.</p>
+    <header class="dashboard-card-header"><div><h2 id="seasonal-future-title">Next six monthly estimates</h2><p>Source cutoff {{ $sourceMonthLabel }} · forecasts only</p></div></header>
+    <p class="forecast-note">Arrivals: {{ $predictedInMigration === null ? 'Not ready' : $forecastArrivalEvaluation['method'] }}. Departures: {{ $predictedOutMigration === null ? 'Not ready' : $forecastEvaluation['method'] }}. Counts come from classified RBI save months and checked departure months. Each component keeps its selected model across all six estimates. Historical error checks use the first target's {{ $forecastHorizon }}-month horizon; later targets have no separately displayed error score. Previous-year months in the table are comparison references, used directly only by Seasonal naive.</p>
     <div class="forecast-chart-legend"><span style="color:#345b82">● Arrivals</span><span style="color:#238576">● Departures</span><span style="color:#a76a22">● Net change</span></div>
     <div class="forecast-future-chart-scroll"><svg class="forecast-comparison-chart" viewBox="0 0 720 235" role="img" aria-labelledby="seasonal-future-chart-title seasonal-future-chart-description">
-        <title id="seasonal-future-chart-title">Six monthly Seasonal naive forecasts</title><desc id="seasonal-future-chart-description">Predictions only, using actual reviewed RBI arrivals and dated departure records. The table provides exact values and previous-year reference months.</desc>
+        <title id="seasonal-future-chart-title">Six monthly migration forecasts</title><desc id="seasonal-future-chart-description">Predictions only, using classified RBI entries grouped by first-save month and dated departure records. The table provides exact values and previous-year comparison months.</desc>
         @for($tick=0;$tick<=4;$tick++)<line x1="65" y1="{{ 185-$tick*35 }}" x2="615" y2="{{ 185-$tick*35 }}" stroke="#dce4eb"/><text x="53" y="{{ 189-$tick*35 }}" text-anchor="end">{{ number_format($futureMin+$futureRange*$tick/4,1) }}</text>@endfor
         @foreach(['in'=>'#345b82','out'=>'#238576','net'=>'#a76a22'] as $series=>$color)
             @if($futureRows->first()[$series] !== null)

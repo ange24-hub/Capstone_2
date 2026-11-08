@@ -185,7 +185,7 @@ class AssistantReportSummary
             'arrival_verified_months' => count($report['forecastArrivalSource']['consecutive']),
             'required_months' => $evaluation['required_months'], 'source_through' => $report['sourceMonthLabel'],
             'refresh_every_months' => 3, 'next_refresh' => $report['forecastNextRefreshLabel'],
-            'basis' => 'Seasonal naive on verified RBI arrivals and dated moved-out departure counts. Each target repeats the same month from the preceding year. Net is predicted arrivals minus predicted departures, not population change. Held-out errors are available only with enough separate history. Not a confirmed future count.'];
+            'basis' => 'Models are selected separately on earlier chronological validation; Seasonal naive is the fallback when history is short or challengers do not improve validation MAE and RMSE. Arrivals count classified RBI entries by first-save month, which can differ from actual arrival month. Departures use dated moved-out records. Net is predicted arrivals minus predicted departures, not population change. Final test errors never select the model. Not a confirmed future count.'];
         $metrics = [
             'arrivals' => [$report['predictedInMigration'], $report['forecastArrivalEvaluation'], $ceb ? 'Moabot' : 'Arrivals', 'predicted_arrivals'],
             'departures' => [$report['predictedOutMigration'], $evaluation, $ceb ? 'Mobalhin gawas' : 'Departures', 'predicted_departures'],
@@ -208,6 +208,7 @@ class AssistantReportSummary
             if ($value !== null) {
                 $facts[$factKey] = round($value, 2);
                 $facts[$kind.'_mae'] = $result['mae'];
+                $facts[$kind.'_rmse'] = $result['rmse'];
                 $facts[$kind.'_baseline_mae'] = $result['baseline_mae'];
                 if ($kind !== 'net') {
                     $facts[$kind.'_method'] = $result['method'];

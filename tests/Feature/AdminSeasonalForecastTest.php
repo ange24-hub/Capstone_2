@@ -71,23 +71,18 @@ class AdminSeasonalForecastTest extends TestCase
         $this->get(route('migration.dashboard', ['section' => 'forecast']))->assertForbidden();
         $this->get(route('migration.dashboard'))->assertOk()->assertDontSee('Next six monthly estimates')->assertDontSee(route('municipal.prediction-forecast'));
         $this->actingAs(User::factory()->create(['role' => 'resident']))->get(route('municipal.prediction-forecast'))->assertForbidden();
-        $this->actingAs($admin)->get(route('municipal.prediction-forecast'))->assertOk()->assertSee('Municipal forecast is not ready')
+        $this->actingAs($admin)->get(route('municipal.prediction-forecast'))->assertOk()->assertSee('Kulang pa ang verified monthly records.')
             ->assertViewHas('predictedNetMigration', null);
-        // A reviewed arrival source edit invalidates the fit until the source is reviewed again.
+        // A newly classified RBI row updates its first-save month without another submission or period review.
         $last = BarangayRbiUpdate::orderByDesc('reporting_month')->firstOrFail();
         $rows = $last->rows;
         $rows[] = ['first_name' => 'Extra', 'last_name' => 'Arrival', 'birth_date' => '1990-01-01', 'entry_type' => 'in_migration', 'previous_residence' => 'Cebu', 'arrival_date' => '2026-09-20'];
         $last->update(['rows' => $rows]);
-        $stale = app(MigrationForecastReport::class)->build($area->id);
-        $this->assertNull($stale['predictedInMigration']);
-        $this->assertNull($stale['predictedNetMigration']);
-        $this->assertSame(4.0, $stale['predictedOutMigration']);
-        $original = $response->viewData('forecastArrivalEvaluation');
-        $this->reviewArrivals($area, $owner);
-        $reviewed = app(MigrationForecastReport::class)->build($area->id);
-        $this->assertSame(2.0, $reviewed['predictedInMigration']);
-        $this->assertSame(array_column($original['backtest'], 'predicted'), array_column($reviewed['forecastArrivalEvaluation']['backtest'], 'predicted'));
-        $this->assertNotSame($original['mae'], $reviewed['forecastArrivalEvaluation']['mae']);
+        $updated = app(MigrationForecastReport::class)->build($area->id);
+        $this->assertSame(2.0, $updated['predictedInMigration']);
+        $this->assertSame(-2.0, $updated['predictedNetMigration']);
+        $this->assertSame(4.0, $updated['predictedOutMigration']);
+        $this->assertSame(4, collect($updated['forecastArrivalSource']['rows'])->firstWhere('month', '2026-09')['count']);
     }
 
     public function test_full_year_history_can_forecast_without_reporting_unmeasured_errors_as_zero(): void

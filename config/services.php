@@ -2,6 +2,11 @@
 
 return [
 
+    'experimental_pooled_svr' => [
+        // Reviewed aggregate-only release artifacts; private host exports take precedence.
+        'bundled_fallback' => true,
+    ],
+
     'migration_prediction' => [
         // Legacy synthetic-date Python prototype; the verified dashboard uses the native time-series engine.
         'enabled' => (bool) env('MIGRATION_PREDICTION_ENABLED', false),

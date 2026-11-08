@@ -213,7 +213,7 @@ class BarangayRbiUpdateController extends Controller
             'rows' => $rows,
             'deceased_rows' => $deceasedRows,
             'status' => $submitted ? BarangayRbiUpdate::STATUS_SUBMITTED : BarangayRbiUpdate::STATUS_DRAFT,
-            'submitted_at' => $submitted ? now() : null,
+            'submitted_at' => $submitted ? ($rbiUpdate->submitted_at ?? now()) : null,
         ]);
         $this->syncRelationalRecords($rbiUpdate, $rows, $deceasedRows);
 
@@ -249,7 +249,7 @@ class BarangayRbiUpdateController extends Controller
 
         $rbiUpdate->update($this->reportSignatureAttributes($request, $rbiUpdate) + [
             'status' => BarangayRbiUpdate::STATUS_SUBMITTED,
-            'submitted_at' => now(),
+            'submitted_at' => $rbiUpdate->submitted_at ?? now(),
         ]);
 
         return redirect()
@@ -371,6 +371,7 @@ class BarangayRbiUpdateController extends Controller
     {
         $section = $validated['form_section'] ?? null;
         $rows = $this->cleanRows($section === 'deceased' ? ($report?->rows ?? []) : ($validated['rows'] ?? []));
+        $rows = app(\App\Support\RbiFirstSave::class)->stamp($rows, $report, now());
         $this->ensureHouseholdHeads($rows);
         \App\Support\RbiEntryClassification::validateRows($rows, $validated['reporting_month']);
         // A subpage owns only its own rows; omitted entries on the other page must survive.
@@ -390,6 +391,7 @@ class BarangayRbiUpdateController extends Controller
             'prepared_by' => ['nullable', 'string', 'max:255'],
             'attested_by' => ['nullable', 'string', 'max:255'],
             'rows.*.history_record_id' => ['nullable', 'integer', Rule::exists('new_inhabitants', 'id')->where('barangay_id', request()->user()?->barangay_id)],
+            'rows.*.source_row_id' => ['nullable', 'uuid'],
             'rows.*.household_number' => ['nullable', 'string', 'max:100'],
             'rows.*.last_name' => ['nullable', 'string', 'max:255'],
             'rows.*.first_name' => ['nullable', 'string', 'max:255'],
@@ -1082,7 +1084,7 @@ class BarangayRbiUpdateController extends Controller
 
     private function cleanRows(array $rows): array
     {
-        $fields = array_merge(['household_id', 'household_number', 'inhabitant_id', 'inhabitant_name', 'history_record_id'], array_keys(BarangayRbiUpdate::rowFields()), \App\Support\RbiEntryClassification::fields());
+        $fields = array_merge(['household_id', 'household_number', 'inhabitant_id', 'inhabitant_name', 'history_record_id', 'source_row_id', 'first_saved_at'], array_keys(BarangayRbiUpdate::rowFields()), \App\Support\RbiEntryClassification::fields());
 
         return collect($rows)
             ->map(fn (array $row): array => \App\Support\HouseholdRbi::normalize($row))
@@ -1100,7 +1102,7 @@ class BarangayRbiUpdateController extends Controller
                 ->mapWithKeys(fn (string $field): array => [$field => trim((string) ($row[$field] ?? ''))])
                 ->all())
             ->filter(fn (array $row): bool => collect($row)
-                ->except(array_merge(['household_id', 'household_number', 'inhabitant_id', 'household_head', 'history_record_id'], \App\Support\RbiEntryClassification::fields()))
+                ->except(array_merge(['household_id', 'household_number', 'inhabitant_id', 'household_head', 'history_record_id', 'source_row_id', 'first_saved_at'], \App\Support\RbiEntryClassification::fields()))
                 ->contains(fn (string $value): bool => $value !== ''))
             ->values()
             ->all();

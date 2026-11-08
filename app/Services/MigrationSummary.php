@@ -15,7 +15,7 @@ class MigrationSummary
         $records = MigrationRecord::whereIn('barangay_id', $barangays->modelKeys())
             ->whereYear('movement_date', $year)->where('type', MigrationRecord::TYPE_OUT)
             ->get(['barangay_id', 'type', 'movement_date']);
-        $arrivals = app(RbiArrivalReview::class)->history($barangayId, \Illuminate\Support\Carbon::create($year, 12, 1), 12);
+        $arrivals = app(RbiSavedArrivalHistory::class)->build($barangayId, \Illuminate\Support\Carbon::create($year, 12, 1), 12);
         $arrivalMonths = collect($arrivals['rows'])->keyBy('month');
         $arrivalAreas = collect($arrivals['coverage'])->keyBy('id');
         $byMonth = $records->groupBy(fn ($record) => $record->movement_date->month);

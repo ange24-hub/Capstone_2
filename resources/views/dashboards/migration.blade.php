@@ -20,7 +20,7 @@
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
                 <h1 id="migration-dashboard-title">{{ $isAdminForecast ? 'Prediction analytics' : 'Migration Trends' }}</h1>
                 <p>{{ match ($migrationSection) {
-                    'forecast' => 'Seasonal estimates from reviewed RBI arrivals and dated Moved Out records.',
+                    'forecast' => 'Verified migration forecasts and experimental SVR arrival estimates for supported barangays.',
                     'events' => 'Review the latest recorded arrivals and departures.',
                     default => 'Compare monthly arrivals and departures for '.$selectedYear.'.',
                 } }}</p>
@@ -28,7 +28,7 @@
         </header>
 
         <nav class="migration-section-nav" aria-label="Migration trends sections">
-            @foreach ((auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? ['trends' => 'Trends', 'forecast' => 'Verified forecast', 'events' => 'Recent events'] : ['trends' => 'Trends', 'events' => 'Recent events']) as $section => $label)
+            @foreach ((auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) && auth()->user()->isApproved() ? ['trends' => 'Trends', 'forecast' => 'Verified forecast', 'events' => 'Recent events'] : ['trends' => 'Trends', 'events' => 'Recent events']) as $section => $label)
                 <a href="{{ route($isAdminForecast && $section === 'forecast' ? $forecastRoute : 'migration.dashboard', array_filter(['year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'section' => $section], fn ($value) => $value !== null)) }}" @if($migrationSection === $section) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
             @if(auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
@@ -136,7 +136,7 @@
 
         @if ($migrationSection === 'events')
         <section class="dashboard-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" aria-labelledby="recent-events-title">
-            <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Latest activity</span><h2 id="recent-events-title">Recent departure records</h2><p>The 12 most recent dated departures. Arrival counts are reviewed in RBI Forms → 3-month arrival counts.</p></div><span class="count-chip">{{ $records->count() }} shown</span></header>
+            <header class="dashboard-card-header flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4"><div><span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Latest activity</span><h2 id="recent-events-title">Recent departure records</h2><p>The 12 most recent dated departures. Arrival counts come from classified RBI entries by first-save month.</p></div><span class="count-chip">{{ $records->count() }} shown</span></header>
             @if ($records->isEmpty())
                 <div class="dashboard-empty-state rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600"><span class="empty-icon"><x-app-icon name="inbox" /></span><strong>No migration events</strong><span>New records will appear here.</span></div>
             @else

@@ -44,8 +44,11 @@ class SourceResidenceSync
     {
         if (! $barangay->usesResidenceRegistry()) return ['updates'=>[], 'unmatched'=>[]];
         $sheet = in_array($barangay->name, ['Carnaga', 'Iniguihan'], true) ? 'Sheet1' : 'CONSOLIDATED RBI';
-        $sheets = ResidenceWorkbookReader::read($path, in_array($barangay->name, ['San Antonio', 'San Isidro', 'San Miguel', 'San Roque'], true)
-            ? [$sheet, 'DECEASED', 'NEW', 'OUT'] : [$sheet]);
+        $sheets = ResidenceWorkbookReader::read($path, $barangay->name === 'Tinago'
+            ? [TinagoWorkbook::PRIMARY_SHEET, 'DECEASED', 'NEW']
+            : (in_array($barangay->name, ['San Antonio', 'San Isidro', 'San Miguel', 'San Roque'], true)
+                ? [$sheet, 'DECEASED', 'NEW', 'OUT'] : [$sheet]));
+        if ($barangay->name === 'Tinago') $sheets[$sheet] = TinagoWorkbook::plan($sheets)['active'];
         if (! isset($sheets[$sheet])) throw new \RuntimeException('Missing consolidated sheet for '.$barangay->name);
         if ($barangay->name === 'San Antonio') $sheets[$sheet] = SanAntonioWorkbook::plan($sheets)['active'];
         if ($barangay->name === 'San Isidro') $sheets[$sheet] = SanIsidroWorkbook::plan($sheets)['active'];
@@ -60,7 +63,7 @@ class SourceResidenceSync
         };
         $source = [];
         foreach ($sheets[$sheet] as $position => $row) {
-            if ($position < (match ($barangay->name) { 'Mag-ata' => 9, 'Punong' => 12, default => 11 })
+            if ($position < (match ($barangay->name) { 'Mag-ata' => 9, 'Tinago' => 10, 'Punong' => 12, default => 11 })
                 || empty($row[$last]) || empty($row[$first])) continue;
             if ($barangay->name === 'Iniguihan' && $row[$last] === 'LAST') continue;
             $key = self::key([$row[$last], $row[$first], $row[$middle] ?? '']);
@@ -74,6 +77,7 @@ class SourceResidenceSync
                 'San Isidro' => SanIsidroWorkbook::residence($row),
                 'San Miguel' => SanMiguelWorkbook::residence($row),
                 'San Roque' => SanRoqueWorkbook::residence($row),
+                'Tinago' => TinagoWorkbook::residence($row),
                 default => self::classify($colors, $row[$remark] ?? ''),
             };
             $source[$key][] = ['position'=>$position,'household'=>$household ? ($row[$household] ?? '') : '',

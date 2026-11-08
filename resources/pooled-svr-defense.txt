@@ -1,0 +1,58 @@
+MIGRATION PREDICTION — DEFENSE GUIDE
+
+OPEN THE SYSTEM
+Municipal admin → Prediction analytics → current reporting year → Cabascan → Show forecast.
+The main screen shows the selected barangay's SVR estimate. “Model details for the defense” contains the guide, model evidence download and Save this forecast. Saved results retain their original figures and have an evidence download. Barangay secretary accounts have Migration Trends only.
+
+WHAT USES MACHINE LEARNING?
+The experimental arrival-record estimate uses a genuine trained Support Vector Regressor with an RBF kernel, C=10, epsilon=1 and gamma=0.1. StandardScaler and one-hot barangay encoding are part of the fitted pipeline. PHP evaluates its exported numerical parameters; twelve reference cases match scikit-learn within 1e-10. Parity proves matching computation, not accuracy.
+
+TRAINING DATA AND TARGET
+The all-sample inference refit uses 12 eligible existing saved-classification samples from Cabascan and Cawayan in 2020–2021. It predicts counts of classified arrival entries within observed source months. It does not predict independently verified physical arrivals or the municipal total. Other barangays do not borrow its outputs. No new dummy data were added for this active model.
+
+Existing classifications have not been independently verified by the reconstruction. Previous residence is unknown for the 22 classified arrival entries, so municipal boundaries cannot be established. Missing source months are unknown; they are not inserted as observed zeros. An observed month containing classified non-arrivals can have a sample arrival count of zero without establishing zero physical migration.
+
+INPUTS
+Barangay encoding, target-month sine/cosine, previous observed sample count, missing-history flag and elapsed calendar months. The previous observed count can be several months or years old; it is not silently labeled as last month's actual. Current population and current away status are not historical predictors.
+
+FUTURE ESTIMATE AND ITS LIMITATION
+For December 2026, the present model returns 1.5351329813, displayed as 1.54, for Cabascan and separately for Cawayan. Filtering Cabascan displays only Cabascan.
+Last observed inputs: Cabascan June 2021 count 1; Cawayan September 2021 count 2.
+The December 2026 gaps are 66 and 63 months, compared with a maximum fitted gap of only 3 months. Kernel weights approach zero at these distant inputs and the output approaches the SVR intercept. Equal estimates do not demonstrate stable future migration.
+This is experimental ML inference on old, limited data. It is not an operationally validated municipal forecast. No intervening actual counts or movement dates are invented, and predicted values are not recycled as observed inputs.
+
+HISTORICAL EVALUATION
+A separate seven-row training fit used two earlier expanding-date validation folds to select settings. All barangays on a calendar date shared the same partition. Five later sample rows across May, June and September 2021 were scored after settings were frozen.
+SVR: MAE 1.9333251468; RMSE 2.5933405363.
+Previous-observed baseline: MAE 3.4; RMSE 4.0249223595.
+Additional pooled training-mean diagnostic: MAE 1.7142857143; RMSE 2.6045486114.
+The mean diagnostic was added after the initial run without changing the SVR. SVR did not beat that baseline on MAE. These small, previously inspected retrospective sample results do not establish general superiority. Historical immutable as-of versions were unavailable.
+Earlier test actuals could enter later features only after their own dates; the evaluation model stayed frozen. Negative count estimates were clipped to zero and raw outputs retained. CV ranked raw estimator errors; reported count errors use nonnegative outputs.
+
+FUTURE ACCURACY
+The five-row historical score is not measured accuracy of the all-12-row inference refit or the December 2026 prediction. Future MAE/RMSE remain unavailable until matching reviewed outcomes exist. MAE and RMSE are count errors, not accuracy percentages. No calibrated confidence interval is claimed.
+
+OUT-MIGRATION
+Only one dated non-demo departure and no complete verified departure periods are available. Away/transferred remarks are status snapshots, not movement dates. No out-migration SVR estimate is invented. Internal transfers between Tomas Oppus barangays do not constitute external municipal migration.
+
+SUGGESTED DEFENSE STATEMENT
+“Our system displays experimental future estimates from a trained SVR for recorded classified arrivals in the selected supported barangay. We expose the old input dates and extrapolation limitation. Historical errors describe a small retrospective sample, not validated future municipal migration. We preserve forecasts and inputs before their target periods for later comparison with matching reviewed outcomes.”
+
+CEBUANO
+“Ang numero gikan gyud sa trained SVR. Apan daan ug gamay ang training data, busa experimental lang kini. Cabascan ra ang gipakita kung Cabascan ang filter. Wala mi nag-imbento og dates o missing-month zeros, ug wala pa namo giangkon nga validated na ang future municipal in/out migration.”
+
+SOURCE REVIEW AND PRESERVATION
+The review scanned 29 original BRBI workbooks and 211 worksheets. It found no additional usable movement dates. Actual source records and original workbooks remain unchanged. The private review queue retains unresolved classifications, origin boundaries and dates for source-backed human confirmation.
+Confirm actual arrival/departure months and boundaries, review reporting completeness including genuine zeros, then retrain and evaluate later periods. A month without a report is not a zero. An exact day is not required when only a source-backed movement month is known.
+
+SAVED EVIDENCE
+Save this forecast preserves target, unrounded/raw outputs, old input dates/counts/gaps, fitted-model hashes, historical evidence and saving administrator/time. Saved views do not recalculate. Application snapshots are not independently certified or cryptographically signed. Saving does not verify the assumptions or future accuracy.
+
+CLEANUP
+Unused scenario/demo screens, historical lab code and superseded experiment files were retired. They are privately archived for restoration; active prediction, actual RBI data, source history and model training/export utilities remain. Old page bookmarks lead to the main forecast.
+
+REFERENCES
+https://scikit-learn.org/1.6/modules/generated/sklearn.svm.SVR.html
+https://scikit-learn.org/1.6/common_pitfalls.html
+https://otexts.com/fpp3/long-short-ts.html
+These explain methods and limitations; they do not validate this source dataset or its forecast.

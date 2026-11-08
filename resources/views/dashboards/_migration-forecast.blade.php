@@ -4,24 +4,24 @@
     $forecastStorageReady = $forecastSource['storage_ready'] && $forecastArrivalSource['storage_ready'];
     $excludedDemo = $forecastSource['excluded_demo_events'] + $forecastArrivalSource['excluded_demo_events'];
 @endphp
+@if(isset($experimentalArrivalForecast))
+    @include('dashboards._barangay-svr-arrival')
+@endif
 <section class="dashboard-card migration-forecast-card forecast-overview" aria-labelledby="out-migration-forecast-title">
     <header class="dashboard-card-header">
-        <div><h2 id="out-migration-forecast-title">Migration estimate · {{ $predictionMonthLabel }}</h2>
+        <div><span class="dashboard-eyebrow">Verified monthly-history forecast</span><h2 id="out-migration-forecast-title">Migration estimate · {{ $predictionMonthLabel }}</h2>
             <p>Banabana sa moabot, mobalhin gawas ug net nga kausaban sa migration.</p></div>
         <span class="section-icon"><x-app-icon name="trend" /></span>
     </header>
     @if(session('status'))<p class="success" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
-    <p class="forecast-note"><strong>Model: Seasonal naive (same month last year).</strong> Each target uses the corresponding month from the latest 12 verified source months. Arrivals come from reviewed submitted RBI forms; departures come from dated Moved Out records.</p>
-    @if($forecastNextRefreshLabel)
-        <p class="forecast-note" data-forecast-schedule>Records refresh every 3 months (January, April, July and October). This cycle uses records through {{ $sourceMonthLabel }}. Next refresh: <b>{{ $forecastNextRefreshLabel }}</b>.</p>
-    @endif
+    <p class="forecast-note forecast-source-period">Records through <b>{{ $sourceMonthLabel }}</b>@if($forecastNextRefreshLabel) · Next refresh <b>{{ $forecastNextRefreshLabel }}</b>@endif</p>
     @if(!$forecastStorageReady)
         <div class="forecast-unavailable" role="status"><strong>Forecast setup is not ready yet</strong><p>Ask the system administrator to complete the setup.</p></div>
     @elseif($selectedYear > now()->year)
         <div class="forecast-unavailable" role="status"><strong>Choose the current year or a past year</strong><p>The system needs completed records to prepare an estimate.</p></div>
     @elseif(!$selectedBarangayId && $predictedInMigration === null && $predictedOutMigration === null)
-        <div class="forecast-start" role="status"><strong>Municipal forecast is not ready</strong><p>Every configured barangay needs complete reviewed monthly counts. Check the coverage below, or select a barangay to view its own records and forecast readiness.</p></div>
+        <div class="forecast-start" role="status"><strong>Kulang pa ang verified monthly records.</strong><p>I-classify ug kompletoha ang saved RBI entries ug i-review ang moved-out records aron makagenerate ug forecast.</p></div>
     @else
         <div class="forecast-summary-grid forecast-estimates" aria-label="Estimated movement events">
             @foreach([['Arrivals', $predictedInMigration, $selectedBarangayId ? 'Moves into the barangay' : 'Moves into reporting barangays'], ['Departures', $predictedOutMigration, $selectedBarangayId ? 'Moves out of the barangay' : 'Moves out of reporting barangays'], ['Net change', $predictedNetMigration, 'Arrivals minus departures']] as [$label, $value, $hint])
@@ -36,9 +36,18 @@
                 <p>Consecutive complete months checked: <b>{{ count($forecastArrivalSource['consecutive']) }} arrivals</b> · <b>{{ count($forecastSource['consecutive']) }} departures</b>. At least <b>{{ $forecastEvaluation['required_months'] }}</b> are needed for each.</p>
             </div>
             @if($selectedBarangayId)<a class="button forecast-review-link" href="{{ route('migration.dashboard', ['section' => 'forecast', 'year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'review' => 1]) }}#forecast-records">Review monthly records</a>@endif
-            <p class="forecast-note">Departures use dated Moved Out records. Arrivals use reviewed RBI forms and zero-entry gaps between recorded history months.</p>
+            <p class="forecast-note">Departures use dated Moved Out records. Arrivals use classified RBI entries grouped by the first date each entry was saved. A later submission does not add another arrival.</p>
         @endif
     @endif
+    <details class="forecast-method forecast-info" data-forecast-details>
+        <summary>Forecast details</summary>
+        <p class="forecast-note"><a href="{{ route('municipal.prediction-forecast-evidence') }}">Download forecast evidence</a> · Reporting coverage, measured errors when available, and model version hashes.</p>
+        <p class="forecast-note"><strong>Models are selected separately for arrivals and departures.</strong> Seasonal naive (same month last year) remains the fallback. With enough history, six earlier validation months compare moving averages, exponential smoothing and Holt trend models against it. A challenger must reduce validation MAE without increasing RMSE. The final three test months never select the model.</p>
+        <p class="forecast-note">Arrivals measure classified RBI entries by first-save date, which can differ from the actual arrival month. Late historical imports can create recording spikes. Departures use dated Moved Out records. The arrival estimate describes newly recorded arrivals, not an independently verified forecast of the month people physically move.</p>
+        @if($forecastNextRefreshLabel)
+            <p class="forecast-note" data-forecast-schedule>Records refresh every 3 months (January, April, July and October). This cycle uses records through {{ $sourceMonthLabel }}. Next refresh: <b>{{ $forecastNextRefreshLabel }}</b>.</p>
+        @endif
+    </details>
     @if($selectedYear < now()->year)<p class="forecast-note">Historical estimate based on records through {{ $sourceMonthLabel }}.</p>@endif
 </section>
 
@@ -48,13 +57,13 @@
     <summary>How close were earlier estimates?</summary>
     <section class="forecast-details-section" aria-labelledby="forecast-evaluation-title">
         <header class="dashboard-card-header"><div><span class="dashboard-eyebrow">Historical evaluation</span><h2 id="forecast-evaluation-title">Actual versus predicted migration</h2>
-            <p>The model is fixed in advance. When enough earlier history exists, the final three verified months are tested using forecasts made at the displayed horizon. Each target stays outside its own training window.</p></div></header>
+            <p>The model is chosen using earlier validation history, or the fixed seasonal fallback is used. The final three verified months test forecasts at the displayed horizon. Each target stays outside its own training window.</p></div></header>
         @foreach(['arrivals' => [$forecastArrivalEvaluation, $predictedInMigration], 'departures' => [$forecastEvaluation, $predictedOutMigration], 'net' => [$forecastNetEvaluation, $predictedNetMigration]] as $kind => [$evaluation, $estimate])
             @if($estimate !== null)
                 @include('dashboards._migration-forecast-evaluation', ['evaluation' => $evaluation, 'kind' => $kind])
             @endif
         @endforeach
-        <details class="forecast-method"><summary>How the forecast is evaluated</summary><p>Seasonal naive repeats the verified count from the same calendar month in the previous year. Twelve consecutive complete months support a forecast. At a {{ $forecastHorizon }}-month horizon, {{ $forecastEvaluation['evaluation_required_months'] }} consecutive months are needed to measure three separate historical test errors. No model settings are selected using those outcomes. For each test target, training ends {{ $forecastHorizon }} month(s) earlier. The comparison is against a three-month moving-average forecast using the same origin and horizon. Net migration is predicted arrivals minus predicted departures; negative results are retained. Net errors are measured after subtraction, not by adding component MAEs. An available forecast can have no measured error yet. @if($forecastNextRefreshLabel)The source window stays fixed within the quarter; the target advances each month. Corrections require another review immediately.@endif Demo data, unverified months and duplicate-affected months stay outside fitting. Reviewed zero-entry gaps in RBI history remain valid arrival counts.</p></details>
+        <details class="forecast-method"><summary>How the forecast is evaluated</summary><p>Twelve consecutive complete months support the seasonal fallback. At this {{ $forecastHorizon }}-month horizon, {{ $forecastEvaluation['evaluation_required_months'] }} months allow three historical test errors; {{ $forecastEvaluation['selection_required_months'] }} months allow six earlier validation targets plus the separate tests at a fixed {{ $forecastEvaluation['selection_horizon'] }}-month selection horizon. Horizon guard gaps keep validation outcomes known at the first test origin. No model settings are selected using test outcomes. For each test target, training ends {{ $forecastHorizon }} month(s) earlier. Earlier test actuals may enter later origins once known: this is a rolling-origin evaluation. The moving-average comparison uses the same origins and horizon. Selected models stay fixed across the six future estimates; error scores apply to the first target's horizon only. Net errors are measured after subtraction. An available forecast can have no measured error yet. @if($forecastNextRefreshLabel)The source cutoff and selection horizon stay fixed within the quarter, keeping model choice stable unless source records change. Test errors use the displayed target horizon. Corrections update the history immediately.@endif Demo data, incomplete months and duplicate-affected months stay outside fitting. Empty months bounded by saved RBI reports count as zero entries under the reporting convention.</p></details>
     </section>
 </details>
 @endif
@@ -63,8 +72,8 @@
     <summary>Check the records used</summary>
     <section class="forecast-details-section" aria-labelledby="forecast-history-title">
     <header class="dashboard-card-header"><div><span class="dashboard-eyebrow">Data readiness</span><h2 id="forecast-history-title">Review monthly migration reporting</h2>
-        <p>Review dated departures from Moved Out here. Arrival counts and empty months between recorded reports are reviewed separately in the 3-month RBI arrival form. Missing departure checks remain unverified.</p></div></header>
-    @if($selectedBarangayId)<p class="forecast-note"><a href="{{ route('rbi.arrivals.index',['barangay_id'=>$selectedBarangayId]) }}">Open submitted RBI 3-month arrival review</a></p>@endif
+        <p>Review dated departures from Moved Out here. Arrival counts come from classified RBI entries by first-save month. Missing departure checks remain unverified.</p></div></header>
+    @if($selectedBarangayId)<p class="forecast-note"><a href="{{ route('municipal.rbi-report-history') }}">Open RBI report history</a> to inspect the underlying entries.</p>@endif
     @if($predictionError)<p class="forecast-note">Departures: {{ $predictionError }}</p>@endif
     @if($predictionArrivalError)<p class="forecast-note">Arrivals: {{ $predictionArrivalError }}</p>@endif
     @if($selectedBarangayId === null)<p class="forecast-note">A municipal forecast requires every configured barangay to confirm the same reporting months for both arrivals and departures. Select one barangay to review its own history.</p>@endif
@@ -75,8 +84,8 @@
             @foreach($forecastSource['coverage'] as $area)<tr><td>{{ $area['name'] }}</td><td>{{ $arrivalCoverage[$area['id']]['events'] }} / {{ $area['events'] }}</td><td>{{ $arrivalCoverage[$area['id']]['consecutive_months'] }} / {{ $area['consecutive_months'] }}</td><td><a href="{{ route('migration.dashboard', ['section' => 'forecast', 'year' => $selectedYear, 'barangay_id' => $area['id'], 'review' => 1]) }}#forecast-records">Review months</a></td></tr>@endforeach
         </tbody></table></div>
     @else
-        <p class="forecast-note">Changed source records automatically need another review. Possible duplicate events must be resolved before verification. Every confirmation and reopening is recorded in Registry Activity History.</p>
-        <div class="table-wrap forecast-history-table"><table><thead><tr><th>Month</th><th>Arrivals</th><th>Departures</th><th>Status</th><th>Review reporting</th></tr></thead><tbody>
+        <p class="forecast-note">Saved RBI classifications update arrival counts automatically. Possible duplicate entries must be resolved before that month can train a forecast. Departure confirmations and reopening are recorded in Registry Activity History.</p>
+        <div class="table-wrap forecast-history-table"><table><thead><tr><th>Month (first saved)</th><th>Arrivals</th><th>Departures</th><th>Status</th><th>Review reporting</th></tr></thead><tbody>
         @foreach(array_reverse($forecastSource['rows']) as $month)
             @php
                 $arrival = $arrivalMonths[$month['month']];
@@ -84,7 +93,14 @@
                 $duplicates = $month['duplicates'] + $arrival['duplicates'];
             @endphp
             <tr><td data-label="Month">{{ $month['label'] }}</td>
-                <td data-label="Arrivals">{{ $arrival['count'] }}@if($arrival['demo_count'])<small class="forecast-cell-note">{{ $arrival['demo_count'] }} synthetic events excluded</small>@endif</td>
+                <td data-label="Arrivals">{{ $arrival['count'] }}@if($arrival['demo_count'])<small class="forecast-cell-note">{{ $arrival['demo_count'] }} synthetic events excluded</small>@endif
+                    @if(!empty($arrival['source_reports']))<details class="forecast-review"><summary>RBI save details</summary>
+                        @foreach($arrival['source_reports'] as $sourceReport)
+                            <p class="forecast-cell-note">Form #{{ $sourceReport['id'] }} · form first saved {{ $sourceReport['first_saved_at'] }} · {{ $sourceReport['rows_first_saved_this_month'] }} entries saved in this month, {{ $sourceReport['arrivals_this_month'] }} classified in-migration · {{ $sourceReport['submitted_at'] ? 'submitted '.$sourceReport['submitted_at'] : 'not submitted' }}</p>
+                            @foreach($sourceReport['save_batches'] as $batch)<p class="forecast-cell-note">Saved {{ $batch['saved_at'] }}: {{ $batch['entries'] }} entries input, {{ $batch['arrivals'] }} classified in-migration</p>@endforeach
+                        @endforeach
+                    </details>@endif
+                </td>
                 <td data-label="Departures">{{ $month['count'] }}@if($month['demo_count'])<small class="forecast-cell-note">{{ $month['demo_count'] }} synthetic events excluded</small>@endif</td>
                 <td data-label="Status">
                     @foreach(['Arrivals' => $arrival, 'Departures' => $month] as $label => $sourceRow)
@@ -92,7 +108,7 @@
                     @endforeach
                 </td>
                 <td><details class="forecast-review"><summary>{{ $complete ? 'Review / reopen' : 'Review month' }}</summary>
-                    <p>Check all dated Moved Out departures for {{ $month['label'] }}. Arrival verification comes from the RBI arrival review form.</p>
+                    <p>Check all dated Moved Out departures for {{ $month['label'] }}. Arrival counts refresh from the saved RBI entries and their classifications.</p>
                     @if(!$complete && !$duplicates)
                         <form method="POST" action="{{ route('migration.reporting-periods.store') }}">
                             @include('dashboards._migration-forecast-review-fields')

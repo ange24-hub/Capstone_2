@@ -46,12 +46,13 @@ class RegistryTransferConfirmationTest extends TestCase
         $this->actingAs($other)->put(route('registry.movement.update', $r), $data + ['confirmed' => 1])->assertForbidden();
     }
 
-    public function test_remarks_do_not_silently_transfer_a_resident(): void
+    public function test_transferred_remarks_archive_without_fabricating_a_dated_movement(): void
     {
         [$b,$u,$r] = $this->fixture();
         $data = ['barangay_id' => $b->id, 'household_number' => '1', 'first_name' => 'Person', 'last_name' => 'Example', 'sex' => 'Male', 'status' => 'active'];
         $this->actingAs($u)->put(route('registry.update', $r), $data + ['remarks' => 'TRANSFERED TO CEBU'])->assertSessionHasNoErrors();
-        $this->assertSame('active', $r->fresh()->status);
+        $this->assertSame('migrated_out', $r->fresh()->status);
+        $this->assertSame('living_elsewhere',$r->fresh()->residence_status);
         $this->assertDatabaseCount('migration_records', 0);
         $this->put(route('registry.update', $r), $data + ['residence_status' => 'transferred'])->assertSessionHasErrors('movement');
     }

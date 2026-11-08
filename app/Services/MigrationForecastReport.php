@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 
 class MigrationForecastReport
 {
-    public function __construct(private MigrationForecastHistory $history, private SeasonalNaiveForecast $engine, private MigrationNetForecast $net) {}
+    public function __construct(private MigrationForecastHistory $history, private ValidatedMigrationForecast $engine, private MigrationNetForecast $net) {}
 
     public function build(?int $barangayId, ?int $year = null): array
     {
@@ -18,8 +18,10 @@ class MigrationForecastReport
         $horizon = $year === $current->year ? (int) $anchor->diffInMonths($target) : 1;
         $source = $this->history->build($barangayId, $anchor);
         $arrivalSource = $this->history->build($barangayId, $anchor, 36, 'in');
-        $evaluation = $this->engine->evaluate($source['consecutive'], $horizon);
-        $arrivalEvaluation = $this->engine->evaluate($arrivalSource['consecutive'], $horizon);
+        // The same source and four-month selection horizon keep model choice stable within a quarter.
+        $selectionHorizon = $year === $current->year ? 4 : 1;
+        $evaluation = $this->engine->evaluate($source['consecutive'], $horizon, $selectionHorizon);
+        $arrivalEvaluation = $this->engine->evaluate($arrivalSource['consecutive'], $horizon, $selectionHorizon);
         $netEvaluation = $this->net->combine($arrivalEvaluation, $evaluation);
         $recent = array_slice($source['rows'], -3);
         $error = $this->error($source, $evaluation, $year, $current, $anchor);
@@ -28,8 +30,8 @@ class MigrationForecastReport
         if (! $error || ! $arrivalError) {
             foreach (range(0, 5) as $offset) {
                 $date = $target->copy()->addMonths($offset);
-                $in = $arrivalError ? null : $this->engine->predict(array_column($arrivalSource['consecutive'], 'count'), $horizon + $offset);
-                $out = $error ? null : $this->engine->predict(array_column($source['consecutive'], 'count'), $horizon + $offset);
+                $in = $arrivalError ? null : $this->engine->predict(array_column($arrivalSource['consecutive'], 'count'), $horizon + $offset, $arrivalEvaluation['method_key']);
+                $out = $error ? null : $this->engine->predict(array_column($source['consecutive'], 'count'), $horizon + $offset, $evaluation['method_key']);
                 $forecastMonths[] = ['month' => $date->format('Y-m'), 'label' => $date->format('M Y'),
                     'in' => $in, 'out' => $out, 'net' => $netEvaluation['ready'] ? $in - $out : null,
                     'reference_month' => $date->copy()->subYear()->format('Y-m')];
@@ -54,6 +56,6 @@ class MigrationForecastReport
     {
         return $year > $current->year ? 'Choose the current year or a past year to estimate migration.'
             : (! $source['storage_ready'] ? 'Reporting-period storage is not ready. Contact the administrator.'
-                : (! $evaluation['ready'] ? 'Insufficient verified history. At least '.$evaluation['required_months'].' consecutive complete months through '.$anchor->format('F Y').' are required for the Seasonal naive forecast. Held-out error is shown only when separate test history is available.' : null));
+                : (! $evaluation['ready'] ? 'Insufficient verified history. At least '.$evaluation['required_months'].' consecutive complete months through '.$anchor->format('F Y').' are required for a forecast. Held-out error is shown only when separate test history is available.' : null));
     }
 }

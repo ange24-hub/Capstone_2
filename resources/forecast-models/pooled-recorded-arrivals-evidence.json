@@ -1,0 +1,52 @@
+{
+  "format": "rbim.pooled_svr_release_metadata.v1",
+  "run": "pooled-actual-review-20261108",
+  "source": {
+    "training_source_years": [
+      2020,
+      2021
+    ],
+    "eligible_samples": 12,
+    "coverage": [
+      "Cabascan",
+      "Cawayan"
+    ],
+    "target": "Classified arrival entries in observed source months",
+    "independently_verified": false
+  },
+  "result": {
+    "source_sha256": "fbd701b1679f10f665716cf9ff88aec904f4c1c9735fc307e8ab53faf79c1245",
+    "recorded_arrival_sample_svr": {
+      "status": "fitted_experimental_actual_record_sample",
+      "target": "existing_classified_arrival_entries_in_observed_source_month",
+      "parameters": {
+        "svr__C": 10,
+        "svr__epsilon": 1,
+        "svr__gamma": 0.1
+      },
+      "mae": 1.9333251467993713,
+      "rmse": 2.5933405363292956,
+      "training_rows": 7,
+      "test_rows": 5,
+      "test_months": [
+        "2021-05",
+        "2021-06",
+        "2021-09"
+      ],
+      "baseline": {
+        "name": "Previous observed count per barangay, same test rows",
+        "mae": 3.4,
+        "rmse": 4.024922359499621
+      }
+    },
+    "additional_training_mean_baseline": {
+      "name": "Frozen pooled training mean; additional diagnostic, not used for selection",
+      "training_mean": 1.4285714285714286,
+      "mae": 1.7142857142857142,
+      "rmse": 2.6045486114464738,
+      "svr_settings_changed": false
+    },
+    "production_model_replaced": false
+  },
+  "note": "Aggregate model metadata only. No resident identities, raw RBI entries, private review queue or database export is included. Future predictions remain experimental."
+}

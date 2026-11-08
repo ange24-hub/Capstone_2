@@ -65,7 +65,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::get('/reports/migration', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration');
         Route::get('/analysis/forecast-readiness', fn () => redirect()->route('migration.dashboard',
             auth()->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? request()->only('barangay_id') : []
-        ))->name('analysis.forecast-readiness');
+        ))->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('analysis.forecast-readiness');
         Route::get('/reports/migration/pdf', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration.pdf');
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -324,19 +324,20 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)
         ->name('migration.dashboard');
 
-    // Research screens stay local; production exposes only actual-record forecasting.
-    if (app()->environment('local', 'testing')) {
-        Route::get('/migration-monitoring/demo', \App\Http\Controllers\DemoMigrationForecastController::class)
-            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
-            ->name('migration.demo');
-
-        Route::get('/migration-monitoring/history-experiment', \App\Http\Controllers\ShortHistoryForecastController::class)
-            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
-            ->name('migration.history-experiment');
-
-        Route::get('/municipal/prediction-analytics', \App\Http\Controllers\MunicipalPredictionController::class)
-            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
-            ->name('municipal.prediction-analytics');
+    // Old bookmarks lead to the one supported prediction screen; retired experiments cannot run.
+    $retiredPrediction = function (\Illuminate\Http\Request $request) {
+        abort_unless($request->user()->isApproved(),403);
+        $filters=$request->validate(['barangay_id'=>['nullable','integer','exists:barangays,id'],'year'=>['nullable','integer','between:1900,9999']]);
+        return redirect()->route('municipal.prediction-forecast',array_filter($filters,fn($value)=>$value!==null));
+    };
+    foreach ([
+        ['/municipal/prediction-analytics/svr','municipal.prediction-svr'],
+        ['/migration-monitoring/demo','migration.demo'],
+        ['/migration-monitoring/history-experiment','migration.history-experiment'],
+        ['/municipal/prediction-analytics','municipal.prediction-analytics'],
+        ['/municipal/prediction-analytics/scenarios','municipal.prediction-scenarios'],
+    ] as [$path,$name]) {
+        Route::get($path,$retiredPrediction)->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name($name);
     }
 
     Route::get('/municipal/rbi-report-history', [\App\Http\Controllers\MunicipalPredictionController::class, 'reports'])
@@ -346,6 +347,20 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/municipal/prediction-analytics/forecast', MigrationDashboardController::class)
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
         ->name('municipal.prediction-forecast');
+
+    Route::controller(\App\Http\Controllers\PooledMigrationEvidenceController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->group(function () {
+            Route::get('/municipal/prediction-analytics/pooled-svr', 'show')->name('municipal.prediction-pooled');
+            Route::get('/municipal/prediction-analytics/pooled-svr/evidence', 'download')->name('municipal.prediction-pooled.evidence');
+            Route::get('/municipal/prediction-analytics/pooled-svr/defense', 'defense')->name('municipal.prediction-pooled.defense');
+            Route::post('/municipal/prediction-analytics/pooled-svr/future', 'saveFuture')->name('municipal.prediction-pooled.future.store');
+            Route::get('/municipal/prediction-analytics/pooled-svr/future/{snapshot}', 'showFuture')->name('municipal.prediction-pooled.future.show');
+            Route::get('/municipal/prediction-analytics/pooled-svr/future/{snapshot}/evidence', 'downloadFuture')->name('municipal.prediction-pooled.future.evidence');
+        });
+
+    Route::get('/municipal/prediction-analytics/forecast/evidence', \App\Http\Controllers\MigrationForecastEvidenceController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
+        ->name('municipal.prediction-forecast-evidence');
 
     Route::get('/municipal/prediction-analytics/history/{barangay}', [\App\Http\Controllers\MunicipalPredictionController::class, 'history'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)

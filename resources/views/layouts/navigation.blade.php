@@ -10,7 +10,7 @@
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ['migration.dashboard', 'migration.*', 'trend', 'Migration trends'],
-                ['municipal.prediction-forecast', 'municipal.prediction-*', 'trend', 'Prediction analytics'],
+                ...($user->isApproved() ? [['municipal.prediction-forecast', 'municipal.prediction-*', 'trend', 'Prediction analytics']] : []),
                 ['concerns.summary', 'concerns.*', 'users', 'Concern summary'],
             ],
             'Maps' => [['spatial.index', 'spatial.index', 'map', 'Household map']],

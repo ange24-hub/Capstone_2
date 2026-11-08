@@ -55,6 +55,13 @@ class Inhabitant extends Model
         'recorded_age' => 'string',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (Inhabitant $person): void {
+            if ($person->isDirty('remarks')) \App\Support\RegistryRemarkResidence::apply($person);
+        });
+    }
+
     public static function statusLabels(): array
     {
         return [
@@ -117,7 +124,7 @@ class Inhabitant extends Model
     public function sourceTransferDestination(): ?string
     {
         if ($this->status !== self::STATUS_MIGRATED_OUT
-            || ! preg_match('/\bTRANSFER(?:RED)?\s+(?:TO\s+)?([^\[\r\n]+)/i', (string) $this->remarks, $match)) {
+            || ! preg_match('/\b(?:TRANSFER(?:RED|ED)?|TRANSFFERED)\s+(?:TO\s+)?([^\[\r\n]+)/i', (string) $this->remarks, $match)) {
             return null;
         }
 

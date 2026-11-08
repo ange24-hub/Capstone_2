@@ -8,6 +8,7 @@ use App\Models\MigrationRecord;
 use App\Models\User;
 use App\Services\MigrationForecastHistory;
 use App\Services\MigrationForecastReport;
+use App\Services\ExperimentalPooledSvrForecast;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -18,7 +19,8 @@ class MigrationDashboardController extends Controller
         if ($request->routeIs('municipal.prediction-forecast')) {
             $request->merge(['section' => 'forecast']);
         }
-        abort_if($request->input('section') === 'forecast' && ! $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU), 403, 'Prediction analytics is available to municipal administrators only.');
+        $canViewPredictions = $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU) && $request->user()->isApproved();
+        abort_if($request->input('section') === 'forecast' && ! $canViewPredictions, 403, 'Prediction analytics is available to approved municipal administrators only.');
         $request->validate([
             'year' => ['nullable', 'integer', 'between:1900,9999'],
             'barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
@@ -78,7 +80,7 @@ class MigrationDashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $arrivalHistory = app(\App\Services\RbiArrivalReview::class)->history($selectedBarangayId, \Illuminate\Support\Carbon::create($selectedYear, 12, 1), 12);
+        $arrivalHistory = app(\App\Services\RbiSavedArrivalHistory::class)->build($selectedBarangayId, \Illuminate\Support\Carbon::create($selectedYear, 12, 1), 12);
         $arrivalByMonth = collect($arrivalHistory['rows'])->keyBy('month');
         $outByArea = $records->groupBy('barangay_id');
         $barangayStats = collect($arrivalHistory['coverage'])->map(function ($area) use ($outByArea) {
@@ -120,7 +122,13 @@ class MigrationDashboardController extends Controller
                 ];
             });
 
-        $forecast = $forecastReport->build($selectedBarangayId, $selectedYear);
+        $forecast = $canViewPredictions ? $forecastReport->build($selectedBarangayId, $selectedYear) : [];
+        $experimental=[];
+        if($canViewPredictions && $request->input('section')==='forecast' && $selectedBarangayId){
+            $experimental['experimentalArrivalForecast']=$selectedYear===now()->year
+                ? app(ExperimentalPooledSvrForecast::class)->preview((int)$selectedBarangayId)
+                : ['ready'=>false,'message'=>'Select the current reporting year to view the experimental future SVR estimate. Historical verified results remain below.'];
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -170,6 +178,7 @@ class MigrationDashboardController extends Controller
                 ->count(),
 
             ...$forecast,
+            ...$experimental,
             'demoRecordCount' => $records->where('reason', MigrationForecastHistory::DEMO_MARKER)->count(),
         ]);
     }

@@ -39,6 +39,7 @@
                             <div class="rbi-history-card-meta">
                                 <span><strong>{{ $familyCount }}</strong> {{ Str::plural('family', $familyCount) }}</span>
                                 <span><strong>{{ count($report->rows ?? []) }}</strong> {{ Str::plural('inhabitant', count($report->rows ?? [])) }}</span>
+                                @if($report->created_at)<span>First saved {{ $report->created_at->copy()->timezone('Asia/Manila')->format('M d, Y') }}</span>@endif
                                 @if($report->submitted_at)
                                     <span class="rbi-history-submitted"><x-app-icon name="clock" />Submitted {{ $report->submitted_at->copy()->timezone('Asia/Manila')->format('M d, Y') }}</span>
                                 @endif
@@ -80,6 +81,6 @@
             @endif
         </section>
 
-        <section class="workflow-card"><h2>Three-month arrival counts</h2><p>Review newly arrived residents from submitted monthly RBI forms. These reviewed counts supply in-migration analytics.</p><a class="button secondary-button" href="{{ route('rbi.arrivals.index') }}">Open 3-month arrival review</a><details><summary>Month with no new or deceased residents?</summary><form method="POST" action="{{ route('barangay.rbi-updates.zero-activity') }}">@csrf<label>Reporting month<input type="month" name="reporting_month" max="{{ now()->format('Y-m') }}" required></label><label><input type="checkbox" name="confirmed" value="1" required> No new or deceased resident entries were recorded this month.</label><button type="submit" class="secondary-button">Create zero-activity draft for signing</button></form></details></section>
+        <section class="workflow-card"><h2>Three-month arrival review</h2><p>Review the arrival months recorded on submitted RBI forms. Classify each entry as In-migration, Birth / Newborn or Late registration before completing the arrival review.</p><a class="button secondary-button" href="{{ route('rbi.arrivals.index') }}">Open 3-month arrival review</a><details><summary>Month with no new or deceased residents?</summary><form method="POST" action="{{ route('barangay.rbi-updates.zero-activity') }}">@csrf<label>Reporting month<input type="month" name="reporting_month" max="{{ now()->format('Y-m') }}" required></label><label><input type="checkbox" name="confirmed" value="1" required> No new or deceased resident entries were recorded this month.</label><button type="submit" class="secondary-button">Create zero-activity draft for signing</button></form></details></section>
         @include('rbi-updates._saved-inhabitants')
         @include('rbi-updates._consolidated-inhabitants')
