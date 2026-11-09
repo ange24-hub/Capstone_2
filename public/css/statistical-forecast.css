@@ -28,3 +28,103 @@
 .statistical-muted { color: #516878; font-size: .9rem; }
 .statistical-forecast summary { cursor: pointer; font-weight: 650; }
 @media(max-width:700px) { .statistical-cards { grid-template-columns: 1fr; } .statistical-card { padding: 16px; } .statistical-entry label { width: 100%; } }
+
+/* Report-first forecast workspace. Keep the population result distinct from monthly migration. */
+.statistical-forecast { display:grid; gap:20px; max-width:1180px; padding-bottom:34px; color:#19354c; }
+.statistical-forecast > * { min-width:0; }
+.statistical-forecast h1,.statistical-forecast h2,.statistical-forecast h3 { letter-spacing:-.025em; line-height:1.2; }
+.statistical-forecast h1 { font-size:clamp(25px,3vw,36px); margin:8px 0 10px; }
+.statistical-forecast h2 { font-size:clamp(20px,2vw,25px); margin:6px 0 8px; }
+.statistical-forecast h3 { font-size:18px; margin:8px 0 12px; }
+.statistical-forecast p { margin:8px 0; line-height:1.55; }
+.statistical-hero { display:flex; align-items:end; justify-content:space-between; gap:24px; padding:26px 30px; border-radius:20px; background:linear-gradient(120deg,#153855,#245e80); color:#fff; box-shadow:0 14px 30px #1538551c; }
+.statistical-hero p { color:#dcebf3; max-width:700px; }
+.statistical-hero .statistical-eyebrow { color:#a9d9e8; font-weight:750; }
+.statistical-hero-links { display:flex; gap:8px; flex-wrap:wrap; }
+.statistical-hero-links a { color:#fff; text-decoration:none; white-space:nowrap; background:#ffffff19; border:1px solid #ffffff4a; border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; }
+.statistical-toolbar { display:flex; align-items:end; gap:12px; margin:0; padding:14px 16px; background:#fff; border:1px solid #d5e2ea; border-radius:14px; box-shadow:0 4px 15px #173d5510; }
+.statistical-toolbar label { min-width:220px; font-size:12px; font-weight:750; color:#4b6174; }
+.statistical-toolbar select { min-width:220px; }
+.statistical-toolbar > a { margin-left:auto; align-self:center; font-size:13px; font-weight:700; }
+.statistical-forecast .statistical-card { margin:0; border:1px solid #d7e3eb; border-radius:17px; background:#fff; box-shadow:0 5px 18px #163e5510; }
+.statistical-section-heading { display:flex; align-items:start; justify-content:space-between; gap:18px; margin-bottom:18px; }
+.statistical-section-heading p { color:#586f80; margin:0; }
+.statistical-kicker { display:block; color:#2b718c; font-size:11px; text-transform:uppercase; letter-spacing:.11em; font-weight:800; }
+.statistical-status { flex:0 0 auto; display:inline-block; padding:7px 11px; border-radius:999px; background:#e9f4ee; color:#286e53; font-size:11px; font-weight:800; }
+.statistical-status.is-waiting { background:#eef3f8; color:#42647c; }
+.statistical-population { padding:24px; border-top:4px solid #397c9e!important; }
+.statistical-population-result { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr); gap:16px; }
+.statistical-result-main { padding:23px 25px; border-radius:14px; background:#eaf4fa; border:1px solid #d1e7f1; }
+.statistical-result-label { font-size:13px; font-weight:800; color:#345b73; }
+.statistical-result-main .statistical-estimate { display:inline-block; font-size:clamp(46px,6vw,70px); line-height:1.05; color:#153f5f; letter-spacing:-.055em; }
+.statistical-unit { margin-left:10px; color:#40617a; font-weight:700; }
+.statistical-result-main p { color:#496477; font-size:12px; }
+.statistical-method { padding:22px; border-radius:14px; background:#f6f8f9; border:1px solid #e1e9ed; }
+.statistical-method > span { display:block; color:#657d8c; font-size:12px; font-weight:700; }
+.statistical-method > strong { display:block; margin-top:5px; font-size:19px; }
+.statistical-method small { display:block; color:#587185; font-weight:700; }
+.statistical-inputs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; margin-top:16px; }
+.statistical-input { display:grid; gap:3px; padding:12px 15px; border:1px solid #d7e4eb; border-radius:11px; background:#fff; text-decoration:none!important; }
+.statistical-input:hover { border-color:#6a9cb9; background:#f5faff; }
+.statistical-input span { color:#557084; font-size:12px; font-weight:700; }
+.statistical-input strong { color:#173d5a; font-size:24px; line-height:1.2; }
+.statistical-input small { color:#557084; }
+.statistical-explain,.statistical-caution,.statistical-empty { padding:12px 14px; border-radius:10px; font-size:13px; }
+.statistical-population .statistical-explain { margin-top:15px; background:#f2f7fb; color:#425f73; }
+.statistical-population .statistical-caution { margin-top:12px; background:#fff8e7; color:#745723; border:1px solid #f1dfac; }
+.statistical-population .statistical-empty { background:#f2f6f8; }
+.statistical-details { margin-top:15px; padding-top:13px; border-top:1px solid #dfe8ee; }
+.statistical-details summary { color:#235d84; font-size:13px; }
+.statistical-details[open] summary { margin-bottom:12px; }
+.statistical-steps { display:grid; gap:7px; padding:0; list-style:none; }
+.statistical-steps li { display:flex; align-items:center; gap:12px; padding:9px 11px; border-radius:8px; background:#f4f8fb; }
+.statistical-steps li strong { margin-left:auto; }
+.statistical-steps li small { min-width:145px; color:#607789; }
+.statistical-backtest { margin:15px 0; padding:14px 16px; background:#f2f7fa; border:1px solid #d7e5ee; border-radius:10px; font-size:13px; }
+.statistical-backtest p { margin:7px 0 0; }
+.statistical-text-link { display:inline-block; margin-top:15px; font-size:13px; font-weight:750; }
+.statistical-forecast #migration-forecast { padding:4px 0 0; }
+.statistical-cards { gap:14px; margin-top:12px; }
+.statistical-cards .statistical-card { border-top:0; }
+.statistical-migration-card { position:relative; padding:22px; }
+.statistical-direction { display:grid; place-items:center; width:36px; height:36px; border-radius:11px; background:#e9f5f1; color:#287b65; font-size:23px; }
+.statistical-direction.is-out { background:#fff1e9; color:#ab6840; }
+.statistical-migration-value { display:flex; align-items:baseline; gap:12px; padding:10px 0; }
+.statistical-migration-value .statistical-estimate { color:#1b5678; font-size:43px; line-height:1.1; }
+.statistical-migration-value span { color:#577084; font-size:12px; }
+.statistical-method-label { font-size:13px; font-weight:800; color:#2b6280; }
+.statistical-migration-card > p { font-size:12px; }
+.statistical-migration-card dl { grid-template-columns:minmax(0,1fr) auto; font-size:12px; gap:8px; }
+.statistical-migration-card dt { color:#5c7181; }
+.statistical-migration-card dd { overflow-wrap:anywhere; }
+.statistical-interpretation { padding:22px; border-left:4px solid #6c9cae!important; }
+.statistical-interpretation h2 { font-size:20px; }
+.statistical-interpretation > form { margin-top:16px; }
+.statistical-operations { padding:0!important; }
+.statistical-operations > summary { padding:17px 20px; font-size:15px; }
+.statistical-operations[open] { padding:0 20px 20px!important; }
+.statistical-operations[open] > summary { margin:0 -20px 14px; border-bottom:1px solid #e1e9ef; }
+.statistical-table { max-width:100%; border:1px solid #e0e9ee; border-radius:10px; }
+.statistical-table th { background:#f2f6f9; color:#395b72; white-space:nowrap; }
+.statistical-table th,.statistical-table td { padding:10px 12px; font-size:12px; }
+.statistical-forecast button { font-weight:700; }
+@media(max-width:760px) {
+  .statistical-hero,.statistical-section-heading { flex-direction:column; align-items:flex-start; }
+  .statistical-hero { padding:23px 20px; }
+  .statistical-toolbar { align-items:stretch; }
+  .statistical-toolbar label,.statistical-toolbar select { min-width:0; width:100%; }
+  .statistical-toolbar > a { margin-left:0; }
+  .statistical-population-result,.statistical-inputs,.statistical-cards { grid-template-columns:1fr; }
+  .statistical-steps li { flex-wrap:wrap; }
+  .statistical-steps li small { min-width:0; width:100%; }
+  .statistical-migration-value { flex-wrap:wrap; }
+}
+@layer print-overrides {
+  @media screen {
+    .statistical-forecast .statistical-toolbar,.statistical-forecast .statistical-interpretation form,.statistical-forecast .statistical-operations form { box-shadow:none!important; }
+    .statistical-forecast .statistical-toolbar { padding:14px 16px!important; }
+    .statistical-forecast .statistical-hero h1,.statistical-forecast .statistical-hero .statistical-hero-links a { color:#fff!important; }
+    .statistical-forecast .statistical-hero p { color:#dcebf3!important; }
+    .statistical-forecast .statistical-hero .statistical-eyebrow { color:#a9d9e8!important; }
+  }
+}

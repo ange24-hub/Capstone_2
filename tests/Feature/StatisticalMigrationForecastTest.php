@@ -154,7 +154,7 @@ class StatisticalMigrationForecastTest extends TestCase
         $other = Barangay::where('name', 'Looc')->firstOrFail();
         $this->person();
         $this->actingAs($this->staff)->get(route('prediction.dashboard'))->assertOk()
-            ->assertViewIs('barangay.dashboard.prediction')->assertSee('Weighted Moving Average')->assertDontSee('SVR');
+            ->assertViewIs('barangay.dashboard.prediction')->assertSee('Population-based assumption')->assertDontSee('SVR');
         $this->get(route('prediction.dashboard', ['barangay_id' => $other->id]))->assertForbidden();
         foreach (['prediction.store', 'prediction.verify', 'prediction.sync', 'prediction.movements.store'] as $route) {
             $this->post(route($route), ['barangay_id' => $other->id])->assertForbidden();

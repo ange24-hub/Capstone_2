@@ -41,11 +41,15 @@ class SemestralPopulationProjectionTest extends TestCase
         $this->assertCount(3, $result['steps']);
         $this->assertSame(['2023 · 2nd semester'], $result['missing_periods']);
         $this->assertSame(3, $result['quality_issues']);
+        $this->assertEqualsWithDelta(457.5, $result['historical_check']['estimate'], .000001);
+        $this->assertSame(466, $result['historical_check']['actual']);
+        $this->assertEqualsWithDelta(8.5, $result['historical_check']['absolute_error'], .000001);
+        $this->assertSame(8, $result['historical_check']['last_report_error']);
         $this->assertNull($result['mape']);
         $staff=User::factory()->create(['role'=>User::ROLE_BARANGAY,'barangay_id'=>$area->id]);
         $this->actingAs($staff)->get(route('prediction.dashboard'))->assertOk()
-            ->assertSee('Semestral population projection')->assertSee('463')->assertSee('unobserved bridge estimate')
-            ->assertSee('MAPE / accuracy: Not yet validated.');
+            ->assertSee('Carnaga population forecast')->assertSee('463')->assertSee('Gap estimate; no actual report')
+            ->assertSee('wala pa ma-validate');
         $other=Barangay::where('name','Looc')->firstOrFail();
         $this->get(route('prediction.dashboard',['barangay_id'=>$other->id]))->assertForbidden();
         $this->assertDatabaseCount('forecast_logs',0);

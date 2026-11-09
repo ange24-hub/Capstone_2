@@ -19,7 +19,7 @@ class SemestralPopulationProjection
         $target = $current + 1;
         $result = ['target' => $this->label($target), 'estimate' => null, 'history' => [],
             'inputs' => [], 'steps' => [], 'reason' => 'Need at least 3 consecutive completed semester reports.',
-            'quality_issues' => 0, 'missing_periods' => [], 'mape' => null];
+            'quality_issues' => 0, 'missing_periods' => [], 'mape' => null, 'historical_check' => null];
         if (! Schema::hasTable('population_report_submissions')) return $result;
         $snapshots = app(PopulationReportSubmissionSnapshot::class);
         $periods = [];
@@ -57,6 +57,19 @@ class SemestralPopulationProjection
             $inputs[] = $periods[$p];
         }
         $result['inputs'] = $inputs;
+        // Usa ka retrospective one-step check lang kung adunay upat ka sunod-sunod
+        // nga actual reports. Dili kini pre-issued forecast o live MAPE.
+        if (isset($periods[$latest - 3])) {
+            $previous = array_map(fn ($p) => $periods[$p]['population'], range($latest - 3, $latest - 1));
+            $actual = $periods[$latest]['population'];
+            $historicalEstimate = ($previous[0] + 2 * $previous[1] + 3 * $previous[2]) / 6;
+            $result['historical_check'] = [
+                'label' => $this->label($latest), 'estimate' => $historicalEstimate, 'actual' => $actual,
+                'absolute_error' => abs($actual - $historicalEstimate),
+                'last_report_error' => abs($actual - $previous[2]),
+                'percentage_error' => $actual > 0 ? abs($actual - $historicalEstimate) / $actual * 100 : null,
+            ];
+        }
         if ($target - $latest > 6) {
             $result['reason'] = 'Latest source is too old: more than 6 projection steps are needed. Add recent reports.';
             return $result;
