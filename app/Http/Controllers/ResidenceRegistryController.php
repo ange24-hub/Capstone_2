@@ -14,7 +14,7 @@ class ResidenceRegistryController extends Controller
         abort_unless($barangay && $barangay->usesResidenceRegistry(), 403);
         $scope = $request->query('scope', 'living_here');
         abort_unless(in_array($scope, ['living_here', 'living_elsewhere', 'unconfirmed'], true), 422);
-        $query = Inhabitant::with('household')->where('barangay_id', $barangay->id)
+        $query = Inhabitant::withoutMigrationDemo()->with('household')->where('barangay_id', $barangay->id)
             ->where('status', Inhabitant::STATUS_ACTIVE)->where('residence_status', $scope);
         if ($search = trim((string) $request->query('search'))) {
             $query->where(fn ($q) => $q->where('first_name', 'like', '%'.$search.'%')->orWhere('last_name', 'like', '%'.$search.'%'));
@@ -22,7 +22,7 @@ class ResidenceRegistryController extends Controller
         return view('registry.residence', [
             'barangay'=>$barangay, 'scope'=>$scope,
             'residents'=>$query->orderBy('last_name')->orderBy('first_name')->orderBy('id')->paginate(25)->withQueryString(),
-            'counts'=>Inhabitant::where('barangay_id', $barangay->id)->where('status', Inhabitant::STATUS_ACTIVE)
+            'counts'=>Inhabitant::withoutMigrationDemo()->where('barangay_id', $barangay->id)->where('status', Inhabitant::STATUS_ACTIVE)
                 ->selectRaw('residence_status, COUNT(*) as total')->groupBy('residence_status')->pluck('total', 'residence_status'),
         ]);
     }
@@ -40,7 +40,7 @@ class ResidenceRegistryController extends Controller
         abort_unless($barangay && $barangay->usesResidenceRegistry(), 403);
         $scope = $request->query('scope', 'living_here');
         abort_unless(in_array($scope, ['registered', 'living_here', 'living_elsewhere', 'unconfirmed'], true), 422);
-        $query = Inhabitant::with('household')->where('barangay_id', $barangay->id)->where('status', Inhabitant::STATUS_ACTIVE)
+        $query = Inhabitant::withoutMigrationDemo()->with('household')->where('barangay_id', $barangay->id)->where('status', Inhabitant::STATUS_ACTIVE)
             ->when($scope !== 'registered', fn ($q) => $q->where('residence_status', $scope))
             ->orderBy('household_id')->orderBy('id');
         return response()->streamDownload(function () use ($query) {

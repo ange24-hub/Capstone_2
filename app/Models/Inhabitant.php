@@ -90,6 +90,13 @@ class Inhabitant extends Model
         return $query->where('status', self::STATUS_ACTIVE)->where('residence_status', self::RESIDENCE_HERE);
     }
 
+    public function scopeWithoutMigrationDemo($query)
+    {
+        return $query->where(fn ($q) => $q->whereNull('remarks')
+            ->orWhere('remarks', '!=', \App\Services\MigrationForecastHistory::DEMO_MARKER))
+            ->whereDoesntHave('household', fn ($q) => $q->where('household_number', 'DEMO-MIGRATION-V1'));
+    }
+
     public function scopeMovedOutRecords($query)
     {
         return $query->where(fn($q) => $q->where('status', self::STATUS_MIGRATED_OUT)

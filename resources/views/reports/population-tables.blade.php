@@ -9,7 +9,7 @@
         <tr><td>Senior citizens (birth date or SC remarks)</td><td class="number">{{ number_format($report['totalSeniors']) }}</td></tr>
         <tr><td>Persons with disability (PWD in remarks)</td><td class="number">{{ number_format($report['totalPwd']) }}</td></tr>
     </tbody></table></div>
-    @if($showReportNotes ?? true)<p class="report-caption report-note">Counts cover available registry records, including active, migrated-out and inactive records.</p>@endif
+    @if($showReportNotes ?? true)<p class="report-caption report-note">Counts cover available registry records, active registered residents, matching Consolidated; transferred and inactive profiles excluded.</p>@endif
 </section>
 @endif
 @if(in_array($selectedSection, ['summary', 'sex'], true))

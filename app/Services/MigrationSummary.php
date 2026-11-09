@@ -12,7 +12,7 @@ class MigrationSummary
     {
         $barangays = Barangay::when($barangayId, fn ($q) => $q->whereKey($barangayId))
             ->orderBy('name')->get(['id', 'name']);
-        $records = MigrationRecord::whereIn('barangay_id', $barangays->modelKeys())
+        $records = MigrationRecord::withoutDemo()->whereIn('barangay_id', $barangays->modelKeys())
             ->whereYear('movement_date', $year)->where('type', MigrationRecord::TYPE_OUT)
             ->get(['barangay_id', 'type', 'movement_date']);
         $arrivals = app(RbiSavedArrivalHistory::class)->build($barangayId, \Illuminate\Support\Carbon::create($year, 12, 1), 12);

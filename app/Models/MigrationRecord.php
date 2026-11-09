@@ -41,6 +41,15 @@ class MigrationRecord extends Model
         return $this->belongsTo(Inhabitant::class);
     }
 
+    public function scopeWithoutDemo($query)
+    {
+        return $query->where(fn ($q) => $q->whereNull('reason')
+            ->orWhere('reason', '!=', \App\Services\MigrationForecastHistory::DEMO_MARKER))
+            ->whereDoesntHave('inhabitant', fn ($q) => $q
+                ->where('remarks', \App\Services\MigrationForecastHistory::DEMO_MARKER)
+                ->orWhereHas('household', fn ($house) => $house->where('household_number', 'DEMO-MIGRATION-V1')));
+    }
+
     public function barangay(): BelongsTo
     {
         return $this->belongsTo(Barangay::class);

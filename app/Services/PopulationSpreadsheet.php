@@ -226,7 +226,7 @@ class PopulationSpreadsheet
         $add([],0,7);
         $add(['Date Accomplished: '.$report['generatedAt']->format('F d, Y')],0,18,true);
         $add(['Note: Submit RBI Form C to DILG C/MLGOO as reference for encoding to BIS-BPS.'],8,22,true);
-        $add(['Current registry as of '.$report['generatedAt']->format('d M Y').'; active, migrated-out and inactive records. Semester/year is a report label, not a reconstructed historical population.'],8,30,true);
+        $add(['Current registry as of '.$report['generatedAt']->format('d M Y').'; active registered residents matching Consolidated; transferred and inactive profiles excluded. Semester/year is a report label, not a reconstructed historical population.'],8,30,true);
         $add(['Ages use recorded birth dates. Sector counts use explicit tags only. A dash means not recorded; coverage is not verified complete.'],8,26,true);
         return ['monitoring'=>true,'headings'=>$headings,'rows'=>$rows,'merges'=>$merges];
     }

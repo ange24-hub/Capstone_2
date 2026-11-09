@@ -6,7 +6,6 @@ use App\Models\Barangay;
 use App\Models\Inhabitant;
 use App\Models\MigrationRecord;
 use App\Models\User;
-use App\Services\MigrationForecastHistory;
 use App\Services\MigrationForecastReport;
 use App\Services\ExperimentalPooledSvrForecast;
 use Illuminate\Http\Request;
@@ -58,7 +57,7 @@ class MigrationDashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $records = MigrationRecord::with([
+        $records = MigrationRecord::withoutDemo()->with([
             'barangay',
             'inhabitant.household',
         ])
@@ -136,7 +135,7 @@ class MigrationDashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $totalInhabitants = Inhabitant::query()
+        $totalInhabitants = Inhabitant::withoutMigrationDemo()
             ->when(
                 $selectedBarangayId,
                 fn ($query) => $query->where(
@@ -171,8 +170,7 @@ class MigrationDashboardController extends Controller
 
             'analyticsInsights' => ! in_array($request->input('section'), ['forecast', 'events'], true)
                 ? app(\App\Services\MigrationAnalyticsInsights::class)->build(
-                    $selectedBarangayId, $selectedYear, $monthlyTrend,
-                    $records->where('reason', MigrationForecastHistory::DEMO_MARKER)->count()
+                    $selectedBarangayId, $selectedYear, $monthlyTrend
                 ) : null,
 
             'totalInhabitants' => $totalInhabitants,
@@ -185,7 +183,6 @@ class MigrationDashboardController extends Controller
 
             ...$forecast,
             ...$experimental,
-            'demoRecordCount' => $records->where('reason', MigrationForecastHistory::DEMO_MARKER)->count(),
         ]);
     }
 }

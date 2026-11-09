@@ -59,10 +59,6 @@
             <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} &middot; {{ $selectedYear }}</span><a href="{{ route($forecastRoute, ['year' => $selectedYear, 'section' => $migrationSection]) }}">Clear barangay filter</a></div>
         @endif
 
-        @if ($demoRecordCount > 0 && $migrationSection !== 'forecast')
-            <p role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">Demo data included: {{ $demoRecordCount }} synthetic migration events. Remove demo data before using official reports.</p>
-        @endif
-
         @if ($migrationSection === 'trends')
         <section class="dashboard-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Migration summary">
             <article class="metric-card metric-primary rounded-xl border border-slate-200 bg-white bg-none shadow-sm flex min-h-32 items-start justify-between gap-4 border-t-4 border-t-blue-600 p-5 transition-shadow duration-200 hover:shadow-md"><span class="metric-icon flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><x-app-icon name="users" /></span><div><span>Registry population</span><strong>{{ number_format($totalInhabitants) }}</strong><small>Current resident profiles in scope</small></div></article>

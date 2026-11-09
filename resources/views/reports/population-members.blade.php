@@ -7,7 +7,7 @@
     <h2>{{ $reportTitle }} — {{ number_format($report[$countKey]) }} {{ $grouped ? strtolower($reportTitle) : 'residents' }}</h2>
     <p class="report-caption">{{ $report['scopeLabel'] }} · As of {{ $report['generatedAt']->format('d F Y') }}.</p>
     @if($showReportNotes ?? true)
-    <p class="report-caption report-note">Available registry records across all statuses; completeness has not been verified.</p>
+    <p class="report-caption report-note">Active registered residents matching Consolidated; transferred and inactive profiles excluded; completeness has not been verified.</p>
     @if($selectedSection === 'families')
         <p class="report-caption report-note">Residents are listed under their identified family. Decimal family numbers remain separate. A household with one resident and no family number is treated as a single-person family.</p>
         @php($unassigned = $report['totalRecords'] - $report['detailGroups']->sum(fn ($group) => $group['members']->count()))

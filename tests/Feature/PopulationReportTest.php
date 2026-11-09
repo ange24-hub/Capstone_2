@@ -168,12 +168,12 @@ class PopulationReportTest extends TestCase
         $response=$this->actingAs($staff)->get(route('reports.population',['barangay_id'=>$area->id]));
         $response->assertOk()->assertSee('Population Summary')->assertSee('Download PDF');
         $r=$response->viewData('report');
-        $this->assertSame(6,$r['totalRecords']);
+        $this->assertSame(5,$r['totalRecords']);
         $this->assertSame(1,$r['totalHouseholds']);
         $this->assertSame(0,$r['totalFamilies']);
-        $this->assertSame(6,$r['recordsWithoutFamily']);
-        $this->assertSame([1,1,1,1,2],array_values($r['ages']));
-        $this->assertSame([1,1,4],array_values($r['sex']));
+        $this->assertSame(5,$r['recordsWithoutFamily']);
+        $this->assertSame([0,1,1,1,2],array_values($r['ages']));
+        $this->assertSame([0,1,4],array_values($r['sex']));
         $this->assertSame(5,$r['confirmedLivingHere']);
         $this->assertSame(1,$r['coveredBarangays']);
         $this->assertSame(1,$r['totalBarangays']);

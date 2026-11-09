@@ -156,9 +156,10 @@ class DashboardController extends Controller
         $barangay = auth()->user()->barangay;
 
         if ($barangay) {
-            $barangay->loadCount(['inhabitants' => fn ($query) => $query->when($barangay->usesResidenceRegistry(), fn ($q) => $q->where('status', \App\Models\Inhabitant::STATUS_ACTIVE)),
-                'inhabitants as local_residents_count' => fn ($query) => $query->livingHere(),
-                'households' => fn ($query) => $query->where('household_number', '!=', 'Not recorded'), 'migrationRecords']);
+            $barangay->loadCount(['inhabitants' => fn ($query) => $query->withoutMigrationDemo()->when($barangay->usesResidenceRegistry(), fn ($q) => $q->where('status', \App\Models\Inhabitant::STATUS_ACTIVE)),
+                'inhabitants as local_residents_count' => fn ($query) => $query->withoutMigrationDemo()->livingHere(),
+                'households' => fn ($query) => $query->whereNotIn('household_number', ['Not recorded', 'DEMO-MIGRATION-V1']),
+                'migrationRecords' => fn ($query) => $query->withoutDemo()]);
         }
 
         $residentApprovalRequests = $barangay

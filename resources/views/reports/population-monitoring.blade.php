@@ -35,7 +35,7 @@
     <div class="monitoring-footnote">
         <p>Note: This RBI Form C Semestral Monitoring Report is to be submitted to DILG C/MLGOO as a reference for encoding to BIS-BPS.</p>
         @if($report['totalRecords'] === 0)<p>Not yet encoded: no resident records are available in this scope; this does not establish zero population.</p>@endif
-        <p>Source: current registry as of {{ $report['generatedAt']->format('d M Y') }}; includes active, migrated-out and inactive records. The selected semester/year labels this report; historical population is not reconstructed. Ages use recorded birth dates. Sector counts cover explicit tags only; “—” means not recorded. Coverage is not verified complete.</p>
+        <p>Source: active registered residents as of {{ $report['generatedAt']->format('d M Y') }}, matching Consolidated. Semester/year is a report label; historical population is not reconstructed. Ages use birth dates; sectors use explicit tags. “—” means not recorded. Completeness unverified.</p>
     </div>
 </article>
 </div>

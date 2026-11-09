@@ -51,7 +51,7 @@ class AssistantPopulationAnswer
         if (in_array('pwd', $selected)) $lines[] = AssistantLanguage::text('Based only on recognized PWD remarks. Missing remarks do not confirm absence of disability.');
         if (array_intersect(['children', 'adults', 'ages'], $selected)) $lines[] = AssistantLanguage::text('Ages use valid birth dates as of today. Unknown / invalid birth dates: ').number_format($report['ages']['Unknown / invalid birth date']).'.';
         if (array_intersect(['male', 'female'], $selected)) $lines[] = AssistantLanguage::text('Sex not specified / other: ').number_format($report['sex']['Not specified / other']).'.';
-        $lines[] = AssistantLanguage::text('Based on available records across all statuses; completeness unverified.');
+        $lines[] = AssistantLanguage::text('Based on active registered residents matching Consolidated; completeness unverified.');
         if (! $report['totalRecords']) $lines[] = AssistantLanguage::text('No resident records encoded; this does not mean zero population.');
         return ['reply' => implode("\n", $lines), 'metrics' => $selected];
     }

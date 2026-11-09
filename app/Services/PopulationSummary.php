@@ -33,10 +33,12 @@ class PopulationSummary
         if ($withNames) {
             $columns = array_merge($columns, ['id', 'first_name', 'middle_name', 'last_name', 'suffix', 'relationship_to_head']);
         }
-        $records = Inhabitant::whereIn('barangay_id', $barangays->modelKeys())
+        $records = Inhabitant::withoutMigrationDemo()->where('status', Inhabitant::STATUS_ACTIVE)
+            ->whereIn('barangay_id', $barangays->modelKeys())
             ->when($withNames, fn ($query) => $query->orderBy('last_name')->orderBy('first_name')->orderBy('id'))
             ->get($columns);
-        $householdRows = Household::whereIn('barangay_id', $barangays->modelKeys())->get(['id', 'barangay_id', 'household_number']);
+        $householdRows = Household::whereIn('barangay_id', $barangays->modelKeys())
+            ->where('household_number', '!=', 'DEMO-MIGRATION-V1')->get(['id', 'barangay_id', 'household_number']);
         $householdLookup = $householdRows->keyBy('id');
         $households = $householdRows->groupBy('barangay_id')->map(fn ($items) => $items
             ->map(function ($item): string {

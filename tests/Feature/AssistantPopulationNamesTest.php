@@ -46,15 +46,15 @@ class AssistantPopulationNamesTest extends TestCase
             config(['assistant_ai.enabled' => $enabled]);
             foreach (['hatagi kog names sa mga pwd', 'Show names of PWD residents', 'Ipakita ang mga ngalan sa PWD', 'Lista sa PWD'] as $question) {
                 $response = $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => $question])
-                    ->assertOk()->assertJsonPath('mode', 'database_list')->assertJsonPath('facts.total_records', 2)
-                    ->assertJsonPath('previous_question', null)->assertSee('Alice Example')->assertSee('Bob Example')
+                    ->assertOk()->assertJsonPath('mode', 'database_list')->assertJsonPath('facts.total_records', 1)
+                    ->assertJsonPath('previous_question', null)->assertSee('Alice Example')->assertDontSee('Bob Example')
                     ->assertDontSee('Excluded')->assertDontSee('OtherBarangay')
                     ->assertDontSee('PRIVATE ADDRESS')->assertDontSee('PRIVATE CONTACT');
                 $this->assertStringContainsString('section=pwd', $response->json('actions.0.url'));
             }
         }
         $direct = app(RbimAssistant::class)->respond($staff, 'Show PWD names');
-        $this->assertSame(2, $direct['facts']['total_records']);
+        $this->assertSame(1, $direct['facts']['total_records']);
         $interpreted = app(AssistantIntentInterpreter::class)->interpret($staff, 'Show PWD names');
         $this->assertSame('database_list', $interpreted['answer']['mode']);
         Http::assertNothingSent();

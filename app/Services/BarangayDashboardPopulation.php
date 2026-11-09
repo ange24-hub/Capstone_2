@@ -12,7 +12,7 @@ class BarangayDashboardPopulation
     {
         $counts = ['residents' => 0, 'pwd' => 0, 'seniors' => 0, 'indigent' => 0];
         $today = now('Asia/Manila')->startOfDay();
-        $records = $barangay->inhabitants()
+        $records = $barangay->inhabitants()->withoutMigrationDemo()
             ->when($barangay->usesResidenceRegistry(), fn ($query) => $query->where('status', Inhabitant::STATUS_ACTIVE))
             ->select(['id', 'birth_date', 'remarks'])->cursor();
 

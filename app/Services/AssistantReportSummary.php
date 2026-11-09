@@ -137,7 +137,7 @@ class AssistantReportSummary
             $r = $this->population->build($areaId);
             $facts = ['scope' => $r['scopeLabel'], 'as_of' => $r['generatedAt']->format('Y-m-d'), 'residents' => $r['totalRecords'], 'families' => $r['totalFamilies'], 'records_without_family_number' => $r['recordsWithoutFamily'], 'households' => $r['totalHouseholds'],
                 'male' => $r['sex']['Male'], 'female' => $r['sex']['Female'], 'sex_unspecified' => $r['sex']['Not specified / other'], 'age_groups' => $r['ages'], 'seniors' => $r['totalSeniors'], 'pwd' => $r['totalPwd'],
-                'basis' => 'Available registry records across all statuses. Families include single-person households. SC uses birth dates or remarks; PWD uses remarks. Missing encoding is not zero population. Not a complete census.'];
+                'basis' => 'Active registered residents matching Consolidated. Families include single-person households. SC uses birth dates or remarks; PWD uses remarks. Missing encoding is not zero population. Not a complete census.'];
             $reply = $r['scopeLabel'].AssistantLanguage::text(' — as of ').$r['generatedAt']->format('M d, Y').AssistantLanguage::text("\nRegistered residents: ").number_format($r['totalRecords']).AssistantLanguage::text("\nFamilies: ").number_format($r['totalFamilies']).AssistantLanguage::text("\nHouseholds: ").number_format($r['totalHouseholds']).AssistantLanguage::text("\nMale: ").number_format($r['sex']['Male']).AssistantLanguage::text(' | Female: ').number_format($r['sex']['Female']).AssistantLanguage::text("\nSenior citizens: ").number_format($r['totalSeniors']).AssistantLanguage::text(' | PWD markers: ').number_format($r['totalPwd']);
             $reply .= AssistantLanguage::text("\nAge groups: ").collect($r['ages'])->map(fn ($count, $label) => AssistantLanguage::text($label).': '.number_format($count))->implode('; ');
             if (preg_match('/\b(bata|children)\b/iu', $question)) {
@@ -147,7 +147,7 @@ class AssistantReportSummary
                 $facts['coverage'] = $r['coverage']->map(fn ($row) => ['barangay' => $row['name'], 'encoded_records' => $row['records']])->values()->all();
                 $reply .= AssistantLanguage::text("\n\nEncoding coverage:\n").collect($facts['coverage'])->map(fn ($row) => $row['barangay'].': '.$row['encoded_records'].AssistantLanguage::text(' encoded records'))->implode("\n");
             }
-            $reply .= AssistantLanguage::text("\nBased on available records across all statuses; completeness unverified. SC uses birth dates or remarks; PWD uses remarks. Single-person households count as families.");
+            $reply .= AssistantLanguage::text("\nBased on active registered residents matching Consolidated; completeness unverified. SC uses birth dates or remarks; PWD uses remarks. Single-person households count as families.");
             if (! $r['totalRecords']) {
                 $reply .= AssistantLanguage::text("\nNo resident records encoded; this does not mean zero population.");
             }

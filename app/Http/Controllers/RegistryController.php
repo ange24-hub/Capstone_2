@@ -28,8 +28,8 @@ class RegistryController extends Controller
 
         return view('registry.moved-out', [
             'barangay' => $barangay,
-            'residents' => Inhabitant::with(['household', 'migrationRecords' => fn ($query) => $query
-                ->where('type', MigrationRecord::TYPE_OUT)->orderByDesc('movement_date')->orderByDesc('id')])
+            'residents' => Inhabitant::withoutMigrationDemo()->with(['household', 'migrationRecords' => fn ($query) => $query
+                ->withoutDemo()->where('type', MigrationRecord::TYPE_OUT)->orderByDesc('movement_date')->orderByDesc('id')])
                 ->where('barangay_id', $barangay->id)->movedOutRecords()
                 ->when($search !== '', fn ($query) => $query->where(fn ($names) => $names
                     ->where('first_name', 'like', '%'.$search.'%')->orWhere('last_name', 'like', '%'.$search.'%')))
@@ -109,7 +109,7 @@ class RegistryController extends Controller
             abort_unless($request->user()->barangay_id, 403, 'Your secretary account is not assigned to a barangay.');
         }
 
-        $query = Inhabitant::with(['barangay', 'household', 'migrationRecords'])
+        $query = Inhabitant::withoutMigrationDemo()->with(['barangay', 'household', 'migrationRecords' => fn ($q) => $q->withoutDemo()])
             ->orderBy('household_id')
             ->orderBy('id');
 

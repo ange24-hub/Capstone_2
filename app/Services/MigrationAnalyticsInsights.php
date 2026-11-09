@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 /** Calculations and review flags are deterministic; local AI may prioritize verified observations only. */
 class MigrationAnalyticsInsights
 {
-    public function build(?int $barangayId, int $year, Collection $months, int $demoCount): array
+    public function build(?int $barangayId, int $year, Collection $months): array
     {
         $closed = $months->filter(fn ($row) => $row['month'] < now()->timezone('Asia/Manila')->format('Y-m'))->values();
         $facts = [];
@@ -46,7 +46,7 @@ class MigrationAnalyticsInsights
         }
 
         // Registration timestamps describe encoding activity, never physical migration dates.
-        $batches = Inhabitant::query()->selectRaw('household_id, DATE(created_at) as encoded_day, COUNT(*) as record_count')
+        $batches = Inhabitant::withoutMigrationDemo()->selectRaw('household_id, DATE(created_at) as encoded_day, COUNT(*) as record_count')
             ->whereNotNull('household_id')->whereYear('created_at', $year)->where('created_at', '<=', now())
             ->when($barangayId, fn ($q) => $q->where('barangay_id', $barangayId))
             ->whereHas('household', fn ($q) => $q->whereColumn('households.barangay_id', 'inhabitants.barangay_id'))
@@ -63,15 +63,12 @@ class MigrationAnalyticsInsights
         if ($batchCount > 0) {
             $facts['encoding_review'] = "{$batchCount} household/day groups contain at least 5 encoded resident profiles in {$year}. Verify household assignments; valid bulk imports can trigger this rule.";
         }
-        $undated = Inhabitant::movedOutRecords()
+        $undated = Inhabitant::withoutMigrationDemo()->movedOutRecords()
             ->when($barangayId, fn ($q) => $q->where('barangay_id', $barangayId))
-            ->whereDoesntHave('migrationRecords', fn ($q) => $q->where('type', MigrationRecord::TYPE_OUT)->whereNotNull('movement_date'))
+            ->whereDoesntHave('migrationRecords', fn ($q) => $q->withoutDemo()->where('type', MigrationRecord::TYPE_OUT)->whereNotNull('movement_date'))
             ->count();
         if ($undated > 0) {
             $facts['undated'] = "{$undated} current moved-out/transfer profiles have no dated departure event. These profiles cannot be assigned to a monthly departure trend without verifying their movement dates.";
-        }
-        if ($demoCount > 0) {
-            $facts['demo'] = "The selected year's departure graph includes {$demoCount} demo events. Its counts are not an actual-data-only migration result.";
         }
 
         $focus = $this->focus($facts, $barangayId, $year);

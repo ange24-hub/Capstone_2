@@ -70,7 +70,7 @@ class AssistantPopulationNames
         $reply .= "\n".AssistantLanguage::text($pwd
             ? 'Based only on recognized PWD remarks. Missing remarks do not confirm absence of disability.'
             : 'Senior citizens are identified from valid birth dates (age 60 or above) or recognized senior-citizen remarks.');
-        $reply .= "\n".AssistantLanguage::text('Based on available records across all statuses; completeness unverified.');
+        $reply .= "\n".AssistantLanguage::text('Based on active registered residents matching Consolidated; completeness unverified.');
         $params = array_filter(['barangay_id' => $areaId, 'section' => $section]);
 
         return ['reply' => $reply, 'mode' => 'database_list', 'scope' => AssistantLanguage::text('RBIM system only'),
