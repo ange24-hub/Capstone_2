@@ -38,6 +38,16 @@ class PredictionDashboardController extends Controller
     public function index(Request $request)
     {
         $barangay = $this->area($request);
+        $forecastPage = $request->routeIs('prediction.migration') ? 'migration' : 'population';
+        $barangays = $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? Barangay::orderBy('name')->get(['id', 'name']) : collect([$barangay]);
+        $chartData = app(\App\Services\PredictionChartData::class);
+        if ($forecastPage === 'population') {
+            $populationProjection = app(\App\Services\SemestralPopulationProjection::class)->forBarangay($barangay->id);
+            $populationChart = $chartData->population($populationProjection);
+
+            return view('barangay.dashboard.prediction', compact('barangay', 'barangays', 'forecastPage', 'populationProjection', 'populationChart'));
+        }
+
         $this->ready();
         $forecasts = []; $accuracies = []; $history = [];
         foreach (['in', 'out'] as $type) {
@@ -50,15 +60,15 @@ class PredictionDashboardController extends Controller
         }
         $summary = $this->prediction->generateHumanReadableSummary($forecasts['in']['predicted_value'], $forecasts['out']['predicted_value'],
             $accuracies['in']['accuracy_rate'], $accuracies['out']['accuracy_rate']);
-        $logs = ForecastLog::where('barangay_id', $barangay->id)->whereNotNull('predicted_value')->orderByDesc('log_month')->paginate(24);
+        $logs = ForecastLog::where('barangay_id', $barangay->id)->whereNotNull('predicted_value')
+            ->orderByDesc('log_month')->orderBy('migration_type')->paginate(24)->fragment('saved-forecasts');
         $logChecks = [];
         foreach ($logs as $log) $logChecks[$log->id] = $this->prediction->monthSnapshot($barangay->id, $log->migration_type, $log->log_month);
         $movements = MigrationLog::actualRecords()->with('resident')->where('barangay_id', $barangay->id)->orderByDesc('transaction_date')->orderByDesc('id')->limit(20)->get();
         $residents = Inhabitant::withoutMigrationDemo()->where('barangay_id', $barangay->id)->orderBy('last_name')->orderBy('first_name')
             ->get(['id', 'first_name', 'middle_name', 'last_name', 'suffix']);
-        $barangays = $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? Barangay::orderBy('name')->get(['id', 'name']) : collect([$barangay]);
-        $populationProjection = app(\App\Services\SemestralPopulationProjection::class)->forBarangay($barangay->id);
-        return view('barangay.dashboard.prediction', compact('barangay', 'barangays', 'forecasts', 'accuracies', 'history', 'summary', 'logs', 'logChecks', 'movements', 'residents', 'populationProjection'));
+        $migrationCharts = $chartData->migration($barangay->id, $history, $forecasts);
+        return view('barangay.dashboard.prediction', compact('barangay', 'barangays', 'forecastPage', 'forecasts', 'accuracies', 'history', 'summary', 'logs', 'logChecks', 'movements', 'residents', 'migrationCharts'));
     }
 
     public function store(Request $request)
@@ -71,7 +81,7 @@ class PredictionDashboardController extends Controller
         DB::transaction(function () use ($barangay) {
             foreach (['in', 'out'] as $type) $this->prediction->issueForecast($barangay->id, $type);
         });
-        return redirect()->route('prediction.dashboard', ['barangay_id' => $barangay->id])->with('status', 'Na-save ang first-issued forecasts. Dili kini ma-overwrite sa sunod nga refresh.');
+        return redirect()->route('prediction.migration', ['barangay_id' => $barangay->id])->with('status', 'Na-save ang first-issued forecasts. Dili kini ma-overwrite sa sunod nga refresh.');
     }
 
     public function verify(Request $request)
@@ -80,14 +90,14 @@ class PredictionDashboardController extends Controller
         $data = $request->validate(['migration_type' => ['required', 'in:in,out'], 'log_month' => ['required', 'date_format:Y-m'],
             'source_hash' => ['required', 'regex:/^[a-f0-9]{64}$/'], 'confirm_complete' => ['required', 'accepted']]);
         $this->prediction->confirmActualMonth($barangay->id, $data['migration_type'], $data['log_month'], $request->user()->id, $data['source_hash']);
-        return redirect()->route('prediction.dashboard', ['barangay_id' => $barangay->id])->with('status', 'Na-confirm ang complete month. Ang actual count gikan mismo sa dated movement logs.');
+        return redirect()->route('prediction.migration', ['barangay_id' => $barangay->id])->with('status', 'Na-confirm ang complete month. Ang actual count gikan mismo sa dated movement logs.');
     }
 
     public function sync(Request $request, StatisticalMigrationLogSync $sync)
     {
         $barangay = $this->area($request); $this->ready();
         DB::transaction(fn () => $sync->syncBarangay($barangay->id));
-        return redirect()->route('prediction.dashboard', ['barangay_id' => $barangay->id])->with('status', 'Na-sync ang existing dated movement records. Wala gi-imbento nga dates o gi-confirm nga coverage.');
+        return redirect()->route('prediction.migration', ['barangay_id' => $barangay->id])->with('status', 'Na-sync ang existing dated movement records. Wala gi-imbento nga dates o gi-confirm nga coverage.');
     }
 
     public function recordMovement(Request $request)
@@ -105,6 +115,6 @@ class PredictionDashboardController extends Controller
             MigrationRecord::create(['barangay_id' => $barangay->id, 'inhabitant_id' => $person->id, 'type' => $data['migration_type'],
                 'movement_date' => $data['transaction_date'], 'recorded_by' => $request->user()->id]);
         });
-        return redirect()->route('prediction.dashboard', ['barangay_id' => $barangay->id])->with('status', 'Na-save ang dated movement event. Ang residency status i-update pinaagi sa Resident Registry kung gikinahanglan.');
+        return redirect()->route('prediction.migration', ['barangay_id' => $barangay->id])->with('status', 'Na-save ang dated movement event. Ang residency status i-update pinaagi sa Resident Registry kung gikinahanglan.');
     }
 }

@@ -74,7 +74,7 @@ class RbiFirstSaveForecastSourceTest extends TestCase
         $this->assertNotNull($months[0]['source_reports'][0]['submitted_at']);
         $this->travelTo(Carbon::parse('2026-07-05 10:00:00'));
         $admin = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
-        $this->actingAs($admin)->get(route('municipal.prediction-forecast', ['barangay_id' => $area->id]))
+        $this->actingAs($admin)->get(route('prediction.migration', ['barangay_id' => $area->id]))
             ->assertOk()->assertViewHas('forecasts', fn ($f) => $f['in']['method'] === 'population_baseline');
         $this->assertDatabaseCount('migration_logs', 0); // RBI first-save dates are not physical movement dates.
     }

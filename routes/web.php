@@ -357,6 +357,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::controller(\App\Http\Controllers\PredictionDashboardController::class)
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)->group(function () {
             Route::get('/prediction-dashboard', 'index')->name('prediction.dashboard');
+            Route::get('/prediction-dashboard/population', 'index')->name('prediction.population');
+            Route::get('/prediction-dashboard/migration', 'index')->name('prediction.migration');
             Route::post('/prediction-dashboard/issue', 'store')->name('prediction.store');
             Route::post('/prediction-dashboard/verify', 'verify')->name('prediction.verify');
             Route::post('/prediction-dashboard/sync', 'sync')->name('prediction.sync');

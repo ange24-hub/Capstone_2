@@ -1,41 +1,48 @@
 <section class="statistical-population statistical-card" id="population-forecast" aria-labelledby="semester-population-title">
     <div class="statistical-section-heading">
-        <div><span class="statistical-kicker">01 / Population</span>
+        <div>
             <h2 id="semester-population-title">{{ $barangay->name }} population forecast</h2>
-            <p>Gikan sa archived RBI Form C summary reports. Ang sukod kay <strong>total inhabitants matag semester</strong>.</p>
         </div>
         <span class="statistical-status {{ $populationProjection['estimate'] === null ? 'is-waiting' : '' }}">{{ $populationProjection['estimate'] === null ? 'Insufficient history' : 'Provisional estimate' }}</span>
     </div>
 
     @if($populationProjection['estimate'] !== null)
-        <div class="statistical-population-result">
+        <div class="statistical-population-result statistical-population-compact">
             <div class="statistical-result-main"><span class="statistical-result-label">Projected {{ $populationProjection['target'] }}</span>
                 <div><strong class="statistical-estimate">{{ number_format($populationProjection['estimate'], 0) }}</strong><span class="statistical-unit">inhabitants</span></div>
-                <p>Rounded gikan sa {{ number_format($populationProjection['estimate'], 2) }}. Forecast kini, dili pa actual population report.</p>
             </div>
-            <div class="statistical-method"><span>Giunsa pagkuha</span><strong>Weighted Moving Average</strong>
-                <p>Ang tulo ka pinakabag-ong sunod-sunod nga completed reports adunay weights nga <b>1, 2, 3</b>; mas bug-at ang pinakabag-o.</p>
-                <small>Last actual source: {{ $populationProjection['data_through'] }}</small>
-            </div>
-        </div>
-        <div class="statistical-inputs" aria-label="Actual reports used for initial forecast">
-            @foreach($populationProjection['inputs'] as $row)
-                <a class="statistical-input" href="{{ route('reports.population.submissions.show', $row['id']) }}">
-                    <span>{{ $row['label'] }}</span><strong>{{ number_format($row['population']) }}</strong><small>reported inhabitants · view source</small>
-                </a>
-            @endforeach
         </div>
         @if(count($populationProjection['steps']) > 1)
-            <p class="statistical-explain"><strong>Naay gap sa reports.</strong> Wala pay actual reports sa intervening semesters. Gigamit ang mga estimate sa ubos aron maabot ang target; dili sila actual counts.</p>
+            <p class="statistical-explain">{{ count($populationProjection['steps']) - 1 }} gap periods use estimates.</p>
         @endif
     @else
         <p class="statistical-empty">{{ $populationProjection['reason'] }}</p>
     @endif
 
     @if($populationProjection['quality_issues'])
-        <p class="statistical-caution"><strong>{{ $populationProjection['quality_issues'] }} report(s) need checking.</strong> Lahi ang headline population ug ang sum sa age brackets sa original reports. Gisunod sa forecast ang headline totals; i-reconcile kini before official planning.</p>
+        <p class="statistical-caution"><strong>{{ $populationProjection['quality_issues'] }} source reports need review.</strong></p>
     @endif
-    <details class="statistical-details"><summary>Tan-awa ang calculation ug tanang source reports</summary>
+    @if($populationChart)
+        @include('barangay.dashboard._prediction-chart', [
+            'chartId' => 'population-trend', 'chartTitle' => 'Population trend',
+            'chartRows' => $populationChart, 'chartNote' => 'S1 / S2 = semester',
+        ])
+    @endif
+    <details class="statistical-details"><summary>Calculation &amp; source reports</summary>
+        @if($populationProjection['estimate'] !== null)
+            <p><strong>Weighted Moving Average</strong> · 3 completed reports · weights 1, 2, 3.</p>
+            <p>Last actual source: {{ $populationProjection['data_through'] }}</p>
+        @endif
+        @if($populationProjection['inputs'])
+            <div class="statistical-inputs" aria-label="Actual reports used for initial forecast">
+                @foreach($populationProjection['inputs'] as $row)
+                    <a class="statistical-input" href="{{ route('reports.population.submissions.show', $row['id']) }}">
+                        <span>{{ $row['label'] }}</span><strong>{{ number_format($row['population']) }}</strong><small>View source report</small>
+                    </a>
+                @endforeach
+            </div>
+        @endif
+        <p>Ang forecast naggamit sa headline population totals. I-reconcile ang age-count differences before official planning.</p>
         @if($populationProjection['steps'])
             <ol class="statistical-steps">@foreach($populationProjection['steps'] as $step)<li><span>{{ $step['label'] }}</span><strong>{{ number_format($step['estimate'], 2) }}</strong><small>{{ $step['is_target'] ? 'Target estimate' : 'Gap estimate; no actual report' }}</small></li>@endforeach</ol>
         @endif
@@ -55,5 +62,5 @@
         <p><b>Accuracy / MAPE:</b> wala pa ma-validate. Kinahanglan una ma-save ang forecast sa dili pa ang target semester, dayon i-compare sa verified actual report. Kini nga preview dili accuracy result.</p>
         <p>Ang method mosunod sa past totals; dili niya mahibal-an ang kalit nga births, deaths, o migration.</p>
     </details>
-    <a class="statistical-text-link" href="{{ route('reports.population.submissions.index', ['barangay_id'=>$barangay->id]) }}">Open Population Report History →</a>
+    <a class="statistical-text-link" href="{{ route('reports.population.submissions.index', ['barangay_id'=>$barangay->id]) }}">Population report history →</a>
 </section>

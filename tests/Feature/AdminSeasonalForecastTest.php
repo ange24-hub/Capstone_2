@@ -26,7 +26,7 @@ class AdminSeasonalForecastTest extends TestCase
     {
         $admin = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($admin)->get(route('municipal.prediction-forecast'))->assertOk()
-            ->assertViewIs('barangay.dashboard.prediction')->assertSee('Weighted Moving Average')
+            ->assertViewIs('barangay.dashboard.prediction')->assertSee('Population forecast')
             ->assertViewMissing('predictedOutMigration')->assertDontSee('SVR');
         $this->assertDatabaseCount('forecast_logs', 0);
     }
