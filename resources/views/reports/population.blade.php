@@ -5,7 +5,7 @@
     @include('reports._document-header', ['documentTitle' => strtoupper($reportTitle).' REPORT', 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y'), 'documentPrintOnly' => true])
     @endunless
     <header class="population-page-heading">
-        <h1 id="population-report-title">Population Reports</h1>
+        <h1 id="population-report-title"><span class="population-sticker population-sticker-blue" aria-hidden="true"><x-app-icon name="users" /></span>Population Reports</h1>
         <p>{{ $report['scopeLabel'] }} · Tomas Oppus, Southern Leyte</p>
     </header>
     @include('reports._population-pages')
@@ -33,9 +33,10 @@
     @include('reports.population-content')
     @if($submissionPreviewToken ?? null)
         <section class="population-submission-panel" aria-label="Submit population summary">
-            <h2>Submit Population Report Summary</h2>
+            <div class="population-submit-copy"><h2><span class="population-sticker population-sticker-green" aria-hidden="true"><x-app-icon name="document" /></span>Submit Population Report Summary</h2>
             <p>After reviewing, sign and submit this {{ $report['monitoring']['semester'] === 1 ? '1st' : '2nd' }} Semester {{ $report['monitoring']['year'] }} report to Municipal DILG/Admin. The signed copy is saved in Submission History.</p>
             @if($errors->any())<div role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+            </div>
             <form method="GET" action="{{ route('reports.population.submissions.sign') }}">
                 <input type="hidden" name="preview_token" value="{{ $submissionPreviewToken }}">
                 <button class="button" type="submit">Submit to Municipal DILG/Admin</button>

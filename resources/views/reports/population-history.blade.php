@@ -4,7 +4,7 @@
 <section class="population-workspace">
     <header class="population-page-heading">
         <div class="population-breadcrumb"><a href="{{ route('reports.population', array_filter(['barangay_id'=>$areaId])) }}">Population Reports</a> / Submission History</div>
-        <h1>Submission History</h1>
+        <h1><span class="population-sticker population-sticker-blue" aria-hidden="true"><x-app-icon name="document" /></span>Submission History</h1>
         <p>{{ $isSecretary ? 'Your barangay’s submitted and archived population reports.' : 'Submitted and archived population reports from all barangays.' }}</p>
     </header>
     @include('reports._population-pages')

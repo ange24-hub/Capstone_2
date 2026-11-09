@@ -33,6 +33,15 @@ class PopulationReportController extends Controller
         $barangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
         $selectedSection = $request->input('section') ?: 'summary';
         $printMode = $request->boolean('print');
+        // Kung adunay original report sa gipiling period, mao kana ang historical source.
+        // Dili ilisan ang historical counts sa current registry totals.
+        if ($barangayId && $selectedSection === 'summary' && $request->filled('report_year') && $request->filled('semester')
+            && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')) {
+            $archive = \App\Models\PopulationReportSubmission::where('barangay_id', $barangayId)
+                ->where('report_year', $request->integer('report_year'))->where('semester', $request->integer('semester'))
+                ->where('snapshot->kind', 'historical_population_photo')->orderByDesc('id')->first();
+            if ($archive) return redirect()->route('reports.population.submissions.show', $archive);
+        }
         $report = $summary->build($barangayId, $selectedSection);
         $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',now()->year),
             'semester'=>$request->integer('semester',now()->month<=6?1:2)]);

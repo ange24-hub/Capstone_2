@@ -22,6 +22,23 @@
 .population-preview-bar .button { min-height:36px; font-size:12px; padding:8px 12px; }
 .population-workspace .population-coverage-note { color:#65798b; font-size:12px; line-height:1.6; margin:0; }
 .population-workspace .population-submission-panel { margin:0; }
+.population-page-heading h1,.population-submit-copy h2 { display:flex; align-items:center; gap:10px; }
+.population-sticker { display:inline-flex; flex:0 0 auto; align-items:center; justify-content:center; width:36px; height:36px; border-radius:11px; border:1px solid #c8dbe9; transform:rotate(-5deg); }
+.population-sticker svg { width:21px; height:21px; }
+.population-sticker-blue { color:#345b82; background:#e7f1fb; box-shadow:2px 3px 0 #d4e3f0; }
+.population-sticker-green { color:#347966; background:#e8f5ef; border-color:#c9e3d6; box-shadow:2px 3px 0 #d4e9df; }
+.population-workspace .population-submission-panel { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:16px 18px; }
+.population-submit-copy { max-width:650px; min-width:0; }
+.population-submission-panel .population-submit-copy h2 { font-size:15px; margin:0 0 8px; }
+.population-submission-panel .population-submit-copy p { font-size:12px; margin:0; line-height:1.6; }
+.population-submission-panel .population-sticker { width:28px; height:28px; border-radius:8px; }
+.population-submission-panel .population-sticker svg { width:17px; height:17px; }
+@layer print-overrides {
+    @media screen {
+        .population-workspace .population-submission-panel form { flex:0 0 auto; margin:0!important; padding:0!important; border:0!important; background:transparent!important; box-shadow:none!important; }
+        .population-workspace .population-submission-panel .button { width:auto!important; min-height:34px!important; padding:7px 12px!important; font-size:12px!important; line-height:1.4!important; border-radius:6px!important; }
+    }
+}
 .population-workspace .population-history { margin:0; padding:0; border:0; background:transparent; }
 .population-workspace .population-history-table { border:1px solid #d5e0e9; border-radius:10px; background:#fff; }
 .population-workspace .population-history-table table { min-width:880px; }
@@ -32,6 +49,7 @@
 .population-breadcrumb a { color:#345b82; text-decoration:none; }
 .population-workspace .population-monitoring-scroll { min-width:0; }
 @media(max-width:700px) {
+    .population-workspace .population-submission-panel { flex-direction:column; align-items:flex-start; gap:12px; }
     .population-page-heading h1 { font-size:23px; }
     .population-workspace { gap:16px; }
     .population-controls .population-control { flex:1 1 140px; }
