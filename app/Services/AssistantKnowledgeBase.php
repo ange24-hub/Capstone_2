@@ -185,14 +185,14 @@ class AssistantKnowledgeBase
                 23 => 'barangay.rbi-updates.deceased', 24, 25 => 'barangay.rbi-updates.history',
                 26, 27 => 'reports.population', 28 => 'barangay.resident-approvals.index',
                 29, 30 => 'barangay.document-requests.index', 31 => 'concerns.index', 44 => 'barangay.registry.moved-out',
-                40, 41, 42, 62, 66 => 'spatial.index', 43, 45, 47 => 'migration.dashboard', 46 => 'rbi.arrivals.index',
+                40, 41, 42, 62, 66 => 'spatial.index', 43, 45, 47 => 'migration.dashboard', 46 => 'prediction.dashboard',
                 56, 57 => 'barangay.registry.moved-out', 59, 60 => 'offline.household', 61 => 'barangay.rbi-updates.history',
                 63 => 'reports.population', default => null,
             };
         } elseif ($user->hasRole(User::ROLE_MUNICIPAL_LGU)) {
             $route = match ($id) {
                 26, 27, 33, 34, 38, 39 => 'reports.population', 32, 35 => 'dashboard.municipal',
-                36, 43, 45, 46, 47 => 'migration.dashboard', 37 => 'municipal.approvals.index',
+                46 => 'prediction.dashboard', 36, 43, 45, 47 => 'migration.dashboard', 37 => 'municipal.approvals.index',
                 40, 41, 42, 62, 66 => 'spatial.index', 63 => 'reports.population', default => null,
             };
         } elseif ($user->hasRole(User::ROLE_RESIDENT) && $user->barangay_id) {

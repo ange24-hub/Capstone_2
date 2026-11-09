@@ -29,9 +29,10 @@
         </header>
 
         <nav class="migration-section-nav" aria-label="Migration trends sections">
-            @foreach ((auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) && auth()->user()->isApproved() ? ['trends' => 'Trends', 'forecast' => 'Verified forecast', 'events' => 'Recent events'] : ['trends' => 'Trends', 'events' => 'Recent events']) as $section => $label)
-                <a href="{{ route($isAdminForecast && $section === 'forecast' ? $forecastRoute : 'migration.dashboard', array_filter(['year' => $selectedYear, 'barangay_id' => $selectedBarangayId, 'section' => $section], fn ($value) => $value !== null)) }}" @if($migrationSection === $section) aria-current="page" @endif>{{ $label }}</a>
+            @foreach (['trends' => 'Trends', 'events' => 'Recent events'] as $section => $label)
+                <a href="{{ route('migration.dashboard', array_filter(['year'=>$selectedYear,'barangay_id'=>$selectedBarangayId,'section'=>$section])) }}" @if($migrationSection===$section) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
+            <a href="{{ route('prediction.dashboard', array_filter(['barangay_id'=>$selectedBarangayId])) }}">Statistical forecast</a>
             @if(auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
             <a href="{{ route('municipal.rbi-report-history') }}">RBI report history</a>
             @endif

@@ -49,18 +49,16 @@ class MigrationForecastTest extends TestCase
         $this->event($person, '2025-11-01');
         Http::fake(fn () => throw new ConnectionException('offline'));
         $this->actingAs($user)->get(route('migration.dashboard', ['year' => 2025]))
-            ->assertOk()->assertViewHas('predictedOutMigration', null)
-            ->assertViewHas('predictionMethod', null)
-            ->assertViewHas('predictionMonthLabel', 'January 2026');
+            ->assertOk()->assertViewMissing('predictedOutMigration')->assertViewMissing('predictionMethod');
         Http::fake();
         foreach ([2024, 2027] as $year) {
             $this->get(route('migration.dashboard', ['year' => $year]))
-                ->assertOk()->assertViewHas('predictedOutMigration', null);
+                ->assertOk()->assertViewMissing('predictedOutMigration');
         }
         Http::assertNothingSent();
     }
 
-    public function test_invalid_model_responses_are_unavailable_and_negative_predictions_are_clamped(): void
+    public function test_retired_model_adapter_never_calls_http_even_if_legacy_setting_is_enabled(): void
     {
         config(['services.migration_prediction.enabled' => true]);
         $features = ['out_migration_count' => 1, 'previous_month_out' => 1, 'out_3month_avg' => 1, 'year' => 2026, 'month' => 8];
@@ -71,7 +69,8 @@ class MigrationForecastTest extends TestCase
         for ($i = 0; $i < 4; $i++) {
             $this->assertNull(app(MigrationPredictionService::class)->predictOutMigration($features));
         }
-        $this->assertSame(0.0, app(MigrationPredictionService::class)->predictOutMigration($features));
+        $this->assertNull(app(MigrationPredictionService::class)->predictOutMigration($features));
+        Http::assertNothingSent();
     }
 
     public function test_demo_is_repeatable_and_removal_preserves_real_records_and_reused_profiles(): void

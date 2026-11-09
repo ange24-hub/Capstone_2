@@ -38,8 +38,7 @@ class PredictionAnalyticsAccessTest extends TestCase
             route('municipal.prediction-svr'), route('municipal.prediction-analytics'),
             route('municipal.rbi-report-history'), route('municipal.prediction-history', $area),
             route('migration.history-experiment'), route('migration.demo'), route('analysis.forecast-readiness'),
-            route('migration.dashboard', ['section' => 'forecast']),
-            route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => $area->id, 'review' => 1])];
+];
         $this->mock(MigrationForecastReport::class)->shouldNotReceive('build');
         foreach ([User::ROLE_BARANGAY, User::ROLE_RESIDENT] as $role) {
             $user = User::factory()->create(['role' => $role, 'barangay_id' => $area->id]);
@@ -51,9 +50,9 @@ class PredictionAnalyticsAccessTest extends TestCase
     {
         $admin = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($admin)->get(route('dashboard.municipal'))->assertOk()
-            ->assertSee('Prediction analytics')->assertSee(route('municipal.prediction-forecast'));
-        $this->get(route('municipal.prediction-forecast'))->assertOk()->assertSee('Prediction analytics')
-            ->assertViewHas('forecastEvaluation')->assertSee('Download forecast evidence');
+            ->assertSee('Statistical forecast')->assertSee(route('prediction.dashboard'));
+        $this->get(route('municipal.prediction-forecast'))->assertOk()->assertSee('Weighted Moving Average')
+            ->assertViewHas('forecasts')->assertSee('Saved forecast logs');
     }
 
     public function test_pending_municipal_account_has_no_prediction_access(): void

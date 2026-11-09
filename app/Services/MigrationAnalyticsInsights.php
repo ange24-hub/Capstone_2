@@ -6,7 +6,6 @@ use App\Models\Household;
 use App\Models\Inhabitant;
 use App\Models\MigrationRecord;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /** Calculations and review flags are deterministic; local AI may prioritize verified observations only. */
@@ -79,26 +78,7 @@ class MigrationAnalyticsInsights
 
     private function focus(array $facts, ?int $barangayId, int $year): array
     {
-        if (! config('assistant_ai.enabled') || count($facts) < 2) return [];
-        $key = 'migration-insights:v1:'.hash('sha256', json_encode([
-            $barangayId, $year, $facts, config('assistant_ai.url'), config('assistant_ai.model'),
-        ], JSON_THROW_ON_ERROR));
-
-        // Never accept generated prose or calculations: the model can select only existing fact IDs.
-        return Cache::remember($key, 300, function () use ($facts) {
-            $schema = ['type' => 'object', 'properties' => ['focus_ids' => ['type' => 'array',
-                'items' => ['type' => 'string', 'enum' => array_keys($facts)], 'minItems' => 1, 'maxItems' => 2]],
-                'required' => ['focus_ids'], 'additionalProperties' => false];
-            $result = app(AssistantOllama::class)->classify(json_encode($facts, JSON_THROW_ON_ERROR), $schema,
-                'Choose one or two supplied observation IDs that staff should review first. Prioritize data quality and meaningful changes. Return only focus_ids. Do not invent facts or infer causes.');
-            if (! is_array($result) || array_keys($result) !== ['focus_ids']) return [];
-            $ids = $result['focus_ids'];
-            if (! is_array($ids) || ! array_is_list($ids) || count($ids) < 1 || count($ids) > 2) return [];
-            foreach ($ids as $id) {
-                if (! is_string($id) || ! array_key_exists($id, $facts)) return [];
-            }
-
-            return array_values(array_unique($ids));
-        });
+        // No ML: ang interpretation puro verified PHP calculations ug explicit rules.
+        return [];
     }
 }

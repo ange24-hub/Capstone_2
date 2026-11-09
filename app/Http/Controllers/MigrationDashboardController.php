@@ -6,20 +6,17 @@ use App\Models\Barangay;
 use App\Models\Inhabitant;
 use App\Models\MigrationRecord;
 use App\Models\User;
-use App\Services\MigrationForecastReport;
-use App\Services\ExperimentalPooledSvrForecast;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class MigrationDashboardController extends Controller
 {
-    public function __invoke(Request $request, MigrationForecastReport $forecastReport): View
+    public function __invoke(Request $request): View|\Illuminate\Http\RedirectResponse
     {
-        if ($request->routeIs('municipal.prediction-forecast')) {
-            $request->merge(['section' => 'forecast']);
+        if ($request->input('section') === 'forecast') {
+            abort_unless($request->user()->isApproved(), 403);
+            return redirect()->route('prediction.dashboard', $request->only('barangay_id'));
         }
-        $canViewPredictions = $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU) && $request->user()->isApproved();
-        abort_if($request->input('section') === 'forecast' && ! $canViewPredictions, 403, 'Prediction analytics is available to approved municipal administrators only.');
         $request->validate([
             'year' => ['nullable', 'integer', 'between:1900,9999'],
             'barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
@@ -121,14 +118,6 @@ class MigrationDashboardController extends Controller
                 ];
             });
 
-        $forecast = $canViewPredictions ? $forecastReport->build($selectedBarangayId, $selectedYear) : [];
-        $experimental=[];
-        if($canViewPredictions && $request->input('section')==='forecast' && $selectedBarangayId){
-            $experimental['experimentalArrivalForecast']=$selectedYear===now()->year
-                ? app(ExperimentalPooledSvrForecast::class)->preview((int)$selectedBarangayId)
-                : ['ready'=>false,'message'=>'Select the current reporting year to view the experimental future SVR estimate. Historical verified results remain below.'];
-        }
-
         /*
         |--------------------------------------------------------------------------
         | Population count
@@ -181,8 +170,6 @@ class MigrationDashboardController extends Controller
                 ->where('type', MigrationRecord::TYPE_OUT)
                 ->count(),
 
-            ...$forecast,
-            ...$experimental,
         ]);
     }
 }

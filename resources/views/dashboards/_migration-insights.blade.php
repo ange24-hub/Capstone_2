@@ -4,15 +4,7 @@
         <h2 id="migration-insights-title">Trend interpretation &amp; review alerts</h2>
         <p class="migration-insights-mode">{{ $analyticsInsights['ai_used'] ? 'AI-assisted focus · verified calculations' : 'Automated statistical summary · rule-based checks' }}</p>
     </header>
-    @if ($analyticsInsights['ai_used'])
-        <div class="migration-insights-focus">
-            <h3>AI-selected points to review</h3>
-            <ul>@foreach ($analyticsInsights['focus'] as $id)<li>{{ $analyticsInsights['observations'][$id] }}</li>@endforeach</ul>
-            <small>Local AI selects points from verified observations. The application calculates every count and percentage.</small>
-        </div>
-    @else
-        <p>AI prioritization is not active for this summary. The observations below use database calculations and explicit review rules.</p>
-    @endif
+    <p>Pure PHP statistics ug explicit review rules. Walay AI model o external API nga gigamit.</p>
     <ul class="migration-insights-observations">
         @foreach ($analyticsInsights['observations'] as $observation)<li>{{ $observation }}</li>@endforeach
     </ul>

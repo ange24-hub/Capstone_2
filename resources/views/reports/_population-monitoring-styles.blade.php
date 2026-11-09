@@ -20,6 +20,8 @@
 .monitoring-signatures td { width: 50%; border: none; vertical-align: top; text-align: center; padding: 0 14px; }
 .monitoring-signatures p { text-align: left; margin: 0; }
 .monitoring-signature-space { height: 30px; }
+.monitoring-signatures .monitoring-signed-space { height: 36px; }
+.monitoring-signed-space img { max-width: 180px; height: 34px; }
 .monitoring-signatory { display: block; min-height: 16px; border-bottom: 1px solid #111; margin: 0 auto 3px; max-width: 240px; text-transform: uppercase; }
 .monitoring-signatures em { font-size: 10px; }
 .monitoring-date { margin: 18px 0 12px; }

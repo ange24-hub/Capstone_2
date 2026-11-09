@@ -16,7 +16,7 @@ class PredictionCleanupTest extends TestCase
         foreach(['dashboard.municipal','municipal.prediction-forecast','migration.dashboard']as$route){
             $this->get(route($route))->assertOk()->assertDontSee('Scenario projections')
                 ->assertDontSee('Pooled SVR evidence')->assertDontSee('Open uploaded SVR preview')
-                ->assertSee('href="'.route('municipal.prediction-forecast').'"',false);
+                ->assertSee('href="'.route('prediction.dashboard').'"',false);
         }
     }
 

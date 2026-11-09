@@ -57,9 +57,15 @@ footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt sol
     .monitoring-grid .monitoring-remarks { font-size: 6.5pt; }
     .monitoring-signatures td { font-size: 9pt; padding: 0 12pt; }
     .monitoring-signature-space { height: 12pt; }
+    .monitoring-signatures .monitoring-signed-space { height: 24pt; }
+    .monitoring-signed-space img { height: 22pt; max-width: 140pt; }
     .monitoring-signatures em { font-size: 7pt; }
     .monitoring-date { margin: 8pt 0 5pt; }
     .monitoring-footnote { font-size: 6.5pt; line-height: 8pt; }
+    @if(!empty($report['signatures']))
+    .monitoring-grid th, .monitoring-grid td { padding: .5pt 4pt; line-height: 8.8pt; }
+    .monitoring-title { margin-bottom: 7pt; }
+    @endif
 @endif
 </style></head><body>
 @unless(($selectedSection ?? 'summary') === 'summary')

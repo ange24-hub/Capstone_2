@@ -228,6 +228,7 @@ class PopulationSpreadsheet
         $add(['Note: Submit RBI Form C to DILG C/MLGOO as reference for encoding to BIS-BPS.'],8,22,true);
         $add(['Current registry as of '.$report['generatedAt']->format('d M Y').'; active registered residents matching Consolidated; transferred and inactive profiles excluded. Semester/year is a report label, not a reconstructed historical population.'],8,30,true);
         $add(['Ages use recorded birth dates. Sector counts use explicit tags only. A dash means not recorded; coverage is not verified complete.'],8,26,true);
+        if (!empty($report['signatures'])) $add(['Data-only export. Signature images are preserved in the signed PDF and submitted report.'],8,22,true);
         return ['monitoring'=>true,'headings'=>$headings,'rows'=>$rows,'merges'=>$merges];
     }
 

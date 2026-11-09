@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Kung enabled ang server scheduler, mag-save una sa target month. First issue dili ma-overwrite.
+        $schedule->command('migration:issue-statistical-forecasts')->monthlyOn(28, '23:00')
+            ->timezone('Asia/Manila')->withoutOverlapping();
     }
 
     /**

@@ -30,6 +30,10 @@ else
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
 fi
 
+# Additive WMA storage only; no invented dates, demo seeds or automatic completeness claims.
+gosu www-data php artisan migration:prepare-statistical-storage --no-interaction
+gosu www-data php artisan population:prepare-submission-storage --no-interaction
+
 # One-time recipient-encrypted transfer explicitly requested for this installation.
 # A sync failure rolls back its transaction and must not take the existing website offline.
 gosu www-data php -d memory_limit=512M artisan brbi:sync-release --no-interaction \

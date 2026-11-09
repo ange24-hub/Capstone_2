@@ -27,16 +27,7 @@ class PooledMigrationEvidenceAccessTest extends TestCase
         Storage::disk('local')->put('migration-reconstruction/fixture-review/review-queue.json',json_encode([['source_note'=>'PRIVATE SOURCE NOTE']]));
     }
 
-    public function test_admin_downloads_model_evidence_and_defense_while_source_review_queue_is_preserved(): void
-    {
-        $admin=User::factory()->create(['role'=>User::ROLE_MUNICIPAL_LGU]);
-        $this->actingAs($admin)->get(route('municipal.prediction-pooled'))->assertRedirect(route('municipal.prediction-forecast'));
-        $download=$this->get(route('municipal.prediction-pooled.evidence'))->assertOk();
-        $this->assertStringNotContainsString('PRIVATE SOURCE NOTE',$download->streamedContent());
-        Storage::disk('local')->assertExists('migration-reconstruction/fixture-review/review-queue.json');
-        $this->get(route('municipal.prediction-pooled.defense'))->assertOk()->assertDownload('pooled-svr-defense.txt');
-        $this->assertSame(0,MigrationRecord::count());
-    }
+
 
     public function test_all_evidence_and_private_download_routes_require_approved_municipal_role(): void
     {

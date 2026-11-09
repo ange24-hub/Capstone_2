@@ -28,8 +28,8 @@
         </tbody>
     </table>
     <table class="monitoring-signatures"><tr>
-        <td><p>Prepared by:</p><div class="monitoring-signature-space"></div><strong class="monitoring-signatory">{{ $form['preparedBy'] ?: ' ' }}</strong><div>{{ $form['isBarangay'] ? 'Barangay Secretary' : 'Authorized Municipal Preparer' }}</div><em>(signature over printed name)</em></td>
-        <td><p>Submitted by:</p><div class="monitoring-signature-space"></div><strong class="monitoring-signatory">{{ $form['submittedBy'] ?: ' ' }}</strong><div>{{ $form['isBarangay'] ? 'Punong Barangay' : 'Authorized Municipal Official' }}</div><em>(signature over printed name)</em></td>
+        <td><p>Prepared by:</p><div class="monitoring-signature-space {{ !empty($report['signatures']['prepared']) ? 'monitoring-signed-space' : '' }}">@if(!empty($report['signatures']['prepared']['image']))<img src="{{ $report['signatures']['prepared']['image'] }}" alt="Barangay Secretary signature">@endif</div><strong class="monitoring-signatory">{{ $form['preparedBy'] ?: ' ' }}</strong><div>{{ $form['isBarangay'] ? 'Barangay Secretary' : 'Authorized Municipal Preparer' }}</div><em>(signature over printed name)</em></td>
+        <td><p>Submitted by:</p><div class="monitoring-signature-space {{ !empty($report['signatures']['submitted']) ? 'monitoring-signed-space' : '' }}">@if(!empty($report['signatures']['submitted']['image']))<img src="{{ $report['signatures']['submitted']['image'] }}" alt="Punong Barangay signature">@endif</div><strong class="monitoring-signatory">{{ $form['submittedBy'] ?: ' ' }}</strong><div>{{ $form['isBarangay'] ? 'Punong Barangay' : 'Authorized Municipal Official' }}</div><em>(signature over printed name)</em></td>
     </tr></table>
     <p class="monitoring-date">Date Accomplished: <strong>{{ $report['generatedAt']->format('F d, Y') }}</strong></p>
     <div class="monitoring-footnote">

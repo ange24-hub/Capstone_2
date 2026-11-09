@@ -69,45 +69,11 @@ class NetMigrationForecastTest extends TestCase
             'in_source_fingerprint' => $this->source($staff, 'in')['fingerprint'], 'action' => $action, 'confirm_complete' => 1];
     }
 
-    public function test_verified_components_produce_a_net_forecast_and_three_separate_accuracy_reports(): void
-    {
-        $staff = $this->staff();
-        $this->seedHistory($staff);
-        $this->actingAs(User::factory()->create(['role' => 'municipal_lgu']))->get(route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => $staff->barangay_id]))
-            ->assertOk()->assertViewHas('predictedInMigration', 3.0)->assertViewHas('predictedOutMigration', 1.0)
-            ->assertViewHas('predictedNetMigration', 2.0)->assertViewHas('predictionMonthLabel', 'December 2026')
-            ->assertViewHas('forecastNetEvaluation', fn ($net) => $net['mae'] === 0.0 && count($net['backtest']) === 3)
-            ->assertSee('Actual versus predicted arrivals')->assertSee('Actual versus predicted departures')
-            ->assertSee('Actual versus predicted net migration')->assertSee('Open RBI report history')
-            ->assertDontSee('Private Identity');
-        Http::assertNothingSent();
-    }
 
-    public function test_negative_net_and_verified_zero_events_are_valid_estimates(): void
-    {
-        $staff = $this->staff();
-        $this->seedHistory($staff, 0, 2);
-        $report = app(MigrationForecastReport::class)->build($staff->barangay_id);
-        $this->assertSame(0.0, $report['predictedInMigration']);
-        $this->assertSame(-2.0, $report['predictedNetMigration']);
-        $this->actingAs(User::factory()->create(['role' => 'municipal_lgu']))->get(route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => $staff->barangay_id]))->assertOk()->assertSee('-2.0');
-        foreach ($report['forecastNetEvaluation']['backtest'] as $row) $this->assertSame(-2, $row['actual']);
-        $this->event($this->person($staff), 'in', '2026-10-20');
-        $this->assertSame(-2.0, app(MigrationForecastReport::class)->build($staff->barangay_id)['predictedNetMigration']);
-    }
 
-    public function test_saved_classified_rbi_arrivals_do_not_require_the_old_three_month_review(): void
-    {
-        $staff = $this->staff();
-        $this->seedHistory($staff, 3, 1, false);
-        $report = app(MigrationForecastReport::class)->build($staff->barangay_id);
-        $this->assertSame(1.0, $report['predictedOutMigration']);
-        $this->assertSame(3.0, $report['predictedInMigration']);
-        $this->assertSame(2.0, $report['predictedNetMigration']);
-        $this->assertTrue($this->source($staff, 'in')['verified']);
-        $this->actingAs(User::factory()->create(['role' => 'municipal_lgu']))->postJson(route('assistant.chat'), ['message' => 'Predict net migration next month in Looc', 'language' => 'en'])
-            ->assertOk()->assertJsonPath('facts.predicted_net_migration', 2);
-    }
+
+
+
 
     public function test_rbi_classification_changes_refresh_the_source_without_a_period_review(): void
     {
@@ -148,42 +114,9 @@ class NetMigrationForecastTest extends TestCase
         $this->assertSame('classified_rbi_first_save_dates',app(MigrationForecastHistory::class)->build($staff->barangay_id,Carbon::parse('2026-09-01'),1,'in')['source']);
     }
 
-    public function test_municipal_net_requires_arrival_confirmation_from_every_barangay(): void
-    {
-        $staff = $this->staff();
-        $this->seedHistory($staff);
-        foreach (Barangay::whereKeyNot($staff->barangay_id)->get() as $area) {
-            for ($i = 18; $i >= 1; $i--) MigrationReportingPeriod::create(['barangay_id' => $area->id,
-                'month' => now()->startOfQuarter()->subMonths($i)->format('Y-m'), 'out_count' => 0,
-                'source_fingerprint' => hash('sha256', '[]'), 'verified_at' => now(), 'verified_by' => $staff->id]);
-        }
-        $this->assertNull(app(MigrationForecastReport::class)->build(null)['predictedNetMigration']);
-        MigrationReportingPeriod::where('barangay_id', '!=', $staff->barangay_id)->update(['in_count' => 0,
-            'in_source_fingerprint' => hash('sha256', '[]'), 'in_verified_at' => now(), 'in_verified_by' => $staff->id]);
-        foreach(Barangay::whereKeyNot($staff->barangay_id)->get() as $area) $this->submittedArrivals($area,$staff,'2025-04',array_fill(0,18,0));
-        $this->assertSame(2.0, app(MigrationForecastReport::class)->build(null)['predictedNetMigration']);
-        $this->actingAs($staff)->get(route('migration.dashboard', ['section' => 'forecast', 'barangay_id' => Barangay::whereKeyNot($staff->barangay_id)->value('id')]))
-            ->assertForbidden();
-    }
 
-    public function test_native_assistant_answers_arrival_and_net_forecasts_in_english_and_bisaya(): void
-    {
-        $staff = $this->staff();
-        $this->seedHistory($staff);
-        $this->actingAs(User::factory()->create(['role' => 'municipal_lgu']))->postJson(route('assistant.chat'), ['message' => 'Predict net migration next month in Looc', 'language' => 'en'])
-            ->assertOk()->assertJsonPath('mode', 'database_forecast')->assertJsonPath('facts.predicted_net_migration', 2)
-            ->assertJsonPath('facts.net_mae', 0)->assertJsonPath('facts.predicted_arrivals', 3)->assertJsonPath('facts.predicted_departures', 1)
-            ->assertSee('Net migration: +2.0');
-        $this->postJson(route('assistant.chat'), ['message' => 'Predict arrivals next month in Looc', 'language' => 'en'])
-            ->assertOk()->assertJsonPath('mode', 'database_forecast')->assertSee('Arrivals: 3.0');
-        $this->postJson(route('assistant.chat'), ['message' => 'Predict arrivals, departures and net migration next month in Looc', 'language' => 'en'])
-            ->assertOk()->assertSee('Arrivals: 3.0')->assertSee('Departures: 1.0')->assertSee('Net migration: +2.0');
-        $this->postJson(route('assistant.chat'), ['message' => 'Pila ang net migration sunod bulan sa Looc?', 'language' => 'auto'])
-            ->assertOk()->assertJsonPath('language', 'ceb')->assertJsonPath('facts.predicted_net_migration', 2)->assertSee('Banabana');
-        $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Predict net migration in Canlupao'])->assertOk()
-            ->assertJsonPath('blocked_reason', 'assigned_barangay_only')->assertJsonMissingPath('facts');
-        Http::assertNothingSent();
-    }
+
+
 
     public function test_upgrade_preserves_departure_checks_without_automatically_verifying_arrivals(): void
     {

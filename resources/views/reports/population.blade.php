@@ -11,6 +11,7 @@
             @include('reports._jurisdiction')
         </div>
         <div class="population-report-actions">
+            <a class="button secondary-button" href="{{ route('reports.population.submissions.index', array_filter(['barangay_id'=>$selectedBarangayId])) }}">Submission History</a>
             <a class="button secondary-button population-print-button" href="{{ route('reports.population', array_merge($reportFilters, ['section' => $selectedSection, 'print' => 1])) }}" target="_blank" rel="noopener"><x-app-icon name="document" /> Print Report</a>
             <a class="button" href="{{ route('reports.population.pdf', array_merge($reportFilters, ['section' => $selectedSection])) }}"><x-app-icon name="document" /> Download PDF</a>
             <a class="button secondary-button" href="{{ route('reports.population.excel', array_merge($reportFilters, ['section' => $selectedSection])) }}"><x-app-icon name="document" /> Download Excel</a>
@@ -49,6 +50,17 @@
         <div class="population-category-hint"><x-app-icon name="document" /><span>{{ $selectedSection === 'summary' ? 'Full summary selected.' : $reportTitle.' selected.' }} Your PDF includes the complete selected report.</span></div>
     </nav>
     @include('reports.population-content')
+    @if($submissionPreviewToken ?? null)
+        <section class="population-submission-panel" aria-label="Submit population summary">
+            <h2>Submit Population Report Summary</h2>
+            <p>Submit the reviewed {{ $report['monitoring']['semester'] === 1 ? '1st' : '2nd' }} Semester {{ $report['monitoring']['year'] }} report to Municipal DILG/Admin. A saved copy will appear in Submission History and stay unchanged when resident records are updated.</p>
+            @if($errors->any())<div role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+            <form method="GET" action="{{ route('reports.population.submissions.sign') }}">
+                <input type="hidden" name="preview_token" value="{{ $submissionPreviewToken }}">
+                <button class="button" type="submit">Submit to Municipal DILG/Admin</button>
+            </form>
+        </section>
+    @endif
     @if($detailPagination){{ $detailPagination->links() }}@endif
 </section>
 @endsection
@@ -56,6 +68,7 @@
 @push('head')
     <style>@layer print-overrides { @include('reports._document-header-styles') }</style>
     <link rel="stylesheet" href="{{ asset('css/population-spreadsheet.css') }}?v={{ filemtime(public_path('css/population-spreadsheet.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/population-submissions.css') }}?v={{ filemtime(public_path('css/population-submissions.css')) }}">
     @if($selectedSection === 'summary')<style>@include('reports._population-monitoring-styles')</style>@endif
     @if(in_array($selectedSection, ['coverage', 'area-ages'], true) || ($report['totalBarangays'] > 1 && in_array($selectedSection, ['sex', 'ages'], true)))<style>@media print { @page { size: A4 landscape; } }</style>@endif
 @endpush

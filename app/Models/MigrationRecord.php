@@ -28,6 +28,12 @@ class MigrationRecord extends Model
         'movement_date' => 'date',
     ];
 
+    protected static function booted(): void
+    {
+        // I-sync ang bag-o o gi-edit nga dated event ngadto sa statistical ledger.
+        static::saved(fn (MigrationRecord $record) => app(\App\Services\StatisticalMigrationLogSync::class)->syncRecord($record));
+    }
+
     public static function typeLabels(): array
     {
         return [

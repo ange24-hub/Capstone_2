@@ -80,29 +80,14 @@ class MigrationAnalyticsInsightsTest extends TestCase
         Http::assertNothingSent();
     }
 
-    public function test_local_ai_only_selects_existing_facts_and_receives_no_resident_identity(): void
+    public function test_no_ml_summary_never_calls_a_model_even_if_old_ai_config_is_enabled(): void
     {
-        $area = Barangay::firstOrFail();
-        $this->batch($area, 'SECRET-HOUSE', 5);
-        config(['assistant_ai.enabled' => true, 'assistant_ai.url' => 'http://ollama:11434', 'assistant_ai.model' => 'qwen2.5:1.5b']);
-        Http::fake([
-            '*/api/tags' => Http::response(['models' => [['name' => 'qwen2.5:1.5b']]]),
-            '*/api/chat' => Http::response(['message' => ['content' => '{"focus_ids":["out_change","encoding_review"]}']]),
-        ]);
-        $result = app(MigrationAnalyticsInsights::class)->build($area->id, 2026, $this->months());
-        $this->assertTrue($result['ai_used']);
-        $this->assertSame(['out_change', 'encoding_review'], $result['focus']);
-        Http::assertSent(function ($request) {
-            if (! str_ends_with($request->url(), '/api/chat')) return false;
-            $payload = json_encode($request->data());
-            $this->assertStringNotContainsString('PrivateName', $payload);
-            $this->assertStringNotContainsString('SECRET-HOUSE', $payload);
-            $this->assertStringNotContainsString('DoNotSendToAI', $payload);
-
-            return str_contains($payload, '35.0%');
-        });
-        $this->assertSame($result, app(MigrationAnalyticsInsights::class)->build($area->id, 2026, $this->months()));
-        Http::assertSentCount(2);
+        config(['assistant_ai.enabled'=>true]);
+        $result = app(MigrationAnalyticsInsights::class)->build(null, 2026, $this->months());
+        $this->assertFalse($result['ai_used']);
+        $this->assertSame([], $result['focus']);
+        $this->assertStringContainsString('35.0%', $result['observations']['out_change']);
+        Http::assertNothingSent();
     }
 
     public function test_invalid_ai_output_and_outage_keep_database_summary_available(): void

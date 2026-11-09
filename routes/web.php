@@ -62,6 +62,15 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::get('/reports/population', \App\Http\Controllers\PopulationReportController::class)->name('reports.population');
         Route::get('/reports/population/pdf', \App\Http\Controllers\PopulationReportController::class)->name('reports.population.pdf');
         Route::get('/reports/population/excel', \App\Http\Controllers\PopulationReportController::class)->name('reports.population.excel');
+        Route::controller(\App\Http\Controllers\PopulationReportSubmissionController::class)->group(function () {
+            Route::get('/reports/population/history', 'index')->name('reports.population.submissions.index');
+            Route::post('/reports/population/submit', 'store')->name('reports.population.submissions.store');
+            Route::get('/reports/population/sign', 'signing')->name('reports.population.submissions.sign');
+            Route::get('/reports/population/history/{submission}', 'show')->name('reports.population.submissions.show');
+            Route::get('/reports/population/history/{submission}/pdf', 'show')->name('reports.population.submissions.pdf');
+            Route::get('/reports/population/history/{submission}/excel', 'show')->name('reports.population.submissions.excel');
+            Route::get('/reports/population/history/{submission}/source', 'show')->name('reports.population.submissions.source');
+        });
         Route::get('/reports/migration', \App\Http\Controllers\MigrationReportController::class)->name('reports.migration');
         Route::get('/analysis/forecast-readiness', fn () => redirect()->route('migration.dashboard',
             auth()->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? request()->only('barangay_id') : []
@@ -344,23 +353,34 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
         ->name('municipal.rbi-report-history');
 
-    Route::get('/municipal/prediction-analytics/forecast', MigrationDashboardController::class)
+    // Local statistics: municipal mahimong mopili og barangay; secretary own barangay ra.
+    Route::controller(\App\Http\Controllers\PredictionDashboardController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU.','.User::ROLE_BARANGAY)->group(function () {
+            Route::get('/prediction-dashboard', 'index')->name('prediction.dashboard');
+            Route::post('/prediction-dashboard/issue', 'store')->name('prediction.store');
+            Route::post('/prediction-dashboard/verify', 'verify')->name('prediction.verify');
+            Route::post('/prediction-dashboard/sync', 'sync')->name('prediction.sync');
+            Route::post('/prediction-dashboard/movements', 'recordMovement')->name('prediction.movements.store');
+        });
+
+    Route::get('/municipal/prediction-analytics/forecast', [\App\Http\Controllers\PredictionDashboardController::class, 'index'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
         ->name('municipal.prediction-forecast');
 
-    Route::controller(\App\Http\Controllers\PooledMigrationEvidenceController::class)
-        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->group(function () {
-            Route::get('/municipal/prediction-analytics/pooled-svr', 'show')->name('municipal.prediction-pooled');
-            Route::get('/municipal/prediction-analytics/pooled-svr/evidence', 'download')->name('municipal.prediction-pooled.evidence');
-            Route::get('/municipal/prediction-analytics/pooled-svr/defense', 'defense')->name('municipal.prediction-pooled.defense');
-            Route::post('/municipal/prediction-analytics/pooled-svr/future', 'saveFuture')->name('municipal.prediction-pooled.future.store');
-            Route::get('/municipal/prediction-analytics/pooled-svr/future/{snapshot}', 'showFuture')->name('municipal.prediction-pooled.future.show');
-            Route::get('/municipal/prediction-analytics/pooled-svr/future/{snapshot}/evidence', 'downloadFuture')->name('municipal.prediction-pooled.future.evidence');
-        });
-
-    Route::get('/municipal/prediction-analytics/forecast/evidence', \App\Http\Controllers\MigrationForecastEvidenceController::class)
-        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
-        ->name('municipal.prediction-forecast-evidence');
+    // Mga karaang ML endpoint: redirect ang read, 410 ang prediction writes.
+    foreach ([
+        ['/municipal/prediction-analytics/pooled-svr', 'municipal.prediction-pooled'],
+        ['/municipal/prediction-analytics/pooled-svr/evidence', 'municipal.prediction-pooled.evidence'],
+        ['/municipal/prediction-analytics/pooled-svr/defense', 'municipal.prediction-pooled.defense'],
+        ['/municipal/prediction-analytics/pooled-svr/future/{snapshot}', 'municipal.prediction-pooled.future.show'],
+        ['/municipal/prediction-analytics/pooled-svr/future/{snapshot}/evidence', 'municipal.prediction-pooled.future.evidence'],
+        ['/municipal/prediction-analytics/forecast/evidence', 'municipal.prediction-forecast-evidence'],
+    ] as [$path, $name]) {
+        Route::get($path, \App\Http\Controllers\RetiredMlForecastController::class)
+            ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name($name);
+    }
+    Route::post('/municipal/prediction-analytics/pooled-svr/future', \App\Http\Controllers\RetiredMlForecastController::class)
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('municipal.prediction-pooled.future.store');
 
     Route::get('/municipal/prediction-analytics/history/{barangay}', [\App\Http\Controllers\MunicipalPredictionController::class, 'history'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)

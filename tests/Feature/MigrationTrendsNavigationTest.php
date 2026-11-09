@@ -25,11 +25,8 @@ class MigrationTrendsNavigationTest extends TestCase
             ->assertSee('value="trends"', false)
             ->assertSee('year=2025', false);
 
-        $forecast = $this->get(route('migration.dashboard', $params + ['section' => 'forecast']))->assertOk();
-        $forecast->assertSee('id="out-migration-forecast-title"', false)
-            ->assertDontSee('id="municipal-trend-title"', false)
-            ->assertDontSee('id="recent-events-title"', false)
-            ->assertSee('value="forecast"', false);
+        $this->get(route('migration.dashboard', $params + ['section'=>'forecast']))
+            ->assertRedirect(route('prediction.dashboard', ['barangay_id'=>$area->id]));
 
         $events = $this->get(route('migration.dashboard', $params + ['section' => 'events']))->assertOk();
         $events->assertSee('id="recent-events-title"', false)

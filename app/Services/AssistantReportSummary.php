@@ -15,7 +15,7 @@ class AssistantReportSummary
             || ! preg_match('/\b(?:forecast|predict|prediction|estimate|next month|sunod bulan)\b/iu', $question)) {
             return null;
         }
-        if (! $user->hasRole(User::ROLE_MUNICIPAL_LGU) || ! $user->isApproved()) {
+        if (! $user->hasAnyRole([User::ROLE_MUNICIPAL_LGU, User::ROLE_BARANGAY]) || ! $user->isApproved()) {
             return $this->answer(app()->getLocale() === 'ceb' ? 'Ang prediction analytics para ra sa approved Municipal LGU administrator. Ang barangay account makapadayon sa pag-andam ug pag-review sa report history.' : 'Prediction analytics is available to approved Municipal LGU administrators only. Barangay accounts can prepare and review their report history.');
         }
         if (app(AssistantKnowledgeBase::class)->isWorkflowQuestion($question)) {
@@ -97,11 +97,11 @@ class AssistantReportSummary
             return $this->answer(AssistantLanguage::text('Population reports are current database snapshots. Historical population totals are not available from these records.'));
         }
         if ($migration && preg_match('/\\b(forecast|predict|prediction|estimate|seasonal|next year)\\b/iu', $question)) {
-            if (! $user->hasRole(User::ROLE_MUNICIPAL_LGU) || ! $user->isApproved()) {
+            if (! $user->hasAnyRole([User::ROLE_MUNICIPAL_LGU, User::ROLE_BARANGAY]) || ! $user->isApproved()) {
                 return $this->answer(app()->getLocale() === 'ceb' ? 'Ang prediction analytics para ra sa approved Municipal LGU administrator.' : 'Prediction analytics is available to approved Municipal LGU administrators only.');
             }
             $ceb = app()->getLocale() === 'ceb';
-            $url = route('migration.dashboard', array_filter(['section' => 'forecast', 'barangay_id' => $areaId]));
+            $url = route('prediction.dashboard', array_filter(['barangay_id' => $areaId]));
             if (preg_match('/\b(?:19|20)\d{2}\b|\b(?:seasonal|next year|monthly|by month|most|highest|peak|pinakadaghan|january|february|march|april|may|june|july|august|september|october|november|december)\b/iu', $question)) {
                 return ['reply' => $ceb ? 'Ang forecast sa chat para sa sunod nga calendar month. Ablihi ang Forecast tab aron susihon ang historical reporting year; dili suportado dinhi ang ubang forecast horizons o seasonal claims.'
                     : 'Chat forecasts cover arrivals, departures and net migration for the next calendar month. Open the Forecast tab to review a historical reporting year; other horizons and seasonal claims are not supported here.',
@@ -177,71 +177,23 @@ class AssistantReportSummary
 
     private function forecastAnswer(?int $areaId, string $question, string $url, bool $ceb): array
     {
-        $report = app(MigrationForecastReport::class)->build($areaId);
-        $evaluation = $report['forecastEvaluation'];
-        $scope = $areaId ? 'Barangay '.Barangay::findOrFail($areaId)->name : Barangay::MUNICIPALITY;
-        $facts = ['scope' => $scope, 'forecast_month' => $report['predictionMonthLabel'],
-            'verified_months' => count($report['forecastSource']['consecutive']),
-            'arrival_verified_months' => count($report['forecastArrivalSource']['consecutive']),
-            'required_months' => $evaluation['required_months'], 'source_through' => $report['sourceMonthLabel'],
-            'refresh_every_months' => 3, 'next_refresh' => $report['forecastNextRefreshLabel'],
-            'basis' => 'Models are selected separately on earlier chronological validation; Seasonal naive is the fallback when history is short or challengers do not improve validation MAE and RMSE. Arrivals count classified RBI entries by first-save month, which can differ from actual arrival month. Departures use dated moved-out records. Net is predicted arrivals minus predicted departures, not population change. Final test errors never select the model. Not a confirmed future count.'];
-        $metrics = [
-            'arrivals' => [$report['predictedInMigration'], $report['forecastArrivalEvaluation'], $ceb ? 'Moabot' : 'Arrivals', 'predicted_arrivals'],
-            'departures' => [$report['predictedOutMigration'], $evaluation, $ceb ? 'Mobalhin gawas' : 'Departures', 'predicted_departures'],
-            'net' => [$report['predictedNetMigration'], $report['forecastNetEvaluation'], 'Net migration', 'predicted_net_migration'],
-        ];
-        $requested = [];
-        if (preg_match('/\bnet\b/iu', $question)) {
-            $requested[] = 'net';
+        if (! $areaId) return $this->answer($ceb ? 'Pilia ang usa ka barangay sa Statistical forecast dashboard.' : 'Select one barangay in the Statistical forecast dashboard.');
+        if (! \Illuminate\Support\Facades\Schema::hasTable('forecast_logs')) return $this->answer('Statistical forecast storage is not ready.');
+        $service = app(MigrationPredictionService::class);
+        $forecasts = []; $scores = [];
+        foreach (['in', 'out'] as $type) {
+            $preview = $service->forecastNextMonth($areaId, $type);
+            $saved = \App\Models\ForecastLog::where(['barangay_id'=>$areaId,'migration_type'=>$type,'log_month'=>$preview['log_month']])->whereNotNull('predicted_value')->first();
+            $forecasts[$type] = $saved?->history_snapshot ?? $preview;
+            $scores[$type] = $service->calculateForecastAccuracy($areaId, $type);
         }
-        if (preg_match('/\b(?:in[ -]migration|arrivals?|moabot|mosulod)\b/iu', $question)) {
-            $requested[] = 'arrivals';
-        }
-        if (preg_match('/\b(?:out[ -]migration|departures?|mogawas)\b/iu', $question)) {
-            $requested[] = 'departures';
-        }
-        $requested = $requested ?: array_keys($metrics);
-        $reply = ($ceb ? 'Banabana sa migration para sa ' : 'Migration estimates for ').$report['predictionMonthLabel'].' — '.$scope;
-        $missing = false;
-        foreach ($metrics as $kind => [$value, $result, $label, $factKey]) {
-            if ($value !== null) {
-                $facts[$factKey] = round($value, 2);
-                $facts[$kind.'_mae'] = $result['mae'];
-                $facts[$kind.'_rmse'] = $result['rmse'];
-                $facts[$kind.'_baseline_mae'] = $result['baseline_mae'];
-                if ($kind !== 'net') {
-                    $facts[$kind.'_method'] = $result['method'];
-                }
-            }
-            if (! in_array($kind, $requested, true)) {
-                continue;
-            }
-            $reply .= "\n".$label.': '.($value === null ? ($ceb ? 'Kulang pa ang verified records' : 'Insufficient verified records')
-                : ($kind === 'net' && $value > 0 ? '+' : '').number_format($value, 1));
-            if ($value === null) {
-                $missing = true;
-            } else {
-                $reply .= $result['mae'] === null
-                    ? ($ceb ? ' (wala pay separate test error)' : ' (held-out error not measured yet)')
-                    : ' (MAE: '.number_format($result['mae'], 2).')';
-            }
-        }
-        // Preserve departure metrics for existing clients; component and net errors remain separate.
-        if ($report['predictedOutMigration'] !== null) {
-            $facts += ['method' => $evaluation['method'], 'mae' => $evaluation['mae'],
-                'baseline_mae' => $evaluation['baseline_mae'], 'test_months' => count($evaluation['backtest'])];
-        }
-        if ($missing) {
-            $reply .= "\n".($ceb ? 'Kinahanglan labing menos ' : 'At least ').$evaluation['required_months']
-                .($ceb ? ' ka sunod-sunod nga verified months hangtod ' : ' consecutive verified months through ').$report['sourceMonthLabel']
-                .($ceb ? '. Ang net nagkinahanglan sa kompleto nga arrivals ug departures. Ablihi ang Forecast aron i-review ang actual logs.' : '. Net requires complete arrivals and departures. Open Forecast to review the actual logs.');
-        }
-        $reply .= "\n".($ceb ? 'Net = arrivals minus departures. Movement events kini, dili total population o garantiya kon kinsa ang mobalhin.' : 'Net = arrivals minus departures. These are movement events, not total population or a guarantee of who will move.')
-            ."\n".($ceb ? 'Ang source records i-refresh matag 3 ka bulan. Sunod nga refresh: ' : 'Source records refresh every 3 months. Next refresh: ').$report['forecastNextRefreshLabel'].'.';
-
-        return ['reply' => $reply, 'facts' => $facts, 'mode' => 'database_forecast', 'scope' => AssistantLanguage::text('RBIM system only'),
-            'actions' => [['label' => AssistantLanguage::text('Open relevant page'), 'url' => $url]], 'suggestions' => []];
+        $reply = Barangay::findOrFail($areaId)->name.' — '.$forecasts['in']['log_month']."\n".
+            $service->generateHumanReadableSummary($forecasts['in']['predicted_value'], $forecasts['out']['predicted_value'],
+                $scores['in']['accuracy_rate'], $scores['out']['accuracy_rate']);
+        return ['reply'=>$reply, 'mode'=>'database_forecast', 'scope'=>AssistantLanguage::text('RBIM system only'),
+            'facts'=>['forecast_month'=>$forecasts['in']['log_month'],'forecasts'=>$forecasts,'accuracy'=>$scores,
+                'basis'=>'Pure PHP WMA or explicitly assumed population baseline; only verified closed months; no ML.'],
+            'actions'=>[['label'=>AssistantLanguage::text('Open relevant page'),'url'=>$url]],'suggestions'=>[]];
     }
 
     private function answer(string $reply): array

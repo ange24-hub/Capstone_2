@@ -6,6 +6,8 @@ use App\Models\Barangay;
 use App\Models\User;
 use App\Services\PopulationSummary;
 use App\Services\PopulationSpreadsheet;
+use App\Services\PopulationReportSubmissionSnapshot;
+use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -26,7 +28,7 @@ class PopulationReportController extends Controller
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
         if ($isSecretary) {
             abort_unless($request->user()->barangay_id, 403, 'Your account must be assigned to a barangay.');
-            abort_if($request->filled('barangay_id') && $request->integer('barangay_id') !== $request->user()->barangay_id, 403);
+            abort_if($request->filled('barangay_id') && $request->integer('barangay_id') !== (int) $request->user()->barangay_id, 403);
         }
         $barangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
         $selectedSection = $request->input('section') ?: 'summary';
@@ -68,7 +70,17 @@ class PopulationReportController extends Controller
                     'barangay' => $members->first()['barangay'], 'members' => $members,
                 ])->values();
         }
+        $submissionPreviewToken = null;
+        if ($isSecretary && $request->user()->isApproved() && $selectedSection === 'summary' && ! $printMode) {
+            $previews = array_filter($request->session()->get('population_submission_previews', []), fn ($item) => $item['expires_at'] >= time());
+            $previews = array_slice($previews, -4, null, true);
+            $submissionPreviewToken = (string) Str::uuid();
+            $previews[$submissionPreviewToken] = ['user_id' => $request->user()->id, 'barangay_id' => $barangayId,
+                'expires_at' => time() + 3600, 'snapshot' => app(PopulationReportSubmissionSnapshot::class)->capture($report)];
+            $request->session()->put('population_submission_previews', $previews);
+        }
         return view('reports.population', [
+            'submissionPreviewToken' => $submissionPreviewToken,
             'selectedSection' => $selectedSection, 'sectionLabels' => $sectionLabels, 'reportTitle' => $reportTitle,
             'detailGroups' => $detailGroups, 'detailPagination' => $detailPagination,
             'printMode' => $printMode,
