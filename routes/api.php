@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HouseholdSyncController;
 
+// Public-key and aggregate progress only. No upload, import, command, or mutation endpoint exists.
+Route::get('/deployment-data-sync/brbi-20261108', \App\Http\Controllers\DeploymentSyncStatusController::class);
+
 Route::middleware(['web', 'auth', 'role:'.\App\Models\User::ROLE_BARANGAY])->group(function () {
     Route::get('/households/offline-sync/session', [HouseholdSyncController::class, 'session'])->name('households.offline-sync.session');
     Route::get('/households/offline-sync/registry', [HouseholdSyncController::class, 'registry'])->name('households.offline-sync.registry');

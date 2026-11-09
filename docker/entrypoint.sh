@@ -30,6 +30,11 @@ else
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
 fi
 
+# One-time recipient-encrypted transfer explicitly requested for this installation.
+# A sync failure rolls back its transaction and must not take the existing website offline.
+gosu www-data php -d memory_limit=512M artisan brbi:sync-release --no-interaction \
+    || echo 'BRBI data sync needs private review; the existing website remains available.' >&2
+
 if [ "${1:-}" = 'apache2-foreground' ]; then
     exec docker-php-entrypoint "$@"
 fi

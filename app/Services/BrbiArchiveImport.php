@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 /** Append missing source records; preserve real registries, submitted forms and classifications. */
 class BrbiArchiveImport
 {
-    public function plan(string $directory): array
+    public function plan(string $directory, bool $includeExisting = false): array
     {
         $inventory = json_decode(file_get_contents($directory.'/archive-inventory.json'), true, flags: JSON_THROW_ON_ERROR);
         $areas = Barangay::all()->keyBy(fn ($a) => strtoupper($a->name));
@@ -20,7 +20,7 @@ class BrbiArchiveImport
             $path = $directory.'/'.basename($file['file']);
             $plan['source_hashes'][$path] = hash_file('sha256', $path);
             $real = Inhabitant::where('barangay_id',$area->id)->where(fn ($q)=>$q->whereNull('remarks')->orWhere('remarks','!=',MigrationForecastHistory::DEMO_MARKER))->exists();
-            $registry = ! $real && isset(Workbook::REGISTRY_SHEETS[$area->name]);
+            $registry = ($includeExisting || ! $real) && isset(Workbook::REGISTRY_SHEETS[$area->name]);
             $names = array_values(array_filter($file['sheets'],fn ($s)=>str_contains(strtoupper($s),'NEW') || strtoupper($s)==='NIF'
                 || ($registry && (in_array($s,[Workbook::REGISTRY_SHEETS[$area->name],'TRANSFERED'],true) || strtoupper($s)==='DECEASED'))));
             $sheets = $names ? ResidenceWorkbookReader::read($path,$names) : [];
@@ -37,7 +37,7 @@ class BrbiArchiveImport
                     $sameSource = $existing->first(fn ($r)=>in_array((int)$r->source_position,$positions,true)
                         && mb_strtolower(trim($r->last_name))===mb_strtolower(trim($row['last_name']))
                         && mb_strtolower(trim($r->first_name))===mb_strtolower(trim($row['first_name'])));
-                    if ($sameSource || $keys->has(Workbook::key($row))) { $entry['existing_history_skipped']++; continue; }
+                    if (! $includeExisting && ($sameSource || $keys->has(Workbook::key($row)))) { $entry['existing_history_skipped']++; continue; }
                     $entry['new_rows'][]=$row;
                     $keys->put(Workbook::key($row),true);
                 }
@@ -84,16 +84,21 @@ class BrbiArchiveImport
                 $area=Barangay::findOrFail($item['barangay_id']);
                 $stat=['barangay'=>$area->name,'residents_added'=>0,'deceased_added'=>0,'history_added'=>0,'forms_created'=>0,'forms_updated'=>0,'form_rows_added'=>0,'already_in_forms'=>0,'pending'=>[]];
                 if ($item['registry']) {
-                    $this->checkEmptyArea($area);
-                    // Only backed-up, unlinked demonstration placeholders are removed.
-                    MigrationRecord::where('barangay_id',$area->id)->where('reason',MigrationForecastHistory::DEMO_MARKER)->delete();
-                    Inhabitant::where('barangay_id',$area->id)->where('remarks',MigrationForecastHistory::DEMO_MARKER)->delete();
-                    Household::where('barangay_id',$area->id)->where('household_number','DEMO-MIGRATION-V1')->delete();
+                    if (empty($plan['append_only'])) {
+                        $this->checkEmptyArea($area);
+                        // Only the legacy local import replaces backed-up, unlinked demo placeholders.
+                        MigrationRecord::where('barangay_id',$area->id)->where('reason',MigrationForecastHistory::DEMO_MARKER)->delete();
+                        Inhabitant::where('barangay_id',$area->id)->where('remarks',MigrationForecastHistory::DEMO_MARKER)->delete();
+                        Household::where('barangay_id',$area->id)->where('household_number','DEMO-MIGRATION-V1')->delete();
+                    }
                     $homes=[];
                     foreach ($item['registry']['residents'] as $person) {
                         $number=$person['household_number'] ?: 'Not recorded';
-                        $homes[$number] ??= Household::create(['barangay_id'=>$area->id,'household_number'=>(string)$number,
-                            'purok'=>$person['complete_address']??null,'address'=>$person['complete_address']??null]);
+                        $homes[$number] ??= !empty($plan['append_only'])
+                            ? Household::firstOrCreate(['barangay_id'=>$area->id,'household_number'=>(string)$number],
+                                ['purok'=>$person['complete_address']??null,'address'=>$person['complete_address']??null])
+                            : Household::create(['barangay_id'=>$area->id,'household_number'=>(string)$number,
+                                'purok'=>$person['complete_address']??null,'address'=>$person['complete_address']??null]);
                         $data=array_intersect_key($person,array_flip((new Inhabitant)->getFillable()));
                         $data['sex'] ??= '';
                         $moved=(bool)$person['_transferred'];
@@ -189,7 +194,8 @@ class BrbiArchiveImport
             if (!$report) {
                 $report=BarangayRbiUpdate::create(['barangay_user_id'=>$owner->id,'barangay_name'=>$area->name,'reporting_month'=>$month.'-01',
                     'household_head'=>$rows[0]['household_head'],'status'=>BarangayRbiUpdate::STATUS_DRAFT,'rows'=>[],'deceased_rows'=>[],
-                    'source_file_name'=>$sourceFile,'source_file_path'=>'import-sources/brbi-20261108/'.$sourceFile]);
+                    'source_file_name'=>$sourceFile,'source_file_path'=>is_file(storage_path('app/import-sources/brbi-20261108/'.$sourceFile))
+                        ? 'import-sources/brbi-20261108/'.$sourceFile : null]);
                 $reports->push($report);$stat['forms_created']++;
             } else $stat['forms_updated']++;
             $report->update(['rows'=>array_merge($report->rows??[],$rows)]);
