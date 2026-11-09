@@ -49,7 +49,7 @@ class DeploymentBrbiSync
         return ['release'=>self::RELEASE, 'recipient_host'=>self::HOST, 'public_key_pem'=>$public,
             'key_sha256'=>hash('sha256', $public), 'transport'=>'private-https', 'server_timestamp'=>now()->timestamp,
             'expected_envelope_sha256'=>$this->expectedEnvelopeSha256()]+array_intersect_key($report,
-                array_flip(['state', 'envelope_sha256', 'completed_at', 'existing_records_preserved', 'skipped', 'identity_review', 'barangays', 'failure_stage', 'failure_category', 'database_sqlstate']));
+                array_flip(['state', 'envelope_sha256', 'completed_at', 'existing_records_preserved', 'skipped', 'identity_review', 'barangays', 'failure_stage', 'failure_category', 'database_sqlstate', 'database_error_number', 'database_column']));
     }
 
     public static function encrypt(array $source, array $recipient): array
@@ -119,9 +119,17 @@ class DeploymentBrbiSync
                 throw new \RuntimeException('Sync report write failed.');
             }
         } catch (\Throwable $error) {
+            $column=null;
+            if ($error instanceof \Illuminate\Database\QueryException
+                && preg_match('/for column [\x27`]([a-z_]+)[\x27`]/i',(string)($error->errorInfo[2]??''),$match)
+                && in_array($match[1],['status','sex','civil_status','reporting_month','birth_date','recorded_age','household_number','source_position','residence_status'],true)) {
+                $column=$match[1];
+            }
             $disk->put(self::DIRECTORY.'/report.json', json_encode(['state'=>'failed', 'envelope_sha256'=>$hash ?? null,
                 'failure_stage'=>$stage??'validation', 'failure_category'=>$error instanceof \Illuminate\Database\QueryException ? 'database_error' : 'validation_error',
-                'database_sqlstate'=>$error instanceof \Illuminate\Database\QueryException ? ($error->errorInfo[0]??null) : null], JSON_THROW_ON_ERROR));
+                'database_sqlstate'=>$error instanceof \Illuminate\Database\QueryException ? ($error->errorInfo[0]??null) : null,
+                'database_error_number'=>$error instanceof \Illuminate\Database\QueryException ? ($error->errorInfo[1]??null) : null,
+                'database_column'=>$column], JSON_THROW_ON_ERROR));
             // Exception text can contain private source values. Keep it exclusively inside private storage.
             $disk->put(self::DIRECTORY.'/private-error.txt', $error->getMessage());
             throw new \RuntimeException('BRBI release sync failed. Existing records are protected; inspect private sync diagnostics.');
