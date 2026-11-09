@@ -21,7 +21,6 @@ database/*.sqlite*
 **/*.log
 **/*.key
 **/*.pem
-!resources/brbi-sync-sender-public.pem
 **/__pycache__
 **/.venv
 android-resident

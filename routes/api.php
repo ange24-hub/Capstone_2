@@ -4,10 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HouseholdSyncController;
 
-// Public key/progress and a temporary, authenticated private transfer of one fixed encrypted release.
+// Read-only public key/progress. The one-time private upload receiver was closed after staging.
 Route::get('/deployment-data-sync/brbi-20261108', \App\Http\Controllers\DeploymentSyncStatusController::class);
-Route::post('/deployment-data-sync/brbi-20261108/private-transfer', \App\Http\Controllers\PrivateBrbiTransferController::class)
-    ->middleware('throttle:3,1');
 
 Route::middleware(['web', 'auth', 'role:'.\App\Models\User::ROLE_BARANGAY])->group(function () {
     Route::get('/households/offline-sync/session', [HouseholdSyncController::class, 'session'])->name('households.offline-sync.session');

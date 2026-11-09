@@ -48,5 +48,6 @@ class DeploymentBrbiSyncTest extends TestCase
             ->assertDontSee('Sensitive Resident')->assertDontSee('private credentials')->assertDontSee('private/backup');
         $this->assertEmpty($response->headers->getCookies());
         $this->postJson('/api/deployment-data-sync/brbi-20261108',['rows'=>[]])->assertStatus(405);
+        $this->postJson('/api/deployment-data-sync/brbi-20261108/private-transfer',['rows'=>[]])->assertNotFound();
     }
 }

@@ -47,9 +47,9 @@ class DeploymentBrbiSync
             ? json_decode($disk->get(self::DIRECTORY.'/report.json'), true, flags:JSON_THROW_ON_ERROR) : ['state'=>'ready'];
         // This fixed whitelist is the only public output: no rows, backup paths, errors, identities or secrets.
         return ['release'=>self::RELEASE, 'recipient_host'=>self::HOST, 'public_key_pem'=>$public,
-            'key_sha256'=>hash('sha256', $public), 'transport'=>'private-https-signed', 'server_timestamp'=>now()->timestamp,
+            'key_sha256'=>hash('sha256', $public), 'transport'=>'private-https', 'server_timestamp'=>now()->timestamp,
             'expected_envelope_sha256'=>$this->expectedEnvelopeSha256()]+array_intersect_key($report,
-                array_flip(['state', 'envelope_sha256', 'completed_at', 'existing_records_preserved', 'skipped', 'identity_review', 'barangays']));
+                array_flip(['state', 'envelope_sha256', 'completed_at', 'existing_records_preserved', 'skipped', 'identity_review', 'barangays', 'failure_stage', 'failure_category', 'database_sqlstate']));
     }
 
     public static function encrypt(array $source, array $recipient): array
@@ -108,68 +108,24 @@ class DeploymentBrbiSync
             if (! hash_equals($this->expectedEnvelopeSha256(),$hash)) throw new \RuntimeException('Unexpected release payload.');
             $report = $this->publicMetadata();
             if (($report['state'] ?? null) === 'completed' && ($report['envelope_sha256'] ?? null) === $hash) return;
+            $stage='decrypt';
             $source = $this->decrypt(json_decode(file_get_contents($envelopePath), true, flags:JSON_THROW_ON_ERROR));
             $backup = $disk->path(self::DIRECTORY.'/backups/'.now()->format('Ymd-His-u'));
+            $stage='backup_and_import';
             $result = app(BrbiAppendOnlySync::class)->apply($source, $backup);
             $report = ['state'=>'completed', 'envelope_sha256'=>$hash, 'completed_at'=>now()->toIso8601String()]+$result;
+            $stage='publish_report';
             if (! $disk->put(self::DIRECTORY.'/report.json', json_encode($report, JSON_THROW_ON_ERROR))) {
                 throw new \RuntimeException('Sync report write failed.');
             }
         } catch (\Throwable $error) {
-            $disk->put(self::DIRECTORY.'/report.json', json_encode(['state'=>'failed', 'envelope_sha256'=>$hash ?? null], JSON_THROW_ON_ERROR));
+            $disk->put(self::DIRECTORY.'/report.json', json_encode(['state'=>'failed', 'envelope_sha256'=>$hash ?? null,
+                'failure_stage'=>$stage??'validation', 'failure_category'=>$error instanceof \Illuminate\Database\QueryException ? 'database_error' : 'validation_error',
+                'database_sqlstate'=>$error instanceof \Illuminate\Database\QueryException ? ($error->errorInfo[0]??null) : null], JSON_THROW_ON_ERROR));
             // Exception text can contain private source values. Keep it exclusively inside private storage.
             $disk->put(self::DIRECTORY.'/private-error.txt', $error->getMessage());
             throw new \RuntimeException('BRBI release sync failed. Existing records are protected; inspect private sync diagnostics.');
         } finally { flock($lock, LOCK_UN); fclose($lock); }
     }
 
-    private static function transportMessage(string $body, string $timestamp): string
-    {
-        return "POST\n".self::HOST."\n/api/deployment-data-sync/".self::RELEASE."/private-transfer\n".$timestamp."\n".hash('sha256',$body);
-    }
-
-    public function senderPublicKey(): string
-    {
-        return file_get_contents(resource_path('brbi-sync-sender-public.pem'));
-    }
-
-    public static function signPrivateTransfer(string $body, string $timestamp, string $privateKey): string
-    {
-        if (!openssl_sign(self::transportMessage($body,$timestamp),$signature,$privateKey,OPENSSL_ALGO_SHA256)) {
-            throw new \RuntimeException('Sender signature failed.');
-        }
-        return base64_encode($signature);
-    }
-
-    public function verifyPrivateTransferSignature(string $body, string $timestamp, string $signature): bool
-    {
-        if (strlen($signature)>1024 || ($bytes=base64_decode($signature,true))===false) return false;
-        return openssl_verify(self::transportMessage($body,$timestamp),$bytes,$this->senderPublicKey(),OPENSSL_ALGO_SHA256)===1;
-    }
-
-    public function stagePrivateTransfer(string $body): array
-    {
-        if (!hash_equals($this->expectedEnvelopeSha256(),hash('sha256',$body))) throw new \RuntimeException('Unapproved transfer payload.');
-        // Validate authenticated encryption and the intended recipient before persisting anything.
-        $this->decrypt(json_decode($body,true,flags:JSON_THROW_ON_ERROR));
-        $disk=Storage::disk('local');
-        $lock=fopen($disk->path(self::DIRECTORY.'/sync.lock'),'c');
-        if (!$lock || !flock($lock,LOCK_EX)) throw new \RuntimeException('Sync lock unavailable.');
-        try {
-            $metadata=$this->publicMetadata();
-            if (($metadata['state']??null)==='completed') return $metadata;
-            if ($disk->exists(self::ENVELOPE) && !hash_equals($this->expectedEnvelopeSha256(),hash_file('sha256',$disk->path(self::ENVELOPE)))) {
-                throw new \RuntimeException('A different private transfer already exists.');
-            }
-            if (!$disk->put(self::ENVELOPE.'.tmp',$body) || !rename($disk->path(self::ENVELOPE.'.tmp'),$disk->path(self::ENVELOPE))) {
-                throw new \RuntimeException('Private transfer storage failed.');
-            }
-            @chmod($disk->path(self::ENVELOPE),0600);
-            $report=['state'=>'staged','envelope_sha256'=>$this->expectedEnvelopeSha256()];
-            if (!$disk->put(self::DIRECTORY.'/report.json',json_encode($report,JSON_THROW_ON_ERROR))) {
-                throw new \RuntimeException('Private transfer report failed.');
-            }
-            return $report;
-        } finally {flock($lock,LOCK_UN);fclose($lock);}
-    }
 }
