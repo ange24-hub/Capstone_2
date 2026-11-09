@@ -70,5 +70,25 @@
     .population-report tr { page-break-inside: avoid; page-break-after: auto; }
     .population-report thead { display: table-header-group; }
     .population-report .population-area-page { break-before: page; }
+    /* Compact Form C on one A4 sheet; keep general resident-list styles separate. */
+    .app-content:has(.population-report-monitoring) { padding: 9mm 10mm !important; }
+    .population-report-monitoring .population-monitoring-paper,
+    .population-report-monitoring .population-monitoring-paper * {
+        font-family: Arial, sans-serif !important; font-size: 8pt !important; line-height: 1.15 !important;
+    }
+    .population-report-monitoring .population-monitoring-paper { min-width:0 !important; max-width:none !important; width:100% !important; padding:0 !important; border:0 !important; }
+    .population-report-monitoring .monitoring-title h2 { font-size:13pt !important; margin:0 0 4pt !important; }
+    .population-report-monitoring .monitoring-title { margin:0 0 10pt !important; }
+    .population-report-monitoring .monitoring-meta { margin:0 0 8pt !important; line-height:11pt !important; }
+    .population-report-monitoring .monitoring-grid :is(th,td) { padding:1.1pt 4pt !important; font-size:8pt !important; line-height:9pt !important; }
+    .population-report-monitoring .monitoring-grid .monitoring-remarks { font-size:6.5pt !important; }
+    .population-report-monitoring .monitoring-signatures td { border:0 !important; padding:0 10pt !important; text-align:center !important; }
+    .population-report-monitoring .monitoring-signature-space { height:18pt !important; }
+    .population-report-monitoring .monitoring-signatures .monitoring-signed-space { height:24pt !important; }
+    .population-report-monitoring .monitoring-signed-space img { display:inline-block !important; height:22pt !important; max-width:140pt !important; }
+    .population-report-monitoring .monitoring-signature-space img { width:auto !important; }
+    .population-report-monitoring .monitoring-date { margin:8pt 0 5pt !important; }
+    .population-report-monitoring .monitoring-footnote,
+    .population-report-monitoring .monitoring-footnote * { font-size:6.5pt !important; line-height:8pt !important; }
 }
 }

@@ -33,8 +33,8 @@ class PopulationExcelTest extends TestCase
             ->assertOk()->assertSee('Resident 1')->assertDontSee('Resident 9 Example')
             ->assertSee(route('reports.population.excel', ['barangay_id' => $area->id, 'report_year'=>now()->year, 'semester'=>now()->month<=6?1:2, 'section' => 'residents']))
             ->assertSee('population-spreadsheet.css')
-            ->assertSee('REGION: VIII')->assertSee('PROVINCE: SOUTHERN LEYTE')
-            ->assertSee('CITY/MUNICIPALITY: TOMAS OPPUS')->assertSee('BARANGAY: <strong>Looc</strong>', false);
+            ->assertSee('Barangay Looc')->assertSee('Tomas Oppus, Southern Leyte')
+            ->assertSee('Report type')->assertSee('Submission History');
         $temporaryFiles = glob(storage_path('framework/cache/population-xlsx-*.tmp'));
         $response = $this->get(route('reports.population.excel', ['barangay_id' => $area->id, 'section' => 'residents']))
             ->assertOk()->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -60,7 +60,7 @@ class PopulationExcelTest extends TestCase
 
         $print = $this->get(route('reports.population', ['barangay_id' => $area->id, 'section' => 'residents', 'print' => 1]))
             ->assertOk()->assertSee('Resident 9 Example')->assertSee('population-spreadsheet.css')
-            ->assertSee('BARANGAY: <strong>Looc</strong>', false);
+            ->assertSee('Barangay Looc');
         $this->assertNull($print->viewData('detailPagination'));
     }
 

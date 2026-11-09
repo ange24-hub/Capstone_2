@@ -1,0 +1,47 @@
+/* Page controls are separate from the official printable report. */
+.population-workspace { display:flex; flex-direction:column; gap:20px; min-width:0; }
+.population-workspace .population-page-heading { display:block; padding:0; margin:0; background:transparent; border:0; }
+.population-page-heading h1 { margin:0 0 6px; font-size:26px; line-height:1.25; font-weight:700; color:#19344c; }
+.population-page-heading p { margin:0; color:#5d7184; font-size:14px; }
+.population-page-tabs { display:flex; gap:24px; border-bottom:1px solid #cddae6; }
+.population-page-tabs a { display:block; padding:12px 2px; color:#587088; text-decoration:none; border-bottom:3px solid transparent; font-size:14px; font-weight:600; }
+.population-page-tabs a[aria-current=page] { border-color:#345b82; color:#234e76; }
+.population-page-tabs a:hover { color:#153b60; border-bottom-color:#8eaac3; }
+.population-page-tabs a:focus-visible { outline:2px solid #345b82; outline-offset:3px; }
+.population-workspace .population-controls { display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px; margin:0; padding:18px; background:#fff; border:1px solid #d5e0e9; border-radius:10px; }
+.population-controls .population-control { flex:1 1 150px; min-width:0; }
+.population-controls .population-control-wide { flex:2 1 220px; }
+.population-controls .population-control-year { flex:0 1 110px; }
+.population-controls label { display:block; margin:0 0 6px; color:#425b72; font-size:12px; font-weight:600; }
+.population-controls :is(select,input) { box-sizing:border-box; width:100%; min-width:0; height:42px; margin:0; border:1px solid #b8c9d8; border-radius:6px; padding:8px 10px; background:#fff; font-size:14px; }
+.population-controls button { min-height:42px; white-space:nowrap; }
+.population-preview-bar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px; }
+.population-preview-bar h2 { margin:0 0 4px; font-size:17px; font-weight:700; color:#19344c; }
+.population-preview-bar p { margin:0; color:#60768b; font-size:12px; }
+.population-preview-bar .population-report-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.population-preview-bar .button { min-height:36px; font-size:12px; padding:8px 12px; }
+.population-workspace .population-coverage-note { color:#65798b; font-size:12px; line-height:1.6; margin:0; }
+.population-workspace .population-submission-panel { margin:0; }
+.population-workspace .population-history { margin:0; padding:0; border:0; background:transparent; }
+.population-workspace .population-history-table { border:1px solid #d5e0e9; border-radius:10px; background:#fff; }
+.population-workspace .population-history-table table { min-width:880px; }
+.population-workspace .population-history-table td { font-size:13px; }
+.population-workspace .population-history-table th { font-size:11px; color:#52697e; }
+.population-history-description { margin:0; color:#65798b; font-size:13px; }
+.population-breadcrumb { color:#647b90; font-size:12px; margin:0 0 10px; }
+.population-breadcrumb a { color:#345b82; text-decoration:none; }
+.population-workspace .population-monitoring-scroll { min-width:0; }
+@media(max-width:700px) {
+    .population-page-heading h1 { font-size:23px; }
+    .population-workspace { gap:16px; }
+    .population-controls .population-control { flex:1 1 140px; }
+    .population-controls .population-control-wide { flex-basis:100%; }
+    .population-controls button { width:100%; }
+    .population-preview-bar .population-report-actions { width:100%; }
+    .population-preview-bar .button { flex:1; text-align:center; justify-content:center; }
+    .population-page-tabs { gap:20px; }
+}
+@media print {
+    .population-page-heading,.population-page-tabs,.population-controls,.population-preview-bar,.population-coverage-note,.population-breadcrumb { display:none!important; }
+    .population-workspace { display:block; }
+}

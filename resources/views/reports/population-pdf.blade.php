@@ -46,7 +46,7 @@ footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt sol
 @include('reports._document-header-styles')
 @if(($selectedSection ?? 'summary') === 'summary')
     @include('reports._population-monitoring-styles')
-    @page { margin: 26pt 30pt; }
+    @page { size: A4 portrait; margin: 26pt 30pt; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 9pt; line-height: 1.15; }
     .population-monitoring-paper { min-width: 0; width: 100%; max-width: none; padding: 0; border: 0; box-shadow: none; font-family: DejaVu Sans, sans-serif; font-size: 9pt; }
     .monitoring-form-code { font-size: 8pt; margin-bottom: 6pt; }
