@@ -47,7 +47,8 @@ class DeploymentBrbiSync
             ? json_decode($disk->get(self::DIRECTORY.'/report.json'), true, flags:JSON_THROW_ON_ERROR) : ['state'=>'ready'];
         // This fixed whitelist is the only public output: no rows, backup paths, errors, identities or secrets.
         return ['release'=>self::RELEASE, 'recipient_host'=>self::HOST, 'public_key_pem'=>$public,
-            'key_sha256'=>hash('sha256', $public), 'transport'=>'private-https', 'expected_envelope_sha256'=>$this->expectedEnvelopeSha256()]+array_intersect_key($report,
+            'key_sha256'=>hash('sha256', $public), 'transport'=>'private-https-signed', 'server_timestamp'=>now()->timestamp,
+            'expected_envelope_sha256'=>$this->expectedEnvelopeSha256()]+array_intersect_key($report,
                 array_flip(['state', 'envelope_sha256', 'completed_at', 'existing_records_preserved', 'skipped', 'identity_review', 'barangays']));
     }
 
@@ -122,13 +123,28 @@ class DeploymentBrbiSync
         } finally { flock($lock, LOCK_UN); fclose($lock); }
     }
 
-    public static function transportSignature(string $body, string $timestamp, string $applicationKey): string
+    private static function transportMessage(string $body, string $timestamp): string
     {
-        $key=str_starts_with($applicationKey,'base64:') ? base64_decode(substr($applicationKey,7),true) : $applicationKey;
-        if (!is_string($key) || strlen($key)!==32) throw new \RuntimeException('Deployment authentication is unavailable.');
-        $transportKey=hash_hkdf('sha256',$key,32,'rbim.private-brbi-transfer.v1');
-        $message="POST\n".self::HOST."\n/api/deployment-data-sync/".self::RELEASE."/private-transfer\n".$timestamp."\n".hash('sha256',$body);
-        return hash_hmac('sha256',$message,$transportKey);
+        return "POST\n".self::HOST."\n/api/deployment-data-sync/".self::RELEASE."/private-transfer\n".$timestamp."\n".hash('sha256',$body);
+    }
+
+    public function senderPublicKey(): string
+    {
+        return file_get_contents(resource_path('brbi-sync-sender-public.pem'));
+    }
+
+    public static function signPrivateTransfer(string $body, string $timestamp, string $privateKey): string
+    {
+        if (!openssl_sign(self::transportMessage($body,$timestamp),$signature,$privateKey,OPENSSL_ALGO_SHA256)) {
+            throw new \RuntimeException('Sender signature failed.');
+        }
+        return base64_encode($signature);
+    }
+
+    public function verifyPrivateTransferSignature(string $body, string $timestamp, string $signature): bool
+    {
+        if (strlen($signature)>1024 || ($bytes=base64_decode($signature,true))===false) return false;
+        return openssl_verify(self::transportMessage($body,$timestamp),$bytes,$this->senderPublicKey(),OPENSSL_ALGO_SHA256)===1;
     }
 
     public function stagePrivateTransfer(string $body): array

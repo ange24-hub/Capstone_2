@@ -17,8 +17,7 @@ class PrivateBrbiTransferController extends Controller
         abort_if(strlen($body)>512*1024,413);
         $timestamp=(string)$request->header('X-Brbi-Timestamp','');
         abort_unless(ctype_digit($timestamp) && abs(now()->timestamp-(int)$timestamp)<=120,401);
-        $expected=DeploymentBrbiSync::transportSignature($body,$timestamp,(string)config('app.key'));
-        abort_unless(hash_equals($expected,(string)$request->header('X-Brbi-Signature','')),401);
+        abort_unless($sync->verifyPrivateTransferSignature($body,$timestamp,(string)$request->header('X-Brbi-Signature','')),401);
         abort_unless(hash_equals($sync->expectedEnvelopeSha256(),hash('sha256',$body)),422);
         try {$result=$sync->stagePrivateTransfer($body);}
         catch(\Throwable){return response()->json(['state'=>'transfer_rejected'],422);}
