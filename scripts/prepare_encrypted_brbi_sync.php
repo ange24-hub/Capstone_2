@@ -16,7 +16,7 @@ $source['source_hashes'] = [];
 foreach ($source['areas'] as &$area) unset($area['barangay_id']);
 unset($area);
 $envelope = DeploymentBrbiSync::encrypt($source, $recipient);
-$destination = resource_path(DeploymentBrbiSync::ENVELOPE);
+$destination = Illuminate\Support\Facades\Storage::disk('local')->path(DeploymentBrbiSync::ENVELOPE);
 if (! is_dir(dirname($destination))) mkdir(dirname($destination), 0755, true);
 if (file_put_contents($destination, json_encode($envelope, JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR)) === false) {
     throw new RuntimeException('Cannot save encrypted transfer.');

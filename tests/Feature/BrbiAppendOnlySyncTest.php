@@ -103,4 +103,38 @@ class BrbiAppendOnlySyncTest extends TestCase
         $this->assertSame('Original',$home->fresh()->address);
         $this->assertDatabaseCount('new_inhabitants',0);
     }
+
+    public function test_existing_draft_rows_and_members_are_preserved_when_missing_new_rows_are_appended(): void
+    {
+        $area=Barangay::where('name','Anahawan')->firstOrFail();
+        $owner=User::factory()->create(['role'=>'barangay','barangay_id'=>$area->id]);
+        $row=['first_name'=>'Original','last_name'=>'Fixture','birth_date'=>'1990-01-01',
+            'household_head'=>'Original household','entry_type'=>'birth','first_saved_at'=>'2021-04-02T10:00:00+08:00'];
+        $form=BarangayRbiUpdate::create(['barangay_user_id'=>$owner->id,'barangay_name'=>$area->name,
+            'reporting_month'=>'2021-04-01','status'=>'draft','rows'=>[$row],'deceased_rows'=>[]]);
+        $family=$form->rbiFamilies()->create(['household_head'=>'Original household','position'=>0]);
+        $member=$family->members()->create(['inhabitant_name'=>'Original Fixture','position'=>0]);
+        $familyBefore=$family->fresh()->getAttributes();$memberBefore=$member->fresh()->getAttributes();
+        $source=$this->source([],[$this->person('Additional')+['reporting_month'=>'2021-04','source_position'=>2]]);
+        $result=$this->apply($source);
+        $this->assertTrue($result['existing_records_preserved']);
+        $this->assertSame($row,$form->fresh()->rows[0]);$this->assertCount(2,$form->fresh()->rows);
+        $this->assertSame($familyBefore,$family->fresh()->getAttributes());
+        $this->assertSame($memberBefore,$member->fresh()->getAttributes());
+        $this->assertDatabaseCount('barangay_rbi_updates',1);
+    }
+
+    public function test_conflicting_birth_dates_and_cross_registry_identity_require_review(): void
+    {
+        $area=Barangay::where('name','Anahawan')->firstOrFail();
+        $home=Household::create(['barangay_id'=>$area->id,'household_number'=>'7']);
+        Inhabitant::create(['barangay_id'=>$area->id,'household_id'=>$home->id,'first_name'=>'Conflicting',
+            'last_name'=>'Fixture','birth_date'=>'1999-01-01','sex'=>'Female']);
+        \App\Models\DeceasedInhabitant::create(['barangay_id'=>$area->id,'household_number'=>'7',
+            'first_name'=>'Deceased','last_name'=>'Fixture','birth_date'=>'2000-01-01','sex'=>'Female']);
+        $result=$this->apply($this->source([$this->person('Conflicting'),$this->person('Deceased')]));
+        $this->assertSame(2,$result['identity_review']);
+        $this->assertSame(0,$result['barangays'][0]['residents_added']);
+        $this->assertDatabaseCount('inhabitants',1);
+    }
 }

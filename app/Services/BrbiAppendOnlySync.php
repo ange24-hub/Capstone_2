@@ -21,13 +21,13 @@ class BrbiAppendOnlySync
             $area = $areas->get(self::text($item['name'])) ?? throw new \RuntimeException('Unmapped barangay.');
             $item['barangay_id'] = $area->id;
             $item['name'] = $area->name;
-            $living = Inhabitant::where('barangay_id', $area->id)->get()->map->getAttributes()->all();
-            $dead = DeceasedInhabitant::where('barangay_id', $area->id)->get()->map->getAttributes()->all();
+            $living = Inhabitant::where('barangay_id', $area->id)->get()->map(fn($r)=>$r->getAttributes()+['_sync_group'=>'residents'])->all();
+            $dead = DeceasedInhabitant::where('barangay_id', $area->id)->get()->map(fn($r)=>$r->getAttributes()+['_sync_group'=>'deceased'])->all();
             if ($item['registry']) {
                 foreach (['residents', 'deceased'] as $group) {
                     $accepted = [];
                     foreach ($item['registry'][$group] as $person) {
-                        $matches = self::matches($person, array_merge($living, $dead));
+                        $matches = self::matches($person+['_sync_group'=>$group], array_merge($living, $dead));
                         if ($matches !== 'new') {
                             $plan['skipped']++;
                             if ($matches === 'review') $plan['review'][] = ['barangay'=>$area->name,
@@ -35,7 +35,7 @@ class BrbiAppendOnlySync
                             continue;
                         }
                         $accepted[] = $person;
-                        if ($group === 'residents') $living[] = $person; else $dead[] = $person;
+                        if ($group === 'residents') $living[] = $person+['_sync_group'=>$group]; else $dead[] = $person+['_sync_group'=>$group];
                     }
                     $item['registry'][$group] = $accepted;
                 }
@@ -61,18 +61,26 @@ class BrbiAppendOnlySync
 
     private static function matches(array $person, array $existing): string
     {
+        $possible = false;
         foreach ($existing as $record) {
             if (self::text($person['first_name'] ?? '') !== self::text($record['first_name'] ?? '')
                 || self::text($person['last_name'] ?? '') !== self::text($record['last_name'] ?? '')) continue;
             $birth = substr((string) ($person['birth_date'] ?? ''), 0, 10);
             $other = substr((string) ($record['birth_date'] ?? ''), 0, 10);
-            if ($birth !== '' && $other !== '' && $birth !== $other) continue;
+            if ($birth !== '' && $other !== '' && $birth !== $other) {
+                $middle=self::text($person['middle_name']??'');$otherMiddle=self::text($record['middle_name']??'');
+                $suffix=self::text($person['suffix']??'');$otherSuffix=self::text($record['suffix']??'');
+                if (($middle!=='' && $otherMiddle!=='' && $middle!==$otherMiddle)
+                    || ($suffix!=='' && $otherSuffix!=='' && $suffix!==$otherSuffix)) continue;
+                $possible=true;continue;
+            }
+            $possible=true;
+            if (isset($person['_sync_group'],$record['_sync_group']) && $person['_sync_group']!==$record['_sync_group']) continue;
             if ($birth !== '' && $birth === $other
                 && self::text($person['middle_name'] ?? '') === self::text($record['middle_name'] ?? '')
                 && self::text($person['suffix'] ?? '') === self::text($record['suffix'] ?? '')) return 'same';
-            return 'review';
         }
-        return 'new';
+        return $possible ? 'review' : 'new';
     }
 
     public function apply(array $source, string $backup): array
@@ -80,6 +88,7 @@ class BrbiAppendOnlySync
         if (! is_dir($backup) && ! mkdir($backup, 0700, true)) throw new \RuntimeException('Private backup unavailable.');
         return DB::transaction(function () use ($source, $backup) {
             Barangay::orderBy('id')->lockForUpdate()->get();
+            if (file_put_contents($backup.'/source-plan.json',json_encode($source,JSON_THROW_ON_ERROR))===false) throw new \RuntimeException('Cannot back up source plan.');
             $before = [];
             foreach (self::TABLES as $table) {
                 $stream = fopen($backup.'/'.$table.'.jsonl', 'x');
