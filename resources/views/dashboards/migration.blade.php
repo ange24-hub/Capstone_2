@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @push('head')
+    <link rel="stylesheet" href="{{ asset('css/migration-insights.css') }}?v={{ filemtime(public_path('css/migration-insights.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/migration-workspace.css') }}?v={{ filemtime(public_path('css/migration-workspace.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/migration-forecast.css') }}?v={{ filemtime(public_path('css/migration-forecast.css')) }}">
 @endpush
@@ -132,6 +133,10 @@
                 </details>
             </section>
         </div>
+        @endif
+
+        @if ($migrationSection === 'trends' && $analyticsInsights)
+            @include('dashboards._migration-insights')
         @endif
 
         @if ($migrationSection === 'events')

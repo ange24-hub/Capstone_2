@@ -169,6 +169,12 @@ class MigrationDashboardController extends Controller
 
             'monthlyTrend' => $monthlyTrend,
 
+            'analyticsInsights' => ! in_array($request->input('section'), ['forecast', 'events'], true)
+                ? app(\App\Services\MigrationAnalyticsInsights::class)->build(
+                    $selectedBarangayId, $selectedYear, $monthlyTrend,
+                    $records->where('reason', MigrationForecastHistory::DEMO_MARKER)->count()
+                ) : null,
+
             'totalInhabitants' => $totalInhabitants,
 
             'totalIn' => array_sum(array_column($arrivalHistory['rows'], 'count')),

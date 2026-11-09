@@ -1,0 +1,132 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Barangay;
+use App\Models\Household;
+use App\Models\Inhabitant;
+use App\Models\User;
+use App\Services\MigrationAnalyticsInsights;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Tests\TestCase;
+
+class MigrationAnalyticsInsightsTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->travelTo(now()->setDate(2026, 11, 8)->setTime(12, 0));
+        config(['assistant_ai.enabled' => false]);
+        Http::preventStrayRequests();
+    }
+
+    private function months(): \Illuminate\Support\Collection
+    {
+        return collect(range(1, 12))->map(fn ($m) => ['month' => sprintf('2026-%02d', $m),
+            'in' => 0, 'out' => match ($m) { 9 => 20, 10 => 27, 11 => 999, 12 => 888, default => 0 }]);
+    }
+
+    public function test_comparisons_use_closed_months_and_do_not_invent_zero_denominator_percentages(): void
+    {
+        $result = app(MigrationAnalyticsInsights::class)->build(null, 2026, $this->months(), 0);
+        $facts = $result['observations'];
+        $this->assertStringContainsString('35.0%', $facts['out_change']);
+        $this->assertStringContainsString('2026-09 = 20; 2026-10 = 27', $facts['out_change']);
+        $this->assertStringContainsString('Percentage change is unavailable', $facts['in_change']);
+        $this->assertStringContainsString('47 recorded departure events', $facts['totals']);
+        $this->assertStringNotContainsString('999', implode(' ', $facts));
+        $this->assertFalse($result['ai_used']);
+        Http::assertNothingSent();
+    }
+
+    private function batch(Barangay $area, string $number, int $count): Household
+    {
+        $house = Household::create(['barangay_id' => $area->id, 'household_number' => $number]);
+        for ($i = 0; $i < $count; $i++) {
+            Inhabitant::create(['barangay_id' => $area->id, 'household_id' => $house->id,
+                'first_name' => 'PrivateName'.$i, 'last_name' => 'DoNotSendToAI', 'sex' => 'Female', 'status' => 'active']);
+        }
+
+        return $house;
+    }
+
+    public function test_secretary_alerts_stay_in_assigned_barangay_and_do_not_modify_records(): void
+    {
+        $area = Barangay::where('name', 'Looc')->firstOrFail();
+        $other = Barangay::where('name', 'Canlupao')->firstOrFail();
+        $this->batch($area, 'OWN-HOUSE', 5);
+        $this->batch($area, 'BELOW-THRESHOLD', 4);
+        $this->batch($other, 'OTHER-PRIVATE-HOUSE', 8);
+        Inhabitant::where('barangay_id', $area->id)->first()->update(['status' => 'migrated_out']);
+        $before = Inhabitant::orderBy('id')->get()->toArray();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
+        $response = $this->actingAs($staff)->get(route('migration.dashboard', ['year' => 2026, 'barangay_id' => $other->id]))
+            ->assertOk()->assertSee('OWN-HOUSE')->assertDontSee('OTHER-PRIVATE-HOUSE')
+            ->assertSee('Automated statistical summary')->assertDontSee('PrivateName')
+            ->assertSee('not a learned anomaly model or evidence of fraud');
+        $result = $response->viewData('analyticsInsights');
+        $this->assertSame(1, $result['alert_count']);
+        $this->assertSame(1, $result['undated_count']);
+        $this->assertSame(5, $result['alerts'][0]['count']);
+        $this->assertSame($before, Inhabitant::orderBy('id')->get()->toArray());
+        $this->get(route('migration.dashboard', ['year' => 2025]))->assertOk()
+            ->assertViewHas('analyticsInsights', fn ($r) => $r['alert_count'] === 0);
+        $resident = User::factory()->create(['role' => User::ROLE_RESIDENT]);
+        $this->actingAs($resident)->get(route('migration.dashboard'))->assertForbidden();
+        Http::assertNothingSent();
+    }
+
+    public function test_local_ai_only_selects_existing_facts_and_receives_no_resident_identity(): void
+    {
+        $area = Barangay::firstOrFail();
+        $this->batch($area, 'SECRET-HOUSE', 5);
+        config(['assistant_ai.enabled' => true, 'assistant_ai.url' => 'http://ollama:11434', 'assistant_ai.model' => 'qwen2.5:1.5b']);
+        Http::fake([
+            '*/api/tags' => Http::response(['models' => [['name' => 'qwen2.5:1.5b']]]),
+            '*/api/chat' => Http::response(['message' => ['content' => '{"focus_ids":["out_change","encoding_review"]}']]),
+        ]);
+        $result = app(MigrationAnalyticsInsights::class)->build($area->id, 2026, $this->months(), 0);
+        $this->assertTrue($result['ai_used']);
+        $this->assertSame(['out_change', 'encoding_review'], $result['focus']);
+        Http::assertSent(function ($request) {
+            if (! str_ends_with($request->url(), '/api/chat')) return false;
+            $payload = json_encode($request->data());
+            $this->assertStringNotContainsString('PrivateName', $payload);
+            $this->assertStringNotContainsString('SECRET-HOUSE', $payload);
+            $this->assertStringNotContainsString('DoNotSendToAI', $payload);
+
+            return str_contains($payload, '35.0%');
+        });
+        $this->assertSame($result, app(MigrationAnalyticsInsights::class)->build($area->id, 2026, $this->months(), 0));
+        Http::assertSentCount(2);
+    }
+
+    public function test_invalid_ai_output_and_outage_keep_database_summary_available(): void
+    {
+        config(['assistant_ai.enabled' => true, 'assistant_ai.url' => 'http://ollama:11434', 'assistant_ai.model' => 'qwen2.5:1.5b']);
+        Http::fake([
+            '*/api/tags' => Http::response(['models' => [['name' => 'qwen2.5:1.5b']]]),
+            '*/api/chat' => Http::response(['message' => ['content' => '{"focus_ids":["invented_job_reason"]}']]),
+        ]);
+        $result = app(MigrationAnalyticsInsights::class)->build(null, 2026, $this->months(), 2);
+        $this->assertFalse($result['ai_used']);
+        $this->assertStringContainsString('2 demo events', $result['observations']['demo']);
+        Cache::flush();
+        Http::fake(['*' => Http::response([], 503)]);
+        $fallback = app(MigrationAnalyticsInsights::class)->build(null, 2026, $this->months(), 2);
+        $this->assertFalse($fallback['ai_used']);
+        $this->assertSame($result['observations'], $fallback['observations']);
+    }
+
+    public function test_future_year_has_no_completed_month_comparison(): void
+    {
+        $months = $this->months()->map(fn ($r) => array_replace($r, ['month' => str_replace('2026', '2027', $r['month'])]));
+        $result = app(MigrationAnalyticsInsights::class)->build(null, 2027, $months, 0);
+        $this->assertArrayNotHasKey('out_change', $result['observations']);
+        $this->assertStringContainsString('No completed calendar months', $result['observations']['period']);
+    }
+}

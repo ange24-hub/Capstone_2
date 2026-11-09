@@ -1,0 +1,12 @@
+.migration-insights { margin-top: 24px; padding: 24px; border: 1px solid #dce4eb; border-radius: 12px; background: #fff; color: #24384b; }
+.migration-insights h2 { margin: 6px 0 10px; font-size: 1.25rem; }
+.migration-insights h3 { margin: 18px 0 8px; font-size: 1rem; }
+.migration-insights p, .migration-insights li { line-height: 1.6; overflow-wrap: anywhere; }
+.migration-insights ul { padding-left: 22px; list-style: disc; }
+.migration-insights li { margin: 8px 0; }
+.migration-insights-mode { font-weight: 600; color: #174a7e; }
+.migration-insights-focus { padding: 4px 18px 16px; background: #eff6ff; border-left: 4px solid #2563eb; border-radius: 6px; }
+.migration-insights-notes { margin: 18px 0; padding: 14px; background: #f4f7fa; border-radius: 8px; }
+.migration-insights-notes summary { cursor: pointer; font-weight: 600; }
+.migration-insights .table-wrap { overflow-x: auto; }
+@media (max-width: 640px) { .migration-insights { padding: 16px; } }
