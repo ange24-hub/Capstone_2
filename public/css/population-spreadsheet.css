@@ -1,4 +1,5 @@
 /* Spreadsheet grid for the Population Report screen and paper copy. */
+.population-report-filter input[name="report_year"] { width: 110px; min-height: 38px; }
 .population-report-header {
     display: flex;
     flex-direction: column;

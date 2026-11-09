@@ -44,8 +44,27 @@ ol { margin: 4pt 0; padding-left: 15pt; } li { margin-bottom: 3pt; }
 footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt solid #000; padding-top: 4pt; font-size: 11pt; color: #000; }
 .page-number { float: right; } .page-number:after { content: counter(page); }
 @include('reports._document-header-styles')
+@if(($selectedSection ?? 'summary') === 'summary')
+    @include('reports._population-monitoring-styles')
+    @page { margin: 26pt 30pt; }
+    body { font-family: DejaVu Sans, sans-serif; font-size: 9pt; line-height: 1.15; }
+    .population-monitoring-paper { min-width: 0; width: 100%; max-width: none; padding: 0; border: 0; box-shadow: none; font-family: DejaVu Sans, sans-serif; font-size: 9pt; }
+    .monitoring-form-code { font-size: 8pt; margin-bottom: 6pt; }
+    .monitoring-title { margin-bottom: 10pt; }
+    .monitoring-title h2 { font-family: DejaVu Sans, sans-serif; font-size: 13pt; margin: 0; letter-spacing: 0; }
+    .monitoring-meta { margin-bottom: 8pt; line-height: 11pt; font-size: 8.5pt; }
+    .monitoring-grid th, .monitoring-grid td { padding: .75pt 4pt; font-size: 8pt; line-height: 9pt; }
+    .monitoring-grid .monitoring-remarks { font-size: 6.5pt; }
+    .monitoring-signatures td { font-size: 9pt; padding: 0 12pt; }
+    .monitoring-signature-space { height: 12pt; }
+    .monitoring-signatures em { font-size: 7pt; }
+    .monitoring-date { margin: 8pt 0 5pt; }
+    .monitoring-footnote { font-size: 6.5pt; line-height: 8pt; }
+@endif
 </style></head><body>
+@unless(($selectedSection ?? 'summary') === 'summary')
 <footer>RBIM | {{ $reportTitle ?? 'Population Summary' }} | {{ $report['generatedAt']->format('d M Y') }} <span class="page-number">Page </span></footer>
 @include('reports._document-header', ['documentTitle' => strtoupper($reportTitle ?? 'Population Summary').' REPORT', 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y')])
+@endunless
 @include('reports.population-content', ['showReportNotes' => false])
 </body></html>

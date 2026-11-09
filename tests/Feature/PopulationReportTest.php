@@ -32,7 +32,7 @@ class PopulationReportTest extends TestCase
         }
         $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $report = $this->actingAs($staff)->get(route('reports.population', ['barangay_id' => $area->id]))
-            ->assertOk()->assertSee('A household with one recorded resident also counts as one family')->viewData('report');
+            ->assertOk()->assertSee('Total No. of Families:')->viewData('report');
         $this->assertSame(3, $report['totalFamilies']);
         $this->assertSame(1, $report['singlePersonFamiliesAdded']);
         $this->assertSame(3, $report['coverage'][0]['families']);
@@ -92,9 +92,9 @@ class PopulationReportTest extends TestCase
         $this->assertSame(0, $empty['totalPwd']);
         $this->assertSame(0, $empty['totalSeniors']);
         $html = view('reports.population-pdf', compact('report'))->render();
-        $this->assertStringContainsString('POPULATION SUMMARY REPORT', $html);
-        $this->assertStringContainsString('Persons with disability', $html);
-        $this->assertStringContainsString('Population by age', $html);
+        $this->assertStringContainsString('MONITORING REPORT', $html);
+        $this->assertStringContainsString('Person with Disabilities (PWDs)', $html);
+        $this->assertStringContainsString('Population by Age Bracket:', $html);
     }
 
     public function test_decimal_family_suffixes_share_a_household_without_merging_families(): void
@@ -141,7 +141,7 @@ class PopulationReportTest extends TestCase
         }
         $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $response = $this->actingAs($staff)->get(route('reports.population'))->assertOk()
-            ->assertSee('Population, families and households');
+            ->assertSee('Total No. of Families:');
         $report = $response->viewData('report');
         $this->assertSame(3, $report['totalFamilies']);
         $this->assertSame(2, $report['totalHouseholds']);

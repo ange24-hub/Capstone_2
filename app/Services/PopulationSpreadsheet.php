@@ -79,6 +79,7 @@ class PopulationSpreadsheet
         ];
 
         if ($section === 'summary') {
+            $summary['Summary']=$this->monitoringWorksheet($report);
             return $report['totalBarangays'] > 1 ? $summary : array_slice($summary, 0, 3, true);
         }
 
@@ -119,6 +120,7 @@ class PopulationSpreadsheet
 
     private function sheet(array $sheet, array $report): string
     {
+        if(!empty($sheet['monitoring'])) return $this->monitoringXml($sheet);
         // Each visible field occupies one actual Excel column, so filters never overlap merged headings.
         $columnCount = count($sheet['headings']);
         $lastColumn = $this->column($columnCount);
@@ -181,6 +183,67 @@ class PopulationSpreadsheet
             .'</worksheet>');
     }
 
+    private function monitoringWorksheet(array $report): array
+    {
+        $form=$report['monitoring'];$rows=[];$merges=[];
+        $add=function(array $values=[],int $style=0,int $height=16,bool $merge=false)use(&$rows,&$merges){
+            $rows[]=['values'=>$values,'style'=>$style,'height'=>$height];
+            if($merge) $merges[]='A'.count($rows).':E'.count($rows);
+        };
+        $add(['RBI FORM C (Revised 2024)'],0,17,true);
+        $add([],0,7);
+        $add(['MONITORING REPORT'],1,23,true);
+        $add(['for '.($form['semester']===1?'1st':'2nd').' Semester of CY '.$form['year']],7,18,true);
+        $add([],0,10);
+        $add(['REGION: VIII'],0,16,true);
+        $add(['PROVINCE: SOUTHERN LEYTE'],0,16,true);
+        $add(['CITY/MUNICIPALITY: TOMAS OPPUS'],0,16,true);
+        $add(['BARANGAY: '.mb_strtoupper($form['barangay'])],0,16,true);
+        $add(['Total No. of Barangay Inhabitants:',$report['totalRecords']],0,17);
+        $add(['Total No. of Households:',$report['totalHouseholds']],0,17);
+        $add(['Total No. of Families:',$report['totalFamilies']?:($report['totalRecords']?'Not yet identified':'Not yet encoded')],0,17);
+        $add([],0,10);
+        $headings=['INDICATORS','MALE','FEMALE','TOTAL','REMARKS'];
+        $add($headings,11,20);
+        $add(['Population by Age Bracket:'],12,17,true);
+        foreach($form['ages'] as $row) $add([$row['label'],$row['male'],$row['female'],$row['total'],
+            $row['unspecified']?'Sex unspecified: '.$row['unspecified']:''],4,16);
+        $add(['Total registered residents',$report['sex']['Male'],$report['sex']['Female'],$report['totalRecords'],
+            $report['sex']['Not specified / other']?'Sex unspecified: '.$report['sex']['Not specified / other']:''],6,17);
+        $add(['Population by Sector:'],12,17,true);
+        foreach($form['sectors'] as $row) $add([$row['label'],$row['available']?$row['male']:'-',
+            $row['available']?$row['female']:'-',$row['available']?$row['total']:'-',
+            $row['remarks'].($row['unspecified']?'; sex unspecified: '.$row['unspecified']:'')],4,19);
+        $add([],0,9);
+        $signatureRow=count($rows)+1;$add(['Prepared by:','','Submitted by:'],0,16);
+        $merges[]='A'.$signatureRow.':B'.$signatureRow;$merges[]='C'.$signatureRow.':E'.$signatureRow;
+        $add([],0,25);
+        foreach([[$form['preparedBy']?:'________________________',$form['submittedBy']?:'________________________'],
+            [$form['isBarangay']?'Barangay Secretary':'Authorized Municipal Preparer',$form['isBarangay']?'Punong Barangay':'Authorized Municipal Official'],
+            ['(signature over printed name)','(signature over printed name)']] as [$left,$right]) {
+            $n=count($rows)+1;$add([$left,'',$right],7,17);$merges[]='A'.$n.':B'.$n;$merges[]='C'.$n.':E'.$n;
+        }
+        $add([],0,7);
+        $add(['Date Accomplished: '.$report['generatedAt']->format('F d, Y')],0,18,true);
+        $add(['Note: Submit RBI Form C to DILG C/MLGOO as reference for encoding to BIS-BPS.'],8,22,true);
+        $add(['Current registry as of '.$report['generatedAt']->format('d M Y').'; active, migrated-out and inactive records. Semester/year is a report label, not a reconstructed historical population.'],8,30,true);
+        $add(['Ages use recorded birth dates. Sector counts use explicit tags only. A dash means not recorded; coverage is not verified complete.'],8,26,true);
+        return ['monitoring'=>true,'headings'=>$headings,'rows'=>$rows,'merges'=>$merges];
+    }
+
+    private function monitoringXml(array $sheet): string
+    {
+        $rows='';foreach($sheet['rows'] as $index=>$row) $rows.=$this->row($index+1,$row['values'],$row['style'],$row['height']);
+        $merges=implode('',array_map(fn($range)=>'<mergeCell ref="'.$range.'"/>',$sheet['merges']));
+        return $this->xml('<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+            .'<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="A1:E'.count($sheet['rows']).'"/>'
+            .'<sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="16"/>'
+            .'<cols><col min="1" max="1" width="58" customWidth="1"/><col min="2" max="4" width="10" customWidth="1"/><col min="5" max="5" width="26" customWidth="1"/></cols>'
+            .'<sheetData>'.$rows.'</sheetData><mergeCells count="'.count($sheet['merges']).'">'.$merges.'</mergeCells>'
+            .'<printOptions horizontalCentered="1"/><pageMargins left="0.35" right="0.35" top="0.35" bottom="0.35" header="0" footer="0"/>'
+            .'<pageSetup orientation="portrait" paperSize="9" fitToWidth="1" fitToHeight="1"/></worksheet>');
+    }
+
     private function rowHeight(array $values, array $widths): int
     {
         $lines = 1;
@@ -231,8 +294,9 @@ class PopulationSpreadsheet
             $entries .= '<sheet name="'.$this->escape($name).'" sheetId="'.($index + 1).'" r:id="rId'.($index + 1).'"/>';
             $quotedName = $this->escape("'".str_replace("'", "''", $name)."'");
             $lastColumn = $this->column(count($sheets[$name]['headings']));
-            $lastRow = max(10, count($sheets[$name]['rows']) + 9);
-            $printNames .= '<definedName name="_xlnm.Print_Titles" localSheetId="'.$index.'">'.$quotedName.'!$9:$9</definedName>'
+            $monitoring=!empty($sheets[$name]['monitoring']);
+            $lastRow = $monitoring ? count($sheets[$name]['rows']) : max(10, count($sheets[$name]['rows']) + 9);
+            $printNames .= '<definedName name="_xlnm.Print_Titles" localSheetId="'.$index.'">'.$quotedName.($monitoring?'!$14:$15':'!$9:$9').'</definedName>'
                 .'<definedName name="_xlnm.Print_Area" localSheetId="'.$index.'">'.$quotedName.'!$A$1:$'.$lastColumn.'$'.$lastRow.'</definedName>';
         }
 
@@ -254,10 +318,10 @@ class PopulationSpreadsheet
     {
         return $this->xml('<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
             .'<fonts count="5"><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="14"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><b/><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Times New Roman"/><color rgb="FF000000"/></font></fonts>'
-            .'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+            .'<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1895CE"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE4EEF3"/><bgColor indexed="64"/></patternFill></fill></fills>'
             .'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="thin"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border></borders>'
             .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-            .'<cellXfs count="11"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+            .'<cellXfs count="13"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
             .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
@@ -268,6 +332,8 @@ class PopulationSpreadsheet
             .'<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="2" fillId="2" borderId="1" xfId="0" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
+            .'<xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>'
             .'</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>');
     }
 

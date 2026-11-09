@@ -20,6 +20,8 @@ class PopulationReportController extends Controller
             'section' => ['nullable', Rule::in(array_keys(PopulationSummary::SECTIONS))],
             'page' => ['nullable', 'integer', 'min:1'],
             'print' => ['nullable', 'boolean'],
+            'report_year' => ['nullable', 'integer', 'min:1900', 'max:'.now()->year],
+            'semester' => ['nullable', Rule::in([1,2])],
         ]);
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
         if ($isSecretary) {
@@ -30,6 +32,12 @@ class PopulationReportController extends Controller
         $selectedSection = $request->input('section') ?: 'summary';
         $printMode = $request->boolean('print');
         $report = $summary->build($barangayId, $selectedSection);
+        $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',now()->year),
+            'semester'=>$request->integer('semester',now()->month<=6?1:2)]);
+        if($selectedSection==='summary') {
+            $report['monitoring']['year']=$reportFilters['report_year'];
+            $report['monitoring']['semester']=$reportFilters['semester'];
+        }
         $sectionLabels = PopulationSummary::SECTIONS;
         $reportTitle = $selectedSection === 'summary' ? 'Population Summary' : $sectionLabels[$selectedSection];
         $detailGroups = $report['detailGroups'];
@@ -44,7 +52,7 @@ class PopulationReportController extends Controller
         }
         if ($request->routeIs('reports.population.pdf')) {
             return Pdf::loadView('reports.population-pdf', compact('report', 'selectedSection', 'reportTitle', 'detailGroups'))
-                ->setPaper('a4', in_array($selectedSection, ['coverage', 'area-ages'], true) || ($report['totalBarangays'] > 1 && in_array($selectedSection, ['summary', 'sex', 'ages'], true)) ? 'landscape' : 'portrait')
+                ->setPaper('a4', in_array($selectedSection, ['coverage', 'area-ages'], true) || ($report['totalBarangays'] > 1 && in_array($selectedSection, ['sex', 'ages'], true)) ? 'landscape' : 'portrait')
                 ->download('population-'.$selectedSection.'-'.($barangayId ? 'barangay-'.$barangayId : 'municipal').'-'.now()->format('Y-m-d').'.pdf');
         }
         $detailPagination = null;
@@ -65,6 +73,7 @@ class PopulationReportController extends Controller
             'detailGroups' => $detailGroups, 'detailPagination' => $detailPagination,
             'printMode' => $printMode,
             'showReportNotes' => ! $printMode,
+            'reportFilters'=>$reportFilters,
             'report' => $report, 'selectedBarangayId' => $barangayId, 'isSecretary' => $isSecretary,
             'barangays' => $isSecretary ? collect() : Barangay::orderBy('name')->get(['id', 'name']),
         ]);

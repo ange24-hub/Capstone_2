@@ -26,9 +26,10 @@ class PopulationSummary
     {
         $generatedAt = now();
         $today = $generatedAt->copy()->startOfDay();
-        $barangays = Barangay::when($barangayId, fn ($q) => $q->whereKey($barangayId))->orderBy('name')->get(['id', 'name']);
+        $barangays = Barangay::when($barangayId, fn ($q) => $q->whereKey($barangayId))->orderBy('name')->get(['id', 'name', 'secretary_name', 'punong_barangay_name']);
         $withNames = in_array($section, ['residents', 'families', 'households', 'seniors', 'pwd'], true);
         $columns = ['barangay_id', 'household_id', 'family_number', 'sex', 'birth_date', 'remarks', 'status', 'residence_status', 'updated_at'];
+        if($section==='summary') $columns=array_merge($columns,['occupation','civil_status']);
         if ($withNames) {
             $columns = array_merge($columns, ['id', 'first_name', 'middle_name', 'last_name', 'suffix', 'relationship_to_head']);
         }
@@ -126,7 +127,7 @@ class PopulationSummary
             ];
         });
 
-        return compact('generatedAt', 'sex', 'ages', 'statuses', 'coverage', 'confirmedLivingHere') + [
+        $report = compact('generatedAt', 'sex', 'ages', 'statuses', 'coverage', 'confirmedLivingHere') + [
             'detailGroups' => $withNames ? $this->detailGroups($section, $namedRecords, $householdRows, $areaNames) : collect(),
             'scopeLabel' => $barangayId ? 'Barangay '.$barangays->firstOrFail()->name : 'Tomas Oppus — available barangay records',
             'totalRecords' => $records->count(), 'totalHouseholds' => (int) $households->sum(),
@@ -139,6 +140,8 @@ class PopulationSummary
             'recordsWithoutFamily' => (int) $coverage->sum('recordsWithoutFamily'),
             'coveredBarangays' => $coverage->where('records', '>', 0)->count(), 'totalBarangays' => $barangays->count(),
         ];
+        if($section==='summary') $report['monitoring']=app(PopulationMonitoringReport::class)->build($records,$report,$barangays);
+        return $report;
     }
 
     private function detailGroups(string $section, $members, $households, $areaNames)

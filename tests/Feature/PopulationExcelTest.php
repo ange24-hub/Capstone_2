@@ -31,7 +31,7 @@ class PopulationExcelTest extends TestCase
 
         $this->actingAs($staff)->get(route('reports.population', ['barangay_id' => $area->id, 'section' => 'residents']))
             ->assertOk()->assertSee('Resident 1')->assertDontSee('Resident 9 Example')
-            ->assertSee(route('reports.population.excel', ['barangay_id' => $area->id, 'section' => 'residents']))
+            ->assertSee(route('reports.population.excel', ['barangay_id' => $area->id, 'report_year'=>now()->year, 'semester'=>now()->month<=6?1:2, 'section' => 'residents']))
             ->assertSee('population-spreadsheet.css')
             ->assertSee('REGION: VIII')->assertSee('PROVINCE: SOUTHERN LEYTE')
             ->assertSee('CITY/MUNICIPALITY: TOMAS OPPUS')->assertSee('BARANGAY: <strong>Looc</strong>', false);
@@ -194,7 +194,10 @@ class PopulationExcelTest extends TestCase
                         $this->assertTrue($xml->loadXML($zip->getFromIndex($index)), $name.' must be valid XML');
                     }
                     if (str_starts_with($name, 'xl/worksheets/')) {
-                        foreach (['A. REGION:', 'VIII', 'B. PROVINCE:', 'SOUTHERN LEYTE', 'C. CITY/MUNICIPALITY:', 'TOMAS OPPUS', 'D. BARANGAY:', 'E. HOUSEHOLD NO.:', 'DATE ACCOMPLISHED:'] as $label) {
+                        $labels=str_contains($zip->getFromIndex($index),'RBI FORM C (Revised 2024)')
+                            ? ['REGION:', 'VIII', 'PROVINCE:', 'SOUTHERN LEYTE', 'CITY/MUNICIPALITY:', 'TOMAS OPPUS', 'BARANGAY:', 'Date Accomplished:', 'MONITORING REPORT', 'INDICATORS', 'MALE', 'FEMALE', 'TOTAL', 'REMARKS']
+                            : ['A. REGION:', 'VIII', 'B. PROVINCE:', 'SOUTHERN LEYTE', 'C. CITY/MUNICIPALITY:', 'TOMAS OPPUS', 'D. BARANGAY:', 'E. HOUSEHOLD NO.:', 'DATE ACCOMPLISHED:'];
+                        foreach ($labels as $label) {
                             $this->assertStringContainsString($label, $zip->getFromIndex($index));
                         }
                     }
