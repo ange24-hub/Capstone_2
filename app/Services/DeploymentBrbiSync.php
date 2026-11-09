@@ -111,6 +111,8 @@ class DeploymentBrbiSync
             $stage='decrypt';
             $source = $this->decrypt(json_decode(file_get_contents($envelopePath), true, flags:JSON_THROW_ON_ERROR));
             $backup = $disk->path(self::DIRECTORY.'/backups/'.now()->format('Ymd-His-u'));
+            $stage='age_schema';
+            app(BrbiAgeStorage::class)->prepare($backup.'-age-schema');
             $stage='backup_and_import';
             $result = app(BrbiAppendOnlySync::class)->apply($source, $backup);
             $report = ['state'=>'completed', 'envelope_sha256'=>$hash, 'completed_at'=>now()->toIso8601String()]+$result;
