@@ -30,9 +30,12 @@ else
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
 fi
 
-# Additive WMA storage only; no invented dates, demo seeds or automatic completeness claims.
-gosu www-data php artisan migration:prepare-statistical-storage --no-interaction
-gosu www-data php artisan population:prepare-submission-storage --no-interaction
+# Optional feature storage must not prevent the existing web server from starting.
+# A failed preparation still needs operator review before using the affected feature.
+gosu www-data php artisan migration:prepare-statistical-storage --no-interaction \
+    || echo 'Statistical forecast storage preparation failed; review app logs and rerun migration:prepare-statistical-storage.' >&2
+gosu www-data php artisan population:prepare-submission-storage --no-interaction \
+    || echo 'Population submission storage preparation failed; review app logs and rerun population:prepare-submission-storage.' >&2
 
 # One-time recipient-encrypted transfer explicitly requested for this installation.
 # A sync failure rolls back its transaction and must not take the existing website offline.

@@ -127,6 +127,8 @@ gosu www-data php artisan up
 
 During maintenance mode `/up` returns 503 and the container will be marked unhealthy; bring the app up after verification. `RUN_MIGRATIONS=true` can apply pending migrations on startup for a reviewed release with a backup; failures stop startup. Return it to `false` afterward. Never use `migrate:fresh` or automatic demo seeding on production.
 
+Optional statistical-forecast and population-submission storage preparation logs a warning if it fails and allows the existing web server to start. The affected feature may remain unavailable until its storage is ready. Inspect the app logs and rerun `gosu www-data php artisan migration:prepare-statistical-storage` or `gosu www-data php artisan population:prepare-submission-storage` after resolving the underlying error. Required configuration, base forecast storage, and explicitly enabled full migrations still stop startup on failure. This fallback does not establish the cause of a live proxy 404; verify the deployment logs, container health, and domain routing separately.
+
 Use Dokploy volume backups for `app_storage` and a consistent logical MySQL dump or a database-aware backup for `database_data`; a raw copy of a running MySQL volume alone is not a proven database backup. Test restoring both the database and uploads into staging.
 
 Before live use, check:
