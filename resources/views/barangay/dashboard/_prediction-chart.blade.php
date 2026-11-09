@@ -1,8 +1,8 @@
-<figure class="statistical-chart" data-forecast-chart aria-labelledby="{{ $chartId }}-title">
+<figure class="statistical-chart" data-forecast-chart data-chart-actual-label="{{ $chartActualLabel ?? 'Actual' }}" aria-labelledby="{{ $chartId }}-title">
     <figcaption class="statistical-chart-caption">
         <span class="statistical-chart-title statistical-visually-hidden" id="{{ $chartId }}-title">{{ $chartTitle }}</span>
         <span class="statistical-chart-legend" aria-label="Chart legend">
-            <span><i class="is-actual" aria-hidden="true"></i>Actual</span>
+            <span><i class="is-actual" aria-hidden="true"></i>{{ $chartActualLabel ?? 'Actual' }}</span>
             <span><i class="is-predicted" aria-hidden="true"></i>Predicted</span>
         </span>
     </figcaption>

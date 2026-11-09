@@ -157,6 +157,12 @@
 .statistical-chart-point:focus-visible > :last-child { stroke: #152f49; stroke-width: 3; }
 .statistical-forecast .statistical-chart-value { min-height: 24px; margin: 0; color: var(--sf-muted); font-size: 13px; line-height: 1.5; }
 .statistical-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.statistical-history-evaluation { border-top: 3px solid #8b5cf6; }
+.statistical-forecast .statistical-evaluation-note { padding: 8px 10px; border-left: 3px solid #f59e0b; background: #fff8e8; border-radius: 6px; color: #79500c; font-size: 14px; }
+.statistical-error-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 12px; }
+.statistical-error-metrics > div { display: grid; gap: 3px; padding: 10px; background: #f3efff; border-radius: 8px; }
+.statistical-error-metrics span { font-size: 13px; color: #5d5483; }
+.statistical-error-metrics strong { font-size: 22px; line-height: 1.3; font-variant-numeric: tabular-nums; }
 .statistical-chart-empty { display: grid; place-items: center; height: 100%; color: var(--sf-muted); font-size: 13px; }
 @media (max-width: 1000px) {
   .statistical-hero { align-items: flex-start; flex-direction: column; gap: 16px; }
@@ -189,6 +195,9 @@
   .statistical-operations[open] > summary { margin: 0 -20px 16px; }
 }
 @media (max-width: 379px) {
+  .statistical-error-metrics { gap: 6px; }
+  .statistical-error-metrics > div { padding: 8px; }
+  .statistical-error-metrics strong { font-size: 18px; }
   .statistical-page-tabs a svg { display: none; }
   .statistical-toolbar { grid-template-columns: minmax(0,1fr); }
   .statistical-toolbar button { width: 100%; }

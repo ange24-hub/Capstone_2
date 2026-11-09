@@ -68,7 +68,8 @@ class PredictionDashboardController extends Controller
         $residents = Inhabitant::withoutMigrationDemo()->where('barangay_id', $barangay->id)->orderBy('last_name')->orderBy('first_name')
             ->get(['id', 'first_name', 'middle_name', 'last_name', 'suffix']);
         $migrationCharts = $chartData->migration($barangay->id, $history, $forecasts);
-        return view('barangay.dashboard.prediction', compact('barangay', 'barangays', 'forecastPage', 'forecasts', 'accuracies', 'history', 'summary', 'logs', 'logChecks', 'movements', 'residents', 'migrationCharts'));
+        $reportHistoryEvaluation = app(\App\Services\TinagoReportHistoryEvaluation::class)->forBarangay($barangay);
+        return view('barangay.dashboard.prediction', compact('barangay', 'barangays', 'forecastPage', 'forecasts', 'accuracies', 'history', 'summary', 'logs', 'logChecks', 'movements', 'residents', 'migrationCharts', 'reportHistoryEvaluation'));
     }
 
     public function store(Request $request)

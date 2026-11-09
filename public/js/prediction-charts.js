@@ -18,6 +18,7 @@
         const output = figure.querySelector('[data-chart-value]');
         const note = output.textContent;
         const title = figure.querySelector('[id]').textContent;
+        const actualLabel = figure.dataset.chartActualLabel || 'Actual';
 
         const render = () => {
             const width = Math.max(220, plot.clientWidth);
@@ -40,9 +41,10 @@
             const top = Math.ceil(maximum / step) * step;
             const x = index => bounds.left + index / Math.max(1, rows.length - 1) * (bounds.right - bounds.left);
             const y = value => bounds.bottom - value / top * (bounds.bottom - bounds.top);
+            const hitRadius = Math.min(14, Math.max(4.5, (bounds.right - bounds.left) / Math.max(1, rows.length - 1) * .42));
             const svg = node('svg', { viewBox: `0 0 ${width} ${height}`, role: 'group', 'aria-label': title });
             svg.append(node('title', {}, title));
-            svg.append(node('desc', {}, 'Solid teal circles: actual. Dashed violet squares: predicted. Missing periods are gaps. Focus or tap a point for values.'));
+            svg.append(node('desc', {}, `Solid teal circles: ${actualLabel}. Dashed violet squares: predicted. Missing periods are gaps. Focus or tap a point for values.`));
 
             for (let tick = 0; tick <= top + step / 100; tick += step) {
                 svg.append(node('line', { x1: bounds.left, x2: bounds.right, y1: y(tick), y2: y(tick), class: 'statistical-chart-grid' }));
@@ -83,14 +85,18 @@
             rows.forEach((row, index) => {
                 for (const key of ['actual', 'predicted']) {
                     if (!hasValue(row[key])) continue;
-                    const label = `${row.label} · ${key === 'actual' ? 'Actual' : 'Predicted'} ${format(row[key])}${key === 'predicted' && row.assumption ? ' (assumption)' : ''}`;
+                    const label = `${row.label} · ${key === 'actual' ? actualLabel : 'Predicted'} ${format(row[key])}${key === 'predicted' && row.assumption ? ' (assumption)' : ''}`;
                     const point = node('g', { tabindex: 0, role: 'img', 'aria-label': label, class: 'statistical-chart-point' });
                     point.append(node('title', {}, label));
-                    point.append(node('circle', { cx: x(index), cy: y(row[key]), r: 14, fill: 'transparent' }));
+                    point.append(node('circle', { cx: x(index), cy: y(row[key]), r: hitRadius, fill: 'transparent' }));
                     point.append(key === 'actual'
                         ? node('circle', { cx: x(index), cy: y(row[key]), r: 4.5, fill: colors[key], stroke: '#fff', 'stroke-width': 2 })
                         : node('rect', { x: x(index) - 4.5, y: y(row[key]) - 4.5, width: 9, height: 9, rx: 1, fill: '#fff', stroke: colors[key], 'stroke-width': 2 }));
-                    const show = () => { output.textContent = label; };
+                    const show = () => {
+                        output.textContent = hasValue(row.actual) && hasValue(row.predicted)
+                            ? `${row.label} · ${actualLabel} ${format(row.actual)} · Predicted ${format(row.predicted)}`
+                            : label;
+                    };
                     point.addEventListener('pointerenter', show);
                     point.addEventListener('focus', show);
                     point.addEventListener('click', show);

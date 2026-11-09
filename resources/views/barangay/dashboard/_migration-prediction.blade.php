@@ -1,3 +1,6 @@
+    @if($reportHistoryEvaluation)
+        @include('barangay.dashboard._report-history-evaluation', ['evaluation' => $reportHistoryEvaluation])
+    @endif
     <section id="migration-forecast" aria-labelledby="migration-forecast-title"><div class="statistical-section-heading"><div>
         <h2 id="migration-forecast-title">Monthly migration</h2><p>Forecast for <strong>{{ $targetLabel }}</strong></p></div>
         <span class="statistical-status {{ $allSaved ? '' : 'is-waiting' }}">{{ $allSaved ? 'Forecasts saved' : 'Preview' }}</span></div>

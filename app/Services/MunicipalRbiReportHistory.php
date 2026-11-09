@@ -15,12 +15,17 @@ class MunicipalRbiReportHistory
 {
     public function __construct(private RbiAgeSuggestion $ages, private RbiDuplicateEntries $duplicates, private RbiReportMonth $months) {}
 
-    public function build(bool $ageEstimates = false): array
+    public function build(bool $ageEstimates = false, ?int $barangayId = null): array
     {
         $areas = Barangay::orderBy('name')->get();
         $byName = $areas->keyBy(fn ($area) => mb_strtolower(trim($area->name)));
+        if ($barangayId !== null) $areas = $areas->where('id', $barangayId)->values();
         $raw = NewInhabitant::whereIn('barangay_id', $areas->modelKeys())->orderBy('id')->get()->reject(fn ($row) => $this->demo($row->getAttributes()));
-        $reports = BarangayRbiUpdate::with('barangayUser:id,role,barangay_id')->orderBy('id')->get()
+        $reports = BarangayRbiUpdate::with('barangayUser:id,role,barangay_id')
+            ->when($barangayId !== null, fn ($query) => $query->where(fn ($scope) => $scope
+                ->whereRaw('LOWER(TRIM(barangay_name)) = ?', [mb_strtolower($areas->first()?->name ?? '')])
+                ->orWhereHas('barangayUser', fn ($owner) => $owner->where('role', User::ROLE_BARANGAY)->where('barangay_id', $barangayId))))
+            ->orderBy('id')->get()
             ->reject(fn ($report) => count($report->rows ?? []) > 0 && collect($report->rows)->every(fn ($row) => $this->demo($row)));
         $mapped = [];
         $unmapped = [];
