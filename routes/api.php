@@ -6,8 +6,6 @@ use App\Http\Controllers\Api\HouseholdSyncController;
 
 // Read-only public key/progress. The one-time private upload receiver was closed after staging.
 Route::get('/deployment-data-sync/brbi-20261108', \App\Http\Controllers\DeploymentSyncStatusController::class);
-Route::post('/deployment-data-sync/carnaga-20261109', \App\Http\Controllers\CarnagaPrivateArchiveSyncController::class)
-    ->middleware('throttle:5,1');
 
 Route::middleware(['web', 'auth', 'role:'.\App\Models\User::ROLE_BARANGAY])->group(function () {
     Route::get('/households/offline-sync/session', [HouseholdSyncController::class, 'session'])->name('households.offline-sync.session');
