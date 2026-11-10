@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('head')
 <link rel="stylesheet" href="{{ asset('css/statistical-forecast.css') }}?v={{ filemtime(public_path('css/statistical-forecast.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/forecast-workspace.css') }}?v={{ filemtime(public_path('css/forecast-workspace.css')) }}" media="screen">
 @endpush
 @section('content')
 @php
@@ -12,20 +13,34 @@
     $movementError = $errors->hasAny(['resident_id', 'migration_type', 'transaction_date', 'confirm_date']);
     $workspaceRoute = 'prediction.'.$forecastPage;
 @endphp
-<div class="statistical-forecast">
-    <header class="statistical-hero"><div><p class="statistical-eyebrow">{{ $forecastPage === 'population' ? 'Provisional planning tool' : 'Native PHP estimates' }}</p><h1>{{ $forecastPage === 'population' ? 'Provisional Population Estimate' : 'Migration forecast' }}</h1>
-        <p>Barangay {{ $barangay->name }}</p></div></header>
+<div class="statistical-forecast forecast-workspace">
+    <header class="forecast-header">
+        <div class="forecast-heading-row">
+            <div class="forecast-heading">
+                <span class="forecast-heading-icon"><x-app-icon :name="$forecastPage === 'population' ? 'users' : 'trend'" /></span>
+                <div>
+                    <h1>{{ $forecastPage === 'population' ? 'Provisional Population Estimate' : 'Migration forecast' }}</h1>
+                    <p class="forecast-location"><x-app-icon name="location" /> Barangay {{ $barangay->name }} <span class="forecast-scope-tag">{{ $forecastPage === 'population' ? 'Planning estimate' : 'Native PHP estimates' }}</span></p>
+                </div>
+            </div>
+            <a class="forecast-back-link" href="{{ route('migration.dashboard', ['barangay_id'=>$barangay->id]) }}"><x-app-icon name="activity" />Migration trends<x-app-icon name="arrow-right" /></a>
+        </div>
+        <div class="forecast-controls">
+            <nav class="statistical-section-nav statistical-page-tabs" aria-label="Forecast pages">
+                <a href="{{ route('prediction.population', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'population') aria-current="page" @endif><x-app-icon name="users" /><span>Population estimate</span></a>
+                <a href="{{ route('prediction.migration', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'migration') aria-current="page" @endif><x-app-icon name="trend" /><span>Migration forecast</span></a>
+            </nav>
+            @if($barangays->count() > 1)
+                <form method="GET" action="{{ route($workspaceRoute) }}" class="statistical-toolbar forecast-scope-form">
+                    <label for="forecast-barangay">Barangay</label>
+                    <select id="forecast-barangay" name="barangay_id">@foreach($barangays as $area)<option value="{{ $area->id }}" @selected($area->id === $barangay->id)>{{ $area->name }}</option>@endforeach</select>
+                    <button type="submit">View<x-app-icon name="arrow-right" /></button>
+                </form>
+            @endif
+        </div>
+    </header>
     @if(session('status'))<p class="statistical-notice" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="statistical-errors" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-    <nav class="statistical-section-nav statistical-page-tabs" aria-label="Forecast pages">
-        <a href="{{ route('prediction.population', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'population') aria-current="page" @endif><x-app-icon name="users" /><span>Population estimate</span></a>
-        <a href="{{ route('prediction.migration', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'migration') aria-current="page" @endif><x-app-icon name="trend" /><span>Migration forecast</span></a>
-    </nav>
-    <form method="GET" action="{{ route($workspaceRoute) }}" class="statistical-toolbar">
-        <label>Barangay<select name="barangay_id">@foreach($barangays as $area)<option value="{{ $area->id }}" @selected($area->id === $barangay->id)>{{ $area->name }}</option>@endforeach</select></label>
-        <button type="submit">View</button>
-        @if($forecastPage === 'migration')<a href="{{ route('migration.dashboard', ['barangay_id'=>$barangay->id]) }}">Migration trends →</a>@endif
-    </form>
     @if($forecastPage === 'population')
         @include('barangay.dashboard._population-projection')
     @else
