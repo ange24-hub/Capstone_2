@@ -65,9 +65,10 @@ class MigrationAnalyticsInsightsTest extends TestCase
         $before = Inhabitant::orderBy('id')->get()->toArray();
         $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
         $response = $this->actingAs($staff)->get(route('migration.dashboard', ['year' => 2026, 'barangay_id' => $other->id]))
-            ->assertOk()->assertSee('OWN-HOUSE')->assertDontSee('OTHER-PRIVATE-HOUSE')
-            ->assertSee('Automated statistical summary')->assertDontSee('PrivateName')
-            ->assertSee('not a learned anomaly model or evidence of fraud');
+            ->assertOk()->assertDontSee('OWN-HOUSE')->assertDontSee('OTHER-PRIVATE-HOUSE')
+            ->assertDontSee('Automated statistical summary')->assertDontSee('PrivateName')
+            ->assertDontSee('Trend interpretation &amp; review alerts', false)
+            ->assertDontSee('migration-insights-title');
         $result = $response->viewData('analyticsInsights');
         $this->assertSame(1, $result['alert_count']);
         $this->assertSame(1, $result['undated_count']);

@@ -19,10 +19,10 @@
 .monitoring-signatures { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
 .monitoring-signatures td { width: 50%; border: none; vertical-align: top; text-align: center; padding: 0 14px; }
 .monitoring-signatures p { text-align: left; margin: 0; }
-.monitoring-signature-space { height: 30px; }
+.monitoring-signature-space { height: 30px; text-align: center; }
 .monitoring-signatures .monitoring-signed-space { height: 36px; }
-.monitoring-signed-space img { max-width: 180px; height: 34px; }
-.monitoring-signatory { display: block; min-height: 16px; border-bottom: 1px solid #111; margin: 0 auto 3px; max-width: 240px; text-transform: uppercase; }
+.monitoring-signed-space img { display: block; width: 170px; max-width: 100%; height: 34px; margin: 0 auto; }
+.monitoring-signatory { display: block; text-align: center; min-height: 16px; border-bottom: 1px solid #111; margin: 0 auto 3px; max-width: 240px; text-transform: uppercase; }
 .monitoring-signatures em { font-size: 10px; }
 .monitoring-date { margin: 18px 0 12px; }
 .monitoring-date strong { display: inline-block; border-bottom: 1px solid #111; padding: 0 10px 2px; }

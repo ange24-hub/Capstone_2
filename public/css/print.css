@@ -85,8 +85,9 @@
     .population-report-monitoring .monitoring-signatures td { border:0 !important; padding:0 10pt !important; text-align:center !important; }
     .population-report-monitoring .monitoring-signature-space { height:18pt !important; }
     .population-report-monitoring .monitoring-signatures .monitoring-signed-space { height:24pt !important; }
-    .population-report-monitoring .monitoring-signed-space img { display:inline-block !important; height:22pt !important; max-width:140pt !important; }
-    .population-report-monitoring .monitoring-signature-space img { width:auto !important; }
+    .population-report-monitoring .monitoring-signed-space { text-align:center !important; }
+    .population-report-monitoring .monitoring-signed-space img { display:block !important; width:110pt !important; height:22pt !important; max-width:100% !important; margin:0 auto !important; }
+    .population-report-monitoring .monitoring-signatory { text-align:center !important; }
     .population-report-monitoring .monitoring-date { margin:8pt 0 5pt !important; }
     .population-report-monitoring .monitoring-footnote,
     .population-report-monitoring .monitoring-footnote * { font-size:6.5pt !important; line-height:8pt !important; }

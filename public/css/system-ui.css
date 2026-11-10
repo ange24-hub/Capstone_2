@@ -1,0 +1,270 @@
+/* Shared screen design for every role and the public portal.
+   Important declarations follow the existing layered theme convention. Keeping
+   this layer after print-overrides preserves official print/document layouts. */
+@layer system-ui {
+    @media screen {
+        :root {
+            --to-navy: #123449 !important;
+            --to-primary: #166d75 !important;
+            --to-primary-hover: #10575f !important;
+            --to-accent: #d2ac65 !important;
+            --to-tint: #e8f5f3 !important;
+            --to-canvas: #f2f6fa !important;
+            --to-surface: #ffffff !important;
+            --to-subtle: #f5f8fb !important;
+            --to-line: #dce6ee !important;
+            --to-ink: #19384e !important;
+            --to-text: #415c70 !important;
+            --to-muted: #61798a !important;
+            --to-chart-blue: #326eaa !important;
+            --to-chart-teal: #218779 !important;
+            --to-chart-gold: #b38737 !important;
+            --to-gold-tint: #fff5df !important;
+        }
+
+        /* The shell is shared even by RBI pages with their own document styles. */
+        .professional-shell .app-main,
+        .professional-public #main-content { background: var(--to-canvas) !important; }
+        .professional-content #main-content {
+            background: radial-gradient(ellipse at 100% 0, #dcefeb70, transparent 42%), var(--to-canvas) !important;
+        }
+        .professional-shell #app-sidebar {
+            background: radial-gradient(ellipse at top left, #25677366, transparent 65%), linear-gradient(170deg, #173b53, #102b41 65%, #10474c) !important;
+            border-right: 1px solid #254c60 !important;
+            border-top: 3px solid var(--to-accent) !important;
+            box-shadow: 4px 0 24px #183d4e0b !important;
+        }
+        .professional-shell #app-sidebar .app-brand { padding-bottom: 18px !important; }
+        .professional-shell #app-sidebar .app-brand em { color: #e1c486 !important; letter-spacing: .12em !important; }
+        .professional-shell #app-sidebar .side-section {
+            color: #93b7c4 !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            letter-spacing: .1em !important;
+        }
+        .professional-shell #app-sidebar .side-nav > a {
+            border-radius: 10px !important;
+            min-height: 43px !important;
+            padding: 9px 12px !important;
+            color: #d5e5ed !important;
+            transition: background-color 160ms ease, color 160ms ease !important;
+        }
+        .professional-shell #app-sidebar .side-nav > a:hover { background: #ffffff10 !important; color: #fff !important; }
+        .professional-shell #app-sidebar .side-nav > a.active {
+            background: linear-gradient(100deg, #247a7e, #20626c) !important;
+            color: #fff !important;
+            box-shadow: inset 3px 0 #e6c585, 0 4px 12px #061e3020 !important;
+            font-weight: 600 !important;
+        }
+        .professional-shell #app-sidebar .nav-mark { color: #93c9cb !important; }
+        .professional-shell #app-sidebar .active .nav-mark { color: #fff !important; }
+        .professional-shell #app-sidebar .account-avatar { background: #28596b !important; border-radius: 12px !important; }
+        .professional-shell .app-header {
+            background: #ffffff !important;
+            border-bottom: 1px solid var(--to-line) !important;
+            box-shadow: 0 3px 16px #19384e05 !important;
+        }
+        .professional-shell :is(.desktop-sidebar-button, .mobile-menu-button, .profile-navigation-trigger) {
+            background: #f6f9fb !important;
+            border-color: var(--to-line) !important;
+            border-radius: 10px !important;
+        }
+        .professional-shell .profile-navigation-avatar { background: #def0ed !important; color: #11636a !important; border-radius: 10px !important; }
+        .professional-shell .workspace-location { font-size: 12px !important; color: var(--to-muted) !important; }
+        .professional-shell .app-footer { background: transparent !important; color: var(--to-muted) !important; }
+
+        /* A compact title, an icon and a small accent give each task a clear start. */
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) {
+            padding: 22px 24px !important;
+            gap: 16px !important;
+            border: 1px solid var(--to-line) !important;
+            border-left: 4px solid #27888a !important;
+            border-radius: 16px !important;
+            background: linear-gradient(110deg, #ffffff 55%, #edf8f6) !important;
+            box-shadow: 0 4px 18px #173b5305 !important;
+        }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) h1 {
+            font-size: clamp(23px, 2.1vw, 30px) !important;
+            font-weight: 700 !important;
+            letter-spacing: -.035em !important;
+            line-height: 1.2 !important;
+            margin: 3px 0 7px !important;
+        }
+        .professional-content #main-content :is(.dashboard-page-header, .page-head, .municipal-hero) :is(.dashboard-eyebrow, .page-kicker, .municipal-eyebrow) {
+            display: block !important;
+            font-size: 10px !important;
+            letter-spacing: .12em !important;
+            color: #166d75 !important;
+            margin-bottom: 5px !important;
+        }
+        .professional-content #main-content .workspace-heading-emblem {
+            display: grid !important;
+            place-items: center !important;
+            flex: 0 0 48px !important;
+            width: 48px !important;
+            height: 48px !important;
+            color: #186d74 !important;
+            background: #e1f2ef !important;
+            border: 1px solid #d0e8e3 !important;
+            border-radius: 14px !important;
+            box-shadow: inset 0 1px #ffffff !important;
+        }
+        .professional-content #main-content :is(.dashboard-page, .barangay-dashboard, .registry-workspace) { gap: 20px !important; }
+        .professional-content #main-content :is(.panel, .dashboard-card, .workflow-card, .government-content-card, .government-side-card, .government-stat-card, .metric-card, .brgy-work-card, .brgy-quick-links, .community-analytics, .population-chart, .population-report-section, .profile-section, .profile-account-card, .municipal-directory-card, .decision-card, .gis-map-card, .gis-household-list, .gis-legend, .gis-physical-profile) {
+            background: #fff !important;
+            border: 1px solid var(--to-line) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 4px 16px #173b5305 !important;
+        }
+        .professional-content #main-content :is(.dashboard-card-header, .workflow-head, .government-card-header, .profile-section-heading, .brgy-work-card > header) {
+            border-color: #e6edf2 !important;
+        }
+        .professional-content #main-content :is(.dashboard-card-header, .workflow-head, .government-card-header, .dashboard-section-heading, .brgy-work-card > header) h2 {
+            font-size: 17px !important;
+            font-weight: 650 !important;
+            letter-spacing: -.02em !important;
+        }
+        .professional-content #main-content :is(.metric-card, .population-metric, .government-stat-card) {
+            border-top: 3px solid #438ab2 !important;
+            padding: 18px !important;
+            min-height: 112px !important;
+            border-radius: 14px !important;
+        }
+        .professional-content #main-content :is(.metric-success, .population-metric:nth-child(2)) { border-top-color: #27967f !important; }
+        .professional-content #main-content :is(.metric-warning, .population-metric:nth-child(3)) { border-top-color: #d2ac65 !important; }
+        .professional-content #main-content :is(.metric-neutral, .population-metric:nth-child(4)) { border-top-color: #8a80ba !important; }
+        .professional-content #main-content :is(.metric-icon, .brgy-tool-icon, .workspace-launcher-icon, .context-icon, .content-panel-heading > span) {
+            background: #e7f3f4 !important;
+            color: #1a747b !important;
+            border-radius: 12px !important;
+        }
+        .professional-content #main-content .metric-success .metric-icon { background: #e5f5ed !important; color: #237858 !important; }
+        .professional-content #main-content .metric-warning .metric-icon { background: #fff3db !important; color: #91681e !important; }
+        .professional-content #main-content .metric-card strong { font-size: 30px !important; font-weight: 700 !important; letter-spacing: -.04em !important; }
+        .professional-content #main-content :is(.workspace-launcher, .municipal-shortcuts) > a,
+        .professional-content #main-content .brgy-quick-links > a {
+            border: 1px solid var(--to-line) !important;
+            border-radius: 12px !important;
+            background: #fff !important;
+            box-shadow: 0 3px 12px #173b5304 !important;
+            transition: border-color 160ms ease, box-shadow 160ms ease !important;
+        }
+        .professional-content #main-content :is(.workspace-launcher, .municipal-shortcuts) > a:hover,
+        .professional-content #main-content .brgy-quick-links > a:hover {
+            background: #f0faf8 !important;
+            border-color: #8fc7bd !important;
+            box-shadow: 0 5px 16px #206b6a0b !important;
+        }
+        .professional-content #main-content .workspace-page-overview .brgy-quick-links {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            gap: 8px !important;
+        }
+        .professional-content #main-content .brgy-quick-links > a { padding: 9px 10px !important; min-height: 46px !important; }
+        .professional-content #main-content :is(.dashboard-context-card, .overview-context-date, .municipal-hero-context) {
+            background: #f0f7f8 !important;
+            border: 1px solid #d9e9ec !important;
+            border-radius: 12px !important;
+        }
+
+        /* Only application controls and data grids: official paper and maps retain
+           their own styling. No dimensions are applied to drawing canvases. */
+        .professional-content #main-content :is(.button, button[type="submit"], .municipal-hero-actions a):not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *)),
+        .professional-public :is(.button, button[type="submit"], .public-register-link, .public-login-link) {
+            background: #166d75 !important;
+            color: #fff !important;
+            border: 1px solid #166d75 !important;
+            border-radius: 9px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 4px #145a6212 !important;
+            transition: background-color 160ms ease, box-shadow 160ms ease !important;
+        }
+        .professional-content #main-content :is(.button, button[type="submit"], .municipal-hero-actions a):hover:not(:disabled):not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *)),
+        .professional-public :is(.button, button[type="submit"], .public-register-link, .public-login-link):hover { background: #10575f !important; }
+        .professional-content #main-content :is(.button.secondary-button, .button.outline-button, .profile-back-link, .municipal-hero-actions a:not(:first-child)),
+        .professional-public .button.secondary-button {
+            background: #fff !important;
+            color: #226570 !important;
+            border-color: #c1d8dc !important;
+            box-shadow: none !important;
+        }
+        .professional-content #main-content :is(.button.secondary-button, .button.outline-button):hover { background: #eaf6f3 !important; color: #226570 !important; }
+        .professional-content #main-content :is(button,a).danger-button { color: #a12b35 !important; background: #fff7f7 !important; border-color: #e5b8be !important; }
+        .professional-content #main-content :is(button,a).danger-button:hover:not(:disabled) { color: #a12b35 !important; background: #ffe7e9 !important; }
+        .professional-content #main-content :is(input,select,textarea):not(:where([type="checkbox"], [type="radio"], [type="hidden"], [type="file"], [type="range"], [type="color"], .leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .population-monitoring-paper *)),
+        .professional-public :is(input,select,textarea):not(:where([type="checkbox"], [type="radio"], [type="hidden"], [type="file"], [type="range"], [type="color"])) {
+            background-color: #fbfdff !important;
+            border: 1px solid #cbdbe5 !important;
+            border-radius: 9px !important;
+            color: #25445a !important;
+            box-shadow: inset 0 1px 2px #173b5303 !important;
+            font-size: 14px !important;
+            min-height: 42px !important;
+            padding: 10px 12px !important;
+        }
+        .professional-content #main-content :is(input,textarea):read-only { background-color: #f0f5f8 !important; }
+        :is(.professional-content, .professional-public) #main-content .portal-password-control input { padding-right: 104px !important; }
+        .professional-content #main-content :is(input,select,textarea):disabled { background-color: #edf2f6 !important; color: #61798a !important; }
+        .professional-content #main-content :is(input,select,textarea)[aria-invalid="true"],
+        .professional-public :is(input,select,textarea)[aria-invalid="true"] { border-color: #bd4d60 !important; }
+        :is(.professional-shell, .professional-public) :is(a,button,input,select,textarea,summary):focus-visible:not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *)) { outline: 3px solid #27888a !important; outline-offset: 3px !important; }
+        .professional-content #main-content :is(.clean-table, .compact-data-table, .registry-table):not(:where(.rbi-source-table, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *)) th {
+            background: #edf4f8 !important;
+            color: #35566b !important;
+            padding-block: 12px !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: .035em !important;
+        }
+        .professional-content #main-content :is(.clean-table, .compact-data-table, .registry-table):not(:where(.rbi-source-table, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *)) tbody tr:hover { background: #eff9f6 !important; }
+        .professional-content #main-content :is(.table-wrap, .clean-table-wrap):not(:where(.rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *)) { border-radius: 11px !important; border-color: var(--to-line) !important; }
+        .professional-content #main-content :is(.migration-section-nav, .resident-section-nav, .registry-section-nav) a[aria-current="page"] {
+            background: #e1f2ee !important;
+            color: #145f62 !important;
+            border-color: #a9d4c9 !important;
+        }
+
+        /* Public entry points use the same identity as the signed-in workspace. */
+        .professional-public .public-site-header { box-shadow: 0 4px 20px #173b5306 !important; }
+        .professional-public :is(.portal-login-layout, .auth-panel, .registration-card) { border-radius: 18px !important; border-color: var(--to-line) !important; box-shadow: 0 12px 42px #173b530c !important; }
+        .professional-public .portal-login-intro {
+            background: radial-gradient(circle at 10% 0, #388f9066, transparent 65%), linear-gradient(155deg, #173b53, #10464c) !important;
+            border-top-color: var(--to-accent) !important;
+        }
+        .professional-public .portal-login-form { box-shadow: none !important; }
+        .professional-public .portal-login-features span { border-color: #ffffff30 !important; background: #ffffff0a !important; border-radius: 8px !important; }
+        .professional-public #home-landing .landing-hero { background: radial-gradient(ellipse at 85% 0, #338a8760, transparent 60%), linear-gradient(120deg, #15394f, #17545c) !important; }
+        .professional-public #home-landing .landing-service-card { border-radius: 16px !important; box-shadow: 0 5px 20px #173b5308 !important; }
+        .professional-public .public-nav a[aria-current="page"]:not(.public-login-link) { color: #166d75 !important; background: #e8f5f3 !important; border-radius: 8px !important; }
+        .professional-shell .assistant-launcher { background: #166d75 !important; border-color: #166d75 !important; border-radius: 14px !important; box-shadow: 0 5px 22px #12344924 !important; }
+
+        /* Monthly RBI workspace chrome; the official document stays independent. */
+        .professional-shell .rbi-workspace-overview .rbi-report-header {
+            background: linear-gradient(110deg, #fff 55%, #edf8f6) !important;
+            border: 1px solid var(--to-line) !important;
+            border-left: 4px solid #27888a !important;
+            border-radius: 16px !important;
+        }
+        .professional-shell .rbi-subpages a[aria-current="page"] { background: #166d75 !important; color: #fff !important; border-color: #166d75 !important; }
+        .professional-shell .rbi-section-nav a { border-radius: 9px !important; }
+        .professional-shell .rbi-workspace-overview .rbi-report-metric { border-radius: 14px !important; }
+
+        @media (max-width: 760px) {
+            .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) { padding: 17px 16px !important; border-radius: 12px !important; gap: 12px !important; }
+            .professional-content #main-content .workspace-heading { gap: 11px !important; }
+            .professional-content #main-content .workspace-heading-emblem { flex-basis: 40px !important; width: 40px !important; height: 40px !important; border-radius: 11px !important; }
+            .professional-content #main-content :is(.metric-card, .population-metric, .government-stat-card) { padding: 14px !important; min-height: 100px !important; }
+            .professional-content #main-content :is(.dashboard-page, .barangay-dashboard, .registry-workspace) { gap: 16px !important; }
+        }
+        @media (min-width: 961px) {
+            .professional-shell.sidebar-collapsed #app-sidebar .side-section { font-size: 0 !important; }
+            .professional-shell.sidebar-collapsed #app-sidebar .side-nav > a { padding: 9px !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .professional-shell #app-sidebar .side-nav > a,
+            .professional-content #main-content :is(.button, button[type="submit"], .workspace-launcher > a, .municipal-shortcuts > a, .brgy-quick-links > a),
+            .professional-public :is(.button, button[type="submit"], .public-register-link, .public-login-link) { transition: none !important; }
+        }
+    }
+}

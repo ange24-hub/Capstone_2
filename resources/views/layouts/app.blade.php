@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
-    <style>@layer print-overrides, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
+    <style>@layer print-overrides, system-ui, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">
     @if(request()->routeIs('barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">
@@ -32,6 +32,7 @@
         <link rel="stylesheet" href="{{ asset('css/assistant.css') }}?v={{ filemtime(public_path('css/assistant.css')) }}" media="screen">
     @endif
     @stack('head')
+    <link rel="stylesheet" href="{{ asset('css/system-ui.css') }}?v={{ filemtime(public_path('css/system-ui.css')) }}" media="screen">
 </head>
 <body @if(!$usesPublicLayout) class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'municipal.prediction-forecast', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endif>
     <a class="skip-link" href="#main-content">Skip to main content</a>

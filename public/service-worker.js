@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sbispgm-v5';
+const CACHE_NAME = 'sbispgm-v6';
 
 const OFFLINE_FILES = [
     '/offline-household',

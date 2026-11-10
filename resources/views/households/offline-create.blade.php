@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#293e55">
+    <meta name="theme-color" content="#123449">
     <title>Household survey | RBIM</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; background: #f4f6f8; color: #172b45; font: 16px/1.5 system-ui, sans-serif; }
+        body { margin: 0; background: #f2f6fa; color: #19384e; font: 15px/1.5 system-ui, sans-serif; }
         .container { width: min(100% - 32px, 720px); margin: 32px auto; }
-        .survey-header { margin-bottom: 24px; }
-        .back-link { color: #2457a7; text-underline-offset: 3px; }
+        .survey-header { margin-bottom: 20px; padding: 22px; background: linear-gradient(110deg, #fff, #edf8f6); border: 1px solid #dce6ee; border-left: 4px solid #27888a; border-radius: 16px; }
+        .back-link { color: #166d75; text-underline-offset: 3px; }
         h1 { margin: 16px 0 4px; font-size: clamp(24px, 5vw, 28px); line-height: 1.2; }
         h2 { margin: 0; font-size: 19px; }
         p { margin: 8px 0 16px; }
         .survey-header p, .field-help { color: #5c6d82; }
-        .card { margin-bottom: 16px; padding: 24px; background: #fff; border: 1px solid #dce3ed; border-radius: 8px; }
+        .card { margin-bottom: 16px; padding: 24px; background: #fff; border: 1px solid #dce6ee; border-radius: 14px; box-shadow: 0 4px 16px #173b5305; }
         .step-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .step-number { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px; border-radius: 6px; background: #edf1f4; color: #2457a7; font-weight: 700; }
+        .step-number { display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 11px; background: #e1f2ef; color: #166d75; font-weight: 700; }
         label { display: block; margin: 16px 0 6px; font-weight: 600; }
         input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9bac7; border-radius: 6px; background: #fff; color: inherit; font: inherit; }
         input[readonly] { background: #f8fafc; color: #5c6d82; }
         button { min-height: 44px; margin-top: 12px; padding: 10px 16px; border: 1px solid #afbec9; border-radius: 6px; color: #172b45; background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
         button:hover { background: #f8fafc; }
         button:disabled { opacity: .6; cursor: wait; }
-        .primary-button { border-color: #2457a7; background: #2457a7; color: white; }
-        .primary-button:hover { background: #194587; }
+        .primary-button { border-color: #166d75; background: #166d75; color: white; border-radius: 9px; }
+        .primary-button:hover { background: #10575f; }
         .save-button { width: 100%; margin-top: 20px; }
         .field-help { display: block; margin-top: 6px; font-size: 14px; }
         #registryStatus { margin-bottom: 0; font-size: 14px; color: #5c6d82; }

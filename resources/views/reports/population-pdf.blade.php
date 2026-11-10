@@ -58,7 +58,7 @@ footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt sol
     .monitoring-signatures td { font-size: 9pt; padding: 0 12pt; }
     .monitoring-signature-space { height: 12pt; }
     .monitoring-signatures .monitoring-signed-space { height: 24pt; }
-    .monitoring-signed-space img { height: 22pt; max-width: 140pt; }
+    .monitoring-signed-space img { display: block; width: 110pt; height: 22pt; max-width: 100%; margin: 0 auto; }
     .monitoring-signatures em { font-size: 7pt; }
     .monitoring-date { margin: 8pt 0 5pt; }
     .monitoring-footnote { font-size: 6.5pt; line-height: 8pt; }
