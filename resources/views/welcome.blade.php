@@ -12,7 +12,6 @@
         <div class="landing-hero-decoration" aria-hidden="true"></div>
         <div class="home-ambient home-ambient-teal" aria-hidden="true"></div>
         <div class="home-ambient home-ambient-gold" aria-hidden="true"></div>
-        <button class="home-motion-toggle" type="button" data-home-motion-toggle aria-pressed="false" hidden><span data-motion-label>Pause motion</span><span data-motion-symbol aria-hidden="true">Ⅱ</span></button>
         <div class="landing-container landing-hero-grid">
             <div class="landing-copy">
                 <p class="landing-eyebrow"><span aria-hidden="true"></span> Official Digital Services Portal</p>
@@ -35,7 +34,9 @@
             <aside class="landing-community" aria-label="Tomas Oppus resident services">
                 <div class="landing-illustration">
                     <div class="landing-illustration-caption"><span class="landing-small-label">Built around our community</span><h2>Local services.<br>A little closer.</h2></div>
-                    <img src="{{ asset('images/civic-services-sticker.png') }}" alt="" width="1536" height="1024" decoding="async" fetchpriority="high">
+                    <span class="seal-crop landing-community-seal">
+                        <img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal" width="900" height="600" decoding="async" fetchpriority="high">
+                    </span>
                 </div>
                 <ul class="landing-service-highlights" aria-label="Resident services">
                     <li><x-app-icon name="document" /><span>Documents</span></li>

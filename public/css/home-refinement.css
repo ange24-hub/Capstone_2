@@ -49,7 +49,6 @@
     #home-landing .landing-bottom .landing-bottom-icon { color: #edcf8d !important; background: #ffffff0c !important; border: 1px solid #ffffff20 !important; }
     #home-landing .landing-bottom .landing-button { background: #fff !important; color: #173b53 !important; border-color: #fff !important; }
     #home-landing .landing-bottom .landing-button:hover { background: #eaf6f3 !important; border-color: #eaf6f3 !important; }
-    #home-landing .home-motion-toggle { min-height: 36px !important; font-size: 12px !important; color: #fff !important; background: #173b53b3 !important; }
     body:has(#home-landing) .public-nav a { font-size: 15px !important; font-weight: 600 !important; }
     body:has(#home-landing) .public-footer :is(span,small,p) { font-size: 13px !important; line-height: 1.7 !important; }
     @media (max-width: 1050px) {

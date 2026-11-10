@@ -14,9 +14,7 @@
     if (anchor) requestAnimationFrame(() => anchor.scrollIntoView({ behavior: 'instant' }));
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const toggle = home.querySelector('[data-home-motion-toggle]');
     const hero = home.querySelector('.landing-hero');
-    let userPaused = false;
     let heroVisible = true;
     let revealObserver;
     let heroObserver;
@@ -28,18 +26,12 @@
     const updateMotion = () => {
         const enabled = !reducedMotion.matches;
         home.classList.toggle('home-motion-enabled', enabled);
-        home.dataset.motionState = !enabled || userPaused || !heroVisible || document.hidden ? 'paused' : 'running';
-        home.dataset.motionPaused = String(!enabled || userPaused);
-        if (toggle) {
-            toggle.hidden = !enabled;
-            toggle.setAttribute('aria-pressed', String(userPaused));
-            toggle.querySelector('[data-motion-label]').textContent = userPaused ? 'Resume motion' : 'Pause motion';
-            toggle.querySelector('[data-motion-symbol]').textContent = userPaused ? '▷' : 'Ⅱ';
-        }
+        home.dataset.motionState = !enabled || !heroVisible || document.hidden ? 'paused' : 'running';
+        home.dataset.motionPaused = String(!enabled);
     };
     const startReveals = () => {
         revealObserver?.disconnect();
-        if (reducedMotion.matches || userPaused || !('IntersectionObserver' in window)) {
+        if (reducedMotion.matches || !('IntersectionObserver' in window)) {
             showAll();
             return;
         }
@@ -69,11 +61,6 @@
     home.addEventListener('focusin', event => {
         const target = event.target.closest('[data-home-reveal]');
         if (target) { target.dataset.homeReveal = 'visible'; revealObserver?.unobserve(target); }
-    });
-    toggle?.addEventListener('click', () => {
-        userPaused = !userPaused;
-        if (userPaused) showAll();
-        updateMotion();
     });
     document.addEventListener('visibilitychange', updateMotion);
     const onPreferenceChange = () => { updateMotion(); startReveals(); };
