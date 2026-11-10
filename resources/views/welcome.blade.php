@@ -2,12 +2,16 @@
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/home-landing.css') }}?v={{ filemtime(public_path('css/home-landing.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/home-motion.css') }}?v={{ filemtime(public_path('css/home-motion.css')) }}" media="screen">
 @endpush
 
 @section('content')
 <div id="home-landing" class="civic-home">
     <section class="landing-hero" aria-labelledby="home-title">
         <div class="landing-hero-decoration" aria-hidden="true"></div>
+        <div class="home-ambient home-ambient-teal" aria-hidden="true"></div>
+        <div class="home-ambient home-ambient-gold" aria-hidden="true"></div>
+        <button class="home-motion-toggle" type="button" data-home-motion-toggle aria-pressed="false" hidden><span data-motion-label>Pause motion</span><span data-motion-symbol aria-hidden="true">Ⅱ</span></button>
         <div class="landing-container landing-hero-grid">
             <div class="landing-copy">
                 <p class="landing-eyebrow"><span aria-hidden="true"></span> Official Digital Services Portal</p>

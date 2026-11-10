@@ -11,17 +11,14 @@
             <div class="statistical-result-main"><span class="statistical-result-label">Projected {{ $populationProjection['target'] }}</span>
                 <div><strong class="statistical-estimate">{{ number_format($populationProjection['estimate'], 0) }}</strong><span class="statistical-unit">inhabitants</span></div>
             </div>
-            <dl class="forecast-result-context">
-                <div><dt>Latest source report</dt><dd>{{ $populationProjection['data_through'] }}</dd></div>
-                <div><dt>Method</dt><dd>Weighted Moving Average</dd></div>
-            </dl>
         </div>
         @if(count($populationProjection['steps']) > 1)
-            <p class="statistical-explain">{{ count($populationProjection['steps']) - 1 }} gap periods use estimates.</p>
+            @php($gapPeriods = count($populationProjection['steps']) - 1)
+            <p class="statistical-explain">{{ $gapPeriods }} {{ $gapPeriods === 1 ? 'gap period uses an estimate.' : 'gap periods use estimates.' }}</p>
         @endif
     @else
         <div class="forecast-unavailable">
-            <span class="forecast-empty-icon"><x-app-icon name="directory" /></span>
+            <span class="forecast-empty-art" aria-hidden="true"><span></span><span></span><span class="forecast-empty-icon"><x-app-icon name="directory" /></span><i><x-app-icon name="clock" /></i></span>
             <div><h3>Estimate not available</h3><p>{{ $populationProjection['reason'] }}</p></div>
         </div>
     @endif
@@ -75,5 +72,4 @@
         <p><b>Accuracy / MAPE:</b> wala pa ma-validate. Kinahanglan una ma-save ang forecast sa dili pa ang target semester, dayon i-compare sa verified actual report. Kini nga preview dili accuracy result.</p>
         <p>Ang method mosunod sa past totals; dili niya mahibal-an ang kalit nga births, deaths, o migration.</p>
     </details>
-    <footer class="forecast-card-footer"><a class="statistical-text-link" href="{{ route('reports.population.submissions.index', ['barangay_id'=>$barangay->id]) }}"><x-app-icon name="clock" />Population report history<x-app-icon name="arrow-right" /></a></footer>
 </section>

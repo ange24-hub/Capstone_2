@@ -19,6 +19,7 @@
             <div class="forecast-heading">
                 <span class="forecast-heading-icon"><x-app-icon :name="$forecastPage === 'population' ? 'users' : 'trend'" /></span>
                 <div>
+                    <span class="forecast-heading-kicker">Population &amp; movement</span>
                     <h1>{{ $forecastPage === 'population' ? 'Provisional Population Estimate' : 'Migration forecast' }}</h1>
                     <p class="forecast-location"><x-app-icon name="location" /> Barangay {{ $barangay->name }} <span class="forecast-scope-tag">{{ $forecastPage === 'population' ? 'Planning estimate' : 'Native PHP estimates' }}</span></p>
                 </div>
@@ -42,7 +43,20 @@
     @if(session('status'))<p class="statistical-notice" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="statistical-errors" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     @if($forecastPage === 'population')
+    <div class="forecast-population-layout">
         @include('barangay.dashboard._population-projection')
+        <aside class="forecast-basis" aria-labelledby="forecast-basis-title">
+            <div class="forecast-basis-heading"><span class="forecast-basis-icon"><x-app-icon name="document" /></span><h2 id="forecast-basis-title">Report basis</h2></div>
+            <div class="forecast-target"><span>Target semester</span><strong>{{ $populationProjection['target'] }}</strong><x-app-icon name="calendar" /></div>
+            <dl class="forecast-basis-facts">
+                <div><dt>Completed source reports</dt><dd>{{ count($populationProjection['history']) }}</dd></div>
+                <div><dt>Latest source</dt><dd>{{ $populationProjection['data_through'] ?? 'Not available' }}</dd></div>
+                <div><dt>Method</dt><dd>Weighted Moving Average</dd></div>
+            </dl>
+            <p class="forecast-basis-note">Requires 3 consecutive completed semesters.</p>
+            <a href="{{ route('reports.population.submissions.index', ['barangay_id'=>$barangay->id]) }}">Open report history<x-app-icon name="arrow-right" /></a>
+        </aside>
+    </div>
     @else
         @include('barangay.dashboard._migration-prediction')
     @endif
