@@ -14,19 +14,7 @@
         <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <x-workspace-heading icon="users"><div class="page-kicker text-xs font-semibold uppercase tracking-widest text-blue-700">{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'Monthly Reporting' : (request()->routeIs('barangay.registry.deceased') ? 'Historical Records' : (request()->routeIs('barangay.registry.active') ? 'Community Records' : (request('source') ?: 'Central Registry'))) }}</div>
                 <h1>{{ request()->routeIs('barangay.registry.new-inhabitants') ? 'New Inhabitants' : (request()->routeIs('barangay.registry.deceased') ? 'Deceased Records' : (request()->routeIs('barangay.registry.active') ? ($isBiasong ? 'Resident Registry' : 'Consolidated / All Registered') : ($registryBarangay ? 'Barangay '.$registryBarangay->name.' RBI Data' : 'Multi-Barangay Registry'))) }}</h1>
-                <p>
-                    @if (request()->routeIs('barangay.registry.new-inhabitants'))
-                        Create and manage monthly family reports for Barangay {{ $registryBarangay->name }}.
-                    @elseif (request()->routeIs('barangay.registry.deceased'))
-                        Maintain the official deceased resident records for Barangay {{ $registryBarangay->name }}.
-                    @elseif (request()->routeIs('barangay.registry.active'))
-                        @if($isBiasong) Maintain the resident registry for Barangay Biasong. @else All registered residents of Barangay {{ $registryBarangay->name }}, including those living elsewhere. Moved-out residents remain registered here. Transferred and deceased records are separate. @endif
-                    @elseif (request('source'))
-                        Editable records imported from {{ request('source') }}. The information is separated per person and household.
-                    @else
-                        {{ auth()->user()->name }} is signed in as {{ auth()->user()->roleLabel() }}.
-                    @endif
-                </p>
+                @if($registryBarangay)<p>Barangay {{ $registryBarangay->name }}</p>@endif
             </x-workspace-heading>
         </div>
 
@@ -41,7 +29,6 @@
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'unconfirmed']) }}">Residence Needs Confirmation</a>
                 <a class="button secondary-button" href="{{ route('barangay.registry.download', ['scope' => 'consolidated']) }}">Download Consolidated Excel</a>
             </div>
-            <p class="registry-residence-note">Living elsewhere rows are shaded in muted gold.</p>
         @endif
 
         @if(request()->routeIs('barangay.registry.active'))
@@ -73,7 +60,7 @@
             <div class="workflow-head registry-records-heading flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <h2 class="section-title text-lg font-semibold text-slate-900">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
-                    <p>@if ($editThroughRbi) {{ number_format($inhabitants->total()) }} records found. Edit resident details or person / household movement in Resident Registry. Saved changes appear here automatically. @elseif ($usesFamilyNewInhabitants && request('sheet') === 'new-inhabitants') Add each family, then click <strong>Save Monthly Report</strong> to consolidate them for the selected month. @else {{ match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => number_format($inhabitants->total()) } }} records found. Edit a cell, then confirm the change to save it. @endif</p>
+                    <p>{{ number_format(match(request('sheet')) { 'deceased' => $deceasedRecords->count(), 'new-inhabitants' => $newInhabitantRecords->count(), default => $inhabitants->total() }) }} records</p>
                     @if (request('source') && ! $isDedicatedRegistryPage)
                         <div class="rbi-sheet-tabs">
                             <a class="button {{ request('sheet') !== 'deceased' ? '' : 'secondary-button' }}" href="{{ route('registry.index', ['source' => request('source')]) }}">Active Household</a>

@@ -17,11 +17,8 @@
         ];
     } elseif ($user->hasRole(App\Models\User::ROLE_BARANGAY)) {
         $recordLinks = [
-            ['barangay.registry.active', 'barangay.registry.active', 'users', 'Resident registry'],
+            ['barangay.registry.active', ['barangay.registry.active', 'barangay.residence.*'], 'users', 'Resident registry'],
         ];
-        if ($user->barangay?->usesResidenceRegistry()) {
-            $recordLinks[] = ['barangay.residence.index', 'barangay.residence.*', 'home', 'Living in barangay'];
-        }
         $recordLinks[] = ['barangay.registry.moved-out', 'barangay.registry.moved-out*', 'trend', 'Moved out'];
         $recordLinks[] = ['barangay.registry.deceased', 'barangay.registry.deceased', 'document', 'Deceased records'];
         $navigationGroups = [

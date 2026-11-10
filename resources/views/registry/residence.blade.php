@@ -10,7 +10,7 @@
 @section('content')
 <section class="panel registry-workspace registry-color-workspace residence-list rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6 grid gap-6">
     <div class="page-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
-            <x-workspace-heading icon="home" label="Resident registry"><h1>{{ App\Models\Inhabitant::residenceLabels()[$scope] }}</h1><p>Barangay {{ $barangay->name }} — current residence of registered residents.</p></x-workspace-heading>
+            <x-workspace-heading icon="home" label="Resident registry"><h1>{{ App\Models\Inhabitant::residenceLabels()[$scope] }}</h1><p>Barangay {{ $barangay->name }}</p></x-workspace-heading>
         <div class="toolbar flex flex-wrap items-center gap-3">
             @php($reportScope = $scope === App\Models\Inhabitant::RESIDENCE_HERE ? 'registered' : $scope)
             <a class="button secondary-button" href="{{ route('barangay.registry.print', ['scope' => $reportScope]) }}" target="_blank" rel="noopener">Print this list</a>
@@ -25,7 +25,6 @@
             <a class="button {{ $scope === $value ? '' : 'secondary-button' }}" href="{{ route('barangay.residence.index', ['scope'=>$value]) }}">{{ $label }} ({{ number_format($counts[$value] ?? 0) }})</a>
         @endforeach
     </div>
-    <p>Green means registered here but living elsewhere. Only residents marked “Living in barangay” appear in the local-residents file. Moved-out residents remain in Consolidated; transferred and deceased records are excluded. Update movement only in Resident Registry.</p>
     <form class="toolbar flex flex-wrap items-end gap-3" method="GET"><input type="hidden" name="scope" value="{{ $scope }}"><input name="search" value="{{ request('search') }}" placeholder="Search resident name"><button type="submit">Search</button></form>
     <div class="table-wrap registry-document-table registry-document-list w-full overflow-x-auto rounded-xl border border-slate-200"><table><thead><tr><th>Name</th><th>Household</th><th>Current residence</th><th>Remarks</th><th>Action</th></tr></thead><tbody>
     @forelse($residents as $resident)
