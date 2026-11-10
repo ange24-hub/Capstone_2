@@ -66,6 +66,14 @@ footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt sol
     .monitoring-grid th, .monitoring-grid td { padding: .5pt 4pt; line-height: 8.8pt; }
     .monitoring-title { margin-bottom: 7pt; }
     @endif
+    @if($report['historical'] ?? false)
+    .monitoring-title { margin-bottom: 7pt; }
+    .monitoring-meta { margin-bottom: 6pt; }
+    .monitoring-grid th, .monitoring-grid td { padding: .5pt 4pt; line-height: 8.5pt; }
+    .monitoring-signature-space { height: 8pt; }
+    .monitoring-date { margin: 6pt 0 4pt; }
+    .monitoring-footnote { font-size: 6.3pt; line-height: 7.4pt; }
+    @endif
 @endif
 </style></head><body>
 @unless(($selectedSection ?? 'summary') === 'summary')

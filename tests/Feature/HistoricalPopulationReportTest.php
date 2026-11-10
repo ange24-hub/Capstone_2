@@ -29,23 +29,27 @@ class HistoricalPopulationReportTest extends TestCase
         $this->assertSame(429, $saved->snapshot['age_total_sum']);
         $user = User::factory()->create(['role'=>User::ROLE_BARANGAY, 'barangay_id'=>$area->id]);
         $this->actingAs($user)->get(route('reports.population.submissions.index'))->assertOk()->assertSee('Archived historical report');
-        // New reports always use current Consolidated data. Historical paper
-        // originals remain independently accessible and immutable in History.
-        $current = $this->get(route('reports.population', ['report_year'=>2024,'semester'=>1]))->assertOk();
-        $this->assertSame(0, $current->viewData('report')['totalRecords']);
-        $this->get(route('reports.population.pdf', ['report_year'=>2024,'semester'=>1]))
-            ->assertOk()->assertHeader('Content-Type', 'application/pdf');
-        $this->get(route('reports.population.excel', ['report_year'=>2024,'semester'=>1]))
-            ->assertOk()->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->get(route('reports.population',['report_year'=>2024,'semester'=>2]))->assertOk();
+        foreach (['reports.population'=>'show','reports.population.pdf'=>'pdf','reports.population.excel'=>'excel'] as $route=>$action) {
+            $this->get(route($route,['report_year'=>2024,'semester'=>1]))
+                ->assertRedirect(route('reports.population.submissions.'.$action,$saved));
+        }
+        $this->get(route('reports.population',['report_year'=>2024,'semester'=>2]))
+            ->assertRedirect(route('reports.population.submissions.show',$saved))->assertSessionHas('population_period_notice');
         $this->get(route('reports.population.submissions.show', $saved))->assertOk()->assertSee('Needs reconciliation')->assertSee('459')->assertSee('429');
         $this->get(route('reports.population.submissions.source', $saved))->assertOk()->assertHeader('Content-Type', 'image/jpeg');
         $this->get(route('reports.population.submissions.source', ['submission'=>$saved->id, 'download'=>1]))
             ->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="'.$saved->reference.'-original.jpg"');
-        $this->get(route('reports.population.submissions.excel', $saved))->assertNotFound();
+        $this->get(route('reports.population.submissions.excel', $saved))->assertOk()
+            ->assertHeader('Content-Type','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->get(route('reports.population.submissions.pdf', $saved))->assertOk()->assertHeader('Content-Type','application/pdf');
+        $this->get(route('reports.population.submissions.show',$saved))->assertOk()
+            ->assertSee('Document preview')->assertSee('HISTORICAL TRANSCRIPTION')
+            ->assertDontSee('<img src="'.route('reports.population.submissions.source',$saved).'"',false);
         $other = User::factory()->create(['role'=>User::ROLE_BARANGAY, 'barangay_id'=>Barangay::where('name','Looc')->firstOrFail()->id]);
         $this->actingAs($other)->get(route('reports.population.submissions.source', $saved))->assertForbidden();
         $this->get(route('reports.population.submissions.show', $saved))->assertForbidden();
+        $this->get(route('reports.population.submissions.pdf', $saved))->assertForbidden();
+        $this->get(route('reports.population.submissions.excel', $saved))->assertForbidden();
         $admin = User::factory()->create(['role'=>User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($admin)->get(route('reports.population.submissions.show', $saved))->assertOk();
         Storage::disk('local')->put('private/population-reports/'.$saved->snapshot['source_sha256'].'.jpg', 'corrupt');

@@ -22,7 +22,7 @@ class PopulationMonitoringReportTest extends TestCase
                 'birth_date'=>$age===null?null:now()->copy()->subYears($age)->toDateString()]);
         }
         $response=$this->actingAs(User::factory()->create(['role'=>'municipal_lgu']))
-            ->get(route('reports.population',['barangay_id'=>$area->id]))->assertOk()
+            ->get(route('reports.population',['barangay_id'=>$area->id,'report_year'=>2027,'semester'=>1]))->assertOk()
             ->assertSee('RBI FORM C (Revised 2024)')->assertSee('MONITORING REPORT')->assertSee('Population by Age Bracket:');
         $report=$response->viewData('report');$rows=collect($report['monitoring']['ages'])->keyBy('label');
         $this->assertSame(1,$rows['Under 5 years old']['total']);
@@ -51,7 +51,7 @@ class PopulationMonitoringReportTest extends TestCase
             'household_id'=>$home->id,'first_name'=>'Fixture','last_name'=>(string)$i,'sex'=>'Female',
             'birth_date'=>$birth,'remarks'=>$remarks,'occupation'=>$occupation,'civil_status'=>$civil,'birth_place'=>'Philippines']);
         $this->travelTo(Carbon::parse('2026-05-28'));
-        $report=$this->actingAs(User::factory()->create(['role'=>'municipal_lgu']))->get(route('reports.population',['barangay_id'=>$area->id]))->assertOk()->viewData('report');
+        $report=$this->actingAs(User::factory()->create(['role'=>'municipal_lgu']))->get(route('reports.population',['barangay_id'=>$area->id,'report_year'=>2027,'semester'=>1]))->assertOk()->viewData('report');
         $rows=collect($report['monitoring']['sectors'])->keyBy('label');
         foreach(['Person with Disabilities (PWDs)','Overseas Filipino Workers (OFWs)','Solo Parents','Indigenous Peoples (IPs)',
             'Unemployed','Out of School Children (OSC) (6-14 years old)','Out of School Youth (OSY) (15-24 years old)'] as $label) $this->assertSame(1,$rows[$label]['total'],$label);
@@ -65,16 +65,16 @@ class PopulationMonitoringReportTest extends TestCase
         $this->travelTo(Carbon::parse('2026-05-28'));
         $area=Barangay::where('name','Carnaga')->firstOrFail();$area->update(['secretary_name'=>'Configured Secretary','punong_barangay_name'=>'Configured Captain']);
         $user=User::factory()->create(['role'=>'barangay','barangay_id'=>$area->id]);
-        $parameters=['report_year'=>2024,'semester'=>2];
+        $parameters=['report_year'=>2027,'semester'=>2];
         $response=$this->actingAs($user)->get(route('reports.population',$parameters))->assertOk()
-            ->assertSee('2nd Semester of CY 2024')->assertSee('Configured Secretary')->assertSee('Configured Captain')
+            ->assertSee('2nd Semester of CY 2027')->assertSee('Configured Secretary')->assertSee('Configured Captain')
             ->assertSee('historical population is not reconstructed');
-        $this->assertSame(2024,$response->viewData('report')['monitoring']['year']);
+        $this->assertSame(2027,$response->viewData('report')['monitoring']['year']);
         $this->assertSame(2026,$response->viewData('report')['generatedAt']->year);
         $this->get(route('reports.population.pdf',$parameters))->assertOk()->assertHeader('content-type','application/pdf');
         $xlsx=$this->get(route('reports.population.excel',$parameters))->assertOk()->getContent();
         $path=tempnam(sys_get_temp_dir(),'form-c-test-');file_put_contents($path,$xlsx);$zip=new \ZipArchive;$zip->open($path);
-        try{$sheet=$zip->getFromName('xl/worksheets/sheet1.xml');$this->assertStringContainsString('2nd Semester of CY 2024',$sheet);
+        try{$sheet=$zip->getFromName('xl/worksheets/sheet1.xml');$this->assertStringContainsString('2nd Semester of CY 2027',$sheet);
             $this->assertStringContainsString('Population by Age Bracket:',$sheet);$this->assertStringContainsString('orientation="portrait"',$sheet);
             $this->assertStringContainsString('Not recorded',$sheet);
         }finally{$zip->close();unlink($path);}

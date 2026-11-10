@@ -16,10 +16,10 @@
                 <optgroup label="{{ $group }}">@foreach($keys as $key)<option value="{{ $key }}" @selected($selectedSection === $key)>{{ $key==='summary' ? 'Population Summary' : $sectionLabels[$key] }}</option>@endforeach</optgroup>
             @endforeach
         </select></div>
-        <div class="population-control population-control-year"><label for="report-year">Year</label><select id="report-year" name="report_year" required>@foreach(range(now()->year,1900) as $year)<option value="{{ $year }}" @selected($reportFilters['report_year']===$year)>{{ $year }}</option>@endforeach</select></div>
+        <div class="population-control population-control-year"><label for="report-year">Year</label><select id="report-year" name="report_year" required>@foreach(range(\App\Services\PopulationReportPeriod::maximumYear(),1900) as $year)<option value="{{ $year }}" @selected($reportFilters['report_year']===$year)>{{ $year }}</option>@endforeach</select></div>
         <div class="population-control"><label for="report-semester">Semester</label><select id="report-semester" name="semester"><option value="1" @selected($reportFilters['semester'] === 1)>1st Semester · Jan–Jun</option><option value="2" @selected($reportFilters['semester'] === 2)>2nd Semester · Jul–Dec</option></select></div>
         <button class="button" type="submit"><x-app-icon name="document" /><span data-report-generate-label>Generate report</span></button>
-        <p class="population-builder-control-hint" data-report-control-status role="status">Choose a year and semester. Your document updates automatically from Consolidated.</p>
+        <p class="population-builder-control-hint" data-report-control-status role="status">Through 1st Semester 2026: saved reports. Newer periods: latest Consolidated data.</p>
     </form>
     @if($selectedSection==='summary')
     <div class="population-builder-stats" aria-label="Consolidated report totals">

@@ -1,25 +1,34 @@
 @extends('layouts.app')
-@push('head')<link rel="stylesheet" href="{{ asset('css/population-submissions.css') }}?v={{ filemtime(public_path('css/population-submissions.css')) }}">@endpush
+@push('head')
+<link rel="stylesheet" href="{{ asset('css/population-spreadsheet.css') }}?v={{ filemtime(public_path('css/population-spreadsheet.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/population-submissions.css') }}?v={{ filemtime(public_path('css/population-submissions.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/population-workspace.css') }}?v={{ filemtime(public_path('css/population-workspace.css')) }}">
+<style>@include('reports._population-monitoring-styles')</style>
+@endpush
 @section('content')
-<section class="population-history">
-    <h1>{{ $submission->barangay_name }} Historical Population Report · {{ $submission->reference }}</h1>
-    <p>{{ $submission->semester === 1 ? '1st' : '2nd' }} Semester {{ $submission->report_year }} · Original photographed RBI Form C</p>
-    <p>Archived in this system on {{ $submission->submitted_at->format('M d, Y h:i A') }}. {{ $archive['date_note'] }}</p>
-    <div class="population-report-actions">
-        <a class="button secondary-button" href="{{ route('reports.population.submissions.index', ['barangay_id'=>$submission->barangay_id]) }}">Population Report History</a>
-        <a class="button" href="{{ route('reports.population.submissions.source', ['submission'=>$submission->id,'download'=>1]) }}">Download original photo</a>
-        <a class="button secondary-button" href="{{ route('reports.population.submissions.source', $submission) }}" target="_blank" rel="noopener">Open original photo</a>
+<section class="population-workspace population-report-builder population-report-monitoring population-archive-document">
+    <header class="population-page-heading population-builder-heading"><div><span class="population-builder-eyebrow">Saved historical report · {{ $submission->reference }}</span><h1><span class="population-sticker population-sticker-blue"><x-app-icon name="document" /></span>{{ $submission->barangay_name }} Population Summary</h1><p>{{ $submission->semester===1?'1st':'2nd' }} Semester {{ $submission->report_year }} · Original reporting period preserved</p></div><span class="population-history-badge"><x-app-icon name="clock" />Historical document</span></header>
+    @include('reports._population-pages')
+    @if(session('population_period_notice'))<p class="population-period-notice" role="status">{{ session('population_period_notice') }}</p>@endif
+    @include('reports._population-period-controls')
+    <div class="population-builder-stats" aria-label="Original reported totals">
+        @foreach([['users','Reported inhabitants',$archive['population']],['home','Households',$archive['households']],['directory','Families',$archive['families']]] as [$icon,$label,$value])<div><span class="population-builder-stat-icon"><x-app-icon :name="$icon" /></span><p><strong>{{ number_format($value) }}</strong><span>{{ $label }}</span></p></div>@endforeach
     </div>
-    <div class="population-history-table"><table><thead><tr><th>Reported inhabitants</th><th>Households</th><th>Families</th><th>Sum of age brackets</th></tr></thead><tbody><tr>
-        <td>{{ number_format($archive['population']) }}</td><td>{{ number_format($archive['households']) }}</td><td>{{ number_format($archive['families']) }}</td><td>{{ number_format($archive['age_total_sum']) }}</td>
-    </tr></tbody></table></div>
     @if($archive['age_total_sum'] !== $archive['population'])
-        <p role="note"><strong>Needs reconciliation:</strong> The reported population ({{ $archive['population'] }}) differs from the sum of the 17 age brackets ({{ $archive['age_total_sum'] }}). Both figures are preserved as read from the document; neither has been silently corrected.</p>
-    @else
-        <p>The 17 age-bracket totals add up to the reported population. This arithmetic check does not independently verify registry completeness.</p>
+        <p class="population-period-notice" role="note"><strong>Needs reconciliation:</strong> Reported population: {{ $archive['population'] }}. Sum of age brackets: {{ $archive['age_total_sum'] }}. Both original figures are preserved.</p>
     @endif
-    <p><strong>Analytics use:</strong> Historical population comparison only. This semestral report does not identify monthly arrivals or departures. Population changes can also reflect births, deaths and record corrections. It is excluded from monthly migration forecasting and MAPE evaluation.</p>
-    <p>The original photograph below preserves the age, sex and sector breakdowns, blank fields and signatures. Blank entries are not interpreted as zero. Current resident records are unchanged.</p>
-    <img src="{{ route('reports.population.submissions.source', $submission) }}" alt="Original {{ $submission->barangay_name }} population report, semester {{ $submission->semester }} of {{ $submission->report_year }}" style="display:block;width:100%;height:auto;margin-top:24px">
+    <div class="population-builder-document">
+        <div class="population-preview-bar"><div><span class="population-builder-document-label">Document preview</span><h2>Historical Population Summary</h2><p>{{ $submission->reference }} · {{ $submission->semester===1?'1st':'2nd' }} Semester {{ $submission->report_year }} · A4</p></div><div class="population-report-actions">
+            <a class="button secondary-button" href="{{ route('reports.population.submissions.show',['submission'=>$submission->id,'print'=>1]) }}" target="_blank" rel="noopener"><x-app-icon name="print" />Print Report</a>
+            <a class="button population-builder-pdf" href="{{ route('reports.population.submissions.pdf',$submission) }}"><x-app-icon name="download" />Download PDF</a>
+            <a class="button secondary-button" href="{{ route('reports.population.submissions.excel',$submission) }}"><x-app-icon name="download" />Download Excel</a>
+        </div></div>
+        <div class="population-builder-source"><x-app-icon name="shield" /><p><strong>Digitized original report · historical counts</strong><span>No current Consolidated values or current signatures are applied to this saved report.</span></p></div>
+        <p class="population-builder-mobile-hint">Swipe to view the full document, or download the A4 PDF.</p>
+        @include('reports.population-monitoring')
+    </div>
+    <details class="population-archive-source-details"><summary>Original source &amp; archive details</summary><p>Original photographed RBI Form C, retained unchanged. Archived on {{ $submission->submitted_at->format('M d, Y h:i A') }}. {{ $archive['date_note'] }}</p><p>Original signatures remain in the retained source. Blank source cells are not treated as zero. Historical population reports are excluded from monthly migration forecasting and MAPE evaluation.</p><div class="population-report-actions"><a class="button secondary-button" href="{{ route('reports.population.submissions.source',$submission) }}" target="_blank" rel="noopener">Open original source</a><a class="button secondary-button" href="{{ route('reports.population.submissions.source',['submission'=>$submission->id,'download'=>1]) }}">Download original photo</a></div></details>
 </section>
 @endsection
+@push('scripts')<script src="{{ asset('js/population-reports.js') }}?v={{ filemtime(public_path('js/population-reports.js')) }}" defer></script>@endpush
+@if($printMode)@push('scripts')<script>window.addEventListener('load',()=>window.print());</script>@endpush @endif

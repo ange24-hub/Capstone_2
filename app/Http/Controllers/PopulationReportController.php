@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\PopulationSummary;
 use App\Services\PopulationSpreadsheet;
 use App\Services\PopulationReportSubmissionSnapshot;
+use App\Services\PopulationReportPeriod;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class PopulationReportController extends Controller
             'section' => ['nullable', Rule::in(array_keys(PopulationSummary::SECTIONS))],
             'page' => ['nullable', 'integer', 'min:1'],
             'print' => ['nullable', 'boolean'],
-            'report_year' => ['nullable', 'integer', 'min:1900', 'max:'.now()->year],
+            'report_year' => ['nullable', 'integer', 'min:1900', 'max:'.PopulationReportPeriod::maximumYear()],
             'semester' => ['nullable', Rule::in([1,2])],
         ]);
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
@@ -33,11 +34,30 @@ class PopulationReportController extends Controller
         $barangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
         $selectedSection = $request->input('section') ?: 'summary';
         $printMode = $request->boolean('print');
-        // The builder always uses the latest Consolidated registry. Original
-        // historical photographs remain available, unchanged, in History.
-        $report = $summary->build($barangayId, $selectedSection);
         $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',now()->year),
             'semester'=>$request->integer('semester',now()->month<=6?1:2)]);
+        if ($selectedSection === 'summary' && app(PopulationReportPeriod::class)->usesHistory($reportFilters['report_year'], $reportFilters['semester'])) {
+            $saved = $barangayId && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')
+                ? app(PopulationReportPeriod::class)->nearestSaved($barangayId, $reportFilters['report_year'], $reportFilters['semester']) : null;
+            if ($saved) {
+                $action = $request->routeIs('reports.population.pdf') ? 'pdf' : ($request->routeIs('reports.population.excel') ? 'excel' : 'show');
+                $parameters = ['submission'=>$saved->id] + ($printMode && $action === 'show' ? ['print'=>1] : []);
+                $redirect = redirect()->route('reports.population.submissions.'.$action, $parameters);
+                if ($saved->report_year !== $reportFilters['report_year'] || $saved->semester !== $reportFilters['semester']) {
+                    $redirect->with('population_period_notice', 'No exact saved report for '.($reportFilters['semester']===1?'1st':'2nd')
+                        .' Semester '.$reportFilters['report_year'].'. Opened the nearest earlier report: '
+                        .($saved->semester===1?'1st':'2nd').' Semester '.$saved->report_year.'. Its original period and counts are preserved.');
+                }
+                return $redirect;
+            }
+            return response()->view('reports.population-period-empty', [
+                'reportFilters'=>$reportFilters, 'isSecretary'=>$isSecretary, 'areaId'=>$barangayId,
+                'barangays'=>$isSecretary ? collect() : Barangay::orderBy('name')->get(['id','name']),
+            ], $request->routeIs('reports.population') ? 200 : 404)->header('Cache-Control','private, no-store');
+        }
+        // New periods use the latest Consolidated data. Saved historical copies
+        // are opened above without changing their actual reporting period.
+        $report = $summary->build($barangayId, $selectedSection);
         if($selectedSection==='summary') {
             $report['monitoring']['year']=$reportFilters['report_year'];
             $report['monitoring']['semester']=$reportFilters['semester'];

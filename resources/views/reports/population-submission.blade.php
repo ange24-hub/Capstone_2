@@ -8,6 +8,7 @@
 <section class="population-report population-spreadsheet population-report-monitoring">
     <header class="population-submission-toolbar">
         <h1>Submitted Population Summary · {{ $submission->reference }}</h1>
+        @if(session('population_period_notice'))<p class="population-period-notice" role="status">{{ session('population_period_notice') }}</p>@endif
         @if(session('status'))<p role="status">{{ session('status') }}</p>@endif
         <p>Submitted to Municipal DILG/Admin by {{ $submission->submitted_by_name }} on {{ $submission->submitted_at->format('M d, Y h:i A') }}.</p>
         <p>This is the saved report as reviewed before submission. Later registry updates do not change this copy.</p>

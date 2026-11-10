@@ -26,7 +26,7 @@ class PopulationReportSubmissionController extends Controller
     {
         $this->authorizeStaff($request);
         $filters = $request->validate(['barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
-            'report_year' => ['nullable', 'integer', 'between:1900,'.now()->year], 'semester' => ['nullable', Rule::in([1, 2])]]);
+            'report_year' => ['nullable', 'integer', 'between:1900,'.\App\Services\PopulationReportPeriod::maximumYear()], 'semester' => ['nullable', Rule::in([1, 2])]]);
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
         if ($isSecretary && $request->filled('barangay_id')) abort_unless($request->integer('barangay_id') === (int) $request->user()->barangay_id, 403);
         $areaId = $isSecretary ? $request->user()->barangay_id : ($request->integer('barangay_id') ?: null);
@@ -50,6 +50,10 @@ class PopulationReportSubmissionController extends Controller
         $preview = $request->session()->get('population_submission_previews.'.$token);
         if (! $preview || (int) $preview['user_id'] !== (int) $user->id || (int) $preview['barangay_id'] !== (int) $user->barangay_id || $preview['expires_at'] < time()) {
             throw ValidationException::withMessages(['submission' => 'This preview expired. Reload the summary and review it before submitting.']);
+        }
+        if (app(\App\Services\PopulationReportPeriod::class)->usesHistory(
+            $preview['snapshot']['monitoring']['year'], $preview['snapshot']['monitoring']['semester'])) {
+            throw ValidationException::withMessages(['submission'=>'This historical period uses saved reports. Choose a newer period to submit a new report from Consolidated.']);
         }
         $signatures = app(\App\Services\PopulationReportSignatures::class)->capture($request);
         $submission = DB::transaction(function () use ($preview, $summary, $snapshots, $user, $token, $signatures) {
@@ -122,8 +126,24 @@ class PopulationReportSubmissionController extends Controller
                     'Content-Disposition' => ($request->boolean('download') ? 'attachment' : 'inline').'; filename="'.$submission->reference.'-original.jpg"',
                 ]);
             }
-            abort_unless($request->routeIs('reports.population.submissions.show'), 404);
-            return response()->view('reports.population-archive', compact('submission', 'archive'))
+            $report = app(\App\Services\HistoricalPopulationReportDocument::class)->build($submission);
+            $selectedSection='summary'; $reportTitle='Historical Population Summary'; $detailGroups=collect();
+            if ($request->routeIs('reports.population.submissions.pdf')) {
+                return Pdf::loadView('reports.population-pdf', compact('report','selectedSection','reportTitle','detailGroups'))
+                    ->setPaper('a4','portrait')->download($submission->reference.'-'.$submission->report_year.'-semester-'.$submission->semester.'.pdf')
+                    ->header('Cache-Control','private, no-store');
+            }
+            if ($request->routeIs('reports.population.submissions.excel')) {
+                return response($spreadsheet->build($report,$selectedSection,$reportTitle),200,[
+                    'Content-Type'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'Content-Disposition'=>'attachment; filename="'.$submission->reference.'-'.$submission->report_year.'-semester-'.$submission->semester.'.xlsx"',
+                    'Cache-Control'=>'private, no-store',
+                ]);
+            }
+            return response()->view('reports.population-archive', compact('submission', 'archive', 'report') + [
+                'printMode'=>$request->boolean('print'),
+                'barangays'=>$request->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? Barangay::orderBy('name')->get(['id','name']) : collect(),
+            ])
                 ->header('Cache-Control', 'private, no-store');
         }
         abort_if($request->routeIs('reports.population.submissions.source'), 404);

@@ -10,7 +10,7 @@
     @include('reports._population-pages')
     <form method="GET" class="population-controls" aria-label="Filter submission history">
         @unless($isSecretary)<label class="population-control population-control-wide">Barangay<select name="barangay_id"><option value="">All barangays</option>@foreach($barangays as $area)<option value="{{ $area->id }}" @selected((int)$areaId===$area->id)>{{ $area->name }}</option>@endforeach</select></label>@endunless
-        <label class="population-control population-control-year">Year<input type="number" name="report_year" min="1900" max="{{ now()->year }}" value="{{ $filters['report_year'] ?? '' }}" placeholder="All years"></label>
+        <label class="population-control population-control-year">Year<input type="number" name="report_year" min="1900" max="{{ \App\Services\PopulationReportPeriod::maximumYear() }}" value="{{ $filters['report_year'] ?? '' }}" placeholder="All years"></label>
         <label class="population-control">Semester<select name="semester"><option value="">All semesters</option><option value="1" @selected(($filters['semester']??'')==1)>1st Semester</option><option value="2" @selected(($filters['semester']??'')==2)>2nd Semester</option></select></label>
         <button class="button" type="submit">Filter history</button>
     </form>

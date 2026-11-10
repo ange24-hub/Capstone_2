@@ -8,7 +8,7 @@
         form.removeAttribute('aria-busy');
         button.disabled = false;
         label.textContent = 'Generate report';
-        status.textContent = 'Choose a year and semester. Your document updates automatically from Consolidated.';
+        status.textContent = 'Through 1st Semester 2026: saved reports. Newer periods: latest Consolidated data.';
     };
     form.addEventListener('submit', event => {
         if (form.getAttribute('aria-busy') === 'true') {
@@ -18,7 +18,11 @@
         form.setAttribute('aria-busy', 'true');
         button.disabled = true;
         label.textContent = 'Generating…';
-        status.textContent = 'Preparing your document from the latest Consolidated registry…';
+        const year = Number(form.elements.report_year.value);
+        const semester = Number(form.elements.semester.value);
+        status.textContent = year < 2026 || (year === 2026 && semester === 1)
+            ? 'Opening the saved report for this period, or the nearest earlier copy…'
+            : 'Preparing your document from the latest Consolidated registry…';
     });
     form.querySelectorAll('select').forEach(select => {
         select.addEventListener('change', () => {

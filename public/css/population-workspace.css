@@ -92,6 +92,17 @@
 .population-builder-stats p > span { color:#7a8d9d; font-size:11px; }
 .population-builder-document { min-width:0; border:1px solid #dce5ec; border-radius:12px; background:#fff; overflow:hidden; }
 .population-builder-mobile-hint { display:none; }
+.population-period-notice { margin:0; padding:12px 15px; border:1px solid #eadfbd; border-radius:9px; background:#fffbf0; color:#806630; font-size:12px; line-height:1.6; }
+.population-history-badge { display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border:1px solid #d5e1ed; border-radius:20px; color:#56718c; background:#f0f5fb; font-size:11px; font-weight:600; }
+.population-history-badge .app-icon { width:13px; height:13px; }
+.population-archive-source-details { padding:15px 18px; border:1px solid #dce5ec; border-radius:10px; background:#fff; color:#6a7f90; font-size:12px; line-height:1.6; }
+.population-archive-source-details summary { color:#41667f; font-weight:600; cursor:pointer; }
+.population-archive-source-details p { margin:10px 0; }
+.population-archive-source-details .population-report-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.population-period-empty { display:flex; align-items:center; flex-direction:column; gap:12px; padding:40px 24px; border:1px solid #dce5ec; border-radius:12px; background:#fff; text-align:center; }
+.population-period-empty > .app-icon { width:35px; height:35px; color:#86a0b5; }
+.population-period-empty h2 { margin:0; color:#36556e; font-size:18px; }
+.population-period-empty p { max-width:540px; margin:0; color:#7a8c9b; font-size:13px; line-height:1.6; }
 .population-report-builder .population-preview-bar { gap:12px; padding:16px 18px; border-bottom:1px solid #e6edf2; }
 .population-builder-document-label { display:block; margin-bottom:4px; color:#8a9aa7; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
 .population-report-builder .population-preview-bar h2 { font-size:15px; margin:0 0 3px; }
@@ -145,7 +156,7 @@
     .population-report-builder .population-builder-mobile-hint { display:block; padding:8px 12px; margin:0; border-bottom:1px solid #e6edf2; background:#f6f9fc; color:#70899c; font-size:10px; line-height:1.5; }
 }
 @media print {
-    .population-builder-stats,.population-builder-source,.population-builder-mobile-hint { display:none!important; }
+    .population-builder-stats,.population-builder-source,.population-builder-mobile-hint,.population-archive-source-details,.population-period-notice { display:none!important; }
     .population-builder-document { border:0!important; border-radius:0!important; overflow:visible!important; }
     .population-report-builder .population-monitoring-scroll { padding:0!important; background:#fff!important; }
 }

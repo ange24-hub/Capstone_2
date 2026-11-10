@@ -50,6 +50,9 @@ class PopulationSpreadsheet
 
     private function sheets(array $report, string $section, string $title): array
     {
+        if ($section === 'summary' && ($report['historical'] ?? false)) {
+            return ['Summary'=>$this->monitoringWorksheet($report)];
+        }
         $summary = [
             'Summary' => ['title' => 'Population, families and households', 'headings' => ['Indicator', 'Count'], 'rows' => [
                 ['Total registered residents', $report['totalRecords']],
@@ -185,12 +188,12 @@ class PopulationSpreadsheet
 
     private function monitoringWorksheet(array $report): array
     {
-        $form=$report['monitoring'];$rows=[];$merges=[];
+        $form=$report['monitoring'];$rows=[];$merges=[];$historical=$report['historical']??false;
         $add=function(array $values=[],int $style=0,int $height=16,bool $merge=false)use(&$rows,&$merges){
             $rows[]=['values'=>$values,'style'=>$style,'height'=>$height];
             if($merge) $merges[]='A'.count($rows).':E'.count($rows);
         };
-        $add(['RBI FORM C (Revised 2024)'],0,17,true);
+        $add([$historical?'RBI FORM C - HISTORICAL TRANSCRIPTION':'RBI FORM C (Revised 2024)'],0,17,true);
         $add([],0,7);
         $add(['MONITORING REPORT'],1,23,true);
         $add(['for '.($form['semester']===1?'1st':'2nd').' Semester of CY '.$form['year']],7,18,true);
@@ -201,15 +204,15 @@ class PopulationSpreadsheet
         $add(['BARANGAY: '.mb_strtoupper($form['barangay'])],0,16,true);
         $add(['Total No. of Barangay Inhabitants:',$report['totalRecords']],0,17);
         $add(['Total No. of Households:',$report['totalHouseholds']],0,17);
-        $add(['Total No. of Families:',$report['totalFamilies']?:($report['totalRecords']?'Not yet identified':'Not yet encoded')],0,17);
+        $add(['Total No. of Families:',$historical?$report['totalFamilies']:($report['totalFamilies']?:($report['totalRecords']?'Not yet identified':'Not yet encoded'))],0,17);
         $add([],0,10);
         $headings=['INDICATORS','MALE','FEMALE','TOTAL','REMARKS'];
         $add($headings,11,20);
         $add(['Population by Age Bracket:'],12,17,true);
-        foreach($form['ages'] as $row) $add([$row['label'],$row['male'],$row['female'],$row['total'],
-            $row['unspecified']?'Sex unspecified: '.$row['unspecified']:''],4,16);
-        $add(['Total registered residents',$report['sex']['Male'],$report['sex']['Female'],$report['totalRecords'],
-            $report['sex']['Not specified / other']?'Sex unspecified: '.$report['sex']['Not specified / other']:''],6,17);
+        foreach($form['ages'] as $row) $add([$row['label'],$row['male']??'-',$row['female']??'-',$row['total'],
+            $row['remarks']??($row['unspecified']?'Sex unspecified: '.$row['unspecified']:'')],4,16);
+        $add([$historical?'Sum of age brackets as recorded':'Total registered residents',$report['sex']['Male']??'-',$report['sex']['Female']??'-',$historical?$report['ageTotalSum']:$report['totalRecords'],
+            $historical&&$report['ageTotalSum']!==$report['totalRecords']?'Differs from reported population':($report['sex']['Not specified / other']?'Sex unspecified: '.$report['sex']['Not specified / other']:'')],6,17);
         $add(['Population by Sector:'],12,17,true);
         foreach($form['sectors'] as $row) $add([$row['label'],$row['available']?$row['male']:'-',
             $row['available']?$row['female']:'-',$row['available']?$row['total']:'-',
@@ -224,10 +227,15 @@ class PopulationSpreadsheet
             $n=count($rows)+1;$add([$left,'',$right],7,17);$merges[]='A'.$n.':B'.$n;$merges[]='C'.$n.':E'.$n;
         }
         $add([],0,7);
-        $add(['Date Accomplished: '.$report['generatedAt']->format('F d, Y')],0,18,true);
+        $add(['Date Accomplished: '.($historical?'Not recorded on original':$report['generatedAt']->format('F d, Y'))],0,18,true);
         $add(['Note: Submit RBI Form C to DILG C/MLGOO as reference for encoding to BIS-BPS.'],8,22,true);
-        $add(['Current registry as of '.$report['generatedAt']->format('d M Y').'; active registered residents matching Consolidated; transferred and inactive profiles excluded. Semester/year is a report label, not a reconstructed historical population.'],8,30,true);
-        $add(['Ages use recorded birth dates. Sector counts use explicit tags only. A dash means not recorded; coverage is not verified complete.'],8,26,true);
+        if($historical){
+            $add(['Digitized from preserved original. Counts and reporting period unchanged. Original signatures retained in the source; no current registry values applied.'],8,30,true);
+            $add(['Blank or untranscribed cells are shown as a dash, not zero. Reported population: '.$report['totalRecords'].'; age-bracket sum: '.$report['ageTotalSum'].'.'],8,26,true);
+        }else{
+            $add(['Current registry as of '.$report['generatedAt']->format('d M Y').'; active registered residents matching Consolidated; transferred and inactive profiles excluded. Semester/year is a report label, not a reconstructed historical population.'],8,30,true);
+            $add(['Ages use recorded birth dates. Sector counts use explicit tags only. A dash means not recorded; coverage is not verified complete.'],8,26,true);
+        }
         if (!empty($report['signatures'])) $add(['Data-only export. Signature images are preserved in the signed PDF and submitted report.'],8,22,true);
         return ['monitoring'=>true,'headings'=>$headings,'rows'=>$rows,'merges'=>$merges];
     }
