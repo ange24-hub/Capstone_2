@@ -33,15 +33,8 @@ class PopulationReportController extends Controller
         $barangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
         $selectedSection = $request->input('section') ?: 'summary';
         $printMode = $request->boolean('print');
-        // Kung adunay original report sa gipiling period, mao kana ang historical source.
-        // Dili ilisan ang historical counts sa current registry totals.
-        if ($barangayId && $selectedSection === 'summary' && $request->filled('report_year') && $request->filled('semester')
-            && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')) {
-            $archive = \App\Models\PopulationReportSubmission::where('barangay_id', $barangayId)
-                ->where('report_year', $request->integer('report_year'))->where('semester', $request->integer('semester'))
-                ->where('snapshot->kind', 'historical_population_photo')->orderByDesc('id')->first();
-            if ($archive) return redirect()->route('reports.population.submissions.show', $archive);
-        }
+        // The builder always uses the latest Consolidated registry. Original
+        // historical photographs remain available, unchanged, in History.
         $report = $summary->build($barangayId, $selectedSection);
         $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',now()->year),
             'semester'=>$request->integer('semester',now()->month<=6?1:2)]);
@@ -49,11 +42,24 @@ class PopulationReportController extends Controller
             $report['monitoring']['year']=$reportFilters['report_year'];
             $report['monitoring']['semester']=$reportFilters['semester'];
         }
+        // Keep stale-data validation tied to registry data, before displaying
+        // the current user's remembered names and signatures in the preview.
+        $submissionReport = $report;
+        $usingSavedSignatures = false;
+        if ($selectedSection === 'summary' && $isSecretary && $request->user()->isApproved()
+            && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')) {
+            foreach (app(\App\Services\PopulationReportSignatures::class)->savedFor($request->user()) as $key => $signature) {
+                $report['signatures'][$key] = array_intersect_key($signature, array_flip(['name', 'image', 'method']));
+                $report['monitoring'][$key === 'prepared' ? 'preparedBy' : 'submittedBy'] = $signature['name'];
+                $usingSavedSignatures = true;
+            }
+        }
         $sectionLabels = PopulationSummary::SECTIONS;
         $reportTitle = $selectedSection === 'summary' ? 'Population Summary' : $sectionLabels[$selectedSection];
         $detailGroups = $report['detailGroups'];
         if ($request->routeIs('reports.population.excel')) {
-            $filename = 'population-'.$selectedSection.'-'.($barangayId ? 'barangay-'.$barangayId : 'municipal').'-'.now()->format('Y-m-d').'.xlsx';
+            $filename = 'population-'.$selectedSection.'-'.($barangayId ? 'barangay-'.$barangayId : 'municipal')
+                .'-'.$reportFilters['report_year'].'-semester-'.$reportFilters['semester'].'-'.now()->format('Y-m-d').'.xlsx';
 
             return response($spreadsheet->build($report, $selectedSection, $reportTitle), 200, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -64,7 +70,9 @@ class PopulationReportController extends Controller
         if ($request->routeIs('reports.population.pdf')) {
             return Pdf::loadView('reports.population-pdf', compact('report', 'selectedSection', 'reportTitle', 'detailGroups'))
                 ->setPaper('a4', in_array($selectedSection, ['coverage', 'area-ages'], true) || ($report['totalBarangays'] > 1 && in_array($selectedSection, ['sex', 'ages'], true)) ? 'landscape' : 'portrait')
-                ->download('population-'.$selectedSection.'-'.($barangayId ? 'barangay-'.$barangayId : 'municipal').'-'.now()->format('Y-m-d').'.pdf');
+                ->download('population-'.$selectedSection.'-'.($barangayId ? 'barangay-'.$barangayId : 'municipal')
+                    .'-'.$reportFilters['report_year'].'-semester-'.$reportFilters['semester'].'-'.now()->format('Y-m-d').'.pdf')
+                ->header('Cache-Control', 'private, no-store');
         }
         $detailPagination = null;
         if ($detailGroups->isNotEmpty() && ! $printMode) {
@@ -85,11 +93,12 @@ class PopulationReportController extends Controller
             $previews = array_slice($previews, -4, null, true);
             $submissionPreviewToken = (string) Str::uuid();
             $previews[$submissionPreviewToken] = ['user_id' => $request->user()->id, 'barangay_id' => $barangayId,
-                'expires_at' => time() + 3600, 'snapshot' => app(PopulationReportSubmissionSnapshot::class)->capture($report)];
+                'expires_at' => time() + 3600, 'snapshot' => app(PopulationReportSubmissionSnapshot::class)->capture($submissionReport)];
             $request->session()->put('population_submission_previews', $previews);
         }
-        return view('reports.population', [
+        return response()->view('reports.population', [
             'submissionPreviewToken' => $submissionPreviewToken,
+            'usingSavedSignatures' => $usingSavedSignatures,
             'selectedSection' => $selectedSection, 'sectionLabels' => $sectionLabels, 'reportTitle' => $reportTitle,
             'detailGroups' => $detailGroups, 'detailPagination' => $detailPagination,
             'printMode' => $printMode,
@@ -97,6 +106,6 @@ class PopulationReportController extends Controller
             'reportFilters'=>$reportFilters,
             'report' => $report, 'selectedBarangayId' => $barangayId, 'isSecretary' => $isSecretary,
             'barangays' => $isSecretary ? collect() : Barangay::orderBy('name')->get(['id', 'name']),
-        ]);
+        ])->header('Cache-Control', 'private, no-store');
     }
 }

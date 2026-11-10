@@ -38,7 +38,12 @@ class PopulationSummary
             ->when($withNames, fn ($query) => $query->orderBy('last_name')->orderBy('first_name')->orderBy('id'))
             ->get($columns);
         $householdRows = Household::whereIn('barangay_id', $barangays->modelKeys())
-            ->where('household_number', '!=', 'DEMO-MIGRATION-V1')->get(['id', 'barangay_id', 'household_number']);
+            ->whereNotIn('household_number', ['DEMO-MIGRATION-V1', 'Not recorded'])
+            // Match Consolidated: keep encoded empty households and households
+            // with active registered residents; exclude transferred/inactive-only rows.
+            ->where(fn ($query) => $query->doesntHave('inhabitants')
+                ->orWhereHas('inhabitants', fn ($people) => $people->withoutMigrationDemo()->where('status', Inhabitant::STATUS_ACTIVE)))
+            ->get(['id', 'barangay_id', 'household_number']);
         $householdLookup = $householdRows->keyBy('id');
         $households = $householdRows->groupBy('barangay_id')->map(fn ($items) => $items
             ->map(function ($item): string {

@@ -29,10 +29,14 @@ class HistoricalPopulationReportTest extends TestCase
         $this->assertSame(429, $saved->snapshot['age_total_sum']);
         $user = User::factory()->create(['role'=>User::ROLE_BARANGAY, 'barangay_id'=>$area->id]);
         $this->actingAs($user)->get(route('reports.population.submissions.index'))->assertOk()->assertSee('Archived historical report');
-        foreach (['reports.population','reports.population.pdf','reports.population.excel'] as $route) {
-            $this->get(route($route, ['report_year'=>2024,'semester'=>1]))
-                ->assertRedirect(route('reports.population.submissions.show',$saved));
-        }
+        // New reports always use current Consolidated data. Historical paper
+        // originals remain independently accessible and immutable in History.
+        $current = $this->get(route('reports.population', ['report_year'=>2024,'semester'=>1]))->assertOk();
+        $this->assertSame(0, $current->viewData('report')['totalRecords']);
+        $this->get(route('reports.population.pdf', ['report_year'=>2024,'semester'=>1]))
+            ->assertOk()->assertHeader('Content-Type', 'application/pdf');
+        $this->get(route('reports.population.excel', ['report_year'=>2024,'semester'=>1]))
+            ->assertOk()->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $this->get(route('reports.population',['report_year'=>2024,'semester'=>2]))->assertOk();
         $this->get(route('reports.population.submissions.show', $saved))->assertOk()->assertSee('Needs reconciliation')->assertSee('459')->assertSee('429');
         $this->get(route('reports.population.submissions.source', $saved))->assertOk()->assertHeader('Content-Type', 'image/jpeg');
