@@ -22,6 +22,8 @@
                 <span><b>{{ count($forecast['history']) }}</b> verified months</span>
                 <span>History cutoff <b>{{ \Illuminate\Support\Carbon::createFromFormat('!Y-m', $forecast['data_through'])->format('M Y') }}</b></span>
             </div>
+            @php($leadMonths = (int) \Illuminate\Support\Carbon::createFromFormat('!Y-m', $forecast['data_through'])->diffInMonths(\Illuminate\Support\Carbon::createFromFormat('!Y-m', $forecast['log_month'])))
+            <p>{{ $leadMonths }}-month lead from history cutoff to target. The intervening incomplete month is excluded from observed counts. This is a provisional estimate.</p>
             @if($forecast['method']==='population_baseline')
                 <p>{{ $forecast['population'] }} active residents × {{ number_format($forecast['baseline_rate']*100, 3) }}%. Population assumption kay kulang pa sa 3 verified months.</p>
                 @if($forecast['population']===0)<p>Walay active residents. Ang zero estimate dili verified zero migration.</p>@endif

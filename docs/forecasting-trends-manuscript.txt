@@ -1,0 +1,93 @@
+FORECASTING AND MIGRATION TRENDS: MANUSCRIPT NOTES AND VALIDATION RESULTS
+SB-ISPGM / RBIM
+Prepared: November 10, 2026
+Scope: published implementation at 3fd6fb4, with a forecast-lead clarification.
+
+EVIDENCE BOUNDARY
+The numerical examples below are controlled synthetic tests executed in an isolated SQLite in-memory database. They are not production barangay statistics or measured real-world prediction accuracy. No production database was accessed for this evaluation. Unreleased experimental forecasting models are outside this report.
+
+1. IMPLEMENTATION AND METHODS
+The application implements the computation in native PHP within Laravel. Eloquent handles database queries, and Carbon handles dates using the configured Asia/Manila calendar. Production uses MySQL; the validation suite uses SQLite in memory. These paths do not require a machine-learning model, Python prediction server, external AI API, or model training.
+
+Migration Trends is descriptive analytics. It groups dated arrival and departure events by their actual movement month and barangay. Its source is migration_records, supplemented by unlinked dated migration_logs. Linked ledger rows are mirrors rather than additional observations. The same barangay, resident, direction, and date count once. Different movement dates remain separate events. Demo records, future dates, and records assigned to the wrong barangay are excluded. RBI save dates, import dates, and residence status alone do not establish movement dates.
+
+The recorded net movement is arrivals minus departures. It is an event balance, not a full population-growth estimate. Births, deaths, registration changes, reporting completeness, and movements at both the origin and destination prevent interpreting it as a census population change. Months without confirmed observations are not silently treated as actual zero migration. A displayed confirmed zero requires a completed, verified month whose source still matches.
+
+The optional monthly migration forecast uses a Weighted Moving Average (WMA) when at least three consecutive verified completed months are available. The configured history window is six months, restricted to three through six. Weights are 1 through n, from oldest to newest:
+    F = sum(w_i * x_i) / sum(w_i).
+A gap or an unverified month breaks the usable consecutive history.
+
+The monthly target is the next calendar month; observed history stops at the last completed month. For an issue during November, the cutoff is October and the target is December: a two-month lead from the last observed period. The deployed monthly estimator applies WMA directly to that target. It does not insert a fabricated observed November value and does not use a recursively generated November observation. This lead must be retained when describing and evaluating the method.
+
+When fewer than three consecutive verified months are available, the monthly tool uses an explicitly labeled population-based assumption. The committed default is P * 0.001 per direction, where P is the active registered-resident count excluding demo data. The rate is configurable; its live production override was not inspected. This fallback is not an empirically estimated migration rate or a net population-growth model.
+
+Provisional Population Estimate uses population totals from immutable historical archives and eligible submitted digital reports for completed semesters. Digital reports must have a matching period, a valid saved generation timestamp within that semester in Asia/Manila, valid submission chronology, matching snapshot hash, and internally consistent integer totals. Current, future, or relabeled live-registry snapshots are excluded. Conflicting totals or integrity failures block projection. Legacy age-bracket discrepancies are flagged without rewriting the archived report.
+
+Population WMA uses three consecutive completed semesters with fixed weights 1, 2, and 3. Missing intervening projection periods are calculated recursively and remain estimates, not observed reports. More than six required projection steps prevents an estimate. The final displayed population is rounded; intermediate computations retain their precision.
+
+2. CONTROLLED COMPUTATION RESULTS
+
+A. Monthly migration WMA
+    Verified completed-month counts: August 2, September 4, October 8.
+    Weighted sum: (1*2) + (2*4) + (3*8) = 34.
+    Sum of weights: 6.
+    Output: 34 / 6 = 5.6667 expected arrival events.
+    History cutoff: October 2026. Target: December 2026.
+    Interpretation: direct provisional estimate with a two-month lead;
+    5.6667 is an expected count, not an observed fractional person.
+
+B. Migration trend aggregation and duplicate handling
+    Initial dated arrivals: 2 + 4 + 8 = 14.
+    An additional duplicate of an existing resident/direction/day was inserted.
+    One dated departure was also recorded.
+    Output: 14 unique arrival events, 1 departure, 1 excluded duplicate.
+    Recorded net: 14 - 1 = +13 events.
+    An unverified empty July remained unknown rather than a confirmed zero.
+    This duplicate-handling stage is separate from the earlier verified-WMA stage;
+    changed sources must be reviewed again before being treated as verified history.
+
+C. Semestral provisional population estimate
+    Synthetic completed reports:
+        2025 first semester: 600
+        2025 second semester: 620
+        2026 first semester: 640
+    Evaluation date: November 10, 2026, Asia/Manila.
+    Unobserved 2026 second-semester bridge:
+        (600 + 2*620 + 3*640) / 6 = 626.6666667.
+    Target 2027 first-semester estimate:
+        (620 + 2*640 + 3*626.6666667) / 6 = 630.
+    Output: 630 inhabitants, explicitly provisional.
+    The saved source reports remained unchanged after projection.
+
+3. TEST RESULTS
+The isolated validation run passed 50 tests and 358 assertions, with zero failures and zero errors. The suites covered actual movement dates, duplicate exclusion, confirmed zero versus unknown months, barangay isolation, current/future period exclusion, Philippine-calendar boundaries, report eligibility and integrity, WMA computation, saved-forecast behavior, and error-metric eligibility. Passing these tests establishes correctness for the tested cases; it does not establish a percentage of real-world predictive accuracy.
+
+Reproducible test suites:
+    ForecastManuscriptEvidenceTest
+    RecordedMigrationTrendsTest
+    SemestralPopulationProjectionTest
+    PopulationForecastSourceIntegrationTest
+    StatisticalMigrationForecastTest
+    ForecastMovementDateTest
+
+4. ACCURACY EVALUATION AND LIMITATIONS
+Real predictive evaluation requires forecasts saved before the target period and subsequently verified actual counts. The monthly service supports:
+    MAE  = mean(abs(A_t - F_t))
+    RMSE = sqrt(mean((A_t - F_t)^2))
+    MAPE = mean(abs(A_t - F_t) / A_t) * 100, for A_t > 0.
+Confirmed zero-actual periods are included in MAE and RMSE, but excluded from MAPE to avoid division by zero. The displayed 100 - MAPE score is an error-derived score; it is not classification accuracy and can be negative. Do not describe it as an established system-wide accuracy rate.
+
+The population tool returns no validated MAPE. A historical one-step check, when available, is retrospective and is not equivalent to a forecast issued before the outcome. Population projections are planning estimates, not official counts, demographic forecasts incorporating all births/deaths/migration, or validated population-growth predictions. Insufficient verified history is a limitation to report, not a reason to invent historical dates or zero values.
+
+5. MANUSCRIPT-READY METHOD PARAGRAPH
+The system implemented native PHP statistical processing for migration trend analysis and provisional population estimation. Migration trends were computed from dated arrival and departure records, with duplicate observations counted once and unconfirmed periods distinguished from verified zero counts. Weighted Moving Average forecasting assigned greater weight to more recent eligible observations. Monthly migration estimates used consecutive verified completed-month counts, while semestral population estimates used three consecutive completed population reports with weights of 1, 2, and 3. Source-period validation, timestamp checks, snapshot-integrity verification, and explicit labeling of unobserved projection periods supported traceability and prevented modification of historical reports.
+
+6. MANUSCRIPT-READY RESULTS PARAGRAPH
+Controlled validation produced the expected computational outputs. Verified monthly counts of 2, 4, and 8 yielded a weighted estimate of 5.6667 events. A separate aggregation stage retained 14 unique arrivals and one departure after excluding one duplicate, producing a recorded net balance of +13 events. Synthetic population totals of 600, 620, and 640 produced an intermediate semestral estimate of 626.6667 and a subsequent target estimate of 630 inhabitants. The selected test suites passed 50 tests and 358 assertions. These findings demonstrate computation correctness under the tested conditions; real-world forecasting accuracy remains unestablished pending sufficient verified historical observations and prospective forecast-versus-actual comparisons.
+
+IMPLEMENTATION REFERENCES
+    app/Services/RecordedMigrationHistory.php
+    app/Services/MigrationPredictionService.php (published version)
+    app/Services/SemestralPopulationProjection.php
+    config/migration_forecast.php
+    tests/Feature/ForecastManuscriptEvidenceTest.php
