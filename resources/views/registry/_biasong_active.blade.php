@@ -1,8 +1,9 @@
 <thead>
     <tr class="rbi-title-row"><th colspan="19">CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</th></tr>
+    <tr class="rbi-meta-row"><th colspan="19">Households in this report: {{ number_format($reportHouseholdCount) }}</th></tr>
     <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
     <tr class="rbi-meta-row"><th colspan="3"></th><th colspan="2">A. REGION:</th><th colspan="5">VIII</th><th colspan="2">D. BARANGAY:</th><th colspan="7">BIASONG</th></tr>
-    <tr class="rbi-meta-row"><th colspan="3"></th><th colspan="2">B. PROVINCE:</th><th colspan="5">SOUTHERN LEYTE</th><th colspan="2">E. HOUSEHOLD NO.</th><th colspan="7">{{ number_format($registryHouseholdCount) }} HOUSEHOLDS</th></tr>
+    <tr class="rbi-meta-row"><th colspan="3"></th><th colspan="2">B. PROVINCE:</th><th colspan="5">SOUTHERN LEYTE</th><th colspan="2">E. HOUSEHOLD NO.</th><th colspan="7">{{ number_format($reportHouseholdCount) }} HOUSEHOLDS</th></tr>
     <tr class="rbi-meta-row"><th colspan="3"></th><th colspan="2">C. MUNICIPALITY:</th><th colspan="14">TOMAS OPPUS</th></tr>
     <tr class="rbi-spacer-row"><th colspan="19"></th></tr>
     <tr class="rbi-meta-row"><th colspan="19">Residents: {{ number_format($inhabitants->total()) }}</th></tr>

@@ -56,7 +56,7 @@
         </div>
         @endunless
 
-        <div class="workflow-card registry-records-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
+        <div id="registry-records" class="workflow-card registry-records-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
             <div class="workflow-head registry-records-heading flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
                     <h2 class="section-title text-lg font-semibold text-slate-900">{{ $isDedicatedRegistryPage ? match(request('sheet')) { 'deceased' => 'Deceased resident records', 'new-inhabitants' => 'Monthly new inhabitant report', default => 'Consolidated household records' } : (request('source') ? request('source').' — '.match(request('sheet')) { 'deceased' => 'Deceased', 'new-inhabitants' => 'New Inhabitants', default => 'Active Household' } : 'Registry Records') }}</h2>
@@ -89,12 +89,12 @@
                 @if(request()->routeIs('barangay.registry.active') && ! $isBiasong)
                     <div class="registry-table-summary">
                         <h3>Consolidated household record of barangay inhabitants (RBI)</h3>
+                        <p class="text-center text-sm font-semibold">Households in this report: {{ number_format($reportHouseholdCount) }}</p>
                         <dl>
                             <div><dt>Region</dt><dd>VIII</dd></div>
                             <div><dt>Province</dt><dd>Southern Leyte</dd></div>
                             <div><dt>Municipality</dt><dd>Tomas Oppus</dd></div>
                             <div><dt>Barangay</dt><dd>{{ $registryBarangay?->name }}</dd></div>
-                            <div><dt>Households</dt><dd>{{ number_format($registryHouseholdCount) }}</dd></div>
                             <div><dt>Residents</dt><dd>{{ number_format($inhabitants->total()) }}</dd></div>
                         </dl>
                     </div>
@@ -190,12 +190,13 @@
                         <thead>
                             @unless(request()->routeIs('barangay.registry.active'))
                             <tr class="rbi-title-row"><th colspan="{{ $activeColumns }}">CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)</th></tr>
+                            <tr class="rbi-meta-row"><th colspan="{{ $activeColumns }}">Households in this report: {{ number_format($reportHouseholdCount) }}</th></tr>
                             <tr class="rbi-spacer-row"><th colspan="{{ $activeColumns }}"></th></tr>
                             <tr class="rbi-meta-row">
                                 <th colspan="2">A. REGION:</th><th colspan="4">VIII</th><th colspan="3"></th><th colspan="2">D. BARANGAY:</th><th colspan="{{ $activeColumns - 11 }}">{{ strtoupper($registryBarangay?->name ?? '') }}</th>
                             </tr>
                             <tr class="rbi-meta-row">
-                                <th colspan="2">B. PROVINCE:</th><th colspan="4">SOUTHERN LEYTE</th><th colspan="3"></th><th colspan="2">E. HOUSEHOLD:</th><th colspan="{{ $activeColumns - 11 }}">{{ number_format($registryHouseholdCount) }} HOUSEHOLDS</th>
+                                <th colspan="2">B. PROVINCE:</th><th colspan="4">SOUTHERN LEYTE</th><th colspan="3"></th><th colspan="2">E. HOUSEHOLD:</th><th colspan="{{ $activeColumns - 11 }}">{{ number_format($reportHouseholdCount) }} HOUSEHOLDS</th>
                             </tr>
                             <tr class="rbi-meta-row">
                                 <th colspan="2">C. MUNICIPALITY:</th><th colspan="4">TOMAS OPPUS</th><th colspan="{{ $activeColumns - 6 }}"></th>
@@ -286,7 +287,7 @@
                     </fieldset>
                 </div>
 
-                @if (!request('sheet')){{ $inhabitants->links() }}@endif
+                @if (!request('sheet')){{ $inhabitants->fragment('registry-records')->links() }}@endif
             @endif
         </div>
     </section>

@@ -54,6 +54,8 @@ class RegistryPrintController extends Controller
             default => 'CONSOLIDATED HOUSEHOLD RECORD OF BARANGAY INHABITANTS (RBI)',
         };
 
-        return compact('barangay', 'scope', 'residents', 'title');
+        $reportHouseholdCount = \App\Support\RegistryHouseholdCount::forResidents($residents);
+
+        return compact('barangay', 'scope', 'residents', 'title', 'reportHouseholdCount');
     }
 }

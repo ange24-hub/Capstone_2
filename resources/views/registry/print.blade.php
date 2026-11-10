@@ -38,7 +38,7 @@
     <div class="print-toolbar"><a href="{{ route('barangay.registry.active') }}">Back to Resident Registry</a><div class="print-actions"><a href="{{ route('barangay.registry.download', ['scope' => $scope]) }}">Download Excel</a><button type="button" onclick="window.print()">Print report</button></div></div>
     <main>
         @include('reports._document-header', ['documentTitle' => $title, 'documentBarangay' => strtoupper($barangay->name), 'documentDate' => now()->format('m/d/Y')])
-        <p class="report-document-context">HOUSEHOLDS: {{ $residents->pluck('household_id')->unique()->count() }} &middot; RESIDENTS: {{ $residents->count() }}</p>
+        <p class="report-document-context">HOUSEHOLDS IN THIS REPORT: {{ number_format($reportHouseholdCount) }} &middot; RESIDENTS: {{ number_format($residents->count()) }}</p>
         <table>
             <colgroup>
                 <col style="width: 3%"><col style="width: 3.5%"><col style="width: 7%"><col style="width: 8%"><col style="width: 6.5%"><col style="width: 4.5%"><col style="width: 6%"><col style="width: 7%"><col style="width: 8%"><col style="width: 6%"><col style="width: 2.5%"><col style="width: 3%"><col style="width: 4.5%"><col style="width: 6.5%"><col style="width: 4.5%"><col style="width: 6%"><col style="width: 9%"><col style="width: 4.5%">

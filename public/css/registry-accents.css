@@ -1,4 +1,7 @@
 /* Restrained color for the resident registry, residence lists, and edit forms. */
+#registry-records { scroll-margin-block-start: 16px; }
+#registry-records:target { min-block-size: calc(100dvh - 32px); }
+
 @layer professional-workspace {
     @media screen {
         .professional-content #main-content .registry-color-workspace {

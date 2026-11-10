@@ -169,6 +169,54 @@ class RegistryPrintTest extends TestCase
         }
     }
 
+    public function test_report_household_total_counts_unique_recorded_households_across_all_pages_and_scopes(): void
+    {
+        $barangay = Barangay::where('name', 'Canlupao')->firstOrFail();
+        $other = Barangay::where('name', 'Hugpa')->firstOrFail();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
+        $household = Household::create(['barangay_id' => $barangay->id, 'household_number' => '001']);
+        for ($i = 1; $i <= 27; $i++) {
+            $this->resident($barangay, $household, 'Member'.$i, Inhabitant::RESIDENCE_HERE);
+        }
+        $second = Household::create(['barangay_id' => $barangay->id, 'household_number' => '002']);
+        $this->resident($barangay, $second, 'SecondHousehold', Inhabitant::RESIDENCE_ELSEWHERE);
+        foreach (['Not recorded', ' ', 'archived', 'departed'] as $number) {
+            $excluded = Household::create(['barangay_id' => $barangay->id, 'household_number' => $number]);
+            $status = match ($number) {
+                'archived' => Inhabitant::STATUS_INACTIVE,
+                'departed' => Inhabitant::STATUS_MIGRATED_OUT,
+                default => Inhabitant::STATUS_ACTIVE,
+            };
+            $this->resident($barangay, $excluded, 'Excluded'.$number, Inhabitant::RESIDENCE_HERE, $status);
+        }
+        Household::create(['barangay_id' => $barangay->id, 'household_number' => 'empty']);
+        $otherHousehold = Household::create(['barangay_id' => $other->id, 'household_number' => '001']);
+        $this->resident($other, $otherHousehold, 'OtherBarangay', Inhabitant::RESIDENCE_HERE);
+        $this->actingAs($staff);
+
+        foreach ([1, 2] as $page) {
+            $this->get(route('barangay.registry.active', ['page' => $page]))->assertOk()
+                ->assertViewHas('reportHouseholdCount', 2)
+                ->assertSee('id="registry-records"', false)
+                ->assertSee('#registry-records', false)
+                ->assertSee('Households in this report: 2');
+        }
+        $this->get(route('barangay.registry.active', ['search' => 'SecondHousehold']))->assertOk()
+            ->assertViewHas('reportHouseholdCount', 1)->assertSee('Households in this report: 1');
+        $this->get(route('barangay.registry.active', ['search' => 'NoMatchingResident']))->assertOk()
+            ->assertViewHas('reportHouseholdCount', 0);
+
+        foreach (['consolidated' => 2, 'registered' => 1, 'living_elsewhere' => 1, 'unconfirmed' => 0] as $scope => $expected) {
+            $this->get(route('barangay.registry.print', ['scope' => $scope]))->assertOk()
+                ->assertViewHas('reportHouseholdCount', $expected)
+                ->assertSee('HOUSEHOLDS IN THIS REPORT: '.$expected);
+            $sheet = simplexml_load_string($this->worksheet($this->get(route('barangay.registry.download', ['scope' => $scope]))->assertOk()->getContent()));
+            $sheet->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+            $this->assertSame('HOUSEHOLDS IN THIS REPORT: '.$expected, (string) $sheet->xpath('s:sheetData/s:row/s:c[@r="A2"]/s:is/s:t')[0]);
+            $this->assertNotEmpty($sheet->xpath('s:mergeCells/s:mergeCell[@ref="A2:R2"]'));
+        }
+    }
+
     private function resident(Barangay $barangay, Household $household, string $firstName, string $residence, string $status = Inhabitant::STATUS_ACTIVE): void
     {
         Inhabitant::create([

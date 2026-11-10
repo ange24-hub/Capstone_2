@@ -139,6 +139,7 @@ class RegistryController extends Controller
         }
 
         return view('registry.index', [
+            'reportHouseholdCount' => \App\Support\RegistryHouseholdCount::forQuery($query),
             'inhabitants' => $query->paginate(25)->withQueryString(),
             'registryBarangay' => $isBarangaySecretary
                 ? $request->user()->barangay

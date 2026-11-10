@@ -52,8 +52,11 @@ class RegistrySpreadsheet
 
     private function sheet(Collection $residents, Barangay $barangay, string $title): string
     {
+        $householdCount = \App\Support\RegistryHouseholdCount::forResidents($residents);
         $header = (new SpreadsheetReportHeader)->build(18, $title, strtoupper($barangay->name), '', now()->format('m/d/Y'),
             ['title' => 1, 'label' => 3]);
+        $header['rows'][1] = $this->row(2, ['HOUSEHOLDS IN THIS REPORT: '.number_format($householdCount)], 3, 18);
+        $header['merges'][] = 'A2:R2';
         $rows = [...$header['rows'],
             $this->row(9, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 28),
             '<row r="10" ht="28" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',
@@ -81,7 +84,7 @@ class RegistrySpreadsheet
         }
 
         $totalRow = max(11, $residents->count() + 10) + 2;
-        $rows[] = $this->row($totalRow, ['HOUSEHOLDS: '.$residents->pluck('household_id')->unique()->count().'    RESIDENTS: '.$residents->count()], 3, 20);
+        $rows[] = $this->row($totalRow, ['HOUSEHOLDS: '.$householdCount.'    RESIDENTS: '.$residents->count()], 3, 20);
         $merges = [...$header['merges'], 'C9:F9', 'A'.$totalRow.':R'.$totalRow];
         foreach (['A', 'B', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'] as $column) {
             $merges[] = $column.'9:'.$column.'10';
