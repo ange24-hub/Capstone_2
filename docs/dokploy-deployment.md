@@ -60,6 +60,12 @@ In the service's **Domains** tab, add your domain with service **app**, containe
 
 Leave `RUN_MIGRATIONS=false` for the first deployment and deploy. The MySQL health check waits for the application account to be usable. The application `/up` endpoint checks Laravel and database connectivity without opening a browser session or exposing diagnostics; it does not assert that migrations or administrator setup have finished.
 
+### Database hostname collisions on shared proxy networks
+
+The application connects to `rbim-sbispgm-mysql`, an alias assigned only to this deployment's `database` service on its `backend` network. Keep that alias and `app.environment.DB_HOST` together in Preview Compose. A generic hostname such as `database` can also name another application's MySQL container on `dokploy-network`. In that case the app can receive MySQL error 1045 even when its credentials match and its own database container is healthy. Docker documents the network scope and ambiguity of shared aliases in its [Compose networking reference](https://docs.docker.com/reference/compose-file/services/#aliases).
+
+Redeploy the Compose service after applying this change. Updating `DB_HOST` only in the Dokploy Environment text does not override the explicit value in `docker-compose.yml`. Keep the existing Compose project, service names, and `database_data` volume so the deployment reuses its records. Once the app stays running, check `getent ahostsv4 rbim-sbispgm-mysql` in its terminal and confirm `/up` returns HTTP 200. If authentication still fails against the intended server, inspect that account's credentials and host entries separately.
+
 ## 4. Initialize a new database
 
 Open the **app** container terminal in Dokploy and run:

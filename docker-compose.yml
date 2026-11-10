@@ -15,7 +15,8 @@ services:
       LOG_CHANNEL: stderr
       LOG_LEVEL: ${LOG_LEVEL:-warning}
       DB_CONNECTION: mysql
-      DB_HOST: database
+      # Avoid the generic database alias used by other apps on proxy networks.
+      DB_HOST: rbim-sbispgm-mysql
       DB_PORT: "3306"
       DB_DATABASE: ${DB_DATABASE:-sbispgm}
       DB_USERNAME: ${DB_USERNAME:-sbispgm}
@@ -77,7 +78,9 @@ services:
     volumes:
       - database_data:/var/lib/mysql
     networks:
-      - backend
+      backend:
+        aliases:
+          - rbim-sbispgm-mysql
     healthcheck:
       test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql --protocol=TCP -h 127.0.0.1 -u \"$$MYSQL_USER\" \"$$MYSQL_DATABASE\" -e 'SELECT 1' >/dev/null 2>&1"]
       interval: 10s
