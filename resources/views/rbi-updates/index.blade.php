@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @push('head')
+    <link rel="stylesheet" href="{{ asset('css/rbi-editor.css') }}?v={{ filemtime(public_path('css/rbi-editor.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/rbi-workspace.css') }}?v={{ filemtime(public_path('css/rbi-workspace.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/rbi-report-view.css') }}?v={{ filemtime(public_path('css/rbi-report-view.css')) }}">
     @if(request()->routeIs('barangay.rbi-updates.history'))
@@ -18,17 +19,17 @@
         $requiredMemberFields = ['last_name', 'first_name', 'sex', 'recorded_age', 'civil_status', 'birth_place', 'religion', 'birth_date'];
         $formFamilies = [];
 
-        foreach ($formRows as $row) {
+        foreach ($formRows as $index => $row) {
             $householdHead = trim((string) ($row['household_head'] ?? ''));
             $householdId = (string) ($row['household_id'] ?? '');
-            $familyKey = $householdId !== '' ? 'household:'.$householdId : ($householdHead !== '' ? mb_strtolower($householdHead) : '__blank_family__');
-            $formFamilies[$familyKey] ??= ['household_id' => $householdId, 'household_head' => $householdHead, 'household_number' => $row['household_number'] ?? '', 'members' => []];
+            $familyKey = \App\Support\RbiFamilyIdentity::key($row, $index);
+            $formFamilies[$familyKey] ??= ['family_key' => ($row['family_key'] ?? '') ?: (string) \Illuminate\Support\Str::uuid(), 'household_id' => $householdId, 'household_head' => $householdHead, 'household_number' => $row['household_number'] ?? '', 'members' => []];
             unset($row['household_head'], $row['household_id']);
             $formFamilies[$familyKey]['members'][] = $row;
         }
 
         if ($formFamilies === []) {
-            $formFamilies = [['household_id' => '', 'household_head' => '', 'household_number' => '', 'members' => [[]]]];
+            $formFamilies = [['family_key'=>(string) \Illuminate\Support\Str::uuid(), 'household_id' => '', 'household_head' => '', 'household_number' => '', 'members' => [[]]]];
         }
 
         $noNewResidents = empty($editingReport?->rows) && (old('form_section') ? (bool) old('no_new_residents', false) : ($editingReport !== null || $rbiSection === 'deceased'));
@@ -81,10 +82,9 @@
         </nav>
         @if($rbiSection !== 'history')
         <nav class="rbi-section-nav" aria-label="RBI form sections">
-            <a href="#monthly-report"><span>01</span> Monthly report</a>
-            <a href="#family-section"><span>A</span> Registered inhabitants</a>
-            <a href="#deceased-section"><span>B</span> Deceased inhabitants</a>
-            <a href="#certification-section"><span>C</span> Certification</a>
+            <a href="#family-section" data-rbi-step-link="residents"><span>A</span> Registered inhabitants</a>
+            <a href="#deceased-section" data-rbi-step-link="deceased"><span>B</span> Deceased inhabitants</a>
+            <a href="#certification-section" data-rbi-step-link="certification"><span>C</span> Certification</a>
         </nav>
         @endif
         @if (session('status'))
@@ -150,6 +150,7 @@
                 <strong data-member-number>Member</strong>
                 <button class="secondary-button" type="button" data-remove-member>Remove Member</button>
             </div>
+            <input type="hidden" data-row-field="family_key" data-family-key-hidden>
             <input type="hidden" data-row-field="household_head" data-household-head-hidden>
             <input type="hidden" data-row-field="household_number" data-household-number-hidden><input type="hidden" data-row-field="household_id" data-household-id-hidden>
             <input type="hidden" data-row-field="inhabitant_id">
@@ -178,7 +179,7 @@
                 <div><span class="step-pill" data-family-number></span><h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4></div>
                 <button class="secondary-button" type="button" data-remove-family>Remove Family</button>
             </div>
-            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <x-required-mark /></label><input type="text" list="rbi-household-heads" data-family-head required autocomplete="off"><input type="hidden" data-family-household-id><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
+            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label><input type="text" list="rbi-household-heads" data-family-head autocomplete="off"><input type="hidden" data-family-household-id></div><div><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
             <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
             <div class=" grid gap-6" data-family-members></div>
             <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
@@ -203,8 +204,15 @@
             const existingHouseholds = @json($rbiHouseholds);
             let nextRowIndex = {{ count($formRows) }};
             let nextFamilyId = 0;
+            const newFamilyKey = () => {
+                const bytes = crypto.getRandomValues(new Uint8Array(16));
+                bytes[6] = (bytes[6] & 15) | 64; bytes[8] = (bytes[8] & 63) | 128;
+                return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('').replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5');
+            };
 
             const syncHouseholdHead = (familyCard) => {
+                familyCard.dataset.familyKey ||= newFamilyKey();
+                familyCard.querySelectorAll('[data-family-key-hidden]').forEach(input => input.value = familyCard.dataset.familyKey);
                 const headInput = familyCard.querySelector('[data-family-head]');
                 const enteredHead = headInput.value.trim();
                 const currentId = familyCard.querySelector('[data-family-household-id]').value;
@@ -239,19 +247,21 @@
 
             const savedFamilies = @json(collect($editingReport?->rows ?? [])->map(fn ($row) => ['id' => $row['household_id'] ?? '', 'label' => $row['household_head'] ?? '', 'household_number' => $row['household_number'] ?? ''])->unique('label')->values());
             const refreshDeceasedFamilyOptions = () => {
-                const currentFamilies = [...(familyForms?.querySelectorAll('[data-family-card]') || [])].map(card => ({id:card.querySelector('[data-family-household-id]').value,label:card.querySelector('[data-family-head]').value.trim().replace(/ \[Household .*\]$/, ''),household_number:card.querySelector('[data-family-household-number]').value.trim()}));
-                const families = [...existingHouseholds, ...savedFamilies, ...currentFamilies].filter((family,index,all) => family.label && all.findIndex(other => (family.id && other.id) ? String(other.id)===String(family.id) : other.label===family.label)===index);
+                const currentFamilies = [...(familyForms?.querySelectorAll('[data-family-card]') || [])].map(card => ({family_key:card.dataset.familyKey,id:card.querySelector('[data-family-household-id]').value,label:card.querySelector('[data-family-head]').value.trim().replace(/ \[Household .*\]$/, ''),household_number:card.querySelector('[data-family-household-number]').value.trim()}));
+                const families = [...existingHouseholds, ...savedFamilies, ...currentFamilies].filter((family,index,all) => (family.label || family.family_key) && all.findIndex(other => (family.id && other.id) ? String(other.id)===String(family.id) : (family.label ? other.label===family.label : other.family_key===family.family_key))===index);
                 document.querySelectorAll('[data-deceased-family]').forEach(select => {
                     const selected = select.dataset.selected || select.value || '';
                     const hiddenId = select.closest('td').querySelector('[data-deceased-household-id]');
                     const selectedId = hiddenId?.value || '';
+                    const selectedKey = select.closest('td').querySelector('[data-deceased-family-key]')?.value || '';
                     select.replaceChildren(new Option('Select family', ''));
-                    families.forEach(family => {
-                        const option = new Option(family.label + (family.household_number ? ` (Household ${family.household_number})` : ''), family.label);
+                    families.forEach((family,index) => {
+                        const option = new Option((family.label || `Family ${index + 1} · head not provided`) + (family.household_number ? ` (Household ${family.household_number})` : ''), family.label);
                         option.dataset.householdId = family.id || '';
+                        option.dataset.familyKey = family.family_key || '';
                         select.add(option);
                     });
-                    const match = [...select.options].find(option => selectedId ? option.dataset.householdId === selectedId : option.value === selected);
+                    const match = [...select.options].find(option => selectedKey ? option.dataset.familyKey === selectedKey : (selectedId ? option.dataset.householdId === selectedId : option.value === selected));
                     if (match) match.selected = true;
                     else if (selected) select.add(new Option(selected, selected, true, true));
                     select.dataset.selected = '';
@@ -260,6 +270,7 @@
             document.getElementById('rbi-deceased-rows-table')?.addEventListener('change', event => {
                 if (!event.target.matches('[data-deceased-family]')) return;
                 event.target.closest('td').querySelector('[data-deceased-household-id]').value = event.target.selectedOptions[0]?.dataset.householdId || '';
+                event.target.closest('td').querySelector('[data-deceased-family-key]').value = event.target.selectedOptions[0]?.dataset.familyKey || '';
             });
 
             const refreshMemberNumbers = (familyCard) => {
@@ -350,7 +361,7 @@
                 const body = document.querySelector('#rbi-deceased-rows-table tbody');
                 const index = body.querySelectorAll('tr').length;
                 const row = document.createElement('tr');
-                row.insertAdjacentHTML('beforeend', '<td data-label="Household / Family"><input type="hidden" name="deceased_rows[' + index + '][household_id]" data-deceased-household-id><select aria-label="Household for deceased inhabitant" name="deceased_rows[' + index + '][household_head]" data-deceased-family><option value="">Select family</option></select></td>');
+                row.insertAdjacentHTML('beforeend', '<td data-label="Household / Family"><input type="hidden" name="deceased_rows[' + index + '][family_key]" data-deceased-family-key><input type="hidden" name="deceased_rows[' + index + '][household_id]" data-deceased-household-id><select aria-label="Household for deceased inhabitant" name="deceased_rows[' + index + '][household_head]" data-deceased-family><option value="">Select family</option></select></td>');
                 @foreach ($rbiDeceasedRowFields as $field => $label)
                     row.insertAdjacentHTML('beforeend', `<td data-label="{{ $field === 'deceased_name' ? 'Full name' : $label }}"><input name="deceased_rows[${index}][{{ $field }}]" type="{{ $field === 'death_date' ? 'date' : 'text' }}" aria-label="{{ $label }}"></td>`);
                 @endforeach
@@ -361,6 +372,7 @@
 
         })();
     </script>
+    <script src="{{ asset('js/rbi-form-workspace.js') }}?v={{ filemtime(public_path('js/rbi-form-workspace.js')) }}" defer></script>
     <script src="{{ asset('js/rbi-duplicates.js') }}?v={{ filemtime(public_path('js/rbi-duplicates.js')) }}" defer></script>
 @endsection
 

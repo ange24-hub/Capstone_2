@@ -27,6 +27,20 @@ class PopulationReportController extends Controller
             'semester' => ['nullable', Rule::in([1,2])],
         ]);
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
+        if ($request->user()->hasRole(User::ROLE_MUNICIPAL_LGU)) {
+            $period = ['report_year'=>($request->filled('report_year') ? $request->integer('report_year') : now()->year),
+                'semester'=>($request->filled('semester') ? $request->integer('semester') : (now()->month <= 6 ? 1 : 2))];
+            if ($request->routeIs('reports.population')) {
+                return redirect()->route('reports.population.submissions.index', $period + $request->only('barangay_id'));
+            }
+            // A municipal export must resolve to an actually submitted snapshot;
+            // never build a live barangay report through an alternate URL.
+            abort_unless($request->input('section', 'summary') === 'summary' && $request->filled('barangay_id'), 404);
+            $saved = \App\Models\PopulationReportSubmission::receivedByMunicipal()
+                ->where('barangay_id', $request->integer('barangay_id'))->where($period)
+                ->orderByDesc('submitted_at')->orderByDesc('id')->firstOrFail();
+            return redirect()->route('reports.population.submissions.'.($request->routeIs('reports.population.pdf') ? 'pdf' : 'excel'), $saved);
+        }
         if ($isSecretary) {
             abort_unless($request->user()->barangay_id, 403, 'Your account must be assigned to a barangay.');
             abort_if($request->filled('barangay_id') && $request->integer('barangay_id') !== (int) $request->user()->barangay_id, 403);

@@ -34,7 +34,7 @@ class RbiReportRegistry
         $rows = array_map([HouseholdRbi::class, 'normalize'], $report->rows ?? []);
         Validator::make(['rows' => $rows], [
             'rows' => ['required', 'array', 'min:1'],
-            'rows.*.household_head' => ['required', 'string', 'max:255'],
+            'rows.*.household_head' => ['nullable', 'string', 'max:255'],
             'rows.*.inhabitant_name' => ['required', 'string', 'max:255'],
             'rows.*.sex' => ['required', 'in:Male,Female'],
             'rows.*.birth_date' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'],
@@ -59,7 +59,8 @@ class RbiReportRegistry
             $matchesDate = fn ($person) => $date === null || $person->birth_date === null || $person->birth_date->format('Y-m-d') === $date;
             if ($deceased->filter($matchesName)->contains($matchesDate)) self::fail($row['inhabitant_name'].' matches a deceased record. Review the form before adding to RBI.');
 
-            $head = self::normalize($row['household_head']);
+            $head = self::normalize($row['household_head'] ?? '');
+            $familyKey = RbiFamilyIdentity::key($row, $index);
             if (! empty($row['household_id'])) {
                 $household = $households->firstWhere('id', (int) $row['household_id']);
                 if (! $household) self::fail('The selected household does not belong to your barangay.');
@@ -70,14 +71,15 @@ class RbiReportRegistry
                     $household = Household::create(['barangay_id' => $barangay->id, 'household_number' => $number, 'address' => $row['complete_address'] ?? null]);
                     $households->push($household);
                 }
-            } elseif (isset($resolved[$head])) {
-                $household = $resolved[$head];
+            } elseif (isset($resolved[$familyKey])) {
+                $household = $resolved[$familyKey];
             } else {
                 $heads = $residents->filter(fn ($person) => self::normalize($person->fullName()) === $head
                     || self::normalize($person->last_name.', '.trim($person->first_name.' '.$person->middle_name)) === $head);
                 $ids = $heads->pluck('household_id')->merge($knownFamilies
                     ->filter(fn ($family) => self::normalize($family->household_head) === $head)
                     ->pluck('household_id'))->unique();
+                if ($head === '') $ids = collect();
                 if ($ids->count() > 1) self::fail('Several households match '.$row['household_head'].'. Select the correct household in the form.');
                 $household = $ids->count() === 1 ? $households->firstWhere('id', $ids->first()) : null;
                 if (! $household) {
@@ -87,7 +89,7 @@ class RbiReportRegistry
                 }
             }
             if ($household->household_number === 'Not recorded') self::fail('Select a numbered household before adding members to RBI.');
-            $resolved[$head] = $household;
+            $resolved[$familyKey] = $household;
 
             if (! empty($row['inhabitant_id'])) {
                 $person = $residents->firstWhere('id', (int) $row['inhabitant_id']);

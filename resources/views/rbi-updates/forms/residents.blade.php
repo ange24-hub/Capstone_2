@@ -4,7 +4,7 @@
                     @if ($editingReport) @method('PUT') @endif
                     <p class="field-help"><x-required-mark /> Required fields must be filled out.</p>
 
-                    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
+                    <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2" data-rbi-common-fields>
                         <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
                         <div>
                             <label for="reporting_month">For the month of <x-required-mark /></label>
@@ -15,7 +15,7 @@
                         </div>
                     </div>
 
-                    <section class="rbi-monthly-section rbi-monthly-residents">
+                    <section class="rbi-monthly-section rbi-monthly-residents" data-rbi-step-panel="residents">
                     <div class="rbi-section-heading"><div><h3 class="section-title" id="family-section"><span class="rbi-section-letter">A</span> Newly registered inhabitants</h3><p class="rbi-section-help">Group residents by household. Section B follows below on the same monthly form.</p></div>
                     @if(empty($editingReport?->rows))
                         <label class="rbi-no-residents"><input type="checkbox" name="no_new_residents" value="1" data-no-new-residents @checked($noNewResidents)> No new residents this month</label>
@@ -24,7 +24,7 @@
                     <fieldset class="rbi-resident-fields" data-resident-fields @disabled($noNewResidents)><legend class="sr-only">Newly registered residents and households</legend>
                     <div id="family-forms" class=" grid gap-6">
                         @foreach ($formFamilies as $family)
-                            <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card>
+                            <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card data-family-key="{{ $family['family_key'] }}">
                                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                                     <div>
                                         <span class="step-pill" data-family-number>Family {{ $loop->iteration }}</span>
@@ -35,10 +35,10 @@
 
                                 <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                     <div>
-                                        <label data-family-head-label>Household head <x-required-mark /></label>
-                                        <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head required autocomplete="off">
-                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household">
-                                        <small class="field-help">Choose a registry match when available. A typed name is allowed for a newly registered household.</small>
+                                        <label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label>
+                                        <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head autocomplete="off">
+                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id></div><div><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household">
+                                        <small class="field-help">Use a known household number, or leave it blank if it is not recorded.</small>
                                         <p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p>
                                     </div>
                                 </div>
@@ -53,6 +53,7 @@
                                                 <button class="secondary-button" type="button" data-remove-member @disabled(count($family['members']) === 1)>Remove Member</button>
                                             </div>
                                             @if(!empty($member['history_record_id']))<p class="field-help">History entry #{{ $member['history_record_id'] }} · {{ trim(implode(' ', array_filter([$member['first_name'] ?? '', $member['middle_name'] ?? '', $member['last_name'] ?? '', $member['suffix'] ?? '']))) }}</p>@endif
+                                            <input type="hidden" name="rows[{{ $currentRowIndex }}][family_key]" value="{{ $family['family_key'] }}" data-family-key-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_head]" value="{{ $family['household_head'] }}" data-household-head-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][household_number]" value="{{ $family['household_number'] ?? '' }}" data-household-number-hidden><input type="hidden" name="rows[{{ $currentRowIndex }}][household_id]" value="{{ $family['household_id'] }}" data-household-id-hidden>
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
@@ -91,12 +92,16 @@
 
                     </fieldset></section>
                     @include('rbi-updates.forms._deceased-fields')
+                    <section data-rbi-step-panel="certification">
                     @include('rbi-updates.forms._certification')
+                    </section>
 
                     <div class="form-actions split-actions civic-sticky-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
-                        <span>Save your changes first, then submit the saved report from Report history.</span>
+                        <span data-rbi-step-status>Complete the monthly form, then save once.</span>
                         <div class="toolbar compact-toolbar flex flex-wrap items-end gap-3">
-                            <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Monthly Form' : 'Save Monthly Form' }}</button>
+                            <button class="secondary-button" type="button" data-rbi-previous hidden>Back</button>
+                            <button class="button" type="button" data-rbi-next hidden>Continue</button>
+                            <button class="button" type="submit" data-rbi-save>{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Monthly Form' : 'Save Monthly Form' }}</button>
                         </div>
                     </div>
                 </form>

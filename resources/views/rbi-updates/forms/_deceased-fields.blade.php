@@ -1,4 +1,4 @@
-<section class="rbi-monthly-section rbi-monthly-deceased">
+<section class="rbi-monthly-section rbi-monthly-deceased" data-rbi-step-panel="deceased">
                     <h3 class="section-title text-lg font-semibold text-slate-900" id="deceased-section"><span class="rbi-section-letter">B</span> Deceased registered inhabitants</h3>
                     <p class="rbi-section-help">List deaths for this reporting month. Leave this section blank when there are none.</p>
                     <div class="table-wrap form-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
@@ -8,6 +8,7 @@
                                 @foreach ($formDeceasedRows as $index => $row)
                                     <tr>
                                         <td data-label="Household / Family">
+                                            <input type="hidden" name="deceased_rows[{{ $index }}][family_key]" value="{{ $row['family_key'] ?? '' }}" data-deceased-family-key>
                                             <input type="hidden" name="deceased_rows[{{ $index }}][household_id]" value="{{ $row['household_id'] ?? '' }}" data-deceased-household-id>
                                             <input type="hidden" name="deceased_rows[{{ $index }}][inhabitant_id]" value="{{ $row['inhabitant_id'] ?? '' }}">
                                             <select name="deceased_rows[{{ $index }}][household_head]" data-deceased-family data-selected="{{ $row['household_head'] ?? '' }}" aria-label="Household for deceased inhabitant {{ $index + 1 }}">

@@ -2,6 +2,7 @@
     $entryTemplate=$entryTemplate ?? false;
     $entryMember=$entryTemplate ? [] : ($member ?? []);
 @endphp
+<details class="rbi-entry-review" @if(!empty($entryMember['entry_type'])) open @endif><summary>Reason for registration <span>Review entry details</span></summary>
 <fieldset class="rbi-entry-classification" data-entry-classification>
     <legend>Reason for this RBI entry</legend>
     <p class="field-help">Classify why this person is being added. A baby who actually moved here can be an in-migrant; birth date alone does not decide this.</p>
@@ -20,4 +21,4 @@
         <div data-arrival-fields><label>Exact arrival date (if known)</label><input data-entry-arrival @if($entryTemplate) data-row-field="arrival_date" @else name="rows[{{ $currentRowIndex }}][arrival_date]" @endif type="date" value="{{ $entryMember['arrival_date'] ?? '' }}"><small class="field-help">Leave blank when the history records only the month.</small></div>
     </div>
     <small class="field-help">Birth / Newborn: added because of birth. Late registration: already living here, newly encoded. These are excluded from arrival counts.</small>
-</fieldset>
+</fieldset></details>

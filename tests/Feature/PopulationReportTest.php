@@ -30,7 +30,7 @@ class PopulationReportTest extends TestCase
                 }
             }
         }
-        $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id'=>$area->id]);
         $report = $this->actingAs($staff)->get(route('reports.population', ['barangay_id' => $area->id]))
             ->assertOk()->assertSee('Total No. of Families:')->viewData('report');
         $this->assertSame(3, $report['totalFamilies']);
@@ -38,7 +38,7 @@ class PopulationReportTest extends TestCase
         $this->assertSame(3, $report['coverage'][0]['families']);
         $this->assertSame(4, $report['recordsWithoutFamily']);
         $this->assertSame(5, $report['totalHouseholds']);
-        $all = $this->get(route('reports.population'))->assertOk()->viewData('report');
+        $all = app(\App\Services\PopulationSummary::class)->build(null, 'summary');
         $this->assertSame(4, $all['totalFamilies']);
         $this->assertSame(2, $all['singlePersonFamiliesAdded']);
         $pdfHtml = view('reports.population-pdf', compact('report'))->render();
@@ -76,7 +76,7 @@ class PopulationReportTest extends TestCase
                 'sex' => $index % 2 ? 'Female' : 'Male', 'remarks' => $remarks, 'birth_date' => $date,
                 'status' => Inhabitant::STATUS_ACTIVE]);
         }
-        $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id'=>$area->id]);
         $response = $this->actingAs($staff)->get(route('reports.population', ['barangay_id' => $area->id]))
             ->assertOk()->assertSee('Persons with disability')->assertSee('Senior citizens');
         $report = $response->viewData('report');
@@ -88,7 +88,7 @@ class PopulationReportTest extends TestCase
         $this->assertSame(4, $report['coverage'][0]['seniors']);
         $this->assertSame([6, 6, 0], array_values($report['coverage'][0]['sex']));
         $this->assertSame($report['ages'], $report['coverage'][0]['ages']);
-        $empty = $this->get(route('reports.population', ['barangay_id' => $other->id]))->assertOk()->viewData('report');
+        $empty = app(\App\Services\PopulationSummary::class)->build($other->id, 'summary');
         $this->assertSame(0, $empty['totalPwd']);
         $this->assertSame(0, $empty['totalSeniors']);
         $html = view('reports.population-pdf', compact('report'))->render();
@@ -111,8 +111,9 @@ class PopulationReportTest extends TestCase
                 }
             }
         }
-        $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
-        $report = $this->actingAs($staff)->get(route('reports.population'))->assertOk()->viewData('report');
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id'=>$area->id]);
+        $this->actingAs($staff);
+        $report = app(\App\Services\PopulationSummary::class)->build(null, 'summary');
         $this->assertSame(2, $report['totalHouseholds']);
         $this->assertSame(8, $report['encodedHouseholdRows']);
         $this->assertSame(8, $report['totalFamilies']);
@@ -139,10 +140,10 @@ class PopulationReportTest extends TestCase
                 ]);
             }
         }
-        $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id'=>$areas[0]->id]);
         $response = $this->actingAs($staff)->get(route('reports.population'))->assertOk()
             ->assertSee('Total No. of Families:');
-        $report = $response->viewData('report');
+        $report = app(\App\Services\PopulationSummary::class)->build(null, 'summary');
         $this->assertSame(3, $report['totalFamilies']);
         $this->assertSame(2, $report['totalHouseholds']);
         $this->assertSame(2, $report['recordsWithoutFamily']);
@@ -164,7 +165,7 @@ class PopulationReportTest extends TestCase
                 'status'=>$i === 0 ? Inhabitant::STATUS_MIGRATED_OUT : Inhabitant::STATUS_ACTIVE,
                 'residence_status'=>Inhabitant::RESIDENCE_HERE]);
         }
-        $staff=User::factory()->create(['role'=>User::ROLE_MUNICIPAL_LGU]);
+        $staff=User::factory()->create(['role'=>User::ROLE_BARANGAY,'barangay_id'=>$area->id]);
         $response=$this->actingAs($staff)->get(route('reports.population',['barangay_id'=>$area->id]));
         $response->assertOk()->assertSee('Population Summary')->assertSee('Download PDF');
         $r=$response->viewData('report');
@@ -177,9 +178,9 @@ class PopulationReportTest extends TestCase
         $this->assertSame(5,$r['confirmedLivingHere']);
         $this->assertSame(1,$r['coveredBarangays']);
         $this->assertSame(1,$r['totalBarangays']);
-        $this->get(route('reports.population',['barangay_id'=>$other->id]))->assertOk()
+        $this->actingAs(User::factory()->create(['role'=>User::ROLE_BARANGAY,'barangay_id'=>$other->id]))->get(route('reports.population'))->assertOk()
             ->assertSee('No resident records encoded in this scope')->assertSee('Not yet encoded');
-        $all=$this->get(route('reports.population'))->assertOk()->viewData('report');
+        $all=app(\App\Services\PopulationSummary::class)->build(null, 'summary');
         $this->assertSame(1,$all['coveredBarangays']);
         $this->assertSame(Barangay::count(),$all['totalBarangays']);
         $this->getJson(route('reports.population',['barangay_id'=>999999]))->assertUnprocessable();

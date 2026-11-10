@@ -83,8 +83,12 @@
             <a class="{{ $active ? 'active' : '' }}" href="{{ route($routeName) }}" @if($active) aria-current="page" @endif><span class="nav-mark"><x-app-icon :name="$icon" /></span><span>{{ $label }}</span></a>
             @if($routeName === 'reports.population' && request()->routeIs('reports.population*'))
                 <div class="rbi-sidebar-subpages" aria-label="Population report subpages">
+                    @if($user->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
+                    <a href="{{ route('reports.population.submissions.index', request()->only('report_year','semester')) }}">Reports by year &amp; semester</a>
+                    @else
                     <a href="{{ route('reports.population', request()->only('barangay_id')) }}" @if(request()->routeIs('reports.population', 'reports.population.submissions.sign')) aria-current="page" @endif>Population Summary</a>
                     <a href="{{ route('reports.population.submissions.index', request()->only('barangay_id')) }}" @if(request()->routeIs('reports.population.submissions.index', 'reports.population.submissions.show')) aria-current="page" @endif>Submission History</a>
+                    @endif
                 </div>
             @endif
         @endforeach

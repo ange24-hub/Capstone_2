@@ -13,7 +13,7 @@
         <p>Submitted to Municipal DILG/Admin by {{ $submission->submitted_by_name }} on {{ $submission->submitted_at->format('M d, Y h:i A') }}.</p>
         <p>This is the saved report as reviewed before submission. Later registry updates do not change this copy.</p>
         <div class="population-report-actions">
-            <a class="button secondary-button" href="{{ route('reports.population.submissions.index') }}">Submission History</a>
+            <a class="button secondary-button" href="{{ route('reports.population.submissions.index', auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? ['report_year'=>$submission->report_year,'semester'=>$submission->semester] : []) }}">{{ auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? 'Back to semester reports' : 'Submission History' }}</a>
             <a class="button secondary-button" href="{{ route('reports.population.submissions.show', ['submission'=>$submission->id,'print'=>1]) }}" target="_blank" rel="noopener">Print Report</a>
             <a class="button" href="{{ route('reports.population.submissions.pdf',$submission) }}">Download PDF</a>
             <a class="button secondary-button" href="{{ route('reports.population.submissions.excel',$submission) }}">Download Excel{{ !empty($report['signatures']) ? ' (data only)' : '' }}</a>

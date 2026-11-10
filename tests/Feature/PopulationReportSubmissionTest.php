@@ -184,7 +184,7 @@ class PopulationReportSubmissionTest extends TestCase
             $this->get(route('reports.population', $query))->assertOk()->assertDontSee('name="preview_token"', false);
         }
         $this->actingAs(User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]))
-            ->get(route('reports.population'))->assertOk()->assertSee('Submission History')->assertDontSee('name="preview_token"', false);
+            ->get(route('reports.population'))->assertRedirect();
         foreach ([['role' => User::ROLE_RESIDENT], ['role' => User::ROLE_BARANGAY, 'barangay_id' => null],
             ['role' => User::ROLE_BARANGAY, 'barangay_id' => $staff->barangay_id, 'approval_status' => 'pending']] as $attributes) {
             $user = User::factory()->create($attributes);

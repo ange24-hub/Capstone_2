@@ -51,7 +51,8 @@ class HistoricalPopulationReportTest extends TestCase
         $this->get(route('reports.population.submissions.pdf', $saved))->assertForbidden();
         $this->get(route('reports.population.submissions.excel', $saved))->assertForbidden();
         $admin = User::factory()->create(['role'=>User::ROLE_MUNICIPAL_LGU]);
-        $this->actingAs($admin)->get(route('reports.population.submissions.show', $saved))->assertOk();
+        $this->actingAs($admin)->get(route('reports.population.submissions.show', $saved))->assertNotFound();
+        $this->actingAs($user);
         Storage::disk('local')->put('private/population-reports/'.$saved->snapshot['source_sha256'].'.jpg', 'corrupt');
         $this->get(route('reports.population.submissions.source', $saved))->assertStatus(409);
         $this->assertDatabaseCount('population_report_submissions', 1);

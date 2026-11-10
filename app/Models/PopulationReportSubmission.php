@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class PopulationReportSubmission extends Model
 {
@@ -22,5 +23,17 @@ class PopulationReportSubmission extends Model
     public function getIsHistoricalArchiveAttribute(): bool
     {
         return ($this->snapshot['kind'] ?? null) === 'historical_population_photo';
+    }
+
+    public function scopeReceivedByMunicipal(Builder $query): Builder
+    {
+        // Only snapshots created by the barangay submission workflow. Imported
+        // historical photographs are private archives, not municipal submissions.
+        return $query->whereNotNull('submitted_at')->whereNull('snapshot->kind')->whereNotNull('snapshot->monitoring');
+    }
+
+    public function getIsMunicipalSubmissionAttribute(): bool
+    {
+        return $this->submitted_at !== null && !isset($this->snapshot['kind']) && isset($this->snapshot['monitoring']);
     }
 }

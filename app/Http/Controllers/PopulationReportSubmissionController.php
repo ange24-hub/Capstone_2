@@ -28,6 +28,24 @@ class PopulationReportSubmissionController extends Controller
         $filters = $request->validate(['barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
             'report_year' => ['nullable', 'integer', 'between:1900,'.\App\Services\PopulationReportPeriod::maximumYear()], 'semester' => ['nullable', Rule::in([1, 2])]]);
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
+        if (!$isSecretary) {
+            $year = ($request->filled('report_year') ? $request->integer('report_year') : now()->year);
+            $semester = ($request->filled('semester') ? $request->integer('semester') : (now()->month <= 6 ? 1 : 2));
+            $areaId = $request->integer('barangay_id') ?: null;
+            $base = PopulationReportSubmission::receivedByMunicipal();
+            $years = (clone $base)->distinct()->orderByDesc('report_year')->pluck('report_year')
+                ->push($year)->push(now()->year)->unique()->sortDesc()->values();
+            $periodCounts = (clone $base)->where('report_year', $year)->selectRaw('semester, COUNT(DISTINCT barangay_id) AS total')
+                ->groupBy('semester')->pluck('total', 'semester');
+            $latest = (clone $base)->where('report_year', $year)->where('semester', $semester)
+                ->selectRaw('MAX(id)')->groupBy('barangay_id');
+            $submissions = (clone $base)->whereIn('id', $latest)
+                ->when($areaId, fn ($q) => $q->where('barangay_id', $areaId))
+                ->orderBy('barangay_name')->paginate(18)->withQueryString();
+            $barangays = Barangay::whereIn('id', (clone $base)->select('barangay_id'))->orderBy('name')->get(['id','name']);
+            return response()->view('reports.population-inbox', compact('submissions','years','year','semester','periodCounts','barangays','areaId'))
+                ->header('Cache-Control', 'private, no-store');
+        }
         if ($isSecretary && $request->filled('barangay_id')) abort_unless($request->integer('barangay_id') === (int) $request->user()->barangay_id, 403);
         $areaId = $isSecretary ? $request->user()->barangay_id : ($request->integer('barangay_id') ?: null);
         $submissions = PopulationReportSubmission::query()->when($areaId, fn ($q) => $q->where('barangay_id', $areaId))
@@ -121,6 +139,7 @@ class PopulationReportSubmissionController extends Controller
     {
         $this->authorizeStaff($request);
         if ($request->user()->hasRole(User::ROLE_BARANGAY)) abort_unless((int) $submission->barangay_id === (int) $request->user()->barangay_id, 403);
+        if ($request->user()->hasRole(User::ROLE_MUNICIPAL_LGU)) abort_unless($submission->is_municipal_submission, 404);
         $request->validate(['print' => ['nullable', 'boolean'], 'download' => ['nullable', 'boolean']]);
         if ($submission->is_historical_archive) {
             $archive = $submission->snapshot;

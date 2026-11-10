@@ -21,7 +21,7 @@ class PopulationMonitoringReportTest extends TestCase
                 'last_name'=>(string)$index,'sex'=>$age===null?'':'Male','family_number'=>'1',
                 'birth_date'=>$age===null?null:now()->copy()->subYears($age)->toDateString()]);
         }
-        $response=$this->actingAs(User::factory()->create(['role'=>'municipal_lgu']))
+        $response=$this->actingAs(User::factory()->create(['role'=>'barangay','barangay_id'=>$area->id]))
             ->get(route('reports.population',['barangay_id'=>$area->id,'report_year'=>2027,'semester'=>1]))->assertOk()
             ->assertSee('RBI FORM C (Revised 2024)')->assertSee('MONITORING REPORT')->assertSee('Population by Age Bracket:');
         $report=$response->viewData('report');$rows=collect($report['monitoring']['ages'])->keyBy('label');
@@ -51,7 +51,7 @@ class PopulationMonitoringReportTest extends TestCase
             'household_id'=>$home->id,'first_name'=>'Fixture','last_name'=>(string)$i,'sex'=>'Female',
             'birth_date'=>$birth,'remarks'=>$remarks,'occupation'=>$occupation,'civil_status'=>$civil,'birth_place'=>'Philippines']);
         $this->travelTo(Carbon::parse('2026-05-28'));
-        $report=$this->actingAs(User::factory()->create(['role'=>'municipal_lgu']))->get(route('reports.population',['barangay_id'=>$area->id,'report_year'=>2027,'semester'=>1]))->assertOk()->viewData('report');
+        $report=$this->actingAs(User::factory()->create(['role'=>'barangay','barangay_id'=>$area->id]))->get(route('reports.population',['barangay_id'=>$area->id,'report_year'=>2027,'semester'=>1]))->assertOk()->viewData('report');
         $rows=collect($report['monitoring']['sectors'])->keyBy('label');
         foreach(['Person with Disabilities (PWDs)','Overseas Filipino Workers (OFWs)','Solo Parents','Indigenous Peoples (IPs)',
             'Unemployed','Out of School Children (OSC) (6-14 years old)','Out of School Youth (OSY) (15-24 years old)'] as $label) $this->assertSame(1,$rows[$label]['total'],$label);

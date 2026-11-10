@@ -75,4 +75,29 @@ class MonthlyRbiFormTest extends TestCase
         $this->assertDatabaseCount('barangay_rbi_updates', 1);
         $this->assertSame([], $report->fresh()->deceased_rows);
     }
+
+    public function test_optional_household_heads_preserve_separate_families_and_their_members(): void
+    {
+        $staff=$this->staff();$this->actingAs($staff);
+        $one=(string) \Illuminate\Support\Str::uuid();$two=(string) \Illuminate\Support\Str::uuid();
+        $rows=[['family_key'=>$one,'inhabitant_name'=>'Sample, One','sex'=>'Male'],
+            ['family_key'=>$one,'inhabitant_name'=>'Sample, Two','sex'=>'Female'],
+            ['family_key'=>$two,'inhabitant_name'=>'Sample, Three','sex'=>'Male']];
+        $this->post(route('barangay.rbi-updates.store'),['form_section'=>'monthly','reporting_month'=>'2026-10','rows'=>$rows,
+            'deceased_rows'=>[['family_key'=>$two,'deceased_name'=>'Sample Death','death_date'=>'2026-10-01']]])->assertSessionHasNoErrors();
+        $report=BarangayRbiUpdate::firstOrFail();
+        $this->assertSame('', $report->rows[0]['household_head']);
+        $families=$report->rbiFamilies()->orderBy('position')->with('members','deceasedRecords')->get();
+        $this->assertCount(2,$families);$this->assertCount(2,$families[0]->members);$this->assertCount(1,$families[1]->members);
+        $this->assertCount(0,$families[0]->deceasedRecords);$this->assertCount(1,$families[1]->deceasedRecords);
+        $response=$this->get(route('barangay.rbi-updates.residents',['edit'=>$report->id]))->assertOk();
+        $this->assertCount(2,$response->viewData('draftRbiUpdate')->rbiFamilies);
+        $this->put(route('barangay.rbi-updates.update',$report),['form_section'=>'monthly','reporting_month'=>'2026-10','rows'=>$report->rows,'deceased_rows'=>$report->deceased_rows])->assertSessionHasNoErrors();
+        $this->assertSame(2,$report->rbiFamilies()->count());
+        $this->get(route('rbi-updates.export-pdf',$report))->assertOk()->assertHeader('content-type','application/pdf');
+        \Illuminate\Support\Facades\DB::transaction(fn()=>\App\Support\RbiReportRegistry::add($staff->barangay,$report));
+        $people=\App\Models\Inhabitant::where('barangay_id',$staff->barangay_id)->orderBy('id')->get();
+        $this->assertCount(3,$people);$this->assertSame($people[0]->household_id,$people[1]->household_id);
+        $this->assertNotSame($people[0]->household_id,$people[2]->household_id);
+    }
 }

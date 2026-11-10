@@ -379,7 +379,6 @@ class BarangayRbiUpdateController extends Controller
             throw ValidationException::withMessages(['rows' => 'Uncheck "No new residents" before including resident entries.']);
         }
         $rows = app(\App\Support\RbiFirstSave::class)->stamp($rows, $report, now());
-        $this->ensureHouseholdHeads($rows);
         \App\Support\RbiEntryClassification::validateRows($rows, $validated['reporting_month']);
         // A subpage owns only its own rows; omitted entries on the other page must survive.
         $deceasedRows = $section === 'residents'
@@ -400,6 +399,7 @@ class BarangayRbiUpdateController extends Controller
             'attested_by' => ['nullable', 'string', 'max:255'],
             'rows.*.history_record_id' => ['nullable', 'integer', Rule::exists('new_inhabitants', 'id')->where('barangay_id', request()->user()?->barangay_id)],
             'rows.*.source_row_id' => ['nullable', 'uuid'],
+            'rows.*.family_key' => ['nullable', 'uuid'],
             'rows.*.household_number' => ['nullable', 'string', 'max:100'],
             'rows.*.last_name' => ['nullable', 'string', 'max:255'],
             'rows.*.first_name' => ['nullable', 'string', 'max:255'],
@@ -428,6 +428,7 @@ class BarangayRbiUpdateController extends Controller
             'rows.*.occupation' => ['nullable', 'string', 'max:255'],
             'rows.*.relationship' => ['nullable', 'string', 'max:255'],
             'deceased_rows' => ['nullable', 'array'],
+            'deceased_rows.*.family_key' => ['nullable', 'uuid'],
             'deceased_rows.*.deceased_name' => ['nullable', 'string', 'max:255'],
             'deceased_rows.*.death_date' => ['nullable', 'date'],
             'deceased_rows.*.household_head' => ['nullable', 'string', 'max:255'],
@@ -1092,7 +1093,7 @@ class BarangayRbiUpdateController extends Controller
 
     private function cleanRows(array $rows): array
     {
-        $fields = array_merge(['household_id', 'household_number', 'inhabitant_id', 'inhabitant_name', 'history_record_id', 'source_row_id', 'first_saved_at'], array_keys(BarangayRbiUpdate::rowFields()), \App\Support\RbiEntryClassification::fields());
+        $fields = array_merge(['family_key', 'household_id', 'household_number', 'inhabitant_id', 'inhabitant_name', 'history_record_id', 'source_row_id', 'first_saved_at'], array_keys(BarangayRbiUpdate::rowFields()), \App\Support\RbiEntryClassification::fields());
 
         return collect($rows)
             ->map(fn (array $row): array => \App\Support\HouseholdRbi::normalize($row))
@@ -1110,19 +1111,10 @@ class BarangayRbiUpdateController extends Controller
                 ->mapWithKeys(fn (string $field): array => [$field => trim((string) ($row[$field] ?? ''))])
                 ->all())
             ->filter(fn (array $row): bool => collect($row)
-                ->except(array_merge(['household_id', 'household_number', 'inhabitant_id', 'household_head', 'history_record_id', 'source_row_id', 'first_saved_at'], \App\Support\RbiEntryClassification::fields()))
+                ->except(array_merge(['family_key', 'household_id', 'household_number', 'inhabitant_id', 'household_head', 'history_record_id', 'source_row_id', 'first_saved_at'], \App\Support\RbiEntryClassification::fields()))
                 ->contains(fn (string $value): bool => $value !== ''))
             ->values()
             ->all();
-    }
-
-    private function ensureHouseholdHeads(array $rows): void
-    {
-        if (collect($rows)->contains(fn (array $row): bool => ($row['household_head'] ?? '') === '')) {
-            throw ValidationException::withMessages([
-                'rows' => 'Enter the household head for every family section that has a member.',
-            ]);
-        }
     }
 
     private function storeReportSignatures(
@@ -1149,7 +1141,7 @@ class BarangayRbiUpdateController extends Controller
 
     private function cleanDeceasedRows(array $rows): array
     {
-        $fields = array_merge(['household_id', 'household_head', 'inhabitant_id'], array_keys(BarangayRbiUpdate::deceasedRowFields()));
+        $fields = array_merge(['family_key', 'household_id', 'household_head', 'inhabitant_id'], array_keys(BarangayRbiUpdate::deceasedRowFields()));
 
         return collect($rows)
             ->map(fn (array $row): array => collect($fields)
@@ -1168,9 +1160,21 @@ class BarangayRbiUpdateController extends Controller
             ->map(fn (array $row): array => [
                 'household_id' => (string) ($row['household_id'] ?? ''),
                 'household_head' => trim((string) ($row['household_head'] ?? '')),
+                'household_number' => $row['household_number'] ?? '',
+                'family_key' => $row['family_key'] ?? '',
             ])
-            ->unique(fn (array $family): string => $family['household_id'] ?: mb_strtolower($family['household_head']))
+            ->unique(fn (array $family, int $index): string => \App\Support\RbiFamilyIdentity::key($family, $index))
             ->values();
+
+        $deceasedRows = collect($deceasedRows)->map(function (array $row) use ($families): array {
+            if ($row['family_key'] !== '') {
+                $family = $families->firstWhere('family_key', $row['family_key']);
+                if (!$family) throw ValidationException::withMessages(['deceased_rows'=>'Choose a family from this monthly form.']);
+                $row['household_id'] = $family['household_id'];
+                $row['household_head'] = $family['household_head'];
+            }
+            return $row;
+        })->all();
 
         if ($families->count() === 1) {
             return collect($deceasedRows)->map(function (array $row) use ($families): array {
@@ -1178,6 +1182,7 @@ class BarangayRbiUpdateController extends Controller
                 if ($row['household_id'] === '' && $row['household_head'] === '') {
                     $row['household_id'] = $family['household_id'];
                     $row['household_head'] = $family['household_head'];
+                    $row['family_key'] = $family['family_key'];
                 } elseif ($row['household_id'] === '' && $row['household_head'] === $family['household_head']) {
                     $row['household_id'] = $family['household_id'];
                 }
@@ -1187,7 +1192,7 @@ class BarangayRbiUpdateController extends Controller
         }
 
         if ($families->count() > 1 && collect($deceasedRows)->contains(
-            fn (array $row): bool => ($row['household_id'] ?? '') === '' && ($row['household_head'] ?? '') === ''
+            fn (array $row): bool => ($row['household_id'] ?? '') === '' && ($row['household_head'] ?? '') === '' && ($row['family_key'] ?? '') === ''
         )) {
             throw ValidationException::withMessages([
                 'deceased_rows' => 'Select the household for every deceased inhabitant when the report contains more than one family.',
@@ -1204,9 +1209,7 @@ class BarangayRbiUpdateController extends Controller
             $report->rbiFamilies()->delete();
 
             $groupedRows = collect($rows)
-                ->groupBy(fn (array $row, int $index): string => ($row['household_id'] ?? '') !== ''
-                    ? 'household:'.$row['household_id']
-                    : (mb_strtolower(trim((string) ($row['household_head'] ?? ''))) ?: '__unnamed_'.$index));
+                ->groupBy(fn (array $row, int $index): string => \App\Support\RbiFamilyIdentity::key($row, $index));
             $familyMap = [];
 
             foreach ($groupedRows->values() as $familyPosition => $members) {
@@ -1261,9 +1264,7 @@ class BarangayRbiUpdateController extends Controller
 
     private function familyKey(array $row): string
     {
-        return ($row['household_id'] ?? '') !== ''
-            ? 'household:'.$row['household_id']
-            : mb_strtolower(trim((string) ($row['household_head'] ?? '')));
+        return \App\Support\RbiFamilyIdentity::key($row);
     }
 
     private function pdfPages(BarangayRbiUpdate $report): array

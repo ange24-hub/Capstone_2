@@ -27,7 +27,7 @@ class PopulationExcelTest extends TestCase
         }
         Inhabitant::create(['barangay_id' => $other->id, 'household_id' => $foreignHome->id,
             'first_name' => 'ForeignResident', 'last_name' => 'Example', 'sex' => 'Male']);
-        $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id'=>$area->id]);
 
         $this->actingAs($staff)->get(route('reports.population', ['barangay_id' => $area->id, 'section' => 'residents']))
             ->assertOk()->assertSee('Resident 1')->assertDontSee('Resident 9 Example')
@@ -72,7 +72,9 @@ class PopulationExcelTest extends TestCase
         Inhabitant::create(['barangay_id' => $area->id, 'household_id' => $home->id,
             'first_name' => 'A', 'last_name' => 'Resident', 'sex' => 'Female']);
         $municipal = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
-        $workbook = $this->actingAs($municipal)->get(route('reports.population.excel'))->assertOk()->getContent();
+        $report = app(\App\Services\PopulationSummary::class)->build(null, 'summary');
+        $workbook = app(\App\Services\PopulationSpreadsheet::class)->build($report,'summary','Population Summary');
+        $this->actingAs($municipal)->get(route('reports.population.excel'))->assertNotFound();
         $this->withWorkbook($workbook, function (ZipArchive $zip): void {
             $names = $zip->getFromName('xl/workbook.xml');
             foreach (['Summary', 'By Sex', 'By Age', 'By Barangay', 'Age by Barangay'] as $name) {
@@ -107,26 +109,18 @@ class PopulationExcelTest extends TestCase
                 'birth_date' => '1940-01-01', 'remarks' => 'PWD',
             ]);
         }
-        $this->actingAs(User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]));
-
-        foreach (['residents', 'seniors', 'pwd'] as $section) {
-            $screen = $this->get(route('reports.population', ['section' => $section]))->assertOk()
-                ->assertSeeInOrder(['population-barangay-heading">Barangay Canlupao', 'Alpha Resident',
-                    'population-barangay-heading">Barangay Looc', 'Beta Resident'], false);
-            $this->assertCount(2, $screen->viewData('detailGroups'));
+        // Grouped formatting remains a pure export capability; the municipal
+        // inbox itself may only open barangay-submitted snapshots.
+        foreach (['residents','seniors','pwd','families'] as $section) {
+            $report = app(\App\Services\PopulationSummary::class)->build(null,$section);
+            $this->assertCount(2,$report['detailGroups']);
+            $html = view('reports.population-pdf',['report'=>$report,'selectedSection'=>$section,'reportTitle'=>'Report','detailGroups'=>$report['detailGroups']])->render();
+            $this->assertStringContainsString('Alpha Resident',$html);
+            $this->assertStringContainsString('Beta Resident',$html);
+            $this->assertTrue(strpos($html,'Canlupao') < strpos($html,'Looc'));
         }
-        $print = $this->get(route('reports.population', ['section' => 'residents', 'print' => 1]))->assertOk()
-            ->assertSeeInOrder(['population-barangay-heading">Barangay Canlupao', 'Alpha Resident',
-                'population-barangay-heading">Barangay Looc', 'Beta Resident'], false);
-        $this->assertNull($print->viewData('detailPagination'));
-
-        $this->get(route('reports.population', ['section' => 'families']))->assertOk()
-            ->assertSeeInOrder(['Barangay Canlupao', 'Family 1', 'Alpha Resident',
-                'Barangay Looc', 'Family 1', 'Beta Resident']);
-        $this->get(route('reports.population.pdf', ['section' => 'residents']))
-            ->assertOk()->assertHeader('content-type', 'application/pdf');
-
-        $workbook = $this->get(route('reports.population.excel', ['section' => 'residents']))->assertOk()->getContent();
+        $report = app(\App\Services\PopulationSummary::class)->build(null,'residents');
+        $workbook = app(\App\Services\PopulationSpreadsheet::class)->build($report,'residents','Registered residents');
         $this->withWorkbook($workbook, function (ZipArchive $zip): void {
             $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
             $this->assertStringContainsString('<c r="A10" s="6" t="inlineStr"><is><t>Barangay Canlupao</t>', $sheet);
@@ -138,9 +132,8 @@ class PopulationExcelTest extends TestCase
         });
 
         foreach (['sex' => 'By Barangay', 'ages' => 'Age by Barangay'] as $section => $sheetName) {
-            $this->get(route('reports.population', ['section' => $section]))->assertOk()
-                ->assertSee($section === 'sex' ? 'Summary by barangay' : 'Age groups by barangay');
-            $this->withWorkbook($this->get(route('reports.population.excel', ['section' => $section]))->assertOk()->getContent(),
+            $report = app(\App\Services\PopulationSummary::class)->build(null,$section);
+            $this->withWorkbook(app(\App\Services\PopulationSpreadsheet::class)->build($report,$section,'Population breakdown'),
                 function (ZipArchive $zip) use ($sheetName): void {
                     $this->assertStringContainsString('name="'.$sheetName.'"', $zip->getFromName('xl/workbook.xml'));
                     $this->assertStringContainsString('Canlupao', $zip->getFromName('xl/worksheets/sheet2.xml'));

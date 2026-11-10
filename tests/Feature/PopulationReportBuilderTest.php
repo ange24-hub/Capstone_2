@@ -155,8 +155,10 @@ class PopulationReportBuilderTest extends TestCase
             ->assertViewIs('reports.population-period-empty')->assertSee('No earlier saved report available');
         $this->get(route('reports.population.pdf',['report_year'=>2026,'semester'=>1]))->assertNotFound();
         $this->actingAs(User::factory()->create(['role'=>User::ROLE_MUNICIPAL_LGU]))
-            ->get(route('reports.population',['report_year'=>2026,'semester'=>1]))->assertOk()
-            ->assertSee('Choose a barangay for historical reports');
+            ->get(route('reports.population',['report_year'=>2026,'semester'=>1]))
+            ->assertRedirect(route('reports.population.submissions.index',['report_year'=>2026,'semester'=>1]));
+        $this->get(route('reports.population.submissions.index',['report_year'=>2026,'semester'=>1]))->assertOk()
+            ->assertSee('No reports received for this period');
         $this->assertDatabaseCount('population_report_submissions',1);
     }
 

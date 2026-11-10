@@ -1,0 +1,40 @@
+@layer system-ui {
+@media screen {
+    .professional-shell .rbi-workspace-overview .rbi-report-metrics { display:flex !important; gap:12px !important; margin-top:12px !important; }
+    .professional-shell .rbi-workspace-overview .rbi-report-metric { min-height:0 !important; flex:1 !important; padding:10px 14px !important; border-top:0 !important; border-radius:9px !important; }
+    .professional-shell .rbi-report-metric .rbi-metric-icon { width:30px !important; height:30px !important; }
+    .professional-shell .rbi-report-metric strong { font-size:20px !important; }
+    .professional-shell .rbi-section-nav { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; padding:6px !important; }
+    .professional-shell .rbi-section-nav a { min-width:0 !important; gap:9px !important; padding:12px !important; white-space:normal !important; font-size:12px !important; border:0 !important; background:transparent !important; box-shadow:none !important; }
+    .professional-shell .rbi-section-nav a > span { display:grid !important; place-items:center !important; width:28px !important; height:28px !important; flex:0 0 28px !important; border-radius:8px !important; background:#e1eaf1 !important; color:#506d82 !important; }
+    .professional-shell .rbi-section-nav a[aria-current="step"] { background:#fff !important; color:#166d75 !important; box-shadow:0 2px 6px #19384e0b !important; }
+    .professional-shell .rbi-section-nav a[aria-current="step"] > span { background:#166d75 !important; color:white !important; }
+    .professional-shell #rbi-monthly-form [data-rbi-step-panel][hidden],
+    .professional-shell #rbi-monthly-form :is([data-rbi-next],[data-rbi-previous],[data-rbi-save])[hidden] { display:none !important; }
+    .professional-shell #rbi-monthly-form { gap:16px !important; }
+    .professional-shell #rbi-monthly-form > p { margin:0 !important; }
+    .professional-shell #rbi-monthly-form .form-grid { margin-block:0 !important; }
+    .professional-shell #rbi-monthly-form .rbi-monthly-section { padding-top:16px !important; }
+    .professional-shell #rbi-monthly-form .family-entry-card { background:#fff !important; border:1px solid #dce6ee !important; border-left:3px solid #439b97 !important; padding:16px !important; }
+    .professional-shell #rbi-monthly-form .family-entry-card > .workflow-head { margin-bottom:14px !important; padding-bottom:12px !important; }
+    .professional-shell #rbi-monthly-form .member-entry-card { background:#f7fafc !important; padding:16px !important; }
+    .professional-shell #rbi-monthly-form .member-entry-card > .workflow-head { margin-bottom:14px !important; padding-bottom:12px !important; }
+    .professional-shell #rbi-monthly-form .form-grid { gap:14px !important; }
+    .professional-shell #rbi-monthly-form .form-grid label { font-size:12px !important; margin-bottom:6px !important; }
+    .professional-shell #rbi-monthly-form :is(input,select):not([type="hidden"],[type="checkbox"],[type="radio"]) { min-height:40px !important; height:40px !important; background:#fff !important; padding:8px 10px !important; }
+    .professional-shell .rbi-optional-label { margin-left:4px !important; color:#78909f !important; font-size:10px !important; font-weight:400 !important; }
+    .professional-shell .rbi-entry-review { margin:0 0 16px !important; border:1px solid #dce6ee !important; border-radius:9px !important; background:#fff !important; }
+    .professional-shell .rbi-entry-review > summary { cursor:pointer !important; padding:11px 12px !important; color:#365a70 !important; font-size:12px !important; font-weight:600 !important; }
+    .professional-shell .rbi-entry-review > summary span { margin-left:8px !important; color:#78909f !important; font-size:11px !important; font-weight:400 !important; }
+    .professional-shell .rbi-entry-review .rbi-entry-classification { margin:0 !important; border:0 !important; border-top:1px solid #e4edf3 !important; background:#fff !important; padding:14px !important; }
+    .professional-shell #rbi-monthly-form .civic-sticky-actions { margin-top:4px !important; padding:14px 16px !important; background:#f4f8fa !important; border-radius:10px !important; box-shadow:none !important; }
+    .professional-shell #rbi-monthly-form [data-rbi-step-status] { color:#496b7d !important; font-size:12px !important; }
+    @media(min-width:1200px) { .professional-shell #rbi-monthly-form .member-entry-card > .form-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; } }
+    @media(max-width:760px) {
+        .professional-shell .rbi-section-nav a { flex-direction:column !important; align-items:flex-start !important; padding:10px !important; gap:7px !important; line-height:1.4 !important; }
+        .professional-shell #rbi-monthly-form .civic-sticky-actions .compact-toolbar { display:flex !important; width:100% !important; }
+        .professional-shell #rbi-monthly-form .civic-sticky-actions button:not([hidden]) { flex:1 !important; min-width:0 !important; white-space:normal !important; }
+        .professional-shell .rbi-entry-review > summary span { display:none !important; }
+    }
+}
+}
