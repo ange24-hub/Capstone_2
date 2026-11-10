@@ -1,349 +1,109 @@
-/* Report history only. Keep the RBI entry form and printable form untouched. */
+/* Screen workspace only; official RBI documents retain their own layout. */
+@layer system-ui {
 @media screen {
-    .professional-content:has(.rbi-history-workspace) {
-        --to-canvas: #f7f5f0;
-    }
-    .rbi-history-workspace {
-        --history-navy: #293e55;
-        --history-blue: #3e5975;
-        --history-gold: #ad9061;
-        --history-ink: #293b50;
-        --history-muted: #657482;
-        --history-line: #e4e0d8;
-        --history-surface: #fffefb;
-        --history-warm: #f7f5f0;
-        gap: 18px;
-    }
-
-    .rbi-history-workspace .rbi-workspace-overview {
-        display: block;
-    }
-    .rbi-history-workspace .rbi-report-view .rbi-report-header {
-        padding: 19px 22px;
-        border: 1px solid var(--history-line);
-        border-left: 4px solid var(--history-gold);
-        border-radius: 8px;
-        background: var(--history-surface);
-        box-shadow: none;
-    }
-    .rbi-history-workspace .rbi-report-emblem {
-        background: #edf1f4;
-        color: var(--history-blue);
-    }
-    .rbi-history-workspace .rbi-report-eyebrow,
-    .rbi-history-workspace .rbi-report-view .rbi-report-header h1 { color: var(--history-navy); }
-    .rbi-history-workspace .rbi-report-view .rbi-report-pdf {
-        border-color: var(--history-line);
-        background: var(--history-surface);
-        color: var(--history-blue);
-    }
-    .rbi-history-workspace .rbi-report-view .rbi-report-pdf:hover {
-        background: #edf1f4;
-        border-color: #bdc9d3;
-        box-shadow: none;
-    }
-
-    .rbi-history-workspace .rbi-history-sections {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px 24px;
-        padding: 0 2px 12px;
-        border-bottom: 1px solid var(--history-line);
-    }
-    .rbi-history-workspace .rbi-history-sections a {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 7px 0;
-        color: var(--history-blue);
-        font-size: 13px;
-        font-weight: 600;
-        text-decoration: none;
-        border-bottom: 2px solid transparent;
-    }
-    .rbi-history-workspace .rbi-history-sections a:hover,
-    .rbi-history-workspace .rbi-history-sections a:focus-visible {
-        color: var(--history-navy);
-        border-bottom-color: var(--history-gold);
-    }
-    .rbi-history-workspace .rbi-history-sections span {
-        padding: 2px 7px;
-        color: var(--history-blue);
-        background: #edf1f4;
-        border-radius: 99px;
-        font-size: 11px;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .rbi-history-workspace #report-history {
-        padding: 0;
-        overflow: hidden;
-    }
-    .rbi-history-workspace #report-history > .rbi-history-header {
-        align-items: center;
-        margin: 0;
-        padding: 21px 24px 18px;
-        border-bottom: 1px solid var(--history-line);
-    }
-    .rbi-history-workspace #report-history .rbi-history-header h2 {
-        margin: 0 0 3px;
-        color: var(--history-navy);
-        font-size: 19px;
-        font-weight: 650;
-    }
-    .rbi-history-workspace #report-history .rbi-history-header p {
-        color: var(--history-muted);
-        font-size: 13px;
-    }
-    .rbi-history-workspace #report-history .rbi-history-total {
-        border: 0;
-        background: #f4eee3;
-        color: #765f3d;
-    }
-    .rbi-history-workspace #report-history .rbi-history-list {
-        display: block;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card {
-        padding: 18px 24px;
-        border: 0;
-        border-radius: 0;
-        background: var(--history-surface);
-        box-shadow: none;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card + .rbi-history-card {
-        border-top: 1px solid var(--history-line);
-    }
-    .rbi-history-workspace #report-history .rbi-history-month-icon {
-        width: 38px;
-        height: 38px;
-        border-color: #dbe3e9;
-        background: #edf1f4;
-        color: var(--history-blue);
-    }
-    .rbi-history-workspace #report-history .rbi-history-month h3 {
-        color: var(--history-ink);
-        font-size: 16px;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-meta {
-        margin: 6px 0 0 49px;
-        color: var(--history-muted);
-        font-size: 12px;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-meta strong {
-        color: var(--history-ink);
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-actions {
-        align-items: flex-start;
-        gap: 10px 15px;
-        margin-top: 14px;
-        padding: 13px 0 0 49px;
-        border-top: 1px solid #eeeae3;
-    }
-    .rbi-history-workspace #report-history .rbi-history-main-actions,
-    .rbi-history-workspace #report-history .rbi-history-workflow {
-        gap: 7px;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-actions :is(a, button, .rbi-history-more > summary) {
-        min-height: 34px;
-        padding: 7px 11px;
-        border: 1px solid #d5d9da;
-        border-radius: 6px;
-        background: var(--history-surface);
-        color: var(--history-blue);
-        font-size: 12px;
-        font-weight: 600;
-        line-height: 1.35;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-actions :is(a, button, .rbi-history-more > summary):hover {
-        border-color: #a9b8c5;
-        background: #edf1f4;
-        color: var(--history-navy);
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-actions .rbi-history-view {
-        border-color: var(--history-blue);
-        background: var(--history-blue);
-        color: #fff;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-actions .rbi-history-view:hover {
-        border-color: var(--history-navy);
-        background: var(--history-navy);
-        color: #fff;
-    }
-    .rbi-history-workspace #report-history .rbi-history-card-actions .rbi-history-edit {
-        background: #f3f5f6;
-    }
-    .rbi-history-workspace #report-history .rbi-history-more {
-        position: relative;
-        margin-left: auto;
-    }
-    .rbi-history-workspace #report-history .rbi-history-more > summary {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        list-style: none;
-    }
-    .rbi-history-workspace #report-history .rbi-history-more > summary::-webkit-details-marker { display: none; }
-    .rbi-history-workspace #report-history .rbi-history-more > summary::after { content: '⌄'; font-size: 15px; line-height: .7; }
-    .rbi-history-workspace #report-history .rbi-history-more[open] > summary::after { transform: rotate(180deg); }
-    .rbi-history-workspace #report-history .rbi-history-downloads {
-        display: flex;
-        gap: 6px;
-        min-width: 146px;
-        margin-top: 6px;
-        padding: 7px;
-        border: 1px solid var(--history-line);
-        border-radius: 7px;
-        background: var(--history-surface);
-        box-shadow: 0 5px 16px #293b5014;
-    }
-    .rbi-history-workspace #report-history .rbi-history-downloads a {
-        width: 100%;
-        justify-content: flex-start;
-        border: 0;
-    }
-    .rbi-history-workspace #report-history .rbi-history-pagination {
-        margin: 0;
-        padding: 14px 24px;
-        border: 0;
-        border-top: 1px solid var(--history-line);
-        border-radius: 0;
-        background: var(--history-warm);
-    }
-    .rbi-history-workspace #report-history .rbi-history-page-links [aria-current=page] {
-        border-color: var(--history-blue);
-        background: var(--history-blue);
-    }
-
-    .rbi-history-workspace > .saved-report-list,
-    .rbi-history-workspace > .rbi-registry-activity {
-        margin: 0;
-        padding: 20px 24px;
-        border: 1px solid var(--history-line);
-        border-radius: 8px;
-        background: var(--history-surface);
-        box-shadow: none;
-    }
-    .rbi-history-workspace > .saved-report-list {
-        display: block;
-    }
-    .rbi-history-workspace > .saved-report-list > .rbi-history-header {
-        align-items: center;
-        margin-bottom: 13px;
-    }
-    .rbi-history-workspace > .saved-report-list > .rbi-history-header h3,
-    .rbi-history-workspace .rbi-activity-heading h2 {
-        margin: 0 0 3px;
-        color: var(--history-navy);
-        font-size: 18px;
-        font-weight: 650;
-    }
-    .rbi-history-workspace > .saved-report-list > .rbi-history-header p,
-    .rbi-history-workspace .rbi-activity-heading p {
-        margin: 0;
-        color: var(--history-muted);
-        font-size: 13px;
-    }
-    .rbi-history-workspace > .saved-report-list > .saved-report {
-        margin-top: 8px;
-        border-color: var(--history-line);
-        border-radius: 6px;
-        box-shadow: none;
-    }
-    .rbi-history-workspace > .saved-report-list > .saved-report > summary,
-    .rbi-history-workspace #saved-inhabitant-records .saved-report > summary {
-        background: #f7f7f4;
-    }
-    .rbi-history-workspace > .saved-report-list .report-month-icon,
-    .rbi-history-workspace #saved-inhabitant-records .report-month-icon {
-        background: #edf1f4;
-        color: var(--history-blue);
-        border: 1px solid #dbe3e9;
-    }
-    .rbi-history-workspace > .saved-report-list .report-counts,
-    .rbi-history-workspace #saved-inhabitant-records .report-counts {
-        color: var(--history-blue);
-        background: var(--history-surface);
-        border-color: var(--history-line);
-    }
-    .rbi-history-workspace > .saved-report-list .saved-household {
-        border-color: var(--history-line);
-        box-shadow: none;
-    }
-    .rbi-history-workspace > .saved-report-list .saved-household-heading,
-    .rbi-history-workspace #saved-inhabitant-records .saved-household-heading {
-        border-color: var(--history-line);
-        background: #f8f7f3;
-    }
-    .rbi-history-workspace > .saved-report-list .saved-household-heading h3,
-    .rbi-history-workspace #saved-inhabitant-records .saved-household-heading h3 {
-        color: var(--history-navy);
-    }
-    .rbi-history-workspace .rbi-activity-table {
-        margin-top: 14px;
-        border: 1px solid var(--history-line);
-        border-radius: 6px;
-    }
-    .rbi-history-workspace .rbi-activity-table table { border-collapse: collapse; }
-    .rbi-history-workspace .rbi-activity-table th {
-        color: var(--history-blue);
-        background: #f3f3ef;
-        font-size: 12px;
-        font-weight: 650;
-        white-space: nowrap;
-    }
-    .rbi-history-workspace .rbi-activity-table td {
-        color: var(--history-ink);
-        border-color: var(--history-line);
-        line-height: 1.45;
-    }
-    .rbi-history-workspace .rbi-activity-table tbody tr:nth-child(even) { background: #faf9f6; }
-
-    @media (max-width: 700px) {
-        html.municipal-ui .rbi-history-workspace .rbi-subpages {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            width: 100%;
-            max-width: 100%;
-        }
-        html.municipal-ui .rbi-history-workspace .rbi-subpages > a {
-            min-width: 0;
-            justify-content: center;
-            text-align: center;
-        }
-        html.municipal-ui .rbi-history-workspace .rbi-subpages > a:last-child {
-            grid-column: 1 / -1;
-        }
-        .rbi-history-workspace .rbi-history-sections { gap: 2px 15px; }
-        .rbi-history-workspace #report-history > .rbi-history-header,
-        .rbi-history-workspace #report-history .rbi-history-card,
-        .rbi-history-workspace > .saved-report-list,
-        .rbi-history-workspace > .rbi-registry-activity { padding: 16px; }
-        .rbi-history-workspace #report-history .rbi-history-card-meta { margin-left: 0; }
-        .rbi-history-workspace #report-history .rbi-history-card-actions { padding-left: 0; }
-        .rbi-history-workspace #report-history .rbi-history-more { margin-left: 0; }
-        .rbi-history-workspace #report-history .rbi-history-pagination { padding: 13px 16px; }
+    .professional-shell:has(.rbi-history-more[open],.rbi-history-page-tools[open]) .assistant-launcher { visibility:hidden !important; pointer-events:none !important; }
+    .professional-shell .rbi-history-workspace { display:grid !important; gap:16px !important; border:0 !important; padding:0 !important; background:transparent !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace [hidden] { display:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-view .rbi-report-header { padding:18px 20px !important; gap:16px !important; border-radius:14px !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-emblem { width:42px !important; height:42px !important; min-width:42px !important; border-radius:12px !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-header h1 { font-size:26px !important; line-height:1.2 !important; letter-spacing:-.035em !important; margin:3px 0 6px !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-header p { font-size:12px !important; line-height:1.5 !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-eyebrow { font-size:10px !important; letter-spacing:.1em !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-downloads { display:flex !important; gap:8px !important; align-items:center !important; }
+    .professional-shell .rbi-history-workspace .rbi-report-downloads > .rbi-history-create { display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:7px !important; min-height:38px !important; padding:9px 13px !important; background:#166d75 !important; border:1px solid #166d75 !important; color:#fff !important; border-radius:9px !important; font-size:12px !important; font-weight:600 !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-create .app-icon { width:15px !important; height:15px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-sections { display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:4px !important; padding:4px !important; margin:0 !important; width:fit-content !important; max-width:100% !important; border:1px solid #dce6ee !important; border-radius:11px !important; background:#eaf1f6 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-sections a { display:inline-flex !important; align-items:center !important; gap:7px !important; margin:0 !important; padding:9px 13px !important; border:0 !important; border-radius:8px !important; color:#526f81 !important; background:transparent !important; font-size:12px !important; font-weight:600 !important; text-decoration:none !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-sections a[aria-current="page"] { background:#fff !important; color:#166d75 !important; box-shadow:0 2px 6px #19384e0a !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-sections a > span { padding:2px 6px !important; border-radius:6px !important; background:#deeeeb !important; color:#33756e !important; font-size:10px !important; }
+    .professional-shell .rbi-history-workspace #report-history { min-width:0 !important; padding:0 !important; border:1px solid #dce6ee !important; border-radius:13px !important; background:#fff !important; overflow:visible !important; box-shadow:0 4px 16px #173b5304 !important; }
+    .professional-shell .rbi-history-workspace #report-history > .rbi-history-header { display:flex !important; flex-wrap:wrap !important; align-items:center !important; justify-content:space-between !important; gap:12px !important; padding:17px 20px !important; margin:0 !important; border:0 !important; border-bottom:1px solid #e3ebf1 !important; border-radius:13px 13px 0 0 !important; background:#fff !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-header h2 { margin:0 0 4px !important; font-size:16px !important; font-weight:650 !important; color:#23465b !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-header p { margin:0 !important; color:#7a8f9e !important; font-size:12px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-total { padding:6px 9px !important; border:1px solid #dce6ee !important; border-radius:7px !important; color:#567588 !important; background:#f4f8fb !important; font-size:11px !important; font-weight:500 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-list { display:grid !important; gap:0 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card { position:relative !important; display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; align-items:center !important; gap:16px !important; min-width:0 !important; padding:20px !important; border:0 !important; border-radius:0 !important; background:#fff !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card + .rbi-history-card { border-top:1px solid #e6edf2 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card:has(details[open]) { z-index:5 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-info { display:flex !important; align-items:center !important; gap:13px !important; min-width:0 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-month-icon { display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; gap:3px !important; flex:0 0 48px !important; width:48px !important; height:54px !important; border:1px solid #d8e9e8 !important; border-radius:10px !important; background:#eff7f6 !important; color:#276e72 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-month-icon small { font-size:10px !important; font-weight:600 !important; text-transform:uppercase !important; letter-spacing:.06em !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-month-icon strong { font-size:13px !important; font-weight:650 !important; color:#276e72 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-copy { min-width:0 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-title { display:flex !important; align-items:center !important; flex-wrap:wrap !important; gap:10px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-title h3 { margin:0 !important; color:#23465b !important; font-size:15px !important; line-height:1.4 !important; font-weight:650 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-title .badge { padding:3px 7px !important; font-size:9px !important; letter-spacing:.025em !important; border-radius:5px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-meta { display:flex !important; flex-wrap:wrap !important; gap:5px 12px !important; margin:6px 0 0 !important; padding:0 !important; color:#6c8495 !important; font-size:11px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-meta strong { font-weight:600 !important; color:#4a6a7e !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-dates { margin-top:5px !important; color:#8a9ba8 !important; font-size:10px !important; line-height:1.5 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-actions { display:flex !important; flex-wrap:wrap !important; align-items:center !important; justify-content:flex-end !important; gap:7px !important; margin:0 !important; padding:0 !important; border:0 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-actions > a,
+    .professional-shell .rbi-history-workspace :is(.rbi-history-more,.rbi-history-page-tools) > summary { display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:9px 11px !important; min-height:36px !important; margin:0 !important; border:1px solid #d4e0e9 !important; border-radius:8px !important; color:#496c80 !important; background:#fff !important; font-size:11px !important; font-weight:600 !important; line-height:1.4 !important; text-decoration:none !important; cursor:pointer !important; list-style:none !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-actions > a.rbi-history-view { background:#166d75 !important; border-color:#166d75 !important; color:#fff !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-actions > a:hover,
+    .professional-shell .rbi-history-workspace :is(.rbi-history-more,.rbi-history-page-tools) > summary:hover { border-color:#8cb9b9 !important; background:#f0f8f6 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-actions > a.rbi-history-view:hover { background:#10575f !important; color:#fff !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-card-actions .app-icon { width:14px !important; height:14px !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-more,.rbi-history-page-tools) { position:relative !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-more:not([open]) > .rbi-history-action-menu,
+    .professional-shell .rbi-history-workspace .rbi-history-page-tools:not([open]) > div { display:none !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-more,.rbi-history-page-tools) > summary::-webkit-details-marker { display:none !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-more,.rbi-history-page-tools) > summary .app-icon { width:13px !important; height:13px !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-action-menu,.rbi-history-page-tools > div) { position:absolute !important; top:calc(100% + 7px) !important; right:0 !important; z-index:30 !important; min-width:220px !important; max-width:calc(100vw - 40px) !important; margin:0 !important; padding:7px !important; border:1px solid #d8e4ec !important; border-radius:11px !important; background:#fff !important; box-shadow:0 10px 30px #173b531a !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-menu-group { padding:4px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-menu-group + .rbi-history-menu-group { border-top:1px solid #e5edf2 !important; margin-top:4px !important; padding-top:8px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-menu-group > p { margin:2px 8px 5px !important; color:#91a1ad !important; font-size:9px !important; letter-spacing:.08em !important; text-transform:uppercase !important; font-weight:650 !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-workflow,.rbi-history-downloads) { display:block !important; margin:0 !important; min-width:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-action-menu,.rbi-history-page-tools > div) a { display:flex !important; align-items:center !important; justify-content:flex-start !important; gap:8px !important; width:100% !important; min-height:36px !important; margin:0 !important; padding:9px 10px !important; border:0 !important; border-radius:6px !important; background:#fff !important; color:#3e6379 !important; text-decoration:none !important; font-size:11px !important; line-height:1.4 !important; font-weight:500 !important; white-space:normal !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-history-action-menu,.rbi-history-page-tools > div) a:hover { background:#edf7f4 !important; color:#166d75 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-action-menu .history-submit { color:#166d75 !important; font-weight:650 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-page-tools[open] { z-index:35 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-pagination { display:flex !important; flex-wrap:wrap !important; align-items:center !important; justify-content:space-between !important; gap:12px !important; margin:0 !important; padding:13px 20px !important; border:0 !important; border-top:1px solid #e5edf2 !important; border-radius:0 0 13px 13px !important; color:#8a9ba8 !important; background:#f8fafc !important; font-size:11px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-page-links { display:flex !important; gap:4px !important; align-items:center !important; flex-wrap:wrap !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-page-links :is(a,span):not(.rbi-history-ellipsis) { display:inline-flex !important; justify-content:center !important; align-items:center !important; min-width:29px !important; min-height:29px !important; padding:5px 8px !important; border:1px solid #dce6ee !important; border-radius:6px !important; background:#fff !important; color:#627e90 !important; text-decoration:none !important; font-size:11px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-page-links [aria-current="page"] { color:#fff !important; border-color:#166d75 !important; background:#166d75 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-page-links [aria-disabled="true"] { opacity:.5 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools { padding:0 !important; border:1px solid #dce6ee !important; border-radius:11px !important; background:#fff !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools > summary { display:flex !important; align-items:center !important; gap:12px !important; padding:13px 16px !important; color:#4e7084 !important; font-size:12px !important; font-weight:600 !important; cursor:pointer !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools > summary small { color:#91a1ad !important; font-size:10px !important; font-weight:400 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools > div { padding:0 16px 16px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools .workflow-card { margin:0 !important; padding:14px !important; border:1px solid #e5edf2 !important; border-radius:9px !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools h2 { font-size:14px !important; margin:0 0 7px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-tools p { color:#7a8f9e !important; font-size:12px !important; line-height:1.7 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-empty { display:grid !important; justify-items:center !important; gap:12px !important; padding:34px 20px !important; border:0 !important; border-radius:0 !important; background:transparent !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-empty > span { display:grid !important; place-items:center !important; width:46px !important; height:46px !important; border-radius:13px !important; background:#edf5f7 !important; color:#7193a6 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-empty > span .app-icon { width:23px !important; height:23px !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-empty strong { font-size:14px !important; color:#4e7084 !important; }
+    .professional-shell .rbi-history-workspace .rbi-history-empty p { margin:0 !important; max-width:380px !important; text-align:center !important; font-size:12px !important; color:#91a1ad !important; }
+    .professional-shell .rbi-history-workspace > :is(.saved-report-list,.rbi-registry-activity) { margin:0 !important; padding:18px !important; border:1px solid #dce6ee !important; border-radius:13px !important; background:#fff !important; box-shadow:none !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-activity-heading,.saved-report-list > .rbi-history-header) :is(h2,h3) { font-size:16px !important; margin:0 0 6px !important; }
+    .professional-shell .rbi-history-workspace :is(.rbi-activity-heading,.saved-report-list > .rbi-history-header) p { font-size:12px !important; color:#7a8f9e !important; margin:0 !important; }
+    .professional-shell .rbi-history-workspace .rbi-activity-table { border:1px solid #e1eaf0 !important; border-radius:9px !important; margin-top:16px !important; }
+    .professional-shell .rbi-history-workspace .rbi-activity-table :is(th,td) { padding:12px 14px !important; font-size:12px !important; }
+    .professional-shell .rbi-history-workspace .rbi-activity-table th { background:#f1f6f9 !important; color:#678395 !important; font-size:10px !important; }
+    .professional-shell .rbi-history-workspace .rbi-activity-table td { border-top:1px solid #e8eef3 !important; color:#5f7d8f !important; }
+    .professional-shell .rbi-history-workspace :is(a,summary):focus-visible { outline:3px solid #27888a !important; outline-offset:3px !important; }
+    @media(max-width:1050px) { .professional-shell .rbi-history-workspace .rbi-history-card { grid-template-columns:minmax(0,1fr) !important; gap:14px !important; } .professional-shell .rbi-history-workspace .rbi-history-card-actions { justify-content:flex-start !important; padding-left:61px !important; } }
+    @media(max-width:760px) {
+        .professional-shell .rbi-history-workspace .rbi-report-view .rbi-report-header { padding:16px !important; gap:14px !important; }
+        .professional-shell .rbi-history-workspace .rbi-report-header h1 { font-size:23px !important; }
+        .professional-shell .rbi-history-workspace .rbi-report-downloads { width:100% !important; }
+        .professional-shell .rbi-history-workspace .rbi-report-downloads > .rbi-history-create { flex:1 !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-sections { width:100% !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-sections a { flex:1 1 auto !important; justify-content:center !important; padding:9px !important; }
+        .professional-shell .rbi-history-workspace #report-history > .rbi-history-header { padding:15px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-total { font-size:10px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card { padding:16px 15px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card-info { gap:10px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-month-icon { width:43px !important; height:49px !important; flex-basis:43px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card-title { gap:7px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card-title h3 { font-size:14px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card-actions { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:6px !important; padding-left:0 !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card-actions > a, .professional-shell .rbi-history-workspace .rbi-history-more > summary { width:100% !important; padding:9px 6px !important; font-size:10px !important; white-space:normal !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-card-actions > a .app-icon { display:none !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-action-menu { min-width:228px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-pagination { padding:12px 15px !important; }
+        .professional-shell .rbi-history-workspace .rbi-history-tools > summary { align-items:flex-start !important; flex-direction:column !important; gap:4px !important; }
     }
 }
-
-@layer professional-workspace {
-    @media screen {
-        .professional-content:has(.rbi-history-workspace) :is(.app-main, #main-content, .app-footer) {
-            background: #f7f5f0 !important;
-        }
-        .professional-content #main-content .rbi-history-workspace #saved-inhabitant-records .member-delete {
-            color: #9c4f4f !important;
-            border-color: #e2c9c9 !important;
-            background: #fffafa !important;
-        }
-        .professional-content #main-content .rbi-history-workspace #saved-inhabitant-records .member-delete:hover {
-            background: #fbf0ef !important;
-        }
-        .professional-content #main-content .rbi-history-workspace #report-history .history-submit {
-            border-color: #3e5975 !important;
-            background: #3e5975 !important;
-            color: #fff !important;
-        }
-    }
 }

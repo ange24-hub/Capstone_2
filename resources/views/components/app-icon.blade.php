@@ -16,6 +16,7 @@
         'clock' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         'check' => '<path d="m5 12 4 4L19 6"/>',
         'arrow-right' => '<path d="M5 12h14M13 6l6 6-6 6"/>',
+        'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
         'inbox' => '<path d="M4 4h16v16H4z"/><path d="M4 14h4l2 3h4l2-3h4"/>',
         'activity' => '<path d="M3 12h4l2-7 4 14 2-7h6"/>',
         'shield' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
