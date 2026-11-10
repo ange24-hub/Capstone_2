@@ -59,12 +59,11 @@
     <div class="side-section">Overview</div>
     <a class="{{ request()->routeIs('dashboard', 'dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'active' : '' }}" href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'dashboard.barangay', 'dashboard.municipal', 'dashboard.resident')) aria-current="page" @endif><span class="nav-mark"><x-app-icon name="home" /></span><span>Overview</span></a>
     @if ($user->hasRole(App\Models\User::ROLE_BARANGAY))
-        <a class="{{ request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*', 'rbi.arrivals.*') ? 'active' : '' }}" href="{{ route('barangay.rbi-updates.index') }}" @if(request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*', 'rbi.arrivals.*')) aria-current="{{ request()->routeIs('barangay.rbi-updates.index') ? 'page' : 'location' }}" @endif><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
+        <a class="{{ request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*', 'rbi.arrivals.*') ? 'active' : '' }}" href="{{ route('barangay.rbi-updates.index') }}" @if(request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*', 'registry.new-inhabitants.*', 'rbi.arrivals.*')) aria-current="location" @endif><span class="nav-mark"><x-app-icon name="form" /></span><span>RBI Forms</span></a>
         @if(request()->routeIs('barangay.rbi-updates.*', 'registry.new-inhabitants.*', 'rbi.arrivals.*'))
             <div class="rbi-sidebar-subpages">
                 <a href="{{ route('rbi.arrivals.index') }}" @if(request()->routeIs('rbi.arrivals.*')) aria-current="page" @endif>3-month arrival counts</a>
-                <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if(request()->routeIs('barangay.rbi-updates.residents')) aria-current="page" @endif>Add residents</a>
-                <a href="{{ route('barangay.rbi-updates.deceased', request()->only('edit', 'new')) }}" @if(request()->routeIs('barangay.rbi-updates.deceased')) aria-current="page" @endif>Deceased inhabitants</a>
+                <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if(request()->routeIs('barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.deceased')) aria-current="page" @endif>Monthly RBI form</a>
                 <a href="{{ route('barangay.rbi-updates.history') }}" @if(request()->routeIs('barangay.rbi-updates.history', 'registry.new-inhabitants.*', 'rbi.arrivals.*')) aria-current="page" @endif>Report history</a>
             </div>
         @endif

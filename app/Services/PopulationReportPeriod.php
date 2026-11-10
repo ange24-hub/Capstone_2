@@ -26,4 +26,11 @@ class PopulationReportPeriod
             ->orderByDesc('report_year')->orderByDesc('semester')
             ->orderByDesc('submitted_at')->orderByDesc('id')->first();
     }
+
+    public function submitted(int $barangayId, int $year, int $semester): ?PopulationReportSubmission
+    {
+        return PopulationReportSubmission::where('barangay_id', $barangayId)
+            ->where('report_year', $year)->where('semester', $semester)
+            ->orderByDesc('submitted_at')->orderByDesc('id')->first();
+    }
 }

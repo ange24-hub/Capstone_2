@@ -361,6 +361,7 @@ class BarangayRbiUpdateController extends Controller
     private function formRoute(Request $request): string
     {
         return match ($request->input('form_section')) {
+            'monthly' => 'barangay.rbi-updates.residents',
             'residents' => 'barangay.rbi-updates.residents',
             'deceased' => 'barangay.rbi-updates.deceased',
             default => 'barangay.rbi-updates.index',
@@ -370,7 +371,13 @@ class BarangayRbiUpdateController extends Controller
     private function sectionRows(Request $request, array $validated, ?BarangayRbiUpdate $report = null): array
     {
         $section = $validated['form_section'] ?? null;
+        if ($section === 'monthly' && $request->boolean('no_new_residents') && !empty($report?->rows)) {
+            throw ValidationException::withMessages(['rows' => 'This saved report already contains residents. Keep and review those entries before saving.']);
+        }
         $rows = $this->cleanRows($section === 'deceased' ? ($report?->rows ?? []) : ($validated['rows'] ?? []));
+        if ($section === 'monthly' && $request->boolean('no_new_residents') && $rows !== []) {
+            throw ValidationException::withMessages(['rows' => 'Uncheck "No new residents" before including resident entries.']);
+        }
         $rows = app(\App\Support\RbiFirstSave::class)->stamp($rows, $report, now());
         $this->ensureHouseholdHeads($rows);
         \App\Support\RbiEntryClassification::validateRows($rows, $validated['reporting_month']);
@@ -385,7 +392,8 @@ class BarangayRbiUpdateController extends Controller
     private function formRules(): array
     {
         return [
-            'form_section' => ['nullable', Rule::in(['residents', 'deceased'])],
+            'form_section' => ['nullable', Rule::in(['monthly', 'residents', 'deceased'])],
+            'no_new_residents' => ['nullable', 'boolean'],
             'reporting_month' => ['required', 'date_format:Y-m'],
             'as_of_date' => ['nullable', 'date'],
             'prepared_by' => ['nullable', 'string', 'max:255'],

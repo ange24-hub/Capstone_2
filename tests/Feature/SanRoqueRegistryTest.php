@@ -35,7 +35,7 @@ class SanRoqueRegistryTest extends TestCase
         $this->get(route('barangay.registry.moved-out'))->assertOk()->assertViewHas('residents', fn ($rows) => $rows->total() === 1);
         $this->get(route('barangay.registry.deceased'))->assertOk()->assertSee('HistoricalPerson');
         $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
-        $this->get(route('barangay.rbi-updates.residents'))->assertOk()->assertSee('Save Residents');
+        $this->get(route('barangay.rbi-updates.residents'))->assertOk()->assertSee('Save Monthly Form');
         $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
             'reporting_month' => '2026-09', 'families' => [['household_number' => '2',
                 'members' => [['last_name' => 'Example', 'first_name' => 'NewPerson', 'sex' => 'Male']]]],

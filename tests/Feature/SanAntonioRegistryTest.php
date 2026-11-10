@@ -40,6 +40,6 @@ class SanAntonioRegistryTest extends TestCase
         $this->get(route('barangay.registry.active'))->assertOk()
             ->assertSee('ElsewherePerson')->assertDontSee('TransferredPerson');
         $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
-        $this->get(route('barangay.rbi-updates.residents'))->assertOk()->assertSee('Save Residents');
+        $this->get(route('barangay.rbi-updates.residents'))->assertOk()->assertSee('Save Monthly Form');
     }
 }

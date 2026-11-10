@@ -43,7 +43,15 @@
     @include('reports.population-content')
     <p class="population-coverage-note" role="note">{{ $report['coveredBarangays'] }} / {{ $report['totalBarangays'] }} barangays with resident records. Completeness has not been verified. Original historical reports remain unchanged in Submission History.</p>
     </div>
-    @if($submissionPreviewToken ?? null)
+    @if(($periodSubmission ?? null) && !$printMode)
+        <section class="population-submission-panel population-submission-complete" aria-label="Population summary already submitted">
+            <span class="population-submitted-icon" aria-hidden="true"><x-app-icon name="check" /></span>
+            <div class="population-submit-copy"><h2>Already submitted for this semester</h2>
+                <p>{{ $periodSubmission->reference }} · Submitted {{ $periodSubmission->submitted_at->format('M d, Y') }}. The saved report stays unchanged; this preview shows the latest registry.</p>
+            </div>
+            <a class="button secondary-button" href="{{ route('reports.population.submissions.show', $periodSubmission) }}">View submitted report<x-app-icon name="arrow-right" /></a>
+        </section>
+    @elseif($submissionPreviewToken ?? null)
         <section class="population-submission-panel" aria-label="Submit population summary">
             <div class="population-submit-copy"><h2><span class="population-sticker population-sticker-green" aria-hidden="true"><x-app-icon name="document" /></span>Submit Population Report Summary</h2>
             <p>After reviewing, sign and submit this {{ $report['monitoring']['semester'] === 1 ? '1st' : '2nd' }} Semester {{ $report['monitoring']['year'] }} report to Municipal DILG/Admin. The signed copy is saved in Submission History.</p>

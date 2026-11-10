@@ -79,15 +79,15 @@ class PopulationReportSubmissionTest extends TestCase
             'status' => Inhabitant::STATUS_ACTIVE, 'birth_date' => '2000-01-01']);
     }
 
-    private function preview(User $staff): string
+    private function preview(User $staff, int $year = 2026, int $semester = 2): string
     {
-        return $this->actingAs($staff)->get(route('reports.population', ['report_year' => 2026, 'semester' => 2]))
+        return $this->actingAs($staff)->get(route('reports.population', ['report_year' => $year, 'semester' => $semester]))
             ->assertOk()->assertSee('Submit to Municipal DILG/Admin')->viewData('submissionPreviewToken');
     }
 
-    private function submit(User $staff): PopulationReportSubmission
+    private function submit(User $staff, int $year = 2026, int $semester = 2): PopulationReportSubmission
     {
-        $token = $this->preview($staff);
+        $token = $this->preview($staff, $year, $semester);
         $this->post(route('reports.population.submissions.store'), ['preview_token' => $token] + $this->signaturePayload())->assertSessionHasNoErrors()->assertRedirect();
         return PopulationReportSubmission::latest('id')->firstOrFail();
     }
@@ -103,7 +103,10 @@ class PopulationReportSubmissionTest extends TestCase
         foreach (range(1, 2) as $attempt) {
             $this->post(route('reports.population.submissions.store'), ['preview_token' => $token] + $this->signaturePayload())->assertRedirect()->assertSessionHasNoErrors();
         }
-        $saved = $this->submit($staff); // New preview, same report: no duplicate.
+        $saved = PopulationReportSubmission::firstOrFail();
+        $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertOk()
+            ->assertSee('Already submitted for this semester')->assertSee('View submitted report')
+            ->assertDontSee('Submit to Municipal DILG/Admin')->assertViewHas('submissionPreviewToken', null);
         $this->assertDatabaseCount('population_report_submissions', 1);
         $this->assertSame(1, $saved->total_records);
         $this->assertSame($staff->id, $saved->submitted_by);
@@ -117,7 +120,7 @@ class PopulationReportSubmissionTest extends TestCase
         $this->assertDatabaseCount('population_report_submissions', 1);
     }
 
-    public function test_saved_report_stays_frozen_and_revised_summary_creates_another_copy(): void
+    public function test_submitted_period_stays_locked_even_when_registry_changes_and_next_period_can_submit(): void
     {
         $staff = $this->secretary();
         $person = $this->resident($staff);
@@ -131,7 +134,9 @@ class PopulationReportSubmissionTest extends TestCase
         $this->assertSame(1, $report['sex']['Male']);
         $this->assertSame(0, $report['sex']['Female']);
         $this->assertSame($original['monitoring'], $report['monitoring']);
-        $new = $this->submit($staff);
+        $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertOk()
+            ->assertViewHas('submissionPreviewToken', null)->assertDontSee('Submit to Municipal DILG/Admin');
+        $new = $this->submit($staff, 2027, 1);
         $this->assertNotSame($saved->id, $new->id);
         $this->assertSame(2, $new->total_records);
         $this->assertSame($original, $saved->fresh()->snapshot);
@@ -204,6 +209,30 @@ class PopulationReportSubmissionTest extends TestCase
         }
     }
 
+    public function test_previously_open_tabs_and_other_accounts_cannot_submit_an_existing_barangay_period(): void
+    {
+        $staff = $this->secretary();
+        $firstToken = $this->preview($staff);
+        $staleToken = $this->preview($staff);
+        $other = $this->secretary();
+        $otherToken = $this->preview($other);
+        $this->actingAs($staff)->post(route('reports.population.submissions.store'), ['preview_token'=>$firstToken]+$this->signaturePayload())->assertRedirect();
+        $saved = PopulationReportSubmission::firstOrFail();
+        $original = $saved->snapshot;
+        $this->resident($staff);
+        foreach ([[$staff,$staleToken],[$other,$otherToken]] as [$account,$token]) {
+            $this->actingAs($account)->get(route('reports.population.submissions.sign', ['preview_token'=>$token]))
+                ->assertRedirect(route('reports.population.submissions.show', $saved));
+            $this->post(route('reports.population.submissions.store'), ['preview_token'=>$token])
+                ->assertRedirect(route('reports.population.submissions.show', $saved));
+            $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertOk()
+                ->assertViewHas('submissionPreviewToken', null)->assertDontSee('Submit to Municipal DILG/Admin');
+        }
+        $this->assertDatabaseCount('population_report_submissions', 1);
+        $this->assertDatabaseCount('registry_activities', 1);
+        $this->assertSame($original, $saved->fresh()->snapshot);
+    }
+
     public function test_successful_submission_remembers_both_names_and_signatures_across_sessions(): void
     {
         $staff = $this->secretary();
@@ -211,7 +240,7 @@ class PopulationReportSubmissionTest extends TestCase
         $original = $first->snapshot;
         $this->app['session']->flush();
         $this->resident($staff);
-        $token = $this->preview($staff->fresh());
+        $token = $this->preview($staff->fresh(), 2027, 1);
         $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))
             ->assertOk()->assertHeader('Cache-Control', 'no-store, private')
             ->assertSee('value="Test Secretary"', false)->assertSee('value="Test Captain"', false)
@@ -237,7 +266,7 @@ class PopulationReportSubmissionTest extends TestCase
         $staff = $this->secretary();
         $first = $this->submit($staff);
         $original = $first->snapshot;
-        $token = $this->preview($staff);
+        $token = $this->preview($staff, 2027, 1);
         $replacement = $this->signaturePayload();
         $this->post(route('reports.population.submissions.store'), ['preview_token' => $token,
             'signature_source_id' => $first->id, 'prepared_name' => 'Updated Secretary', 'submitted_name' => 'Test Captain',
@@ -246,7 +275,7 @@ class PopulationReportSubmissionTest extends TestCase
         $second = PopulationReportSubmission::latest('id')->firstOrFail();
         $this->assertSame('Updated Secretary', $second->snapshot['signatures']['prepared']['name']);
         $this->assertSame($original['signatures']['submitted'], $second->snapshot['signatures']['submitted']);
-        $token = $this->preview($staff);
+        $token = $this->preview($staff, 2027, 2);
         $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
         $this->assertSame('Updated Secretary', $response->viewData('savedSignatures')['prepared']['name']);
         $this->assertSame($second->id, $response->viewData('savedSignatures')['prepared']['source_id']);
@@ -257,7 +286,7 @@ class PopulationReportSubmissionTest extends TestCase
     {
         $first = $this->submit($this->secretary());
         foreach ([$this->secretary(), $this->secretary('Canlupao')] as $other) {
-            $token = $this->preview($other);
+            $token = $this->preview($other, 2027, 1);
             $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
             $this->assertSame([], $response->viewData('savedSignatures'));
             $this->postJson(route('reports.population.submissions.store'), ['preview_token' => $token,
@@ -272,7 +301,7 @@ class PopulationReportSubmissionTest extends TestCase
     {
         $staff = $this->secretary();
         $first = $this->submit($staff);
-        $token = $this->preview($staff);
+        $token = $this->preview($staff, 2027, 1);
         $reuse = ['preview_token' => $token, 'signature_source_id' => $first->id,
             'prepared_name' => 'Test Secretary', 'submitted_name' => 'Test Captain',
             'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'];
@@ -290,9 +319,9 @@ class PopulationReportSubmissionTest extends TestCase
     {
         $staff = $this->secretary();
         $first = $this->submit($staff);
-        $token = $this->preview($staff);
+        $token = $this->preview($staff, 2027, 1);
         $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
-        $newerToken = $this->preview($staff);
+        $newerToken = $this->preview($staff, 2027, 2);
         $replacement = $this->signaturePayload();
         $image = imagecreatefromstring(base64_decode(explode(',', $replacement['prepared_signature_data'], 2)[1]));
         imageflip($image, IMG_FLIP_HORIZONTAL);
@@ -304,7 +333,9 @@ class PopulationReportSubmissionTest extends TestCase
         $this->post(route('reports.population.submissions.store'), ['preview_token' => $token,
             'signature_source_id' => $first->id, 'prepared_name' => 'Test Secretary', 'submitted_name' => 'Test Captain',
             'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'])
-            ->assertSessionHasNoErrors()->assertRedirect(route('reports.population.submissions.show', $first));
-        $this->assertDatabaseCount('population_report_submissions', 2);
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $last = PopulationReportSubmission::latest('id')->firstOrFail();
+        $this->assertSame($first->snapshot['signatures'], $last->snapshot['signatures']);
+        $this->assertDatabaseCount('population_report_submissions', 3);
     }
 }

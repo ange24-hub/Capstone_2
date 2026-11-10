@@ -16,7 +16,7 @@ class RbiSubpagesTest extends TestCase
             'barangay_id' => Barangay::where('name', 'Maslog')->firstOrFail()->id]);
     }
 
-    public function test_subpages_show_only_their_own_form_and_scope_households(): void
+    public function test_monthly_form_includes_both_sections_and_scopes_households(): void
     {
         $staff = $this->secretary();
         $other = Barangay::where('name', 'Looc')->firstOrFail();
@@ -26,10 +26,11 @@ class RbiSubpagesTest extends TestCase
                 'first_name' => $name, 'last_name' => 'Example', 'sex' => 'Male', 'status' => 'active']);
         }
         $this->actingAs($staff)->get(route('barangay.rbi-updates.residents'))->assertOk()
-            ->assertSee('id="family-forms"', false)->assertDontSee('id="rbi-deceased-rows-table"', false);
+            ->assertSee('id="family-forms"', false)->assertSee('id="rbi-deceased-rows-table"', false)
+            ->assertSee('name="form_section" value="monthly"', false);
         $this->get(route('barangay.rbi-updates.deceased'))->assertOk()
-            ->assertSee('id="rbi-deceased-rows-table"', false)->assertDontSee('id="family-forms"', false)
-            ->assertDontSee('data-family-head required', false)->assertSee('LocalHead')->assertDontSee('PrivateOtherHead');
+            ->assertSee('id="rbi-deceased-rows-table"', false)->assertSee('id="family-forms"', false)
+            ->assertSee('data-no-new-residents checked', false)->assertSee('LocalHead')->assertDontSee('PrivateOtherHead');
         $resident = User::factory()->create(['role' => User::ROLE_RESIDENT]);
         $this->actingAs($resident)->get(route('barangay.rbi-updates.deceased'))->assertForbidden();
     }

@@ -12,7 +12,7 @@ class PopulationReportSubmission extends Model
 
     protected static function booted(): void
     {
-        // Corrections kinahanglan bag-ong submission; dili ilisan ang nangaging report.
+        // Submitted snapshots stay immutable when the live registry changes.
         static::updating(fn () => throw new \LogicException('Submitted population reports are immutable.'));
         static::deleting(fn () => throw new \LogicException('Submitted population reports cannot be deleted through the application.'));
     }

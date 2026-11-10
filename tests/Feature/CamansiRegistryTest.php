@@ -39,7 +39,7 @@ class CamansiRegistryTest extends TestCase
             ->assertSee('HistoricalResident');
         $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
         $this->get(route('barangay.rbi-updates.residents'))->assertOk()
-            ->assertSee($barangay->name)->assertSee('Save Residents');
+            ->assertSee($barangay->name)->assertSee('Save Monthly Form');
 
         $this->post(route('registry.new-inhabitant-monthly-reports.store'), [
             'reporting_month' => '2026-09',

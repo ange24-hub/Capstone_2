@@ -108,7 +108,10 @@ class PopulationReportController extends Controller
                 ])->values();
         }
         $submissionPreviewToken = null;
-        if ($isSecretary && $request->user()->isApproved() && $selectedSection === 'summary' && ! $printMode) {
+        $periodSubmission = $selectedSection === 'summary' && $barangayId
+            && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')
+            ? app(PopulationReportPeriod::class)->submitted($barangayId, $reportFilters['report_year'], $reportFilters['semester']) : null;
+        if ($isSecretary && $request->user()->isApproved() && $selectedSection === 'summary' && ! $printMode && !$periodSubmission) {
             $previews = array_filter($request->session()->get('population_submission_previews', []), fn ($item) => $item['expires_at'] >= time());
             $previews = array_slice($previews, -4, null, true);
             $submissionPreviewToken = (string) Str::uuid();
@@ -118,6 +121,7 @@ class PopulationReportController extends Controller
         }
         return response()->view('reports.population', [
             'submissionPreviewToken' => $submissionPreviewToken,
+            'periodSubmission' => $periodSubmission,
             'usingSavedSignatures' => $usingSavedSignatures,
             'selectedSection' => $selectedSection, 'sectionLabels' => $sectionLabels, 'reportTitle' => $reportTitle,
             'detailGroups' => $detailGroups, 'detailPagination' => $detailPagination,

@@ -1,6 +1,6 @@
                 <form method="POST" action="{{ $editingReport ? route('barangay.rbi-updates.update', $editingReport) : route('barangay.rbi-updates.store') }}" id="rbi-monthly-form" data-entry-today="{{ now()->format('Y-m-d') }}" autocomplete="off">
                     @csrf
-                    <input type="hidden" name="form_section" value="residents">
+                    <input type="hidden" name="form_section" value="monthly">
                     @if ($editingReport) @method('PUT') @endif
                     <p class="field-help"><x-required-mark /> Required fields must be filled out.</p>
 
@@ -15,7 +15,13 @@
                         </div>
                     </div>
 
-                    <h3 class="section-title text-lg font-semibold text-slate-900" id="family-section">Family members</h3>
+                    <section class="rbi-monthly-section rbi-monthly-residents">
+                    <div class="rbi-section-heading"><div><h3 class="section-title" id="family-section"><span class="rbi-section-letter">A</span> Newly registered inhabitants</h3><p class="rbi-section-help">Group residents by household. Section B follows below on the same monthly form.</p></div>
+                    @if(empty($editingReport?->rows))
+                        <label class="rbi-no-residents"><input type="checkbox" name="no_new_residents" value="1" data-no-new-residents @checked($noNewResidents)> No new residents this month</label>
+                    @endif
+                    </div>
+                    <fieldset class="rbi-resident-fields" data-resident-fields @disabled($noNewResidents)><legend class="sr-only">Newly registered residents and households</legend>
                     <div id="family-forms" class=" grid gap-6">
                         @foreach ($formFamilies as $family)
                             <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card>
@@ -83,12 +89,14 @@
                         <button type="button" id="add-family-form">Add Another Family Form</button>
                     </div>
 
+                    </fieldset></section>
+                    @include('rbi-updates.forms._deceased-fields')
                     @include('rbi-updates.forms._certification')
 
                     <div class="form-actions split-actions civic-sticky-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
                         <span>Save your changes first, then submit the saved report from Report history.</span>
                         <div class="toolbar compact-toolbar flex flex-wrap items-end gap-3">
-                            <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Residents' : 'Save Residents' }}</button>
+                            <button class="secondary-button" type="submit">{{ $editingReport?->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Save Updated Monthly Form' : 'Save Monthly Form' }}</button>
                         </div>
                     </div>
                 </form>

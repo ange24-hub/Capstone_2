@@ -1,8 +1,20 @@
 /* Shared screen design for every role and the public portal.
    Important declarations follow the existing layered theme convention. Keeping
    this layer after print-overrides preserves official print/document layouts. */
+@font-face {
+    font-family: "Inter";
+    src: url("../fonts/inter/InterVariable.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
 @layer system-ui {
     @media screen {
+        :is(.professional-shell, .professional-public),
+        :is(.professional-shell, .professional-public) :is(h1,h2,h3,h4,h5,h6,p,a,button,input,select,textarea,strong,small,label,dt,dd,span,em,table,summary,legend):not(:where(.population-monitoring-paper *, .rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .leaflet-container *)) {
+            font-family: "Inter", "Segoe UI", system-ui, sans-serif !important;
+            font-optical-sizing: auto;
+        }
         :root {
             --to-navy: #123449 !important;
             --to-primary: #166d75 !important;
@@ -249,6 +261,75 @@
         .professional-shell .rbi-subpages a[aria-current="page"] { background: #166d75 !important; color: #fff !important; border-color: #166d75 !important; }
         .professional-shell .rbi-section-nav a { border-radius: 9px !important; }
         .professional-shell .rbi-workspace-overview .rbi-report-metric { border-radius: 14px !important; }
+
+        /* Reports share a compact workspace header, readable filters and actions. */
+        .professional-shell :is(.population-page-heading, .population-submission-toolbar) {
+            padding: 20px 22px !important;
+            background: linear-gradient(110deg, #fff 65%, #eef8f6) !important;
+            border: 1px solid #dce6ee !important;
+            border-radius: 14px !important;
+        }
+        .professional-shell :is(.population-page-heading, .population-submission-toolbar) h1 { font-size: clamp(22px, 2vw, 28px) !important; letter-spacing: -.04em !important; line-height: 1.2 !important; margin: 0 0 6px !important; }
+        .professional-shell .population-builder-eyebrow { font-size: 10px !important; margin-bottom: 8px !important; color: #52798b !important; }
+        .professional-shell .population-report-builder { gap: 16px !important; }
+        .professional-shell .population-page-tabs { gap: 6px !important; padding: 4px !important; width: fit-content; max-width: 100%; border: 1px solid #dce6ee !important; border-radius: 11px !important; background: #e9f0f5 !important; }
+        .professional-shell .population-page-tabs a { padding: 9px 14px !important; border: 0 !important; border-radius: 8px !important; font-size: 12px !important; }
+        .professional-shell .population-page-tabs a[aria-current="page"] { background: white !important; color: #166d75 !important; box-shadow: 0 2px 6px #19384e0c !important; }
+        .professional-shell .population-controls { padding: 16px !important; gap: 12px !important; border-radius: 12px !important; }
+        .professional-shell .population-controls :is(label, .population-control > label) { font-size: 12px !important; color: #405d70 !important; margin-bottom: 6px !important; }
+        .professional-shell .population-builder-controls .population-control-wide { flex: 1.4 1 200px !important; }
+        .professional-shell .population-builder-controls .population-control-year { flex: 0 1 110px !important; }
+        .professional-shell .population-builder-controls > .population-control:not(.population-control-wide, .population-control-year) { flex: 1 1 210px !important; }
+        .professional-shell .population-controls :is(input,select) { height: 42px !important; min-height: 42px !important; }
+        .professional-shell .population-builder-stats { gap: 12px !important; }
+        .professional-shell .population-builder-stats > div { padding: 14px 16px !important; border-radius: 12px !important; border-left: 3px solid #279688 !important; }
+        .professional-shell .population-builder-stats > div:nth-child(2) { border-left-color: #438ab2 !important; }
+        .professional-shell .population-builder-stats > div:nth-child(3) { border-left-color: #b39a60 !important; }
+        .professional-shell .population-builder-stats strong { font-size: 24px !important; }
+        .professional-shell .population-preview-bar { padding: 16px 18px !important; }
+        .professional-shell .population-submission-complete { align-items: center; background: #eff8f4 !important; border-color: #bcded0 !important; }
+        .population-submitted-icon { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; background: #d9efe4; color: #237858; border-radius: 12px; }
+        .population-submission-complete .population-submit-copy { flex: 1; }
+
+        /* One continuous monthly RBI form: A, B, then certification. */
+        .professional-shell #rbi-monthly-form { display: grid; gap: 22px; }
+        .professional-shell .rbi-monthly-section { min-width: 0; padding-top: 20px; border-top: 1px solid #dce6ee; }
+        .professional-shell .rbi-section-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+        .professional-shell .rbi-monthly-section h3 { display: flex; align-items: center; gap: 10px; font-size: 17px !important; font-weight: 650 !important; letter-spacing: -.025em; scroll-margin-top: 90px; }
+        .professional-shell .rbi-section-letter { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; background: #e1f2ef; color: #166d75; border-radius: 9px; font-size: 13px; font-weight: 700; }
+        .professional-shell #rbi-monthly-form #certification-section { display: flex; align-items: center; gap: 10px; margin-top: 0; font-size: 17px !important; scroll-margin-top: 90px; }
+        .professional-shell #rbi-monthly-form #certification-section::before { content: 'C'; display: grid; place-items: center; width: 30px; height: 30px; background: #e1f2ef; color: #166d75; border-radius: 9px; font-size: 13px; }
+        .professional-shell .rbi-section-help { margin: 8px 0 16px; color: #61798a; font-size: 13px; line-height: 1.6; }
+        .professional-shell .rbi-no-residents { display: flex !important; align-items: center; gap: 9px; margin: 0 !important; padding: 10px 12px; background: #f3f7fa; border: 1px solid #dce6ee; border-radius: 9px; font-size: 12px !important; }
+        .professional-shell .rbi-no-residents input { width: 17px !important; height: 17px !important; min-height: 0 !important; margin: 0 !important; accent-color: #166d75; }
+        .professional-shell .rbi-resident-fields { min-width: 0; margin: 0; padding: 0; border: 0; }
+        .professional-shell .rbi-resident-fields:disabled { display: none; }
+        .professional-shell #rbi-monthly-form .family-entry-card { border-radius: 12px !important; padding: 18px !important; background: #fbfdff !important; }
+        .professional-shell #rbi-monthly-form .member-entry-card { background: #fff !important; border: 1px solid #e1e9ef !important; border-radius: 10px !important; padding: 16px !important; }
+        .professional-shell #rbi-monthly-form :is(input,select):not([type="hidden"], [type="checkbox"], [type="radio"]) { min-height: 42px !important; border-radius: 8px !important; font-size: 13px !important; }
+        .professional-shell #rbi-monthly-form .form-grid { gap: 16px !important; }
+        .professional-shell #rbi-deceased-rows-table { width: 100%; table-layout: fixed; min-width: 0 !important; }
+        .professional-shell #rbi-deceased-rows-table :is(th,td) { padding: 12px !important; }
+        .professional-shell #rbi-deceased-rows-table th { background: #edf4f8 !important; color: #405d70 !important; font-size: 12px !important; }
+        .professional-shell #rbi-deceased-rows-table :is(input,select) { width: 100% !important; min-width: 0 !important; }
+        .professional-shell .rbi-section-nav { gap: 6px !important; padding: 8px !important; border-radius: 12px !important; background: #eef4f8 !important; }
+
+        @media (max-width: 760px) {
+            .professional-shell :is(.population-page-heading, .population-submission-toolbar) { padding: 16px !important; }
+            .professional-shell .population-live-badge { font-size: 10px !important; white-space: normal !important; }
+            .professional-shell .population-builder-controls .population-control { flex: 1 1 100% !important; }
+            .professional-shell .population-builder-controls .population-control-year { flex: 1 1 90px !important; }
+            .professional-shell .population-builder-stats { gap: 8px !important; }
+            .professional-shell .population-builder-stats > div { padding: 12px 10px !important; gap: 7px !important; }
+            .professional-shell .population-builder-stats strong { font-size: 21px !important; }
+            .professional-shell .population-builder-stat-icon { display: none !important; }
+            .professional-shell .population-submission-complete { flex-wrap: wrap; }
+            .professional-shell #rbi-deceased-rows-table thead { display: none; }
+            .professional-shell #rbi-deceased-rows-table :is(tbody,tr,td) { display: block; width: 100%; }
+            .professional-shell #rbi-deceased-rows-table tr { padding: 8px; border-bottom: 1px solid #dce6ee; }
+            .professional-shell #rbi-deceased-rows-table td { border: 0 !important; padding: 8px !important; }
+            .professional-shell #rbi-deceased-rows-table td::before { content: attr(data-label); display: block; margin-bottom: 6px; color: #405d70; font-size: 12px; font-weight: 600; }
+        }
 
         @media (max-width: 760px) {
             .professional-content #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-directory-header, .dashboard-hero, .municipal-hero) { padding: 17px 16px !important; border-radius: 12px !important; gap: 12px !important; }

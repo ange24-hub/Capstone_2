@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="preload" href="{{ asset('fonts/inter/InterVariable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
     <style>@layer print-overrides, system-ui, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">

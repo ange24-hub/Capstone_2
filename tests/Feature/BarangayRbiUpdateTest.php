@@ -325,7 +325,7 @@ class BarangayRbiUpdateTest extends TestCase
             ->assertOk()
             ->assertSee('Update Submitted Monthly Form')
             ->assertSee('Ana Dela Cruz')
-            ->assertSee('Save Updated Residents');
+            ->assertSee('Save Updated Monthly Form');
 
         $this->actingAs($secretary)
             ->put(route('barangay.rbi-updates.update', $report), [

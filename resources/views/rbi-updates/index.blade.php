@@ -13,7 +13,6 @@
         $editingReport = ($rbiSection ?? '') === 'history' ? null : $draftRbiUpdate;
         $rbiSection = $rbiSection ?? 'residents';
         $rbiFormRoute = $rbiSection === 'deceased' ? 'barangay.rbi-updates.deceased' : 'barangay.rbi-updates.residents';
-        $sectionParameters = $editingReport ? ['edit' => $editingReport->id] : (request()->boolean('new') ? ['new' => 1] : []);
         $formRows = array_map([\App\Support\HouseholdRbi::class, 'normalize'], old('rows', $editingReport?->rows ?: [['household_head' => '']]));
         $memberFields = collect($rbiRowFields)->except('household_head')->all();
         $requiredMemberFields = ['last_name', 'first_name', 'sex', 'recorded_age', 'civil_status', 'birth_place', 'religion', 'birth_date'];
@@ -32,8 +31,9 @@
             $formFamilies = [['household_id' => '', 'household_head' => '', 'household_number' => '', 'members' => [[]]]];
         }
 
+        $noNewResidents = empty($editingReport?->rows) && (old('form_section') ? (bool) old('no_new_residents', false) : ($editingReport !== null || $rbiSection === 'deceased'));
         $rowInputIndex = 0;
-        $formDeceasedRows = old('deceased_rows', $editingReport?->deceased_rows ?: array_fill(0, 3, []));
+        $formDeceasedRows = old('deceased_rows', $editingReport?->deceased_rows ?: array_fill(0, 1, []));
         $submittedReport = session('submitted_rbi_update_id')
             ? $rbiUpdates->firstWhere('id', (int) session('submitted_rbi_update_id'))
             : null;
@@ -49,7 +49,7 @@
                     <span class="rbi-report-emblem" aria-hidden="true"><x-portal-sticker name="document" /></span>
                     <div>
                         <span class="rbi-report-eyebrow">RBI Monthly Form</span>
-                        <h1>{{ $rbiSection === 'history' ? 'Report history' : ($rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Add residents') }}</h1>
+                        <h1>{{ $rbiSection === 'history' ? 'Report history' : 'Monthly RBI form' }}</h1>
                         <p>Barangay {{ $barangay?->name ?: 'not set' }} <span aria-hidden="true">&middot;</span> Monthly reporting</p>
                     </div>
                 </div>
@@ -76,15 +76,15 @@
         </div>
 
         <nav class="rbi-subpages" aria-label="RBI Forms subpages">
-            <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if ($rbiSection === 'residents') aria-current="page" @endif><x-app-icon name="users" /><span>Add residents</span></a>
-            <a href="{{ route('barangay.rbi-updates.deceased', $sectionParameters) }}" @if ($rbiSection === 'deceased') aria-current="page" @endif><x-app-icon name="document" /><span>Deceased inhabitants</span></a>
+            <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if ($rbiSection !== 'history') aria-current="page" @endif><x-app-icon name="users" /><span>Monthly RBI form</span></a>
             <a href="{{ route('barangay.rbi-updates.history') }}" @if($rbiSection === 'history') aria-current="page" @endif><x-app-icon name="calendar" /><span>Report history</span></a>
         </nav>
         @if($rbiSection !== 'history')
         <nav class="rbi-section-nav" aria-label="RBI form sections">
             <a href="#monthly-report"><span>01</span> Monthly report</a>
-            <a href="#{{ $rbiSection === 'deceased' ? 'deceased-section' : 'family-section' }}"><span>02</span> {{ $rbiSection === 'deceased' ? 'Deceased inhabitants' : 'Family members' }}</a>
-            <a href="#certification-section"><span>03</span> Certification</a>
+            <a href="#family-section"><span>A</span> Registered inhabitants</a>
+            <a href="#deceased-section"><span>B</span> Deceased inhabitants</a>
+            <a href="#certification-section"><span>C</span> Certification</a>
         </nav>
         @endif
         @if (session('status'))
@@ -121,17 +121,13 @@
                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
-                        <h2 class="section-title text-lg font-semibold text-slate-900">{{ $rbiSection === 'deceased' ? 'Deceased Inhabitants Form' : 'Add Residents Form' }}</h2>
-                        <p>Choose a month, {{ $rbiSection === 'deceased' ? 'record deceased inhabitants' : 'add the families' }}, and save. Add signatures from Report history when submitting or adding to Consolidated RBI.</p>
+                        <h2 class="section-title text-lg font-semibold text-slate-900">One monthly report</h2>
+                        <p>Choose the month, complete Sections A and B, then review the certification. Save once for the entire monthly report.</p>
                     </div>
                     @if ($editingReport)<x-status-badge :status="$editingReport->status">{{ $editingReport->statusLabel() }}</x-status-badge>@endif
                 </div>
 
-                @if ($rbiSection === 'deceased')
-                    @include('rbi-updates.forms.deceased')
-                @else
-                    @include('rbi-updates.forms.residents')
-                @endif
+                @include('rbi-updates.forms.residents')
             </div>
         @endif
 
@@ -147,7 +143,7 @@
         @endforeach
     </datalist>
 
-    @if ($rbiSection === 'residents')
+    @if ($rbiSection !== 'history')
     <template id="member-entry-template">
         <article class="member-entry-card" data-member-card>
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
@@ -243,7 +239,8 @@
 
             const savedFamilies = @json(collect($editingReport?->rows ?? [])->map(fn ($row) => ['id' => $row['household_id'] ?? '', 'label' => $row['household_head'] ?? '', 'household_number' => $row['household_number'] ?? ''])->unique('label')->values());
             const refreshDeceasedFamilyOptions = () => {
-                const families = [...existingHouseholds, ...savedFamilies.filter(family => family.label && !existingHouseholds.some(household => household.label === family.label))];
+                const currentFamilies = [...(familyForms?.querySelectorAll('[data-family-card]') || [])].map(card => ({id:card.querySelector('[data-family-household-id]').value,label:card.querySelector('[data-family-head]').value.trim().replace(/ \[Household .*\]$/, ''),household_number:card.querySelector('[data-family-household-number]').value.trim()}));
+                const families = [...existingHouseholds, ...savedFamilies, ...currentFamilies].filter((family,index,all) => family.label && all.findIndex(other => (family.id && other.id) ? String(other.id)===String(family.id) : other.label===family.label)===index);
                 document.querySelectorAll('[data-deceased-family]').forEach(select => {
                     const selected = select.dataset.selected || select.value || '';
                     const hiddenId = select.closest('td').querySelector('[data-deceased-household-id]');
@@ -328,7 +325,7 @@
             monthlyForm.addEventListener('submit', event => {
                 familyForms?.querySelectorAll('[data-family-card]').forEach(syncHouseholdHead);
                 if (!monthlyForm.reportValidity()) { event.preventDefault(); unsaved = true; return; }
-                const unmatched = [...(familyForms?.querySelectorAll('[data-family-card]') || [])]
+                const unmatched = [...(document.querySelector('[data-resident-fields]')?.disabled ? [] : (familyForms?.querySelectorAll('[data-family-card]') || []))]
                     .filter(family => family.dataset.householdMatch === 'unmatched')
                     .map(family => family.querySelector('[data-family-head]').value);
                 if (!window.RbiHouseholds.confirmUnmatched(unmatched, message => window.confirm(message))) {
@@ -340,6 +337,12 @@
                 unsaved = false;
             });
 
+            const noResidents = document.querySelector('[data-no-new-residents]');
+            noResidents?.addEventListener('change', () => {
+                const fields = document.querySelector('[data-resident-fields]');
+                fields.disabled = noResidents.checked;
+                fields.classList.toggle('rbi-section-inactive', noResidents.checked);
+            });
             refreshFamilyNumbers();
             familyForms?.querySelectorAll('[data-family-card]').forEach(syncHouseholdHead);
 
@@ -347,9 +350,9 @@
                 const body = document.querySelector('#rbi-deceased-rows-table tbody');
                 const index = body.querySelectorAll('tr').length;
                 const row = document.createElement('tr');
-                row.insertAdjacentHTML('beforeend', '<td><input type="hidden" name="deceased_rows[' + index + '][household_id]" data-deceased-household-id><select aria-label="Household for deceased inhabitant" name="deceased_rows[' + index + '][household_head]" data-deceased-family><option value="">Select family</option></select></td>');
+                row.insertAdjacentHTML('beforeend', '<td data-label="Household / Family"><input type="hidden" name="deceased_rows[' + index + '][household_id]" data-deceased-household-id><select aria-label="Household for deceased inhabitant" name="deceased_rows[' + index + '][household_head]" data-deceased-family><option value="">Select family</option></select></td>');
                 @foreach ($rbiDeceasedRowFields as $field => $label)
-                    row.insertAdjacentHTML('beforeend', `<td><input name="deceased_rows[${index}][{{ $field }}]" type="{{ $field === 'death_date' ? 'date' : 'text' }}" aria-label="{{ $label }}"></td>`);
+                    row.insertAdjacentHTML('beforeend', `<td data-label="{{ $field === 'deceased_name' ? 'Full name' : $label }}"><input name="deceased_rows[${index}][{{ $field }}]" type="{{ $field === 'death_date' ? 'date' : 'text' }}" aria-label="{{ $label }}"></td>`);
                 @endforeach
                 body.appendChild(row);
                 refreshDeceasedFamilyOptions();

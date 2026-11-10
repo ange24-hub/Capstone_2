@@ -268,10 +268,10 @@ class RegistryMigrationDashboardTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('barangay.rbi-updates.residents'))
             ->assertOk()
-            ->assertSee('Add residents')
+            ->assertSee('Monthly RBI form')
             ->assertSee('Household')
             ->assertSee('Layo')
-            ->assertSee('Save Residents')
+            ->assertSee('Save Monthly Form')
             ->assertViewHas('barangay', fn ($area) => $area->id === $barangay->id)
             ->assertDontSee('Sheet3');
 
@@ -414,8 +414,8 @@ class RegistryMigrationDashboardTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('barangay.rbi-updates.residents'))
             ->assertOk()
-            ->assertSee('Add residents')
-            ->assertSee('Save Residents')
+            ->assertSee('Monthly RBI form')
+            ->assertSee('Save Monthly Form')
             ->assertSee('Cabascan');
     }
 }

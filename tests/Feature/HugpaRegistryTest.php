@@ -40,7 +40,7 @@ class HugpaRegistryTest extends TestCase
             ->assertSee('HistoricalResident');
         $this->get(route('barangay.registry.new-inhabitants'))->assertRedirect(route('barangay.rbi-updates.history'));
         $this->get(route('barangay.rbi-updates.residents'))->assertOk()
-            ->assertSee($barangay->name)->assertSee('Save Residents')
+            ->assertSee($barangay->name)->assertSee('Save Monthly Form')
             ->assertViewHas('barangay', fn ($area) => $area->secretary_name === 'Hugpa Secretary' && $area->punong_barangay_name === 'Hugpa Chair')
             ->assertDontSee('NENA E. GONZAGA')->assertDontSee('MARY GRACE M. POLISTICO')->assertDontSee('MARCOS L. MAQUILANG');
 
