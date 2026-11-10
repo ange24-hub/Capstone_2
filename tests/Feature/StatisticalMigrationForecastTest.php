@@ -205,7 +205,7 @@ class StatisticalMigrationForecastTest extends TestCase
     {
         $this->person();
         $this->actingAs($this->staff)->get(route('prediction.migration'))->assertOk()
-            ->assertSee('Local prediction analytics')->assertSee('December 2026')
+            ->assertSee('Migration forecast')->assertSee('December 2026')
             ->assertSee('Save in/out forecasts')->assertSee('History cutoff')
             ->assertDontSee('Last usable month:');
         $this->post(route('prediction.store'), ['target_month' => '2026-12'])->assertRedirect();

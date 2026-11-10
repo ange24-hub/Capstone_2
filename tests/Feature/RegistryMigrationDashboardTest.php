@@ -20,6 +20,7 @@ class RegistryMigrationDashboardTest extends TestCase
 
     public function test_monthly_migration_filters_year_and_barangay_and_includes_empty_months(): void
     {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2027-01-08 12:00:00','Asia/Manila'));
         $barangay = Barangay::where('name', 'San Isidro')->firstOrFail();
         $otherBarangay = Barangay::where('name', 'Canlupao')->firstOrFail();
         $secretary = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $barangay->id]);
@@ -140,8 +141,8 @@ class RegistryMigrationDashboardTest extends TestCase
             ->get(route('migration.dashboard', ['section' => 'events']))
             ->assertOk()
             ->assertSee('San Isidro')
-            ->assertSee('Recent departure records')
-            ->assertDontSee('Maria Santos');
+            ->assertSee('Recent movement records')
+            ->assertSee('Maria Santos');
 
         $this->actingAs($municipal)
             ->get(route('spatial.index'))

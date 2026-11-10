@@ -10,7 +10,7 @@
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ['migration.dashboard', 'migration.*', 'trend', 'Migration trends'],
-                ...($user->isApproved() ? [['prediction.dashboard', ['prediction.*','municipal.prediction-*'], 'trend', 'Statistical forecast']] : []),
+                ...($user->isApproved() ? [['prediction.dashboard', ['prediction.*','municipal.prediction-*'], 'trend', 'Provisional estimates']] : []),
                 ['concerns.summary', 'concerns.*', 'users', 'Concern summary'],
             ],
             'Maps' => [['spatial.index', 'spatial.index', 'map', 'Household map']],
@@ -33,7 +33,7 @@
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ['migration.dashboard', 'migration.*', 'trend', 'Migration trends'],
-                ...($user->isApproved() ? [['prediction.dashboard', 'prediction.*', 'trend', 'Statistical forecast']] : []),
+                ...($user->isApproved() ? [['prediction.dashboard', 'prediction.*', 'trend', 'Provisional estimates']] : []),
             ],
             'Maps & surveys' => [
                 ['spatial.index', 'spatial.index', 'map', 'Household map'],

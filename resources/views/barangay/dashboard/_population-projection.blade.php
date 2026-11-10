@@ -1,10 +1,12 @@
 <section class="statistical-population statistical-card" id="population-forecast" aria-labelledby="semester-population-title">
     <div class="statistical-section-heading">
         <div>
-            <h2 id="semester-population-title">{{ $barangay->name }} population forecast</h2>
+            <h2 id="semester-population-title">{{ $barangay->name }} provisional population estimate</h2>
         </div>
         <span class="statistical-status {{ $populationProjection['estimate'] === null ? 'is-waiting' : '' }}">{{ $populationProjection['estimate'] === null ? 'Insufficient history' : 'Provisional estimate' }}</span>
     </div>
+
+    <p class="statistical-muted">Planning estimate only. Predictive accuracy is not yet validated. This is not an official population count.</p>
 
     @if($populationProjection['estimate'] !== null)
         <div class="statistical-population-result statistical-population-compact">
@@ -24,6 +26,7 @@
     @endif
     @if($populationChart)
         @include('barangay.dashboard._prediction-chart', [
+            'chartActualLabel'=>'Reported population', 'chartPredictedLabel'=>'Provisional estimate',
             'chartId' => 'population-trend', 'chartTitle' => 'Population trend',
             'chartRows' => $populationChart, 'chartNote' => 'S1 / S2 = semester',
         ])

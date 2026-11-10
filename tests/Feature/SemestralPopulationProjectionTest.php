@@ -48,7 +48,7 @@ class SemestralPopulationProjectionTest extends TestCase
         $this->assertNull($result['mape']);
         $staff=User::factory()->create(['role'=>User::ROLE_BARANGAY,'barangay_id'=>$area->id]);
         $response = $this->actingAs($staff)->get(route('prediction.dashboard'))->assertOk()
-            ->assertSee('Carnaga population forecast')->assertSee('463')->assertSee('Gap estimate; no actual report')
+            ->assertSee('Carnaga provisional population estimate')->assertSee('463')->assertSee('Gap estimate; no actual report')
             ->assertSee('wala pa ma-validate');
         $chart = collect($response->viewData('populationChart'))->keyBy('label');
         $this->assertNull($chart['2023 S2']['actual']);

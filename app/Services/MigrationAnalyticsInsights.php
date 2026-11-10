@@ -18,9 +18,9 @@ class MigrationAnalyticsInsights
         if ($closed->isEmpty()) {
             $facts['period'] = 'No completed calendar months are available in the selected reporting year.';
         } else {
-            $facts['totals'] = sprintf('Completed months in %d contain %d classified RBI arrival entries and %d recorded departure events.',
+            $facts['totals'] = sprintf('Completed months in %d contain %d recorded arrival events and %d recorded departure events.',
                 $year, $closed->sum('in'), $closed->sum('out'));
-            foreach (['in' => 'classified RBI arrival entries', 'out' => 'recorded departure events'] as $type => $label) {
+            foreach (['in' => 'recorded arrival events', 'out' => 'recorded departure events'] as $type => $label) {
                 $peak = (int) $closed->max($type);
                 if ($peak > 0) {
                     $peakMonths = $closed->where($type, $peak)->pluck('month')->implode(', ');
@@ -29,6 +29,10 @@ class MigrationAnalyticsInsights
                 if ($closed->count() < 2) continue;
                 $previous = $closed[$closed->count() - 2];
                 $latest = $closed->last();
+                if (! ($previous[$type.'_known'] ?? true) || ! ($latest[$type.'_known'] ?? true)) {
+                    $facts[$type.'_change'] = ucfirst($label).': comparison unavailable because a monthly count is not confirmed.';
+                    continue;
+                }
                 $before = (int) $previous[$type];
                 $after = (int) $latest[$type];
                 $comparison = "{$label}: {$previous['month']} = {$before}; {$latest['month']} = {$after}.";

@@ -117,9 +117,9 @@ class AssistantReportSummary
             if ($month !== null) {
                 $r = array_replace($r, $allMonths->firstWhere('month', sprintf('%04d-%02d', $year, $month)));
             }
-            $facts = ['scope' => $r['scopeLabel'], 'year' => $year, 'in_migration' => $r['in'], 'out_migration' => $r['out'], 'net_change' => $r['net'], 'recorded_events' => $r['total'],
+            $facts = ['scope' => $r['scopeLabel'], 'year' => $year, 'in_migration' => $r['in_known'] ? $r['in'] : null, 'out_migration' => $r['out_known'] ? $r['out'] : null, 'net_change' => $r['in_known'] && $r['out_known'] ? $r['net'] : null, 'recorded_events' => $r['total'],
                 'basis' => 'Recorded movement events, not unique people. No events recorded does not confirm no actual movement. Completeness unverified. No forecasts.'];
-            $reply = $r['scopeLabel'].' — '.$year.AssistantLanguage::text("\nIn-migration: ").$r['in'].AssistantLanguage::text("\nOut-migration: ").$r['out'].AssistantLanguage::text("\nNet change: ").$r['net'].AssistantLanguage::text("\nRecorded events: ").$r['total'].AssistantLanguage::text("\nNo recorded events does not confirm zero movement. Reporting completeness is unverified.");
+            $reply = $r['scopeLabel'].' — '.$year.AssistantLanguage::text("\nIn-migration: ").($r['in_known'] ? $r['in'] : 'Not confirmed').AssistantLanguage::text("\nOut-migration: ").($r['out_known'] ? $r['out'] : 'Not confirmed').AssistantLanguage::text("\nNet change: ").($r['in_known'] && $r['out_known'] ? $r['net'] : 'Not confirmed').AssistantLanguage::text("\nRecorded events: ").$r['total'].AssistantLanguage::text("\nNo recorded events does not confirm zero movement. Reporting completeness is unverified.");
             $route = 'reports.migration';
             if ($month !== null) {
                 $facts['month'] = sprintf('%04d-%02d', $year, $month);
@@ -127,7 +127,7 @@ class AssistantReportSummary
                 $reply .= AssistantLanguage::text("\nThe linked PDF contains the full year with monthly rows.");
             } elseif (preg_match('/\b(monthly|by month|most|highest|peak|pinakadaghan)\b/iu', $question)) {
                 $facts['monthly_events'] = $allMonths->values()->all();
-                $reply .= AssistantLanguage::text("\n\nMonthly events (in / out):\n").$allMonths->map(fn ($row) => $row['label'].': '.$row['in'].' / '.$row['out'])->implode("\n");
+                $reply .= AssistantLanguage::text("\n\nMonthly events (in / out):\n").$allMonths->map(fn ($row) => $row['label'].': '.($row['in_known'] ? $row['in'] : '—').' / '.($row['out_known'] ? $row['out'] : '—'))->implode("\n");
                 if ($r['total'] > 0) {
                     $reply .= AssistantLanguage::text("\nHighest recorded activity: ").$allMonths->where('total', $allMonths->max('total'))->pluck('label')->implode(', ').AssistantLanguage::text('. This does not establish a seasonal pattern.');
                 }
@@ -177,7 +177,7 @@ class AssistantReportSummary
 
     private function forecastAnswer(?int $areaId, string $question, string $url, bool $ceb): array
     {
-        if (! $areaId) return $this->answer($ceb ? 'Pilia ang usa ka barangay sa Statistical forecast dashboard.' : 'Select one barangay in the Statistical forecast dashboard.');
+        if (! $areaId) return $this->answer($ceb ? 'Pilia ang usa ka barangay sa Provisional estimates page.' : 'Select one barangay in the Provisional estimates page.');
         if (! \Illuminate\Support\Facades\Schema::hasTable('forecast_logs')) return $this->answer('Statistical forecast storage is not ready.');
         $service = app(MigrationPredictionService::class);
         $forecasts = []; $scores = [];

@@ -13,12 +13,12 @@
     $workspaceRoute = 'prediction.'.$forecastPage;
 @endphp
 <div class="statistical-forecast">
-    <header class="statistical-hero"><div><p class="statistical-eyebrow">Local prediction analytics</p><h1>{{ $forecastPage === 'population' ? 'Population forecast' : 'Migration forecast' }}</h1>
+    <header class="statistical-hero"><div><p class="statistical-eyebrow">{{ $forecastPage === 'population' ? 'Provisional planning tool' : 'Native PHP estimates' }}</p><h1>{{ $forecastPage === 'population' ? 'Provisional Population Estimate' : 'Migration forecast' }}</h1>
         <p>Barangay {{ $barangay->name }}</p></div></header>
     @if(session('status'))<p class="statistical-notice" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="statistical-errors" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <nav class="statistical-section-nav statistical-page-tabs" aria-label="Forecast pages">
-        <a href="{{ route('prediction.population', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'population') aria-current="page" @endif><x-app-icon name="users" /><span>Population forecast</span></a>
+        <a href="{{ route('prediction.population', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'population') aria-current="page" @endif><x-app-icon name="users" /><span>Population estimate</span></a>
         <a href="{{ route('prediction.migration', ['barangay_id' => $barangay->id]) }}" @if($forecastPage === 'migration') aria-current="page" @endif><x-app-icon name="trend" /><span>Migration forecast</span></a>
     </nav>
     <form method="GET" action="{{ route($workspaceRoute) }}" class="statistical-toolbar">

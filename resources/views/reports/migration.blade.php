@@ -44,11 +44,11 @@
 
         <div class="migration-report-highlights" aria-label="Recorded movement totals">
             <div><span>Recorded events</span><strong>{{ number_format($report['total']) }}</strong></div>
-            <div><span>Arrivals</span><strong>{{ number_format($report['in']) }}</strong></div>
-            <div><span>Departures</span><strong>{{ number_format($report['out']) }}</strong></div>
-            <div><span>Net change</span><strong>{{ $report['net'] > 0 ? '+' : '' }}{{ number_format($report['net']) }}</strong></div>
+            <div><span>Arrivals</span><strong>{{ $report['in_known'] ? number_format($report['in']) : '-' }}</strong></div>
+            <div><span>Departures</span><strong>{{ $report['out_known'] ? number_format($report['out']) : '-' }}</strong></div>
+            <div><span>Recorded net</span><strong>{{ $report['in_known'] && $report['out_known'] ? ($report['net'] > 0 ? '+' : '').number_format($report['net']) : '-' }}</strong></div>
         </div>
-        <p class="migration-report-caveat">Arrivals: classified in-migration entries from saved RBI forms, grouped by first-save month. Departures: dated Moved Out records. Missing months outside the saved-report history are not confirmed zeros.</p>
+        <p class="migration-report-caveat">Arrivals and departures use actual movement dates. Duplicate events count once; originals remain unchanged. A dash means no confirmed count. Recorded totals do not establish complete coverage.</p>
     </div>
 
     @include('reports.migration-tables')

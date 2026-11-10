@@ -1,5 +1,13 @@
 # RBIM: WMA migration forecasting, without ML
 
+## Main feature: Migration Trends; optional provisional estimates
+
+Migration Trends, recent events and newly generated migration reports/PDFs share `RecordedMigrationHistory`. Arrivals and departures both use actual dated `migration_records` plus unlinked dated movement-ledger observations. RBI save/import/encoding dates are not physical movement dates. Future-dated events, demo data and mismatched resident/barangay records are excluded. Linked ledger mirrors do not add another event; the same barangay/resident/direction/day counts once, with duplicate originals preserved. Separate movement dates remain separate events.
+
+Values are recorded-event counts, not a claim of complete migration coverage. Unknown monthly counts are shown as gaps/dashes. Zero is displayed only for completed months with matching verified source counts/hashes, synchronized originals and no duplicate inflation. Municipal zero requires coverage for every barangay in scope. An observed nonzero count can be displayed while its completeness remains unconfirmed. Annual totals are totals of recorded events, not proof of a population increase/decrease. Reading trends never syncs, backfills or edits source reports.
+
+The population tool is labeled **Provisional Population Estimate**. Its WMA equations, historical report contents and existing source-eligibility checks remain unchanged. Its reported-history and provisional-estimate graph labels explicitly distinguish observations from estimates. Insufficient history stays unavailable; sample-data correctness tests do not establish real-world predictive accuracy.
+
 ## Mga file nga nagpatuman sa request
 
 - `database/migrations/2026_11_09_000001_create_migration_logs_table.php`

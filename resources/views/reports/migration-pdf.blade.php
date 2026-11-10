@@ -28,5 +28,6 @@ footer { position: fixed; bottom: -22pt; left: 0; right: 0; border-top: .5pt sol
 </style></head><body>
 <footer>SB-ISPGM | Monthly Migration Report | {{ $report['generatedAt']->format('d M Y') }} <span class="page-number">Page </span></footer>
 @include('reports._document-header', ['documentTitle' => 'MONTHLY MIGRATION REPORT — '.$report['year'], 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y')])
+<p class="report-meta">Recorded movement dates only. Dashes mean no confirmed count. Duplicate entries count once; original records are retained.</p>
 @include('reports.migration-tables', ['showReportNotes' => false])
 </body></html>

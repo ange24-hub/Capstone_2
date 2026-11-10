@@ -22,7 +22,7 @@ class MigrationReportController extends Controller
             abort_if($request->filled('barangay_id') && $request->integer('barangay_id') !== $request->user()->barangay_id, 403);
         }
         $selectedBarangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
-        $selectedYear = $request->filled('year') ? $request->integer('year') : now()->year;
+        $selectedYear = $request->filled('year') ? $request->integer('year') : now(config('migration_forecast.timezone', 'Asia/Manila'))->year;
         $report = $summary->build($selectedBarangayId, $selectedYear);
         if ($request->routeIs('reports.migration.pdf')) {
             return Pdf::loadView('reports.migration-pdf', compact('report'))->setPaper('a4')

@@ -17,7 +17,7 @@ class ForecastSubpagesTest extends TestCase
         $admin = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->mock(MigrationPredictionService::class)->shouldNotReceive('forecastNextMonth');
         $this->actingAs($admin)->get(route('prediction.population', ['barangay_id' => $area->id]))
-            ->assertOk()->assertSee('Population forecast')->assertSee('Carnaga population forecast')
+            ->assertOk()->assertSee('Provisional Population Estimate')->assertSee('Carnaga provisional population estimate')
             ->assertSee(route('prediction.migration', ['barangay_id' => $area->id]))
             ->assertDontSee('Monthly migration')->assertDontSee('Save in/out forecasts')
             ->assertViewMissing('forecasts')->assertViewHas('forecastPage', 'population');
@@ -31,7 +31,7 @@ class ForecastSubpagesTest extends TestCase
         $this->actingAs($staff)->get(route('prediction.migration'))->assertOk()
             ->assertSee('Migration forecast')->assertSee('Monthly migration')
             ->assertSee(route('prediction.population', ['barangay_id' => $area->id]))
-            ->assertDontSee('Carnaga population forecast')->assertDontSee('population-trend-title')
+            ->assertDontSee('Carnaga provisional population estimate')->assertDontSee('population-trend-title')
             ->assertViewMissing('populationProjection')->assertViewHas('forecastPage', 'migration');
     }
 

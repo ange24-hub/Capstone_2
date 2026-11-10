@@ -139,13 +139,13 @@ class MigrationAnalyticsInsightsTest extends TestCase
         $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
         $trends = $this->actingAs($staff)->get(route('migration.dashboard', ['year' => 2026]))->assertOk()
             ->assertDontSee('Demo data included')->assertDontSee('DEMO-MIGRATION-V1');
-        $this->assertSame(2, $trends->viewData('totalOut'));
-        $this->assertSame(2, $trends->viewData('monthlyTrend')->sum('out'));
+        $this->assertSame(1, $trends->viewData('totalOut'));
+        $this->assertSame(1, $trends->viewData('monthlyTrend')->sum('out'));
         $this->assertSame(1, $trends->viewData('analyticsInsights')['alert_count']);
         $this->assertSame(1, $trends->viewData('analyticsInsights')['undated_count']);
         $this->get(route('migration.dashboard', ['year' => 2026, 'section' => 'events']))->assertOk()
-            ->assertViewHas('records', fn ($r) => $r->count() === 2);
-        $this->assertSame(2, app(\App\Services\MigrationSummary::class)->build($area->id, 2026)['out']);
+            ->assertViewHas('records', fn ($r) => $r->count() === 1);
+        $this->assertSame(1, app(\App\Services\MigrationSummary::class)->build($area->id, 2026)['out']);
         $population = $this->get(route('reports.population'))->assertOk()->viewData('report');
         $consolidated = $this->get(route('barangay.registry.active'))->assertOk()->viewData('inhabitants');
         $this->assertSame(5, $population['totalRecords']);

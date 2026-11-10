@@ -16,6 +16,7 @@ class MigrationReportTest extends TestCase
 
     public function test_report_filters_by_movement_year_and_barangay_and_matches_dashboard(): void
     {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2027-01-08 12:00:00','Asia/Manila'));
         $area = Barangay::where('name', 'Looc')->firstOrFail();
         $other = Barangay::where('name', 'Canlupao')->firstOrFail();
         foreach ([[$area, 'in', '2026-01-01'], [$area, 'out', '2026-12-31'], [$area, 'out', '2026-12-01'],
@@ -30,7 +31,7 @@ class MigrationReportTest extends TestCase
         $this->submittedArrivals($other,$staff,'2026-01',[1,0,0]);
         $params = ['barangay_id' => $area->id, 'year' => 2026];
         $response = $this->actingAs($staff)->get(route('reports.migration', $params))->assertOk()
-            ->assertSee('Print Report')->assertSee('Download PDF')->assertSee('No recorded events')
+            ->assertSee('Print Report')->assertSee('Download PDF')->assertSee('No confirmed data')
             ->assertSee('aria-label="Recorded movement totals"', false)
             ->assertSee('class="migration-report-print-jurisdiction"', false)
             ->assertSee('<details class="population-report-notes migration-report-notes">', false);
@@ -43,7 +44,7 @@ class MigrationReportTest extends TestCase
         $dashboard = $this->get(route('migration.dashboard', $params))->assertOk();
         $this->assertSame($dashboard->viewData('totalIn'), $report['in']);
         $this->assertSame($dashboard->viewData('totalOut'), $report['out']);
-        $this->assertSame($dashboard->viewData('monthlyTrend')->toArray(), $report['months']->map(fn ($month) =>
+        $this->assertSame($dashboard->viewData('monthlyTrend')->map(fn ($month) => ['month'=>$month['month'],'in'=>$month['in'],'out'=>$month['out']])->toArray(), $report['months']->map(fn ($month) =>
             ['month' => $month['month'], 'in' => $month['in'], 'out' => $month['out']])->toArray());
         $all = $this->get(route('reports.migration', ['year' => 2026]))->assertOk()->viewData('report');
         $this->assertSame(4, $all['total']);
