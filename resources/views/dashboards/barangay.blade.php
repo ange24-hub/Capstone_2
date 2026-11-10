@@ -2,6 +2,7 @@
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/barangay-dashboard.css') }}?v={{ filemtime(public_path('css/barangay-dashboard.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/dashboard-polish.css') }}?v={{ filemtime(public_path('css/dashboard-polish.css')) }}" media="screen">
     @if(request()->routeIs('barangay.resident-approvals.index', 'barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/barangay-service-colors.css') }}?v={{ filemtime(public_path('css/barangay-service-colors.css')) }}" media="screen">
     @endif

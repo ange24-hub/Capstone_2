@@ -2,6 +2,7 @@
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/municipal-dashboard.css') }}?v={{ filemtime(public_path('css/municipal-dashboard.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard-polish.css') }}?v={{ filemtime(public_path('css/dashboard-polish.css')) }}" media="screen">
 @endpush
 
 @section('content')
@@ -13,7 +14,7 @@
         <header class="municipal-hero">
             <div class="municipal-hero-copy">
                 <span class="municipal-eyebrow">Municipal Administration <span aria-hidden="true">/</span> Tomas Oppus</span>
-                <h1 id="municipal-dashboard-title"><x-portal-sticker name="building" /> Municipal overview</h1>
+                <h1 id="municipal-dashboard-title"><x-app-icon name="building" /> Municipal overview</h1>
                 <p>A view of barangay reporting, account approvals, and population movement.</p>
             </div>
             <div class="municipal-hero-actions">
@@ -46,6 +47,7 @@
             <a href="{{ route('municipal.approvals.index') }}"><span><x-app-icon name="shield" /></span><div><strong>Account approvals</strong><small>{{ $secretaryApprovalRequests->count() }} awaiting review</small></div><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('reports.population') }}"><span><x-app-icon name="users" /></span><div><strong>Population reports</strong><small>Review registered residents</small></div><x-app-icon name="arrow-right" /></a>
             <a href="{{ route('spatial.index') }}"><span><x-app-icon name="map" /></span><div><strong>Household map</strong><small>View locations and hazards</small></div><x-app-icon name="arrow-right" /></a>
+            <a href="{{ route('concerns.summary') }}"><span><x-app-icon name="activity" /></span><div><strong>Concern summary</strong><small>Categories and current status</small></div><x-app-icon name="arrow-right" /></a>
         </nav>
 
         <div class="admin-section-heading">
@@ -58,7 +60,7 @@
                 <div>
                     <span class="step-pill">Account Authorization</span>
                     <h2 class="section-title text-lg font-semibold text-slate-900">Secretary approvals</h2>
-                    <p>Approve only verified secretaries assigned to the correct Tomas Oppus barangay.</p>
+                    <p>Verify the assigned barangay before approval.</p>
                 </div>
                 <x-status-badge status="pending">{{ $secretaryApprovalRequests->count() }} pending</x-status-badge>
             </div>
@@ -71,7 +73,7 @@
                 </div>
             @else
                 <div class="municipal-approval-list grid gap-4 ">
-                    @foreach ($secretaryApprovalRequests as $secretary)
+                    @foreach ($secretaryApprovalRequests->take(3) as $secretary)
                         <article class="municipal-approval-item rounded-xl border border-slate-200 bg-white bg-none shadow-sm p-5">
                             <div class="approval-identity">
                                 <span class="account-avatar">{{ str($secretary->name)->substr(0, 1)->upper() }}</span>
@@ -98,6 +100,7 @@
                         </article>
                     @endforeach
                 </div>
+                @if($secretaryApprovalRequests->count() > 3)<a class="dashboard-more-link" href="{{ route('municipal.approvals.index') }}">View all {{ $secretaryApprovalRequests->count() }} pending accounts <x-app-icon name="arrow-right" /></a>@endif
             @endif
         </div>
 
@@ -105,7 +108,7 @@
             <div>
                 <span class="step-pill">Barangay Reporting</span>
                 <h2 class="section-title text-lg font-semibold text-slate-900">Barangay reporting</h2>
-                <p>Review submitted forms and find the latest reports in New Inhabitant Report.</p>
+                <p>Submission coverage across barangays.</p>
             </div>
             <div class="directory-summary-metrics">
                 <div><strong>{{ $barangays->count() }}</strong><span>Total barangays</span></div>
@@ -129,15 +132,17 @@
         </div>
         </div>
 
-        <div class="workflow-card municipal-panel decision-support rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="decision-support">
-            <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
+        <details class="workflow-card municipal-panel decision-support rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="decision-support">
+            <summary class="workflow-head flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <span class="step-pill">AI-assisted Decision Support</span>
+                    <span class="step-pill">Planning overview</span>
                     <h2 class="section-title text-lg font-semibold text-slate-900">Planning indicators</h2>
-                    <p>Explainable indicators use recent RBI and migration patterns. They support planning decisions but do not replace field validation.</p>
+                    <p>Expand to review recent RBI and movement indicators.</p>
                 </div>
                 <span class="badge inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ $analyticsSummary['high_movement_count'] }} priority area(s)</span>
-            </div>
+                <x-app-icon name="chevron-down" />
+            </summary>
+            <p class="dashboard-planning-note">These indicators support planning decisions and do not replace field validation.</p>
 
             <div class="decision-grid">
                 @forelse ($barangays->whereIn('movement_level', ['high', 'watch'])->sortByDesc('movement_total_6m') as $barangay)
@@ -160,6 +165,6 @@
                     </div>
                 @endforelse
             </div>
-        </div>
+        </details>
     </section>
 @endsection

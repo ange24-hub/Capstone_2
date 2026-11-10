@@ -1,0 +1,136 @@
+/* Matching operational dashboards; document previews keep their own rules. */
+@layer print-overrides {
+@media screen {
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) { display: grid !important; gap: 16px !important; color: #19384e !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) > * { min-width: 0 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero,.dashboard-page-header) { min-height: 0 !important; padding: 18px 20px !important; gap: 16px !important; border: 1px solid #d5e3e9 !important; border-left: 4px solid #27888a !important; border-radius: 12px !important; background: linear-gradient(110deg,#fff 55%,#edf7f4) !important; box-shadow: 0 3px 16px #19384e04 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero,.dashboard-page-header) h1 { display: flex !important; align-items: center !important; gap: 12px !important; margin: 3px 0 5px !important; color: #19384e !important; font-size: clamp(25px,2.2vw,30px) !important; line-height: 1.3 !important; font-weight: 700 !important; }
+    .municipal-dashboard .municipal-hero h1 > svg { width: 28px !important; height: 28px !important; color: #166d75 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero,.dashboard-page-header) p { margin: 0 !important; color: #4b6273 !important; font-size: 14px !important; line-height: 1.6 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-eyebrow,.dashboard-eyebrow) { font-size: 11px !important; color: #166d75 !important; letter-spacing: .08em !important; }
+    .barangay-dashboard.workspace-page-overview .workspace-heading-emblem { width: 40px !important; height: 40px !important; flex-basis: 40px !important; border: 1px solid #cce5df !important; border-radius: 11px !important; background: #e8f5f1 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero-actions,.dashboard-header-actions) { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; margin: 0 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero-actions a,.dashboard-header-actions a) { min-height: 39px !important; padding: 8px 12px !important; border: 1px solid #c5dce1 !important; border-radius: 8px !important; background: #fff !important; color: #166d75 !important; font-size: 13px !important; line-height: 1.5 !important; box-shadow: none !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero-actions a:first-child,.dashboard-header-actions a:first-child) { background: #166d75 !important; color: #fff !important; border-color: #166d75 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .admin-section-heading { margin: 0 !important; padding: 0 2px !important; gap: 12px !important; align-items: center !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .admin-section-heading h2 { margin: 0 !important; color: #19384e !important; font-size: 18px !important; line-height: 1.4 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .admin-section-heading > div > span { display: none !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .admin-section-heading p { margin: 0 !important; color: #4b6273 !important; font-size: 13px !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-metrics,.civic-task-metrics) { display: grid !important; gap: 12px !important; margin: 0 !important; }
+    .municipal-dashboard .municipal-metrics { grid-template-columns: repeat(3,minmax(0,1fr)) !important; }
+    .barangay-dashboard.workspace-page-overview .civic-task-metrics { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-card { position: relative !important; display: flex !important; flex-direction: row !important; align-items: flex-start !important; min-height: 0 !important; padding: 14px !important; gap: 11px !important; border: 1px solid #dce6ed !important; border-radius: 11px !important; background: #fff !important; box-shadow: 0 3px 12px #19384e03 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-icon { position: static !important; display: grid !important; place-items: center !important; width: 32px !important; height: 32px !important; flex: 0 0 32px !important; margin: 0 !important; border: 0 !important; border-radius: 9px !important; background: #eaf4f6 !important; color: #166d75 !important; box-shadow: none !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-card > div { min-width: 0 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-card div > span { display: block !important; color: #365467 !important; font-size: 14px !important; line-height: 1.4 !important; font-weight: 550 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-card strong { display: block !important; margin: 4px 0 !important; color: #19384e !important; font-size: 29px !important; line-height: 1.15 !important; font-weight: 650 !important; font-variant-numeric: tabular-nums !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-card small { display: block !important; color: #4b6273 !important; font-size: 13px !important; line-height: 1.5 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-warning .metric-icon { color: #986a22 !important; background: #fff6e5 !important; }
+    :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-success .metric-icon { color: #21725b !important; background: #edf7f1 !important; }
+    .municipal-dashboard .municipal-shortcuts { display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)) !important; gap: 10px !important; }
+    .municipal-dashboard .municipal-shortcuts > a { padding: 12px !important; gap: 10px !important; border: 1px solid #dce6ed !important; border-radius: 10px !important; background: #fff !important; box-shadow: none !important; }
+    .municipal-dashboard .municipal-shortcuts > a > span { width: 30px !important; height: 30px !important; flex-basis: 30px !important; background: #edf6f5 !important; color: #166d75 !important; }
+    .municipal-dashboard .municipal-shortcuts strong { color: #294a5d !important; font-size: 14px !important; line-height: 1.4 !important; }
+    .municipal-dashboard .municipal-shortcuts small { color: #4b6273 !important; font-size: 12px !important; line-height: 1.5 !important; }
+    .municipal-dashboard .municipal-shortcuts > a:hover { background: #f2f9f7 !important; border-color: #bcd9d4 !important; }
+    .municipal-dashboard .municipal-work-grid { display: grid !important; grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; gap: 16px !important; align-items: start !important; }
+    .municipal-dashboard .municipal-panel { min-height: 0 !important; height: auto !important; padding: 16px !important; gap: 12px !important; border: 1px solid #dce6ed !important; border-radius: 12px !important; background: #fff !important; box-shadow: none !important; }
+    .municipal-dashboard .workflow-head { margin: 0 0 12px !important; padding: 0 0 12px !important; gap: 12px !important; }
+    .municipal-dashboard .workflow-head .step-pill { display: none !important; }
+    .municipal-dashboard .section-title { margin: 0 0 5px !important; color: #19384e !important; font-size: 18px !important; line-height: 1.4 !important; font-weight: 650 !important; }
+    .municipal-dashboard .workflow-head p, .municipal-dashboard .municipal-directory-summary > div > p { margin: 0 !important; color: #4b6273 !important; font-size: 13px !important; line-height: 1.6 !important; }
+    .municipal-dashboard .dashboard-empty-state { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important; min-height: 0 !important; padding: 14px !important; border: 1px dashed #d3e1e8 !important; border-radius: 9px !important; text-align: left !important; background: #f7fafb !important; }
+    .municipal-dashboard .dashboard-empty-state strong { color: #294a5d !important; font-size: 14px !important; }
+    .municipal-dashboard .dashboard-empty-state > span:last-child { width: 100% !important; color: #4b6273 !important; font-size: 13px !important; }
+    .municipal-dashboard .municipal-empty-icon { width: 25px !important; height: 25px !important; margin: 0 !important; }
+    .municipal-dashboard .municipal-empty-icon svg { width: 15px !important; height: 15px !important; }
+    .municipal-dashboard .municipal-approval-list { gap: 10px !important; }
+    .municipal-dashboard .municipal-approval-item { padding: 12px !important; gap: 10px !important; border-radius: 9px !important; }
+    .municipal-dashboard .approval-identity strong { font-size: 14px !important; }
+    .municipal-dashboard .approval-identity span, .municipal-dashboard .approval-details :is(span,strong) { color: #4b6273 !important; font-size: 13px !important; }
+    .municipal-dashboard .approval-details { gap: 10px !important; }
+    .municipal-dashboard .approval-details > div { display: grid !important; gap: 3px !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+    .municipal-dashboard .approval-details :is(span,strong) { font-size: 13px !important; line-height: 1.5 !important; letter-spacing: 0 !important; text-transform: none !important; }
+    .municipal-dashboard .approval-details span { font-weight: 500 !important; }
+    .municipal-dashboard .approval-details strong { color: #294a5d !important; font-weight: 600 !important; }
+    .municipal-dashboard .directory-summary-metrics { padding: 12px !important; gap: 10px !important; background: #f3f8fa !important; }
+    .municipal-dashboard .directory-summary-metrics strong { font-size: 24px !important; }
+    .municipal-dashboard .directory-summary-metrics span { color: #4b6273 !important; font-size: 13px !important; text-transform: none !important; letter-spacing: 0 !important; font-weight: 550 !important; }
+    .municipal-dashboard .municipal-report-coverage { padding: 6px 0 !important; }
+    .municipal-dashboard .municipal-report-coverage :is(div,small) { color: #4b6273 !important; font-size: 13px !important; }
+    .municipal-dashboard .municipal-latest-received { padding: 12px !important; gap: 5px !important; border-radius: 9px !important; }
+    .municipal-dashboard .municipal-latest-received :is(span,small,a) { font-size: 13px !important; }
+    .municipal-dashboard .municipal-latest-received strong { font-size: 14px !important; }
+    .municipal-dashboard .dashboard-more-link { display: inline-flex !important; align-items: center !important; gap: 8px !important; margin-top: 12px !important; color: #166d75 !important; font-size: 14px !important; font-weight: 600 !important; }
+    .municipal-dashboard .dashboard-more-link svg { width: 16px !important; height: 16px !important; }
+    .municipal-dashboard .decision-support > summary { display: flex !important; flex-wrap: nowrap !important; align-items: center !important; padding: 0 !important; margin: 0 !important; border: 0 !important; list-style: none !important; cursor: pointer !important; }
+    .municipal-dashboard .decision-support > summary::-webkit-details-marker { display: none !important; }
+    .municipal-dashboard .decision-support > summary > svg { width: 17px !important; height: 17px !important; flex: 0 0 auto !important; color: #567284 !important; }
+    .municipal-dashboard .decision-support[open] > summary > svg { transform: rotate(180deg) !important; }
+    .municipal-dashboard .dashboard-planning-note { margin: 14px 0 !important; color: #4b6273 !important; font-size: 14px !important; }
+    .municipal-dashboard .decision-card { padding: 14px !important; border-radius: 9px !important; }
+    .barangay-dashboard.workspace-page-overview :is(.barangay-overview-layout,.overview-community) { gap: 14px !important; }
+    .barangay-dashboard.workspace-page-overview .overview-work-row { display: grid !important; grid-template-columns: minmax(0,2fr) minmax(220px,1fr) !important; gap: 16px !important; align-items: start !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-workspace { grid-column: auto !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-workspace-panels { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 14px !important; align-items: start !important; }
+    .barangay-dashboard.workspace-page-overview :is(.brgy-work-card,.overview-tools) { min-height: 0 !important; height: auto !important; padding: 16px !important; border: 1px solid #dce6ed !important; border-radius: 12px !important; background: #fff !important; box-shadow: none !important; }
+    .barangay-dashboard.workspace-page-overview :is(.brgy-work-card,.overview-tools) h2 { margin: 0 !important; color: #19384e !important; font-size: 18px !important; line-height: 1.4 !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-work-card > header { margin-bottom: 12px !important; padding-bottom: 10px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-report-counts { padding: 10px 0 !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-report-counts strong { font-size: 27px !important; line-height: 1.2 !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-report-counts span { color: #4b6273 !important; font-size: 13px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-latest-report { margin-top: 10px !important; padding-top: 12px !important; gap: 6px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-latest-report :is(span,a), .barangay-dashboard.workspace-page-overview .brgy-text-link { font-size: 13px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-latest-report strong { font-size: 15px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-task-list > a { min-height: 45px !important; padding: 9px 0 !important; gap: 9px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-task-copy strong { font-size: 14px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-task-copy small { color: #4b6273 !important; font-size: 12px !important; line-height: 1.5 !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-quick-links { display: grid !important; grid-template-columns: minmax(0,1fr) !important; gap: 0 !important; padding: 4px 0 0 !important; border: 0 !important; box-shadow: none !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-quick-links a { min-height: 47px !important; padding: 9px 0 !important; border-radius: 0 !important; border-bottom: 1px solid #e7edf1 !important; gap: 9px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-quick-links strong { color: #294a5d !important; font-size: 14px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-tool-icon { width: 29px !important; height: 29px !important; flex-basis: 29px !important; border-radius: 8px !important; }
+    .barangay-dashboard.workspace-page-overview .brgy-tool-icon svg { width: 17px !important; height: 17px !important; }
+    .barangay-dashboard.workspace-page-overview .community-analytics { padding: 16px !important; gap: 14px !important; border-radius: 12px !important; }
+    .barangay-dashboard.workspace-page-overview .population-metrics { gap: 12px !important; }
+    .barangay-dashboard.workspace-page-overview .population-metric { min-height: 0 !important; padding: 12px 14px !important; border-radius: 9px !important; }
+    .barangay-dashboard.workspace-page-overview .population-metric-label h3 { color: #365467 !important; font-size: 14px !important; line-height: 1.4 !important; }
+    .barangay-dashboard.workspace-page-overview .population-metric > strong { font-size: 27px !important; }
+    .barangay-dashboard.workspace-page-overview .population-overview-grid { display: grid !important; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr) !important; gap: 14px !important; }
+    .barangay-dashboard.workspace-page-overview .population-sector-summary { grid-column: auto !important; }
+    .barangay-dashboard.workspace-page-overview :is(.population-resident-summary,.population-sector-summary) { padding: 14px !important; border-radius: 9px !important; }
+    .barangay-dashboard.workspace-page-overview :is(.population-resident-summary,.population-sector-summary) h3 { font-size: 16px !important; }
+    .barangay-dashboard.workspace-page-overview .population-resident-visual { grid-template-columns: 112px minmax(0,1fr) !important; gap: 14px !important; margin-top: 12px !important; }
+    .barangay-dashboard.workspace-page-overview :is(.population-pie,.population-pie-figure) { width: 112px !important; }
+    .barangay-dashboard.workspace-page-overview :is(.population-resident-legend dt,.population-resident-legend dd,.population-sector-copy h4) { color: #365467 !important; font-size: 14px !important; }
+    .barangay-dashboard.workspace-page-overview :is(.population-groups-heading > span,.population-sector-note,.population-pie-figure figcaption,.population-sector-count span,.population-resident-legend small) { color: #4b6273 !important; font-size: 13px !important; }
+    @media(min-width:1500px) {
+        .municipal-dashboard .municipal-metrics { grid-template-columns: repeat(6,minmax(0,1fr)) !important; }
+        .municipal-dashboard .municipal-metrics .metric-card { display: block !important; }
+        .municipal-dashboard .municipal-metrics .metric-icon { position: absolute !important; right: 12px !important; top: 12px !important; width: 25px !important; height: 25px !important; }
+        .municipal-dashboard .municipal-metrics .metric-card div > span { padding-right: 27px !important; }
+    }
+    @media(max-width:1100px) {
+        .municipal-dashboard .municipal-shortcuts { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+        .barangay-dashboard.workspace-page-overview .overview-work-row { grid-template-columns: minmax(0,1fr) !important; }
+        .barangay-dashboard.workspace-page-overview .brgy-quick-links { grid-template-columns: repeat(3,minmax(0,1fr)) !important; gap: 12px !important; }
+        .barangay-dashboard.workspace-page-overview .population-overview-grid { grid-template-columns: minmax(0,1fr) !important; }
+    }
+    @media(max-width:760px) {
+        .municipal-dashboard .approval-details { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 7px 12px !important; }
+        .municipal-dashboard .approval-details > div:last-child { grid-column: 1 / -1 !important; display: flex !important; align-items: center !important; gap: 8px !important; }
+        .municipal-dashboard .municipal-work-grid { grid-template-columns: minmax(0,1fr) !important; }
+        .municipal-dashboard .municipal-metrics { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+        :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) :is(.municipal-hero,.dashboard-page-header) { padding: 16px !important; }
+        :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-card { padding: 12px !important; }
+        :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .metric-icon { display: none !important; }
+        :is(.municipal-dashboard,.barangay-dashboard.workspace-page-overview) .admin-section-heading p { display: none !important; }
+        .municipal-dashboard .municipal-shortcuts > a { gap: 8px !important; padding: 11px !important; }
+        .municipal-dashboard .municipal-shortcuts small { display: none !important; }
+        .municipal-dashboard .municipal-shortcuts > a > svg { display: none !important; }
+        .municipal-dashboard .decision-support > summary .badge { display: none !important; }
+        .barangay-dashboard.workspace-page-overview .brgy-workspace-panels { grid-template-columns: minmax(0,1fr) !important; }
+        .barangay-dashboard.workspace-page-overview .brgy-quick-links { grid-template-columns: minmax(0,1fr) !important; }
+        .barangay-dashboard.workspace-page-overview .population-metrics { grid-template-columns: minmax(0,1fr) !important; }
+    }
+}
+}

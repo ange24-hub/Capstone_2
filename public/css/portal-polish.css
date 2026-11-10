@@ -1,6 +1,8 @@
 /* Shared screen typography. Paper reports and map controls keep their formats. */
 @layer print-overrides {
 @media screen {
+    .professional-shell .workspace-heading-emblem > .app-icon { width: 23px !important; height: 23px !important; }
+    .professional-shell .metric-icon > .app-icon { width: 21px !important; height: 21px !important; }
     .professional-shell, .professional-public { font-family: "Inter", "Segoe UI", system-ui, sans-serif !important; font-size: 15px !important; line-height: 1.6 !important; }
     :where(.professional-content #main-content, .professional-public #main-content) :is(h1,h2,h3):not(:where(.population-monitoring-paper *, .rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .leaflet-container *, .report-print-meta *)) { text-wrap: balance !important; letter-spacing: -.025em !important; }
     :where(.professional-content #main-content, .professional-public #main-content) :is(input,select,textarea):not(:where([type="hidden"],[type="checkbox"],[type="radio"],.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *)) { color: #19384e !important; font-size: 15px !important; line-height: 1.5 !important; border-color: #bacdd9 !important; border-radius: 8px !important; }
