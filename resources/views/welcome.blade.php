@@ -3,6 +3,7 @@
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/home-landing.css') }}?v={{ filemtime(public_path('css/home-landing.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/home-motion.css') }}?v={{ filemtime(public_path('css/home-motion.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/home-refinement.css') }}?v={{ filemtime(public_path('css/home-refinement.css')) }}" media="screen">
 @endpush
 
 @section('content')
@@ -15,7 +16,7 @@
         <div class="landing-container landing-hero-grid">
             <div class="landing-copy">
                 <p class="landing-eyebrow"><span aria-hidden="true"></span> Official Digital Services Portal</p>
-                <h1 id="home-title">Smart Barangay Information System</h1>
+                <h1 id="home-title"><span>Smart Barangay</span> <span class="landing-title-accent">Information System</span></h1>
                 <p class="landing-subtitle">for Population and Governance Management</p>
                 <p class="landing-description">Your barangay, closer to you. Request documents, keep track of services, and connect with your local government in one place.</p>
                 <div class="landing-actions">

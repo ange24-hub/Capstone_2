@@ -1,0 +1,21 @@
+/* Shared screen typography. Paper reports and map controls keep their formats. */
+@layer print-overrides {
+@media screen {
+    .professional-shell, .professional-public { font-family: "Inter", "Segoe UI", system-ui, sans-serif !important; font-size: 15px !important; line-height: 1.6 !important; }
+    :where(.professional-content #main-content, .professional-public #main-content) :is(h1,h2,h3):not(:where(.population-monitoring-paper *, .rbi-document-preview *, .rbi-word-page *, .rbi-source-table *, .leaflet-container *, .report-print-meta *)) { text-wrap: balance !important; letter-spacing: -.025em !important; }
+    :where(.professional-content #main-content, .professional-public #main-content) :is(input,select,textarea):not(:where([type="hidden"],[type="checkbox"],[type="radio"],.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *)) { color: #19384e !important; font-size: 15px !important; line-height: 1.5 !important; border-color: #bacdd9 !important; border-radius: 8px !important; }
+    :where(.professional-content #main-content, .professional-public #main-content) :is(input,textarea)::placeholder { color: #5a7182 !important; opacity: 1 !important; }
+    :where(.professional-content #main-content, .professional-public #main-content) label:not(:where(.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *)) { font-size: 14px !important; font-weight: 600 !important; line-height: 1.5 !important; color: #294a5d !important; }
+    :where(.professional-content #main-content, .professional-public #main-content) :is(.field-help,.form-help,.helper-text):not(:where(.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *)) { font-size: 13px !important; color: #4b6273 !important; line-height: 1.65 !important; }
+    :where(.professional-content #main-content, .professional-public #main-content) :is(.button,button[type="submit"]):not(:where(.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table *,.leaflet-container *)) { font-size: 14px !important; font-weight: 600 !important; line-height: 1.5 !important; letter-spacing: 0 !important; }
+    :where(.professional-content #main-content) :is(.clean-table,.compact-data-table):not(:where(.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table,.rbi-source-table *)) { font-size: 14px !important; line-height: 1.55 !important; }
+    :where(.professional-content #main-content) :is(.clean-table,.compact-data-table):not(:where(.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table,.rbi-source-table *)) th { color: #294a5d !important; background: #eef4f7 !important; font-size: 13px !important; font-weight: 650 !important; letter-spacing: .01em !important; }
+    :where(.professional-content #main-content) :is(.clean-table,.compact-data-table):not(:where(.population-monitoring-paper *,.rbi-document-preview *,.rbi-word-page *,.rbi-source-table,.rbi-source-table *)) td { color: #294a5d !important; font-size: 14px !important; }
+    .professional-shell #app-sidebar .side-nav > a { font-size: 14px !important; line-height: 1.45 !important; font-weight: 550 !important; }
+    .professional-shell #app-sidebar .side-section { color: #b2cbd5 !important; font-size: 11px !important; line-height: 1.5 !important; }
+    .professional-shell .workspace-location { font-size: 13px !important; color: #365467 !important; }
+    .professional-shell .workspace-location a { color: #166d75 !important; }
+    .professional-shell .app-footer { color: #4b6273 !important; font-size: 13px !important; }
+    :where(.professional-shell, .professional-public) :is(a,button,input,select,textarea,summary):focus-visible { outline: 3px solid #27888a !important; outline-offset: 3px !important; }
+}
+}

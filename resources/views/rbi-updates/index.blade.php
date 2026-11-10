@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ asset('css/rbi-editor.css') }}?v={{ filemtime(public_path('css/rbi-editor.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/rbi-workspace.css') }}?v={{ filemtime(public_path('css/rbi-workspace.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/rbi-report-view.css') }}?v={{ filemtime(public_path('css/rbi-report-view.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/rbi-form-compact.css') }}?v={{ filemtime(public_path('css/rbi-form-compact.css')) }}" media="screen">
     @if(request()->routeIs('barangay.rbi-updates.history'))
         <link rel="stylesheet" href="{{ asset('css/rbi-history.css') }}?v={{ filemtime(public_path('css/rbi-history.css')) }}">
     @endif
@@ -47,7 +48,7 @@
         <div class="rbi-report-view rbi-workspace-overview">
             <header class="rbi-report-header">
                 <div class="rbi-report-heading">
-                    <span class="rbi-report-emblem" aria-hidden="true"><x-portal-sticker name="document" /></span>
+                    <span class="rbi-report-emblem" aria-hidden="true"><x-app-icon name="form" /></span>
                     <div>
                         <span class="rbi-report-eyebrow">RBI Monthly Form</span>
                         <h1>{{ $rbiSection === 'history' ? 'Report history' : 'Monthly RBI form' }}</h1>
@@ -128,9 +129,10 @@
                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
-                        <h2 class="section-title text-lg font-semibold text-slate-900">One monthly report</h2>
-                        <p>Choose the month, complete Sections A and B, then review the certification. Save once for the entire monthly report.</p>
+                        <h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI form</h2>
+                        <p>Complete Sections A and B, then certify and save.</p>
                     </div>
+                    <span class="rbi-required-note"><x-required-mark /> Required fields</span>
                     @if ($editingReport)<x-status-badge :status="$editingReport->status">{{ $editingReport->statusLabel() }}</x-status-badge>@endif
                 </div>
 
@@ -162,7 +164,6 @@
             <input type="hidden" data-row-field="household_number" data-household-number-hidden><input type="hidden" data-row-field="household_id" data-household-id-hidden>
             <input type="hidden" data-row-field="inhabitant_id">
             <input type="hidden" data-row-field="source_row_id">
-            @include('rbi-updates.forms._entry-classification',['entryTemplate'=>true])
             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                 @foreach ($memberFields as $field => $label)
                     <div>
@@ -177,6 +178,7 @@
                     </div>
                 @endforeach
             </div>
+            @include('rbi-updates.forms._entry-classification',['entryTemplate'=>true])
         </article>
     </template>
 
@@ -186,8 +188,8 @@
                 <div><span class="step-pill" data-family-number></span><h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4></div>
                 <button class="secondary-button" type="button" data-remove-family>Remove Family</button>
             </div>
-            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label><input type="text" list="rbi-household-heads" data-family-head autocomplete="off"><input type="hidden" data-family-household-id></div><div><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household"><small class="field-help">Choose a registry match when available.</small><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
-            <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
+            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label><input type="text" list="rbi-household-heads" data-family-head autocomplete="off"><input type="hidden" data-family-household-id></div><div><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing number, or leave blank"><small class="field-help">Choose a registry match when available.</small><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
+            <h5 class="section-title text-lg font-semibold text-slate-900">Family members</h5>
             <div class=" grid gap-6" data-family-members></div>
             <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>
         </article>

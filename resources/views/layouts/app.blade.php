@@ -34,6 +34,7 @@
     @endif
     @stack('head')
     <link rel="stylesheet" href="{{ asset('css/system-ui.css') }}?v={{ filemtime(public_path('css/system-ui.css')) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('css/portal-polish.css') }}?v={{ filemtime(public_path('css/portal-polish.css')) }}" media="screen">
 </head>
 <body @if(!$usesPublicLayout) class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'municipal.prediction-forecast', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endif>
     <a class="skip-link" href="#main-content">Skip to main content</a>

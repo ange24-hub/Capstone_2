@@ -2,7 +2,6 @@
                     @csrf
                     <input type="hidden" name="form_section" value="monthly">
                     @if ($editingReport) @method('PUT') @endif
-                    <p class="field-help"><x-required-mark /> Required fields must be filled out.</p>
 
                     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2" data-rbi-common-fields>
                         <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
@@ -16,7 +15,7 @@
                     </div>
 
                     <section class="rbi-monthly-section rbi-monthly-residents" data-rbi-step-panel="residents">
-                    <div class="rbi-section-heading"><div><h3 class="section-title" id="family-section"><span class="rbi-section-letter">A</span> Newly registered inhabitants</h3><p class="rbi-section-help">Group residents by household. Section B follows below on the same monthly form.</p></div>
+                    <div class="rbi-section-heading"><div><h3 class="section-title" id="family-section"><span class="rbi-section-letter">A</span> Newly registered inhabitants</h3></div>
                     @if(empty($editingReport?->rows))
                         <label class="rbi-no-residents"><input type="checkbox" name="no_new_residents" value="1" data-no-new-residents @checked($noNewResidents)> No new residents this month</label>
                     @endif
@@ -37,13 +36,13 @@
                                     <div>
                                         <label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label>
                                         <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head autocomplete="off">
-                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id></div><div><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing household number or leave blank for a new household">
-                                        <small class="field-help">Use a known household number, or leave it blank if it is not recorded.</small>
+                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id></div><div><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing number, or leave blank">
+                                        <small class="field-help">Use an existing number, or leave blank.</small>
                                         <p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p>
                                     </div>
                                 </div>
 
-                                <h5 class="section-title text-lg font-semibold text-slate-900">Newly Registered Family Members</h5>
+                                <h5 class="section-title text-lg font-semibold text-slate-900">Family members</h5>
                                 <div class=" grid gap-6" data-family-members>
                                     @foreach (($family['members'] ?: [[]]) as $member)
                                         @php($currentRowIndex = $rowInputIndex++)
@@ -59,7 +58,6 @@
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][inhabitant_id]" value="{{ $member['inhabitant_id'] ?? '' }}">
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][history_record_id]" value="{{ $member['history_record_id'] ?? '' }}">
                                             <input type="hidden" name="rows[{{ $currentRowIndex }}][source_row_id]" value="{{ $member['source_row_id'] ?? '' }}">
-                                            @include('rbi-updates.forms._entry-classification',['entryTemplate'=>false])
                                             <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2">
                                                 @foreach ($memberFields as $field => $label)
                                                     <div>
@@ -78,6 +76,7 @@
                                                     </div>
                                                 @endforeach
                                             </div>
+                                            @include('rbi-updates.forms._entry-classification',['entryTemplate'=>false])
                                         </article>
                                     @endforeach
                                 </div>
