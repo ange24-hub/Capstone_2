@@ -230,7 +230,7 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
             navigator.serviceWorker
-                .register('/service-worker.js')
+                .register('/service-worker.js?v={{ filemtime(public_path('service-worker.js')) }}')
                 .then(function (registration) {
                     console.log(
                         'Service Worker registered:',
