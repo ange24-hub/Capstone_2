@@ -11,7 +11,6 @@
             <div class="portal-login-features">
                 <span>Resident records</span><span>Document requests</span><span>Barangay reports</span>
             </div>
-            <img class="portal-services-illustration" src="{{ asset('images/civic-services-sticker.png') }}" alt="" width="1536" height="1024" loading="lazy" decoding="async">
             <span class="portal-login-footnote">Official municipal portal</span>
         </aside>
     <section class="panel auth-panel portal-login-form rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6">
