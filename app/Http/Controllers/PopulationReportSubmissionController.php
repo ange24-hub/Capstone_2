@@ -97,7 +97,8 @@ class PopulationReportSubmissionController extends Controller
             || (int) $preview['barangay_id'] !== (int) $request->user()->barangay_id || $preview['expires_at']<time()) {
             return redirect()->route('reports.population')->withErrors(['submission'=>'Preview expired. Reload the summary and click Submit again.']);
         }
-        return response()->view('reports.population-sign', ['previewToken'=>$token, 'report'=>$preview['snapshot']])
+        return response()->view('reports.population-sign', ['previewToken'=>$token, 'report'=>$preview['snapshot'],
+            'savedSignatures'=>app(\App\Services\PopulationReportSignatures::class)->savedFor($request->user())])
             ->header('Cache-Control', 'private, no-store');
     }
 

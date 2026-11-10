@@ -203,4 +203,108 @@ class PopulationReportSubmissionTest extends TestCase
             $this->get(route('reports.population.submissions.'.$action, $saved))->assertStatus(409);
         }
     }
+
+    public function test_successful_submission_remembers_both_names_and_signatures_across_sessions(): void
+    {
+        $staff = $this->secretary();
+        $first = $this->submit($staff);
+        $original = $first->snapshot;
+        $this->app['session']->flush();
+        $this->resident($staff);
+        $token = $this->preview($staff->fresh());
+        $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))
+            ->assertOk()->assertHeader('Cache-Control', 'no-store, private')
+            ->assertSee('value="Test Secretary"', false)->assertSee('value="Test Captain"', false)
+            ->assertSee('data-initial-mode="saved"', false);
+        $remembered = $response->viewData('savedSignatures');
+        foreach (['prepared', 'submitted'] as $key) {
+            $this->assertSame($original['signatures'][$key]['image'], $remembered[$key]['image']);
+            $this->assertSame($first->id, $remembered[$key]['source_id']);
+        }
+        $this->post(route('reports.population.submissions.store'), ['preview_token' => $token,
+            'signature_source_id' => $first->id, 'prepared_name' => 'Test Secretary', 'submitted_name' => 'Test Captain',
+            'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $second = PopulationReportSubmission::latest('id')->firstOrFail();
+        $this->assertNotSame($first->id, $second->id);
+        $this->assertSame($original['signatures'], $second->snapshot['signatures']);
+        $this->assertSame($original, $first->fresh()->snapshot);
+        $this->assertSame(1, $second->total_records);
+    }
+
+    public function test_a_replacement_becomes_the_next_default_without_changing_old_reports(): void
+    {
+        $staff = $this->secretary();
+        $first = $this->submit($staff);
+        $original = $first->snapshot;
+        $token = $this->preview($staff);
+        $replacement = $this->signaturePayload();
+        $this->post(route('reports.population.submissions.store'), ['preview_token' => $token,
+            'signature_source_id' => $first->id, 'prepared_name' => 'Updated Secretary', 'submitted_name' => 'Test Captain',
+            'prepared_signature_data' => $replacement['prepared_signature_data'], 'submitted_signature_reuse' => '1'])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $second = PopulationReportSubmission::latest('id')->firstOrFail();
+        $this->assertSame('Updated Secretary', $second->snapshot['signatures']['prepared']['name']);
+        $this->assertSame($original['signatures']['submitted'], $second->snapshot['signatures']['submitted']);
+        $token = $this->preview($staff);
+        $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
+        $this->assertSame('Updated Secretary', $response->viewData('savedSignatures')['prepared']['name']);
+        $this->assertSame($second->id, $response->viewData('savedSignatures')['prepared']['source_id']);
+        $this->assertSame($original, $first->fresh()->snapshot);
+    }
+
+    public function test_saved_signatures_cannot_be_loaded_or_reused_by_another_account_or_barangay(): void
+    {
+        $first = $this->submit($this->secretary());
+        foreach ([$this->secretary(), $this->secretary('Canlupao')] as $other) {
+            $token = $this->preview($other);
+            $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
+            $this->assertSame([], $response->viewData('savedSignatures'));
+            $this->postJson(route('reports.population.submissions.store'), ['preview_token' => $token,
+                'signature_source_id' => $first->id, 'prepared_name' => 'Other Secretary', 'submitted_name' => 'Other Captain',
+                'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'])
+                ->assertUnprocessable()->assertJsonValidationErrors('prepared_signature_data');
+        }
+        $this->assertDatabaseCount('population_report_submissions', 1);
+    }
+
+    public function test_tampered_saved_signatures_and_conflicting_signature_methods_cannot_be_reused(): void
+    {
+        $staff = $this->secretary();
+        $first = $this->submit($staff);
+        $token = $this->preview($staff);
+        $reuse = ['preview_token' => $token, 'signature_source_id' => $first->id,
+            'prepared_name' => 'Test Secretary', 'submitted_name' => 'Test Captain',
+            'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'];
+        $this->postJson(route('reports.population.submissions.store'), $reuse + $this->signaturePayload())
+            ->assertUnprocessable()->assertJsonValidationErrors('prepared_signature_data');
+        DB::table('population_report_submissions')->where('id', $first->id)->update(['snapshot_hash' => str_repeat('0', 64)]);
+        $response = $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
+        $this->assertSame([], $response->viewData('savedSignatures'));
+        $this->postJson(route('reports.population.submissions.store'), $reuse)
+            ->assertUnprocessable()->assertJsonValidationErrors('prepared_signature_data');
+        $this->assertDatabaseCount('population_report_submissions', 1);
+    }
+
+    public function test_reuse_is_bound_to_the_report_previewed_even_when_a_newer_signature_exists(): void
+    {
+        $staff = $this->secretary();
+        $first = $this->submit($staff);
+        $token = $this->preview($staff);
+        $this->get(route('reports.population.submissions.sign', ['preview_token' => $token]))->assertOk();
+        $newerToken = $this->preview($staff);
+        $replacement = $this->signaturePayload();
+        $image = imagecreatefromstring(base64_decode(explode(',', $replacement['prepared_signature_data'], 2)[1]));
+        imageflip($image, IMG_FLIP_HORIZONTAL);
+        ob_start(); imagepng($image); $bytes = ob_get_clean();
+        $replacement['prepared_signature_data'] = 'data:image/png;base64,'.base64_encode($bytes);
+        $this->post(route('reports.population.submissions.store'), ['preview_token' => $newerToken] + $replacement)
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertDatabaseCount('population_report_submissions', 2);
+        $this->post(route('reports.population.submissions.store'), ['preview_token' => $token,
+            'signature_source_id' => $first->id, 'prepared_name' => 'Test Secretary', 'submitted_name' => 'Test Captain',
+            'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'])
+            ->assertSessionHasNoErrors()->assertRedirect(route('reports.population.submissions.show', $first));
+        $this->assertDatabaseCount('population_report_submissions', 2);
+    }
 }
