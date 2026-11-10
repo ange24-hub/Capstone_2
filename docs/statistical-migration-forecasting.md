@@ -29,6 +29,16 @@ Ang forecast table adunay requested fields ug audit fields: `issued_at`, `method
 
 ## Pag-save ug accuracy
 
+### Semestral population source integration
+
+Ang population projection nagbasa sa immutable historical archives ug sa barangay reports nga na-submit na sa municipal workflow. Completed semesters ra ang mahimong actual history. Sa submitted digital reports, ang saved `generatedAt` kinahanglan adunay timezone ug sakop sa gi-label nga year/semester gamit ang Philippine calendar; dili mahimong historical observation ang latest-registry snapshot nga gi-label lang og laing period. Ang submission kinahanglan dili future-dated o mas una kaysa iyang captured observation, accounting for the database timestamp's second precision.
+
+Gi-check ang snapshot hash, headline population, stored record count ug age-group totals before gamiton ang submitted source. Conflicting totals block the forecast; unknown or invalid source values never become zero. Equal totals for the same semester count once, keeping the archive reference when present. Ineligible observations are explained inside **Calculation & source reports**. The projection never updates, deletes or rehashes saved reports. Existing archive age-count discrepancies remain visible for review rather than being silently corrected.
+
+Ang default reporting period, forecast cutoff ug movement-date validation naggamit sa configured Philippine calendar. Stored timestamps retain their existing UTC format, and the supplied movement date is stored without shifting its day.
+
+These sources are dated reported observations, not proof of an end-of-semester census or future predictive accuracy. Population projection MAPE remains unavailable without a separately issued forecast and verified outcome.
+
 Preview GET requests walay forecast writes. Pislita ang **Save first-issued in/out forecasts** aron mag-save before the target month. Ang unang value ug history snapshot dili ma-overwrite sa repeated save/refresh. Ang monthly command mahimo usab gamiton; walay backdated issue function.
 
 Human mahuman ang target month, i-review ang dated movement records ug i-confirm nga kompleto ang month. Ang actual value gikan sa database count, dili arbitrary number nga gi-type sa staff. Blocked ang verification kung adunay duplicate resident/type/date events, wala pa ma-sync nga source records o stale source fingerprint. Kung mausab ang source, dili na gamiton ang old verification hangtod ma-review pag-usab.

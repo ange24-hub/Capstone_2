@@ -29,6 +29,10 @@
         ])
     @endif
     <details class="statistical-details"><summary>Calculation &amp; source reports</summary>
+        @if(!empty($populationProjection['excluded_reports']))
+            <p>{{ count($populationProjection['excluded_reports']) }} submitted report(s) excluded from forecast inputs:</p>
+            <ul>@foreach($populationProjection['excluded_reports'] as $excluded)<li>{{ $excluded['label'] }}: {{ $excluded['reason'] }}</li>@endforeach</ul>
+        @endif
         @if($populationProjection['estimate'] !== null)
             <p><strong>Weighted Moving Average</strong> · 3 completed reports · weights 1, 2, 3.</p>
             <p>Last actual source: {{ $populationProjection['data_through'] }}</p>
@@ -49,7 +53,7 @@
         @if($populationProjection['missing_periods'])<p>Missing historical semesters: {{ implode('; ', $populationProjection['missing_periods']) }}. Unknown sila, dili zero.</p>@endif
         @if($populationProjection['history'])
             <div class="statistical-table"><table><thead><tr><th>Semester</th><th>Headline population</th><th>Age-bracket sum</th><th>Used as initial input</th><th>Original</th></tr></thead><tbody>
-                @foreach($populationProjection['history'] as $row)<tr><td>{{ $row['label'] }}</td><td>{{ $row['population'] }}</td><td>{{ $row['age_sum'] }}</td><td>{{ in_array($row['id'], array_column($populationProjection['inputs'], 'id')) ? 'Yes' : 'No' }}</td><td><a href="{{ route('reports.population.submissions.show', $row['id']) }}">View report</a></td></tr>@endforeach
+                @foreach($populationProjection['history'] as $row)<tr><td>{{ $row['label'] }}</td><td>{{ $row['population'] }}</td><td>{{ $row['age_sum'] }}</td><td>{{ in_array($row['id'], array_column($populationProjection['inputs'], 'id')) ? 'Yes' : 'No' }}</td><td><a href="{{ route('reports.population.submissions.show', $row['id']) }}">{{ $row['source'] === 'archive' ? 'Archived report' : 'Submitted report' }}</a></td></tr>@endforeach
             </tbody></table></div>
         @endif
         @if($populationProjection['historical_check'])

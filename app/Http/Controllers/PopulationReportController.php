@@ -18,6 +18,7 @@ class PopulationReportController extends Controller
 {
     public function __invoke(Request $request, PopulationSummary $summary, PopulationSpreadsheet $spreadsheet)
     {
+        $calendar = now(config('migration_forecast.timezone', 'Asia/Manila'));
         $request->validate([
             'barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
             'section' => ['nullable', Rule::in(array_keys(PopulationSummary::SECTIONS))],
@@ -28,8 +29,8 @@ class PopulationReportController extends Controller
         ]);
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
         if ($request->user()->hasRole(User::ROLE_MUNICIPAL_LGU)) {
-            $period = ['report_year'=>($request->filled('report_year') ? $request->integer('report_year') : now()->year),
-                'semester'=>($request->filled('semester') ? $request->integer('semester') : (now()->month <= 6 ? 1 : 2))];
+            $period = ['report_year'=>($request->filled('report_year') ? $request->integer('report_year') : $calendar->year),
+                'semester'=>($request->filled('semester') ? $request->integer('semester') : ($calendar->month <= 6 ? 1 : 2))];
             if ($request->routeIs('reports.population')) {
                 return redirect()->route('reports.population.submissions.index', $period + $request->only('barangay_id'));
             }
@@ -48,8 +49,8 @@ class PopulationReportController extends Controller
         $barangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
         $selectedSection = $request->input('section') ?: 'summary';
         $printMode = $request->boolean('print');
-        $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',now()->year),
-            'semester'=>$request->integer('semester',now()->month<=6?1:2)]);
+        $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',$calendar->year),
+            'semester'=>$request->integer('semester',$calendar->month<=6?1:2)]);
         if ($selectedSection === 'summary' && app(PopulationReportPeriod::class)->usesHistory($reportFilters['report_year'], $reportFilters['semester'])) {
             $saved = $barangayId && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')
                 ? app(PopulationReportPeriod::class)->nearestSaved($barangayId, $reportFilters['report_year'], $reportFilters['semester']) : null;

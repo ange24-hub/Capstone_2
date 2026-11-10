@@ -105,7 +105,7 @@ class PredictionDashboardController extends Controller
     {
         $barangay = $this->area($request); $this->ready();
         $data = $request->validate(['resident_id' => ['required', 'integer'], 'migration_type' => ['required', 'in:in,out'],
-            'transaction_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:1900-01-01', 'before_or_equal:today'],
+            'transaction_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:1900-01-01', 'before_or_equal:'.$this->prediction->calendar()->toDateString()],
             'confirm_date' => ['required', 'accepted']]);
         $person = Inhabitant::withoutMigrationDemo()->where('barangay_id', $barangay->id)->findOrFail($data['resident_id']);
         DB::transaction(function () use ($barangay, $person, $data, $request) {
