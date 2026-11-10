@@ -1,64 +1,144 @@
-/* Match the municipal workspace's soft palette, with distinct report states. */
-@layer municipal-admin {
-    @media screen {
-        .role-municipal-lgu .municipal-directory-page .government-page-heading { background:linear-gradient(115deg,#dce8f1,#dce9e1 75%,#e9e5d8) !important; border-color:#b6cbd0 !important; border-top-color:#6a91ad !important; }
-        .role-municipal-lgu .municipal-directory-page .workspace-heading-emblem { background:#cddfe9 !important; color:#3f6980 !important; }
-        .role-municipal-lgu .municipal-directory-summary-grid > article { background:#e4edf4 !important; border:1px solid #bdcedc !important; border-top:3px solid #7297b7 !important; box-shadow:0 3px 12px #3656680b !important; }
-        .role-municipal-lgu .municipal-directory-summary-grid > article.has-reports { background:#e0ece4 !important; border-color:#bfd2c5 !important; border-top-color:#739c84 !important; }
-        .role-municipal-lgu .municipal-directory-summary-grid > article.needs-report { background:#f0e9d9 !important; border-color:#d9ceb4 !important; border-top-color:#b29b64 !important; }
-        .role-municipal-lgu .municipal-directory-summary-grid > article:last-child { background:#e9e5f0 !important; border-color:#cec5dc !important; border-top-color:#9381ad !important; }
-        .role-municipal-lgu .municipal-directory-summary-grid > article > span { color:#48616d !important; }
-        .role-municipal-lgu .municipal-directory-page .municipal-directory-toolbar { background:#e8ede8 !important; border-color:#c6d2ca !important; gap:16px !important; }
-        .role-municipal-lgu .municipal-directory-toolbar .directory-search-field { flex:1 1 280px; min-width:0; max-width:440px; }
-        .role-municipal-lgu .municipal-directory-toolbar .directory-search-field input { width:100% !important; }
-        .role-municipal-lgu .municipal-directory-toolbar .directory-filter-group { display:flex; flex-wrap:wrap; gap:7px; }
-        .role-municipal-lgu .municipal-directory-page :is(.directory-filter-group,.directory-pagination) button { background:#e8edf0 !important; color:#3b5c70 !important; border:1px solid #bacbd5 !important; box-shadow:none !important; }
-        .role-municipal-lgu .municipal-directory-page :is(.directory-filter-group,.directory-pagination) button:hover:not(:disabled) { background:#d5e3ec !important; color:#284b62 !important; border-color:#89a8bc !important; }
-        .role-municipal-lgu .municipal-directory-page :is(.directory-filter-group,.directory-pagination) button:is(.is-active,[aria-current="page"]) { background:#466e89 !important; color:#f5f6f1 !important; border-color:#466e89 !important; box-shadow:inset 0 -3px 0 #294e69 !important; }
-        .role-municipal-lgu .municipal-directory-page .directory-pagination button:disabled { background:#e4e8e3 !important; color:#61716f !important; opacity:.6; }
-        .role-municipal-lgu .municipal-directory-page .municipal-directory-card { border-top:3px solid #b9a477 !important; }
-        .role-municipal-lgu .municipal-directory-page .municipal-directory-card.has-reports { border-top-color:#729c85 !important; }
-        .role-municipal-lgu .municipal-directory-card > header { background:#e4ebee !important; border-color:#c5d1d6 !important; }
-        .role-municipal-lgu .municipal-directory-card.has-reports > header { background:#e0eae2 !important; }
-        .role-municipal-lgu .municipal-directory-card .barangay-number { background:#d0e0ec !important; color:#355e7b !important; }
-        .role-municipal-lgu .municipal-directory-card .account-status.is-pending { background:#eee4cb !important; color:#73551d !important; }
-        .role-municipal-lgu .municipal-directory-card .account-status.is-active { background:#d4e6d9 !important; color:#356249 !important; }
-        .role-municipal-lgu .municipal-directory-card .status-dot { background:currentColor !important; }
-        .role-municipal-lgu .municipal-directory-card :is(.directory-card-metrics,.directory-card-office,.directory-gcash-settings,.directory-report-history) { background:#edf0e9 !important; border-color:#cbd4cc !important; }
-        .role-municipal-lgu .municipal-directory-card .directory-card-metrics > div { background:transparent !important; border-color:#cbd4cc !important; }
-        .role-municipal-lgu .municipal-directory-card .directory-missing-report { background:#f0eadc !important; color:#665b41 !important; border-color:#d9ceb8 !important; }
-        .role-municipal-lgu .municipal-directory-card .directory-latest-report { background:#e0ece5 !important; border-color:#bbd0c2 !important; }
-        .role-municipal-lgu .municipal-directory-page .directory-pagination { border-color:#c1d0ca !important; }
-        @media (max-width:640px) {
-            .role-municipal-lgu .municipal-directory-toolbar .directory-search-field { flex-basis:100%; max-width:none; }
-            .role-municipal-lgu .municipal-directory-toolbar .directory-filter-group { width:100%; }
-            .role-municipal-lgu .municipal-directory-toolbar .directory-filter-group button { flex:1 1 125px; }
-        }
+/* Compact municipal report list; the underlying registry and submission rules stay unchanged. */
+@layer system-ui {
+@media screen {
+    .professional-shell:has(.municipal-directory-page [data-directory-card]:not([hidden]) .directory-entry-details[open]) .assistant-launcher { visibility:hidden !important; pointer-events:none !important; }
+    .professional-shell #main-content section.municipal-directory-page { display:grid !important; gap:18px !important; padding:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page [hidden] { display:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-page-heading { display:flex !important; align-items:center !important; justify-content:space-between !important; flex-wrap:wrap !important; gap:16px !important; padding:20px 22px !important; border:1px solid #dce6ee !important; border-radius:14px !important; background:linear-gradient(105deg,#fff 60%,#edf7f6) !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-page-identity { display:flex !important; align-items:center !important; gap:14px !important; min-width:0 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-page-icon { display:grid !important; place-items:center !important; flex:0 0 44px !important; width:44px !important; height:44px !important; border:1px solid #cce4e1 !important; border-radius:12px !important; background:#e6f3f1 !important; color:#166d75 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-page-icon .app-icon { width:23px !important; height:23px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-eyebrow { display:block !important; margin-bottom:4px !important; color:#397b80 !important; font-size:10px !important; font-weight:650 !important; letter-spacing:.1em !important; text-transform:uppercase !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-page-heading h1 { margin:0 0 5px !important; color:#193e53 !important; font-size:clamp(22px,2vw,28px) !important; font-weight:700 !important; line-height:1.2 !important; letter-spacing:-.035em !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-page-heading p { margin:0 !important; color:#6a8190 !important; font-size:12px !important; line-height:1.5 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-dashboard-link { display:inline-flex !important; align-items:center !important; gap:7px !important; min-height:36px !important; padding:8px 12px !important; border:1px solid #ccdce5 !important; border-radius:8px !important; color:#3d6176 !important; background:#fff !important; font-size:12px !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid { display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:12px !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid article { display:flex !important; align-items:center !important; gap:12px !important; padding:15px 17px !important; border:1px solid #dce6ee !important; border-radius:11px !important; background:#fff !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-stat-icon { display:grid !important; place-items:center !important; width:36px !important; height:36px !important; flex:0 0 36px !important; border-radius:10px !important; background:#edf3f9 !important; color:#4a789a !important; }
+    .professional-shell #main-content .municipal-directory-page .has-reports .directory-stat-icon { background:#e7f4ee !important; color:#278268 !important; }
+    .professional-shell #main-content .municipal-directory-page .needs-report .directory-stat-icon { background:#fff5e2 !important; color:#a77b2a !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid article:last-child .directory-stat-icon { background:#f0edf8 !important; color:#78609e !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-stat-icon .app-icon { width:18px !important; height:18px !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid strong { display:block !important; margin:0 0 4px !important; color:#21465b !important; font-size:24px !important; font-weight:700 !important; line-height:1 !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid article > div > span { color:#637e8f !important; font-size:11px !important; font-weight:500 !important; letter-spacing:0 !important; text-transform:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-list-shell { min-width:0 !important; overflow:hidden !important; border:1px solid #d9e5ed !important; border-radius:13px !important; background:#fff !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-toolbar { display:flex !important; align-items:flex-end !important; justify-content:space-between !important; flex-wrap:wrap !important; gap:16px !important; padding:17px 20px !important; border:0 !important; border-bottom:1px solid #e4ecf2 !important; border-radius:0 !important; background:#fff !important; scroll-margin-top:18px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-search-field { flex:1 1 240px !important; min-width:0 !important; max-width:380px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-search-field label { display:block !important; margin:0 0 7px !important; font-size:11px !important; font-weight:600 !important; color:#446579 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-search-input { position:relative !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-search-input > .app-icon { position:absolute !important; top:11px !important; left:12px !important; width:16px !important; height:16px !important; color:#7f97a5 !important; pointer-events:none !important; }
+    .professional-shell #main-content .municipal-directory-page #barangay-directory-search { width:100% !important; height:38px !important; min-height:38px !important; padding:8px 12px 8px 36px !important; margin:0 !important; border:1px solid #cfdee8 !important; border-radius:8px !important; background:#f8fbfd !important; color:#24475b !important; font-size:12px !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-filter-group { display:flex !important; gap:3px !important; padding:3px !important; border:1px solid #e0e8ee !important; border-radius:9px !important; background:#f1f5f8 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-filter-group button { min-height:30px !important; padding:7px 10px !important; border:0 !important; border-radius:6px !important; background:transparent !important; color:#637c8c !important; font-size:11px !important; font-weight:550 !important; white-space:nowrap !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-filter-group button.is-active { background:#fff !important; color:#166d75 !important; box-shadow:0 1px 4px #193e531a !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-list-heading { display:flex !important; justify-content:space-between !important; align-items:center !important; flex-wrap:wrap !important; gap:8px !important; padding:17px 20px 14px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-list-heading h2 { margin:0 !important; font-size:14px !important; font-weight:650 !important; color:#294e63 !important; }
+    .professional-shell #main-content .municipal-directory-page #barangay-directory-count { align-self:auto !important; white-space:normal !important; color:#7a8f9e !important; font-size:11px !important; font-weight:400 !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-column-labels,.directory-entry-summary) { display:grid !important; grid-template-columns:minmax(170px,1.3fr) minmax(210px,1.2fr) minmax(130px,.8fr) 74px !important; align-items:center !important; gap:18px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-column-labels { padding:10px 20px !important; border-block:1px solid #e7eef3 !important; background:#f8fafc !important; color:#7b909e !important; font-size:10px !important; font-weight:600 !important; letter-spacing:.03em !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-grid { display:grid !important; grid-template-columns:minmax(0,1fr) !important; align-items:stretch !important; gap:0 !important; }
+    .professional-shell #main-content .municipal-directory-page article.municipal-directory-card { min-width:0 !important; overflow:visible !important; border:0 !important; border-bottom:1px solid #e6edf2 !important; border-radius:0 !important; background:#fff !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .municipal-directory-card:last-child { border-bottom:0 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-details { margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-summary { min-height:86px !important; padding:16px 20px !important; list-style:none !important; cursor:pointer !important; background:#fff !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-summary::-webkit-details-marker { display:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-summary::marker { content:'' !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-summary:hover { background:#f6fafb !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-details[open] > summary { background:#f0f8f7 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-identity { display:flex !important; align-items:center !important; gap:12px !important; min-width:0 !important; }
+    .professional-shell #main-content .municipal-directory-page .barangay-number { display:grid !important; place-items:center !important; width:32px !important; height:34px !important; flex:0 0 32px !important; border:1px solid #dce7ed !important; border-radius:8px !important; background:#f2f7fa !important; color:#6b8797 !important; font-size:11px !important; font-weight:600 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-barangay-name { display:block !important; margin:0 0 5px !important; color:#25485d !important; font-size:14px !important; font-weight:650 !important; line-height:1.3 !important; overflow-wrap:anywhere !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-local-name { display:block !important; color:#7a909e !important; font-size:10px !important; font-weight:400 !important; line-height:1.4 !important; overflow-wrap:anywhere !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-metrics { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:10px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-metrics > span { display:grid !important; gap:5px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-metrics strong { color:#31596f !important; font-size:15px !important; font-weight:600 !important; line-height:1.2 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-metrics > span > span { color:#8093a0 !important; font-size:10px !important; font-weight:400 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-receipt { display:grid !important; justify-items:start !important; gap:6px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-status { display:inline-flex !important; align-items:center !important; gap:6px !important; padding:5px 8px !important; border-radius:6px !important; font-size:10px !important; font-weight:550 !important; line-height:1.2 !important; white-space:nowrap !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-status::before { content:'' !important; width:5px !important; height:5px !important; border-radius:50% !important; background:currentColor !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-status.is-awaiting { background:#fff6e4 !important; color:#927129 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-status.is-received { background:#e6f4ed !important; color:#347c60 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-latest-month { color:#718b9a !important; font-size:10px !important; font-weight:400 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-toggle { display:flex !important; align-items:center !important; justify-content:flex-end !important; gap:6px !important; color:#367680 !important; font-size:11px !important; font-weight:550 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-row-toggle .app-icon { width:14px !important; height:14px !important; transition:transform .15s ease !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-details[open] > summary .directory-row-toggle .app-icon { transform:rotate(180deg) !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-body { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important; align-items:start !important; gap:20px !important; padding:20px !important; border-top:1px solid #dcebe8 !important; background:#f8fbfc !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-body > section { min-width:0 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-detail-heading { display:flex !important; justify-content:space-between !important; align-items:center !important; flex-wrap:wrap !important; gap:8px !important; margin-bottom:12px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-detail-heading h3 { margin:0 !important; color:#2f5468 !important; font-size:12px !important; font-weight:650 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-detail-heading > span { color:#7a909c !important; font-size:10px !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-latest-report,.directory-missing-report) { margin:0 0 12px !important; padding:12px !important; border:1px solid #dfebe5 !important; border-left:3px solid #82ad98 !important; border-radius:8px !important; background:#fff !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-missing-report { border-color:#e4e9ed !important; border-left-color:#d2bd86 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-latest-report > span { font-size:10px !important; font-weight:600 !important; color:#6d8d80 !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-latest-report > strong,.directory-missing-report strong) { font-size:13px !important; font-weight:600 !important; color:#375c6b !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-latest-report > small { font-size:10px !important; color:#81929b !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-report-history,.directory-gcash-settings) { margin:0 !important; padding:0 !important; border:1px solid #dce6ec !important; border-radius:8px !important; background:#fff !important; overflow:hidden !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-report-history,.directory-gcash-settings) > summary { display:flex !important; justify-content:space-between !important; align-items:center !important; flex-wrap:wrap !important; gap:8px !important; padding:12px !important; color:#426577 !important; font-size:11px !important; font-weight:550 !important; cursor:pointer !important; list-style-position:inside !important; background:#fff !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-report-history,.directory-gcash-settings) > summary::after { content:'+' !important; margin-left:auto !important; font-size:16px !important; color:#6b8a9a !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-report-history,.directory-gcash-settings)[open] > summary::after { content:'−' !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-report-history article { display:flex !important; align-items:center !important; justify-content:space-between !important; flex-wrap:wrap !important; gap:8px !important; padding:12px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-report-history article strong { color:#3a5b6c !important; font-size:11px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-report-history article span { color:#7e94a0 !important; font-size:10px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-body .row-actions { display:flex !important; flex-wrap:wrap !important; gap:7px !important; margin-top:8px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-entry-body .row-actions a { display:inline-flex !important; padding:6px 9px !important; border:1px solid #cedfe6 !important; border-radius:6px !important; color:#326b7c !important; background:#fff !important; text-decoration:none !important; font-size:11px !important; font-weight:500 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings .payment-status { padding:4px 7px !important; border-radius:5px !important; font-size:10px !important; font-weight:500 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings form { display:grid !important; gap:8px !important; padding:14px !important; border:0 !important; border-top:1px solid #e6edf1 !important; border-radius:0 !important; background:#fff !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings label { margin:0 !important; font-size:11px !important; font-weight:500 !important; color:#5c7788 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings .gcash-enable-field { display:flex !important; align-items:center !important; gap:8px !important; margin-bottom:6px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings input:not([type=hidden]):not([type=checkbox]) { width:100% !important; min-width:0 !important; min-height:36px !important; padding:8px 10px !important; border:1px solid #d2e0e8 !important; border-radius:7px !important; font-size:12px !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings form > :is(a,small) { font-size:11px !important; color:#567d90 !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-gcash-settings button { justify-self:start !important; min-height:34px !important; padding:8px 12px !important; border:0 !important; border-radius:7px !important; color:#fff !important; background:#166d75 !important; box-shadow:none !important; font-size:11px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-pagination { display:flex !important; align-items:center !important; justify-content:space-between !important; flex-wrap:wrap !important; gap:12px !important; padding:16px 20px 24px !important; border-top:1px solid #e6edf2 !important; }
+    .professional-shell #main-content .municipal-directory-page #barangay-directory-page-status { color:#7b91a0 !important; font-size:11px !important; }
+    .professional-shell #main-content .municipal-directory-page :is(.directory-pagination-controls,.directory-page-numbers) { display:flex !important; align-items:center !important; flex-wrap:wrap !important; gap:5px !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-pagination button { min-width:32px !important; min-height:32px !important; padding:6px 9px !important; border:1px solid #d5e1e9 !important; border-radius:6px !important; color:#54778c !important; background:#fff !important; font-size:11px !important; font-weight:500 !important; box-shadow:none !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-pagination button[aria-current=page] { border-color:#166d75 !important; background:#166d75 !important; color:#fff !important; }
+    .professional-shell #main-content .municipal-directory-page .directory-pagination button:disabled { opacity:.4 !important; cursor:default !important; }
+    .professional-shell #main-content .municipal-directory-page .empty-directory { display:grid !important; justify-items:center !important; gap:9px !important; padding:45px 20px !important; background:#fff !important; color:#7893a2 !important; font-size:12px !important; }
+    .professional-shell #main-content .municipal-directory-page .empty-directory > .app-icon { width:26px !important; height:26px !important; color:#9ab1bd !important; }
+    .professional-shell #main-content .municipal-directory-page .empty-directory strong { font-size:14px !important; font-weight:600 !important; color:#466c80 !important; }
+    .professional-shell #main-content .municipal-directory-page :is(summary,button,a,input):focus-visible { outline:2px solid #32888e !important; outline-offset:3px !important; }
+    @media (max-width:1100px) {
+        .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-column-labels { display:none !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-entry-summary { grid-template-columns:minmax(0,1fr) auto !important; gap:14px 20px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-metrics { grid-column:1 !important; grid-row:2 !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-receipt { grid-column:2 !important; grid-row:1 !important; justify-items:end !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-toggle { grid-column:2 !important; grid-row:2 !important; align-self:end !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-entry-body { grid-template-columns:minmax(0,1fr) !important; }
     }
+    @media (max-width:640px) {
+        .professional-shell #main-content section.municipal-directory-page { gap:12px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-page-heading { padding:16px !important; gap:14px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-page-icon { display:none !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-page-heading h1 { font-size:23px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-dashboard-link { min-height:32px !important; padding:6px 9px !important; font-size:11px !important; }
+        .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid { gap:8px !important; }
+        .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid article { gap:9px !important; padding:12px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-stat-icon { width:28px !important; height:28px !important; flex-basis:28px !important; border-radius:8px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-stat-icon .app-icon { width:15px !important; height:15px !important; }
+        .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid strong { font-size:21px !important; }
+        .professional-shell #main-content .municipal-directory-page .municipal-directory-summary-grid article > div > span { font-size:10px !important; }
+        .professional-shell #main-content .municipal-directory-page .municipal-directory-toolbar { padding:14px !important; gap:12px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-search-field { max-width:none !important; flex-basis:100% !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-filter-group { width:100% !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-filter-group button { flex:1 1 0 !important; padding:7px 5px !important; font-size:10px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-list-heading { padding:14px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-entry-summary { padding:15px 14px !important; gap:14px 10px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-identity { gap:9px !important; }
+        .professional-shell #main-content .municipal-directory-page .barangay-number { display:none !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-barangay-name { font-size:13px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-local-name { max-width:170px !important; font-size:10px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-status { padding:5px 6px !important; font-size:10px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-metrics { gap:14px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-metrics strong { font-size:14px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-row-metrics > span > span { font-size:10px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-entry-body { padding:14px !important; gap:14px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-pagination { justify-content:center !important; padding:14px 14px 70px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-pagination-controls { justify-content:center !important; gap:4px !important; }
+        .professional-shell #main-content .municipal-directory-page .directory-pagination button { min-width:28px !important; padding:6px 8px !important; }
+    }
+    @media (prefers-reduced-motion:reduce) { .professional-shell #main-content .municipal-directory-page .directory-row-toggle .app-icon { transition:none !important; } }
+    .professional-shell #main-content .municipal-directory-page [hidden][hidden] { display:none !important; }
 }
-@layer workspace-headers {
-    .municipal-directory-page .directory-pagination {
-        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-        gap: 14px; padding: 18px 0 56px; border-top: 1px solid #dce5ee;
-    }
-    .municipal-directory-page .directory-pagination[hidden] { display: none !important; }
-    #barangay-directory-page-status { color: #526b83; font-size: 13px; }
-    .directory-pagination-controls, .directory-page-numbers { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-    .municipal-directory-page .directory-pagination button {
-        min-width: 38px; min-height: 38px; padding: 7px 11px !important;
-        border: 1px solid #c7d6e5 !important; border-radius: 7px !important;
-        background: #fff !important; color: #285d92 !important; font-size: 13px !important;
-        font-weight: 600; box-shadow: none !important;
-    }
-    .municipal-directory-page .directory-pagination button:hover:not(:disabled) { background: #edf3fa !important; border-color: #8ba8c4 !important; }
-    .municipal-directory-page .directory-pagination button[aria-current="page"] { background: #285d92 !important; border-color: #285d92 !important; color: #fff !important; }
-    .municipal-directory-page .directory-pagination button:disabled { opacity: .45; cursor: default; }
-    .municipal-directory-page .directory-pagination button:focus-visible { outline: 3px solid #6997c3; outline-offset: 3px; }
-    .municipal-directory-toolbar { scroll-margin-top: 20px; }
-    @media (max-width: 640px) {
-        .municipal-directory-page .directory-pagination { justify-content: center; }
-        .directory-pagination-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .directory-pagination-controls > button { grid-row: 1; }
-        .directory-page-numbers { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(4, 38px); justify-content: center; }
-    }
 }

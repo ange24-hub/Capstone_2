@@ -327,7 +327,7 @@ class AuthRbacTest extends TestCase
         $this->actingAs($municipal)
             ->get(route('municipal.barangays.index'))
             ->assertOk()
-            ->assertSee('Tomas Oppus Barangay Directory')
+            ->assertSee('New Inhabitant Report')
             ->assertSee('All Barangays')
             ->assertSee('Carnaga');
 

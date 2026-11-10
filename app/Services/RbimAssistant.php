@@ -268,7 +268,7 @@ class RbimAssistant
         return $this->response(
             AssistantLanguage::text('The municipal registry covers :areas barangay(s), :residents inhabitant record(s), and :households household(s).', ['areas' => $barangays->count(), 'residents' => $barangays->sum('inhabitants_count'), 'households' => $barangays->sum('households_count')]),
             [AssistantLanguage::text('Show migration totals'), AssistantLanguage::text('Summarize submitted RBI forms')],
-            [['label' => AssistantLanguage::text('Open Barangay Directory'), 'url' => route('municipal.barangays.index')]]
+            [['label' => AssistantLanguage::text('Open New Inhabitant Report'), 'url' => route('municipal.barangays.index')]]
         );
     }
 
@@ -374,7 +374,7 @@ class RbimAssistant
         return match ($user->role) {
             User::ROLE_MUNICIPAL_LGU => [
                 ['label' => 'Municipal Dashboard', 'url' => route('dashboard.municipal')],
-                ['label' => 'Barangay Directory', 'url' => route('municipal.barangays.index')],
+                ['label' => 'New Inhabitant Report', 'url' => route('municipal.barangays.index')],
                 ['label' => 'Migration Monitoring', 'url' => route('migration.dashboard')],
             ],
             User::ROLE_BARANGAY => [

@@ -74,7 +74,7 @@ return [
     'Open Municipal Dashboard' => 'Ablihi ang Municipal Dashboard',
     'Open RBI Forms' => 'Ablihi ang RBI Forms',
     'Open Central Registry' => 'Ablihi ang Central Registry',
-    'Open Barangay Directory' => 'Ablihi ang Barangay Directory',
+    'Open New Inhabitant Report' => 'Ablihi ang New Inhabitant Report',
     'Open Migration Monitoring' => 'Ablihi ang Migration Monitoring',
     'Review Resident Accounts' => 'Susihon ang resident accounts',
     'Review Secretary Accounts' => 'Susihon ang secretary accounts',

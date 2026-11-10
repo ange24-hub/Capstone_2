@@ -11,7 +11,7 @@
     const pageStatus = document.getElementById('barangay-directory-page-status');
     const previous = pagination.querySelector('[data-directory-previous]');
     const next = pagination.querySelector('[data-directory-next]');
-    const pageSize = 4;
+    const pageSize = 6;
     let activeFilter = 'all';
     let currentPage = 1;
     let totalPages = 1;

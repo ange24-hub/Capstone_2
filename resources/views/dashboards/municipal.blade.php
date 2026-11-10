@@ -17,7 +17,7 @@
                 <p>A view of barangay reporting, account approvals, and population movement.</p>
             </div>
             <div class="municipal-hero-actions">
-                <a href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" />Barangay directory</a>
+                <a href="{{ route('municipal.barangays.index') }}"><x-app-icon name="directory" />New Inhabitant Report</a>
                 <a href="{{ route('migration.dashboard') }}"><x-app-icon name="trend" />View migration details</a>
             </div>
         </header>
@@ -105,7 +105,7 @@
             <div>
                 <span class="step-pill">Barangay Reporting</span>
                 <h2 class="section-title text-lg font-semibold text-slate-900">Barangay reporting</h2>
-                <p>Review submitted forms and find the latest reports in the barangay directory.</p>
+                <p>Review submitted forms and find the latest reports in New Inhabitant Report.</p>
             </div>
             <div class="directory-summary-metrics">
                 <div><strong>{{ $barangays->count() }}</strong><span>Total barangays</span></div>
@@ -125,7 +125,7 @@
                     <a href="{{ route('rbi-updates.show', $latestMunicipalReport) }}">View latest report <x-app-icon name="arrow-right" /></a>
                 </div>
             @endif
-            <a class="button" href="{{ route('municipal.barangays.index') }}">Open Barangay Directory</a>
+            <a class="button" href="{{ route('municipal.barangays.index') }}">Open New Inhabitant Report</a>
         </div>
         </div>
 

@@ -4,9 +4,9 @@
         $navigationGroups = [
             'Administration' => [
                 ['municipal.approvals.index', 'municipal.approvals.*', 'check', 'Account approvals'],
-                ['municipal.barangays.index', 'municipal.barangays.*', 'directory', 'Barangay directory'],
             ],
             'Reports' => [
+                ['municipal.barangays.index', 'municipal.barangays.*', 'directory', 'New Inhabitant Report'],
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ['migration.dashboard', 'migration.*', 'trend', 'Migration trends'],
