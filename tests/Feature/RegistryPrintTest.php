@@ -152,6 +152,7 @@ class RegistryPrintTest extends TestCase
         $remark = "Registered with family in Southern Leyte.\nCurrently residing in Cebu City for employment.\nResidence confirmed by the barangay secretary.";
         $this->resident($barangay, $household, $name, Inhabitant::RESIDENCE_HERE);
         Inhabitant::where('household_id', $household->id)->update(['remarks' => $remark]);
+        $this->resident($barangay, $household, 'Short', Inhabitant::RESIDENCE_HERE);
         $view = $this->actingAs($staff)->get(route('barangay.registry.active'))->assertOk();
         $view->assertSee('<span class="registry-cell-value">'.$name.'</span>', false)
             ->assertSee('registry-document-table')->assertSee('Edit '.$name.' Example in Resident Registry');
@@ -159,7 +160,10 @@ class RegistryPrintTest extends TestCase
             $sheet = $this->worksheet($this->get(route('barangay.registry.download', ['scope' => $scope]))->assertOk()->getContent());
             $xml = simplexml_load_string($sheet);
             $xml->registerXPathNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
-            $this->assertGreaterThanOrEqual(108, (int) $xml->xpath('s:sheetData/s:row[@r="11"]')[0]['ht']);
+            $longHeight = (int) $xml->xpath('s:sheetData/s:row[@r="11"]')[0]['ht'];
+            $shortHeight = (int) $xml->xpath('s:sheetData/s:row[@r="12"]')[0]['ht'];
+            $this->assertLessThanOrEqual(22, $shortHeight);
+            $this->assertGreaterThan($shortHeight * 3, $longHeight);
             $this->assertSame($remark, (string) $xml->xpath('s:sheetData/s:row/s:c[@r="Q11"]/s:is/s:t')[0]);
             $this->assertSame('001', (string) $xml->xpath('s:sheetData/s:row/s:c[@r="A11"]/s:is/s:t')[0]);
         }

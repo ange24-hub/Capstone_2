@@ -104,12 +104,12 @@
                     <table @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong) class="rbi-compact-household-columns" @endif>
                         @if(!in_array(request('sheet'), ['deceased', 'new-inhabitants'], true) && !$isBiasong)
                             <colgroup>
-                                <col style="width: 56px"><col style="width: 72px">
-                                <col style="width: 160px"><col style="width: 160px"><col style="width: 150px"><col style="width: 90px">
-                                <col style="width: 160px"><col style="width: 140px"><col style="width: 175px"><col style="width: 135px">
-                                <col style="width: 65px"><col style="width: 65px"><col style="width: 130px"><col style="width: 160px">
-                                <col style="width: 140px"><col style="width: 170px"><col style="width: 190px"><col style="width: 140px">
-                                @if($editThroughRbi)<col style="width: 80px">@endif
+                                <col style="width: 72px"><col style="width: 60px">
+                                <col style="width: 128px"><col style="width: 140px"><col style="width: 128px"><col style="width: 68px">
+                                <col style="width: 132px"><col style="width: 110px"><col style="width: 145px"><col style="width: 110px">
+                                <col style="width: 50px"><col style="width: 50px"><col style="width: 104px"><col style="width: 140px">
+                                <col style="width: 118px"><col style="width: 140px"><col style="width: 180px"><col style="width: 100px">
+                                @if($editThroughRbi)<col style="width: 116px">@endif
                             </colgroup>
                         @endif
                         @if (request('source'))
@@ -243,7 +243,7 @@
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="occupation" :value="$inhabitant->occupation" aria-label="Occupation" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="remarks" :value="\App\Support\RegistryRemarks::display($inhabitant->remarks)" aria-label="Remarks" /></td>
                                     <td><x-registry-cell :read-only="$editThroughRbi" form="{{ $rowForm }}" name="ethnicity" :value="$inhabitant->ethnicity" aria-label="Ethnicity" /></td>
-                                    @if($editThroughRbi)<td><a href="{{ route('registry.edit', $inhabitant) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in Resident Registry">Edit</a> <a href="{{ route('registry.movement', $inhabitant) }}">Movement</a></td>@endif
+                                    @if($editThroughRbi)<td class="registry-row-actions"><a href="{{ route('registry.edit', $inhabitant) }}" class="font-semibold text-blue-800 underline" aria-label="Edit {{ $inhabitant->fullName() }} in Resident Registry">Edit</a> <a href="{{ route('registry.movement', $inhabitant) }}">Movement</a></td>@endif
                                     <td class="rbi-row-save" hidden>
                                         <form id="{{ $rowForm }}" method="POST" action="{{ route('registry.update', $inhabitant) }}">
                                             @csrf

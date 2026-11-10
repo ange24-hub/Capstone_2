@@ -10,7 +10,7 @@ use ZipArchive;
 
 class RegistrySpreadsheet
 {
-    private const COLUMNS = [8, 9, 21, 24, 21, 10, 19, 22, 26, 14, 7, 8, 15, 24, 20, 25, 32, 18];
+    private const COLUMNS = [6, 9, 18, 20, 18, 12, 16, 18, 22, 12, 6, 6, 13, 20, 16, 20, 30, 14];
 
     public function build(Collection $residents, Barangay $barangay, string $title): string
     {
@@ -55,8 +55,8 @@ class RegistrySpreadsheet
         $header = (new SpreadsheetReportHeader)->build(18, $title, strtoupper($barangay->name), '', now()->format('m/d/Y'),
             ['title' => 1, 'label' => 3]);
         $rows = [...$header['rows'],
-            $this->row(9, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 34),
-            '<row r="10" ht="34" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',
+            $this->row(9, ['HH NO.', 'FAMILY NO.', 'NAME', '', '', '', 'RELATIONSHIP TO HH HEAD', 'PUROK / SITIO', 'PLACE OF BIRTH', 'DATE OF BIRTH', 'AGE', 'SEX (M/F)', 'CIVIL STATUS', 'SCHOOL LEVEL', 'RELIGION', 'OCCUPATION', 'REMARKS', 'ETHNICITY'], 4, 28),
+            '<row r="10" ht="28" customHeight="1">'.$this->cell('C10', 'LAST NAME', 4).$this->cell('D10', 'FIRST NAME', 4).$this->cell('E10', 'MIDDLE NAME', 4).$this->cell('F10', 'QUALIFIER', 4).'</row>',
         ];
 
         $previousHousehold = null;
@@ -114,7 +114,7 @@ class RegistrySpreadsheet
         $lines = 1;
         foreach ($values as $index => $value) {
             // Leave room for cell padding and wide characters in Excel's font-based widths.
-            $capacity = max(1, (int) floor((self::COLUMNS[$index] - 2) * 0.85));
+            $capacity = max(1, (int) floor((self::COLUMNS[$index] - 1) * 0.95));
             $wrappedLines = 0;
             foreach (preg_split('/\R/u', (string) ($value ?? '')) as $paragraph) {
                 $used = 0;
@@ -135,7 +135,7 @@ class RegistrySpreadsheet
             $lines = max($lines, $wrappedLines);
         }
 
-        return min(409, max(30, $lines * 16 + 12));
+        return min(409, max(20, $lines * 14 + 6));
     }
 
     private function row(int $number, array $values, int $style, int $height): string
@@ -180,10 +180,10 @@ class RegistrySpreadsheet
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>'
             .'<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1" indent="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'</cellXfs></styleSheet>');
