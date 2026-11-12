@@ -1,6 +1,8 @@
 /* Flat layout for document requests and their payment controls. */
 @layer municipal-components {
     .professional-content #main-content .workspace-page-documents {
+        & > .dashboard-page-header { margin-block-end: 0 !important; }
+
         & .workspace-documents-panel {
             padding: 0 !important;
             border: 0 !important;
@@ -14,7 +16,7 @@
             margin: 0 !important;
             flex-wrap: wrap;
             gap: 8px 16px;
-            padding: 16px 0 !important;
+            padding: 8px 0 !important;
             border: 0 !important;
             background: transparent !important;
         }

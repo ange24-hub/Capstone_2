@@ -58,6 +58,21 @@
             white-space: normal !important;
         }
 
+        & .registry-scope-actions a.button {
+            color: var(--municipal-muted) !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+        }
+
+        & .registry-scope-actions a.button:is(:hover, [aria-current="page"]) {
+            color: var(--municipal-action) !important;
+        }
+
+        & .registry-scope-actions a.button[aria-current="page"] {
+            box-shadow: inset 0 -2px var(--municipal-accent) !important;
+        }
+
         & .registry-print-options {
             width: fit-content;
             max-width: 100%;

@@ -1,14 +1,14 @@
 @layer municipal-workspace {
     .municipal-ui {
         --municipal-primary: #172d46;
-        --municipal-ink: #20262e;
-        --municipal-muted: #535e6b;
-        --municipal-action: #28496b;
-        --municipal-accent: var(--municipal-primary);
-        --municipal-canvas: #f6f8fb;
-        --municipal-line: #dce3ed;
-        --municipal-tint: #e8eef6;
-        --municipal-field-line: #8596ab;
+        --municipal-ink: #252d39;
+        --municipal-muted: #505e70;
+        --municipal-action: #24558a;
+        --municipal-accent: #356b9e;
+        --municipal-canvas: #f7f9fc;
+        --municipal-line: #dbe3ed;
+        --municipal-tint: #eaf1fa;
+        --municipal-field-line: #7c8da2;
         --municipal-font: Roboto, Inter, "Segoe UI", sans-serif;
         --municipal-radius: 6px;
     }
@@ -136,9 +136,9 @@
 
     .professional-shell .app-header :is(.desktop-sidebar-button, .mobile-menu-button, .header-logout button, .profile-navigation-trigger, .assistant-launcher) {
         min-height: 42px !important;
-        border: 1px solid var(--municipal-line) !important;
+        border: 1px solid transparent !important;
         border-radius: var(--municipal-radius) !important;
-        background: white !important;
+        background: transparent !important;
         color: var(--municipal-ink) !important;
         box-shadow: none !important;
     }
@@ -400,65 +400,36 @@
     .professional-public :is(.auth-panel, .registration-card, .service-card) { border-radius: var(--municipal-radius) !important; box-shadow: none !important; }
     .professional-public .portal-login-layout { animation: none !important; }
 
-    .portal-home { background: var(--municipal-canvas); color: var(--municipal-ink); }
-    .portal-home-inner { max-width: 1160px; margin-inline: auto; padding-inline: clamp(18px, 4vw, 36px); }
-
+    .portal-home { background: white; color: var(--municipal-ink); }
     .portal-home-intro {
-        padding-block: clamp(36px, 6vw, 76px);
-        border-bottom: 3px solid var(--municipal-accent);
         background: var(--municipal-primary);
         color: white;
     }
 
     .portal-home-intro h1 {
         max-width: 780px;
-        margin: 0;
-        color: inherit;
-        font-size: clamp(29px, 4vw, 49px);
-        font-weight: 700;
-        line-height: 1.12;
         text-wrap: wrap !important;
     }
 
-    .portal-home-intro p { max-width: 610px; margin: 14px 0 24px; color: var(--municipal-tint); font-size: clamp(15px, 2vw, 18px); }
+    .portal-home-intro p { max-width: 610px; }
     .portal-home-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-    .professional-public .portal-home .portal-home-actions .button {
-        background: white !important;
-        border: 1px solid white !important;
-        border-radius: var(--municipal-radius) !important;
-        color: var(--municipal-primary) !important;
-        box-shadow: none !important;
-    }
-
-    .professional-public .portal-home .portal-home-actions .secondary-button {
-        color: white !important;
-        border-color: #9cb3ca !important;
-        background: transparent !important;
-    }
-
-    .professional-public .portal-home .portal-home-actions .button:hover { background: var(--municipal-tint) !important; color: var(--municipal-primary) !important; }
-    .portal-home-section { padding-block: 28px; scroll-margin-top: 20px; }
-    .portal-home-section + .portal-home-section { padding-top: 4px; padding-bottom: 44px; }
-    .portal-home-section h2 { margin: 0 0 12px; font-size: 23px; font-weight: 700; }
+    .portal-home-section { scroll-margin-top: 20px; }
 
     .portal-home-services {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
+        gap: 24px;
     }
 
     .portal-home-services article {
-        padding: 18px;
-        border: 1px solid var(--municipal-line);
-        border-radius: var(--municipal-radius);
-        background: white;
+        min-width: 0;
+        padding-block: 12px !important;
     }
 
     .portal-home-services .app-icon { width: 22px; height: 22px; color: var(--municipal-action); }
-    .portal-home-services h3 { margin: 8px 0 4px; font-size: 16px; font-weight: 650; }
     .portal-home-section p { margin: 0; color: var(--municipal-muted); }
-    .portal-home-steps { list-style: decimal; margin: 12px 0 0; padding-left: 22px; color: var(--municipal-ink); }
+    .portal-home-steps { color: var(--municipal-ink); }
     .portal-home-steps li + li { margin-top: 4px; }
 
     @media (max-width: 1160px) {
@@ -492,7 +463,8 @@
 
         .professional-shell #main-content .rbi-subpages { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0 !important; }
         .professional-shell #main-content .rbi-subpages a { justify-content: center !important; min-height: 44px !important; padding-inline: 2px !important; font-size: 12px !important; text-align: center !important; }
-        .portal-home-services { grid-template-columns: 1fr; }
+        .portal-home-services { grid-template-columns: 1fr; gap: 0; }
+        .portal-home-services article + article { border-top: 1px solid var(--municipal-line) !important; }
     }
 
     @media (max-width: 480px) {
