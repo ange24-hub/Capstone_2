@@ -89,10 +89,9 @@
 
     .professional-shell .app-content { padding: 32px !important; }
     .professional-shell .app-header .assistant-panel { border-radius: 8px !important; box-shadow: none !important; }
-    .professional-public .portal-home-intro { border-bottom: 0 !important; }
     :is(.professional-shell .app-header, .professional-public .public-site-header) :is(strong, button, a) { font-weight: 700 !important; }
 
-    .professional-public :is(.public-header-inner, .portal-home-inner) {
+    .professional-public .public-header-inner {
         width: min(1180px, calc(100% - 48px)) !important;
         max-width: none !important;
         margin-inline: auto !important;
@@ -123,74 +122,12 @@
 
     .professional-public .public-nav .public-register-link:hover { background: var(--municipal-primary) !important; }
 
-    .professional-public #main-content .portal-home-intro {
-        padding-block: clamp(36px, 5vw, 64px) !important;
-    }
-
-    .professional-public #main-content .portal-home-intro h1 {
-        margin: 0 !important;
-        color: white !important;
-        font-size: clamp(29px, 4vw, 49px) !important;
-        line-height: 1.12 !important;
-    }
-
-    .professional-public #main-content .portal-home-intro p {
-        margin: 16px 0 24px !important;
-        color: var(--municipal-tint) !important;
-        font-size: clamp(16px, 2vw, 18px) !important;
-    }
-
-    .professional-public #main-content .portal-home-actions a.button {
-        border: 1px solid white !important;
-        background: white !important;
-        color: var(--municipal-primary) !important;
-    }
-
-    .professional-public #main-content .portal-home-actions a.secondary-button {
-        border-color: #a5b7cc !important;
-        background: transparent !important;
-        color: white !important;
-    }
-
-    .professional-public #main-content .portal-home-actions a.button:hover {
-        background: var(--municipal-tint) !important;
-        color: var(--municipal-primary) !important;
-    }
-
-    .professional-public #main-content .portal-home-section {
-        padding-block: 32px !important;
-    }
-
-    .professional-public #main-content .portal-home-section + .portal-home-section {
-        border-top: 1px solid var(--municipal-line) !important;
-    }
-
-    .professional-public #main-content .portal-home-section h2 {
-        margin: 0 0 16px !important;
-        color: var(--municipal-ink) !important;
-        font-size: 24px !important;
-    }
-
-    .professional-public #main-content .portal-home-services h3 {
-        margin: 8px 0 4px !important;
-        color: var(--municipal-ink) !important;
-        font-size: 17px !important;
-    }
-
-    .professional-public #main-content .portal-home-steps {
-        list-style: decimal !important;
-        margin: 12px 0 0 !important;
-        padding-inline-start: 24px !important;
-    }
-
     :is(.professional-shell, .professional-public)
     :is(#app-sidebar, .app-header, .public-site-header, #main-content)
     :is(a, button, summary):focus-visible:not(:where(.leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *)) {
         outline: 2px solid var(--municipal-accent) !important;
         outline-offset: 2px !important;
     }
-
-    .professional-public #main-content .portal-home-intro a:focus-visible { outline-color: #b4d4f4 !important; }
 
     :is(.professional-shell, .professional-public) #main-content {
         --workspace-control-ink: var(--municipal-ink);
@@ -579,7 +516,7 @@
     }
 
     @media (max-width: 640px) {
-        .professional-public :is(.public-header-inner, .portal-home-inner) {
+        .professional-public .public-header-inner {
             width: calc(100% - 32px) !important;
         }
 
