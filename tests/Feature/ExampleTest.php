@@ -15,6 +15,6 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('Smart Barangay Information System');
+        $response->assertSeeText('Smart Barangay Information System');
     }
 }

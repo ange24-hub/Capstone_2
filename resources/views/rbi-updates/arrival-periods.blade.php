@@ -1,12 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <section class="dashboard-page grid gap-6">
-    <header class="page-head"><x-workspace-heading icon="trend"><h1>Three-month arrival counts</h1><p>Barangay {{ $barangay->name }} · Consecutive 3-month reporting periods begin with the first recorded history or submitted report month.</p></x-workspace-heading></header>
-    @if(auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
-        @include('rbi-updates._workspace-nav', ['current' => 'arrivals'])
-    @else
-        <div class="toolbar"><a class="button secondary-button" href="{{ route('municipal.barangays.index') }}">Back to reports</a><a class="button secondary-button" href="{{ route('municipal.prediction-forecast', ['barangay_id'=>$barangay->id]) }}">Prediction analytics</a></div>
-    @endif
+    <header class="page-head"><x-workspace-heading icon="trend" label="RBI Forms"><h1>Three-month arrival counts</h1><p>Barangay {{ $barangay->name }} · Consecutive 3-month reporting periods begin with the first recorded history or submitted report month.</p></x-workspace-heading></header>
+    <div class="toolbar"><a class="button secondary-button" href="{{ auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY) ? route('barangay.rbi-updates.history') : route('municipal.barangays.index') }}">Back to reports</a>@if(auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))<a class="button secondary-button" href="{{ route('municipal.prediction-forecast', ['barangay_id'=>$barangay->id]) }}">Prediction analytics</a>@endif</div>
     @if(session('status'))<div class="success" role="status">{{ session('status') }}</div>@endif
     @if($errors->any())<div class="errors" role="alert">{{ $errors->first() }}</div>@endif
     <p>This three-month review checks the arrival months written on submitted RBI forms. Record the previous residence when known, or explicitly mark it as not recorded. Birth / Newborn and Late registration entries are excluded from both counts.</p>

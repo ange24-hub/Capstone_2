@@ -3,7 +3,9 @@
 @section('content')
     <section class="public-section" id="services">
         <div class="public-section-head mb-8 text-center ">
-            <h1 class="text-3xl font-semibold text-blue-950">Barangay services</h1>
+            <span class="public-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700 ">Online Services</span>
+            <h2>Barangay services in one secure portal</h2>
+            <p>Designed to make local government transactions more accessible, organized, and transparent.</p>
         </div>
 
         <div class="service-card-grid grid grid-cols-1 gap-6 md:grid-cols-3 ">

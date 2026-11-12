@@ -48,24 +48,53 @@
         <div class="rbi-report-view rbi-workspace-overview">
             <header class="rbi-report-header">
                 <div class="rbi-report-heading">
+                    <span class="rbi-report-emblem" aria-hidden="true"><x-app-icon name="form" /></span>
                     <div>
+                        <span class="rbi-report-eyebrow">RBI Monthly Form</span>
                         <h1>{{ $rbiSection === 'history' ? 'Report history' : 'Monthly RBI form' }}</h1>
-                        <p>{{ $rbiSection === 'history' ? 'Review drafts and submitted monthly reports.' : 'Record new and deceased inhabitants for the reporting month.' }}</p>
+                        <p>Barangay {{ $barangay?->name ?: 'not set' }} <span aria-hidden="true">&middot;</span> Monthly reporting</p>
                     </div>
                 </div>
-                @if($rbiSection === 'history' || $editingReport)
-                    <div class="rbi-report-downloads" aria-label="Workspace actions">
-                        @if($rbiSection === 'history')
-                            <a class="rbi-report-button rbi-history-create" href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}">New monthly form</a>
-                        @else
-                            <a class="rbi-report-button" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start another month</a>
-                        @endif
-                    </div>
-                @endif
+                <div class="rbi-report-downloads" aria-label="Workspace actions">
+                    @if($rbiSection === 'history')
+                    <a class="rbi-report-button rbi-history-create" href="{{ route('barangay.rbi-updates.residents',['new'=>1]) }}"><x-app-icon name="form" />New monthly form</a>
+                    <details class="rbi-history-page-tools"><summary>Tools<x-app-icon name="chevron-down" /></summary><div><a href="{{ route('rbi.arrivals.index') }}">3-month arrival counts</a><a href="{{ route('dashboard.barangay') }}">Back to Dashboard</a></div></details>
+                    @else
+                    <a class="rbi-report-button" href="{{ route('rbi.arrivals.index') }}">3-month arrival counts</a>
+                    <a class="rbi-report-button rbi-report-pdf" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
+                    @if ($editingReport)
+                        <a class="rbi-report-button rbi-report-word" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start Another Month</a>
+                    @endif
+                    @endif
+                </div>
             </header>
+            @if($rbiSection !== 'history')
+            <div class="rbi-report-metrics" aria-label="Monthly reports summary">
+                <article class="rbi-report-metric rbi-metric-residents">
+                    <span class="rbi-metric-icon" aria-hidden="true"><x-app-icon name="check" /></span>
+                    <div><span class="rbi-metric-label">Submitted reports</span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count() }}</strong></div>
+                </article>
+                <article class="rbi-report-metric rbi-metric-status">
+                    <span class="rbi-metric-icon" aria-hidden="true"><x-app-icon name="document" /></span>
+                    <div><span class="rbi-metric-label">Draft reports</span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong></div>
+                </article>
+            </div>
+            @endif
         </div>
 
-        @include('rbi-updates._workspace-nav', ['current' => $rbiSection === 'history' ? 'history' : 'form'])
+        @if($rbiSection !== 'history')
+        <nav class="rbi-subpages" aria-label="RBI Forms subpages">
+            <a href="{{ route('barangay.rbi-updates.residents', ['new' => 1]) }}" @if ($rbiSection !== 'history') aria-current="page" @endif><x-app-icon name="users" /><span>Monthly RBI form</span></a>
+            <a href="{{ route('barangay.rbi-updates.history') }}" @if($rbiSection === 'history') aria-current="page" @endif><x-app-icon name="calendar" /><span>Report history</span></a>
+        </nav>
+        @endif
+        @if($rbiSection !== 'history')
+        <nav class="rbi-section-nav" aria-label="RBI form sections">
+            <a href="#family-section" data-rbi-step-link="residents"><span>A</span> Registered inhabitants</a>
+            <a href="#deceased-section" data-rbi-step-link="deceased"><span>B</span> Deceased inhabitants</a>
+            <a href="#certification-section" data-rbi-step-link="certification"><span>C</span> Certification</a>
+        </nav>
+        @endif
         @if (session('status'))
             <div class="status-message">{{ session('status') }}</div>
         @endif
@@ -99,7 +128,9 @@
             <div class="workflow-card report-editor rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" id="monthly-report">
                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
-                        <h2 class="section-title text-lg font-semibold text-slate-900">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update submitted report' : 'Continue draft') : 'Reporting details' }}</h2>
+                        <span class="step-pill">{{ $editingReport ? ($editingReport->status === App\Models\BarangayRbiUpdate::STATUS_SUBMITTED ? 'Update Submitted Monthly Form' : 'Continue Monthly Draft') : 'New Monthly Form' }}</span>
+                        <h2 class="section-title text-lg font-semibold text-slate-900">Monthly RBI form</h2>
+                        <p>Complete Sections A and B, then certify and save.</p>
                     </div>
                     <span class="rbi-required-note"><x-required-mark /> Required fields</span>
                     @if ($editingReport)<x-status-badge :status="$editingReport->status">{{ $editingReport->statusLabel() }}</x-status-badge>@endif
@@ -110,10 +141,6 @@
         @endif
 
         @if($rbiSection === 'history')
-            <p class="rbi-history-totals">
-                <span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_SUBMITTED)->count() }}</strong> submitted reports</span>
-                <span><strong>{{ $rbiUpdates->where('status', App\Models\BarangayRbiUpdate::STATUS_DRAFT)->count() }}</strong> drafts</span>
-            </p>
             @include('rbi-updates._history')
             @include('rbi-updates._registry-activity')
         @endif
@@ -158,10 +185,10 @@
     <template id="family-form-template">
         <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card>
             <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                <h4 class="section-title text-lg font-semibold text-slate-900" data-family-number></h4>
+                <div><span class="step-pill" data-family-number></span><h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4></div>
                 <button class="secondary-button" type="button" data-remove-family>Remove Family</button>
             </div>
-            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label><input type="text" list="rbi-household-heads" data-family-head autocomplete="off"><input type="hidden" data-family-household-id></div><div><label>Household number <span class="rbi-optional-label">Optional</span></label><input data-family-household-number maxlength="100"><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
+            <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"><div><label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label><input type="text" list="rbi-household-heads" data-family-head autocomplete="off"><input type="hidden" data-family-household-id></div><div><label>Household number</label><input data-family-household-number maxlength="100" placeholder="Existing number, or leave blank"><small class="field-help">Choose a registry match when available.</small><p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p></div></div>
             <h5 class="section-title text-lg font-semibold text-slate-900">Family members</h5>
             <div class=" grid gap-6" data-family-members></div>
             <div class="form-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5"><button class="secondary-button" type="button" data-add-member>Add Member to This Family</button></div>

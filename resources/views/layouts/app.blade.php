@@ -4,11 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#172d46">
+    <meta name="theme-color" content="#142d4e">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preload" href="{{ asset('fonts/inter/InterVariable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
-    <style>@layer print-overrides, municipal-workspace, system-ui, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
+    <style>@layer print-overrides, system-ui, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">
     @if(request()->routeIs('barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">
@@ -35,7 +35,6 @@
     @stack('head')
     <link rel="stylesheet" href="{{ asset('css/system-ui.css') }}?v={{ filemtime(public_path('css/system-ui.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/portal-polish.css') }}?v={{ filemtime(public_path('css/portal-polish.css')) }}" media="screen">
-    <link rel="stylesheet" href="{{ asset('css/municipal-workspace.css') }}?v={{ filemtime(public_path('css/municipal-workspace.css')) }}" media="screen">
 </head>
 <body @if(!$usesPublicLayout) class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'municipal.prediction-forecast', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endif>
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -48,11 +47,12 @@
                 <div class="public-header-inner">
                     <a class="public-brand" href="{{ route('home') }}">
                         <span class="seal-crop public-seal">
-                            <img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="">
+                            <img src="{{ asset('images/tomas-oppus-seal.png') }}" alt="Municipality of Tomas Oppus seal">
                         </span>
                         <span class="public-brand-copy">
+                            <small>Official Website of the</small>
                             <strong>Municipality of Tomas Oppus</strong>
-                            <small>Registry of Barangay Inhabitants Management</small>
+                            <em>Southern Leyte</em>
                         </span>
                     </a>
                     <nav class="public-nav" aria-label="Public navigation">
@@ -62,7 +62,7 @@
                             <a class="public-login-link" href="{{ route('dashboard') }}">Dashboard</a>
                         @else
                             <a href="{{ route('services') }}" @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
-                            <a class="public-login-link" href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Sign in</a>
+                            <a class="public-login-link" href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Login</a>
                             <a class="public-register-link" href="{{ route('register') }}" @if(request()->routeIs('register')) aria-current="page" @endif>Register</a>
                         @endauth
                     </nav>
@@ -75,11 +75,16 @@
                 <div class="public-footer-main">
                     <div class="public-footer-brand">
                         <span class="seal-crop footer-seal"><img src="{{ asset('images/tomas-oppus-seal.png') }}" alt=""></span>
-                        <div><strong>Municipal Government of Tomas Oppus</strong><span>Southern Leyte, Philippines</span></div>
+                        <div><strong>Municipal Government of Tomas Oppus</strong><span>Serving the people through accessible and responsible digital governance.</span></div>
+                    </div>
+                    <div class="public-footer-meta">
+                        <strong>Registry of Barangay Inhabitants Management</strong>
+                        <span>Authorized public service portal · Municipality of Tomas Oppus</span>
                     </div>
                 </div>
                 <div class="public-footer-bottom">
                     <span>© {{ now()->year }} Municipality of Tomas Oppus. All rights reserved.</span>
+                    <span>Southern Leyte, Philippines</span>
                 </div>
             </footer>
         </div>
@@ -94,10 +99,21 @@
                     <span>
                         <small>Municipality of</small>
                         <strong>Tomas Oppus</strong>
-                        <em>RBIM Portal</em>
+                        <em>RBIM System</em>
                     </span>
                 </a>
                 @include('layouts.navigation')
+                <div class="sidebar-spacer"></div>
+                <div class="sidebar-account">
+                    <span class="account-avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
+                    <div>
+                        <strong>{{ auth()->user()->name }}</strong>
+                        <span>{{ auth()->user()->roleLabel() }}</span>
+                        @if (auth()->user()->barangay)
+                            <small>Barangay {{ auth()->user()->barangay->name }}</small>
+                        @endif
+                    </div>
+                </div>
             </aside>
             <button class="sidebar-backdrop" type="button" aria-label="Close navigation" data-sidebar-close></button>
             <div class="app-main min-w-0 bg-slate-50">
@@ -109,26 +125,19 @@
                         <button class="mobile-menu-button" type="button" aria-label="Open navigation" aria-controls="app-sidebar" aria-expanded="false" data-sidebar-toggle>
                             <x-app-icon name="menu" />
                         </button>
-                        <div class="portal-header-identity">
-                            <strong>{{ auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? 'Municipal administrator' : auth()->user()->roleLabel() }}</strong>
-                            @if(auth()->user()->barangay)
-                                <span>Barangay {{ auth()->user()->barangay->name }}</span>
-                            @endif
-                        </div>
+                        <div class="portal-header-identity"><span>Municipality of Tomas Oppus</span><strong>{{ auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU) ? 'Municipal administrator' : auth()->user()->roleLabel() }}</strong></div>
                     </div>
                     <div class="app-header-meta">
-                        @if(request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident'))
-                            <time class="header-date" data-ph-header-date aria-label="Device local date and time"></time>
-                        @endif
+                        <time class="header-date" data-ph-header-date aria-label="Device local date and time"></time>
                         @if(auth()->user()->hasAnyRole([App\Models\User::ROLE_BARANGAY, App\Models\User::ROLE_MUNICIPAL_LGU]))
                             <a class="header-user profile-navigation-trigger" href="{{ route('profile.edit') }}" title="Profile Info" aria-label="Profile Info: {{ auth()->user()->name }}" @if(request()->routeIs('profile.*')) aria-current="page" @endif>
                                 <span class="profile-navigation-avatar" aria-hidden="true">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
                                 <span class="profile-navigation-copy"><span class="profile-navigation-name">{{ auth()->user()->name }}</span><span class="profile-navigation-label">Profile Info</span></span>
+                                <x-app-icon name="arrow-right" class="profile-navigation-arrow" />
                             </a>
                         @else
                             <span class="header-user">{{ auth()->user()->name }}</span>
                         @endif
-                        @include('assistant.widget')
                         <form class="header-logout" method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" aria-label="Sign out" title="Sign out"><x-app-icon name="logout" /><span>Sign out</span></button>
@@ -136,6 +145,11 @@
                     </div>
                 </header>
                 <main class="app-content min-w-0" id="main-content" tabindex="-1">
+                    <nav class="workspace-location" aria-label="Page location" hidden data-page-location>
+                        <a href="{{ route('dashboard') }}">Workspace</a>
+                        <span aria-hidden="true">/</span>
+                        <span aria-current="page" data-page-location-title></span>
+                    </nav>
                     @yield('content')
                 </main>
                 <footer class="app-footer @hasSection('footer-reminder') app-footer-with-reminder @endif">
@@ -144,6 +158,7 @@
                 </footer>
             </div>
         </div>
+        @include('assistant.widget')
     @endif
     @stack('scripts')
     <script src="{{ asset('js/workspace-ui.js') }}?v={{ filemtime(public_path('js/workspace-ui.js')) }}" defer></script>
@@ -168,7 +183,11 @@
                 } catch (_) {}
                 syncCollapse();
                 const pageTitle = document.querySelector('#main-content h1')?.textContent.trim();
-                if (pageTitle) document.title = `${pageTitle} | RBIM · Tomas Oppus`;
+                if (pageTitle) {
+                    document.querySelector('[data-page-location-title]').textContent = pageTitle;
+                    document.querySelector('[data-page-location]').hidden = {{ request()->routeIs('dashboard.*') ? 'true' : 'false' }};
+                    document.title = `${pageTitle} | RBIM · Tomas Oppus`;
+                }
                 document.querySelectorAll('.side-nav a').forEach((link) => {
                     link.setAttribute('aria-label', link.textContent.trim());
                     link.title = link.textContent.trim();

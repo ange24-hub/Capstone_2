@@ -1,6 +1,6 @@
 <section class="rbi-monthly-section rbi-monthly-deceased" data-rbi-step-panel="deceased">
-                    <h3 class="section-title text-lg font-semibold text-slate-900" id="deceased-section"><span class="rbi-section-letter">B</span> Deceased inhabitants</h3>
-                    <p class="rbi-section-help">Leave this section blank if there were no deaths during the reporting month.</p>
+                    <h3 class="section-title text-lg font-semibold text-slate-900" id="deceased-section"><span class="rbi-section-letter">B</span> Deceased registered inhabitants</h3>
+                    <p class="rbi-section-help">List deaths for this reporting month. Leave this section blank when there are none.</p>
                     <div class="table-wrap form-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
                         <table id="rbi-deceased-rows-table">
                             <thead><tr><th>Household / Family</th>@foreach ($rbiDeceasedRowFields as $field => $label)<th>{{ $field === 'deceased_name' ? 'Full name' : $label }}</th>@endforeach</tr></thead>

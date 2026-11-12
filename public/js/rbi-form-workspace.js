@@ -4,7 +4,7 @@
     const steps = ['residents', 'deceased', 'certification'];
     const panels = [...form.querySelectorAll('[data-rbi-step-panel]')];
     if (panels.length !== 3) return;
-    const links = [...form.querySelectorAll('[data-rbi-step-link]')];
+    const links = [...document.querySelectorAll('[data-rbi-step-link]')];
     const previous = form.querySelector('[data-rbi-previous]');
     const next = form.querySelector('[data-rbi-next]');
     const save = form.querySelector('[data-rbi-save]');
@@ -21,7 +21,7 @@
         next.hidden = active === 2;
         save.hidden = active !== 2;
         next.textContent = active === 0 ? 'Continue to deceased records' : 'Continue to certification';
-        status.textContent = `Step ${active + 1} of ${steps.length}`;
+        status.textContent = `Step ${active + 1} of 3 · ${['Registered inhabitants', 'Deceased records', 'Review and save'][active]}`;
         if (focus) {
             const heading = panels[active].querySelector('h3');
             heading.tabIndex = -1;
