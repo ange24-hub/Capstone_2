@@ -1,5 +1,5 @@
         <nav class="rbi-history-sections" data-rbi-history-navigation aria-label="Report history sections">
-            <a href="#report-history" aria-current="page">Monthly forms <span>{{ $rbiUpdates->count() }}</span></a>
+            <a href="#report-history" aria-current="page">Monthly forms <span>{{ $reportHistoryPage->total() }}</span></a>
             @if($savedHouseholdPage->total() > 0)
                 <a href="#saved-inhabitant-records">Pending consolidation <span>{{ $savedHouseholdPage->total() }}</span></a>
             @endif

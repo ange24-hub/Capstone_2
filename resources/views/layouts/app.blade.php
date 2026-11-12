@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#172d46">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="preload" href="{{ asset('fonts/roboto/RobotoLatin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/inter/InterVariable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>
-    <style>@layer municipal-components, print-overrides, municipal-workspace, system-ui, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
+    <style>@layer print-overrides, municipal-workspace, system-ui, navy-palette, portal, civic, workspace-headers, theme, base, components, utilities;</style>
     <link rel="stylesheet" href="{{ asset('css/professional-workspace.css') }}?v={{ filemtime(public_path('css/professional-workspace.css')) }}" media="screen">
     @if(request()->routeIs('barangay.document-requests.index'))
         <link rel="stylesheet" href="{{ asset('css/document-requests.css') }}?v={{ filemtime(public_path('css/document-requests.css')) }}" media="screen">
@@ -36,7 +36,6 @@
     <link rel="stylesheet" href="{{ asset('css/system-ui.css') }}?v={{ filemtime(public_path('css/system-ui.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/portal-polish.css') }}?v={{ filemtime(public_path('css/portal-polish.css')) }}" media="screen">
     <link rel="stylesheet" href="{{ asset('css/municipal-workspace.css') }}?v={{ filemtime(public_path('css/municipal-workspace.css')) }}" media="screen">
-    <link rel="stylesheet" href="{{ asset('css/municipal-components.css') }}?v={{ filemtime(public_path('css/municipal-components.css')) }}" media="screen">
 </head>
 <body @if(!$usesPublicLayout) class="professional-shell {{ !request()->routeIs('barangay.rbi-updates.*', 'rbi-updates.*') ? 'professional-content' : '' }} role-{{ str_replace('_', '-', auth()->user()->role) }} {{ request()->routeIs('dashboard.barangay', 'dashboard.municipal', 'dashboard.resident') ? 'dashboard-workspace' : '' }} {{ request()->routeIs('barangay.registry.*', 'registry.*', 'barangay.document-requests.index', 'migration.dashboard', 'municipal.prediction-forecast', 'spatial.index') ? 'wide-workspace' : '' }} {{ !request()->routeIs('dashboard.*') ? 'focused-workspace' : '' }}" @else class="professional-public" @endif>
     <a class="skip-link" href="#main-content">Skip to main content</a>

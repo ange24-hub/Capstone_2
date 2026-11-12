@@ -48,7 +48,7 @@
     .rbi-forms-workspace #rbi-monthly-form .rbi-entry-review > summary span { color: #4b6273 !important; font-size: 12px !important; }
     .rbi-forms-workspace #rbi-monthly-form button { min-height: 36px !important; padding: 7px 11px !important; border-radius: 7px !important; font-size: 13px !important; line-height: 1.5 !important; font-weight: 600 !important; }
     .rbi-forms-workspace #rbi-monthly-form button:not(.secondary-button) { color: #fff !important; background: var(--municipal-action) !important; border-color: var(--municipal-action) !important; box-shadow: none !important; }
-    .rbi-forms-workspace #rbi-monthly-form button:not(.secondary-button):hover { background: var(--municipal-primary) !important; border-color: var(--municipal-primary) !important; }
+    .rbi-forms-workspace #rbi-monthly-form button:not(.secondary-button):hover { background: var(--municipal-navy) !important; border-color: var(--municipal-navy) !important; }
     .rbi-forms-workspace #rbi-monthly-form .secondary-button { color: #31566d !important; background: #fff !important; border-color: #c2d4df !important; box-shadow: none !important; }
     .rbi-forms-workspace #rbi-monthly-form button:disabled { color: #587181 !important; background: #f0f4f7 !important; border-color: #d7e2e9 !important; opacity: 1 !important; box-shadow: none !important; }
     .rbi-forms-workspace #rbi-monthly-form :is([data-remove-family], [data-remove-member]):disabled { display: none !important; }

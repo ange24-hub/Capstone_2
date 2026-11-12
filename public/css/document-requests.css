@@ -1,167 +1,338 @@
-/* Flat layout for document requests and their payment controls. */
-@layer municipal-components {
-    .professional-content #main-content .workspace-page-documents {
-        & > .dashboard-page-header { margin-block-end: 0 !important; }
+/* Loaded before the shared theme so this layer's important rules keep their contrast. */
+@layer document-requests {
+    .workspace-page-documents {
+        color: #172b4d;
+    }
 
-        & .workspace-documents-panel {
-            padding: 0 !important;
-            border: 0 !important;
-            background: transparent !important;
-            scroll-margin-block-start: 24px;
-        }
+    .workspace-page-documents > .dashboard-page-header {
+        min-height: 0 !important;
+        padding: 24px !important;
+        border: 1px solid #b9cddf !important;
+        border-top: 4px solid #244b83 !important;
+        border-radius: 14px !important;
+        background: #edf3fc !important;
+        box-shadow: none !important;
+        color: #172b4d !important;
+    }
 
-        & .government-card-header {
-            display: flex !important;
-            align-items: baseline;
-            margin: 0 !important;
+    .workspace-page-documents > .dashboard-page-header::before,
+    .workspace-page-documents > .dashboard-page-header::after,
+    .workspace-page-documents .barangay-hero-weave {
+        display: none !important;
+    }
+
+    .workspace-page-documents .dashboard-page-header h1 {
+        color: #172b4d !important;
+        font-size: clamp(26px, 2.5vw, 34px) !important;
+    }
+
+    .workspace-page-documents .dashboard-page-header :is(p, .dashboard-eyebrow) {
+        color: #334e6f !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents .workspace-documents-panel {
+        border-color: #b9cddf !important;
+        border-top: 4px solid #244b83 !important;
+        background: #fff !important;
+        scroll-margin-top: 24px;
+    }
+
+    .workspace-page-documents .government-card-header {
+        padding: 20px !important;
+        border-bottom: 1px solid #cbd8e8 !important;
+        background: #edf3fc !important;
+    }
+
+    .workspace-page-documents .government-card-header h2 {
+        color: #172b4d !important;
+        font-size: 21px !important;
+    }
+
+    .workspace-page-documents .government-card-header :is(p, .government-eyebrow) {
+        color: #334e6f !important;
+        font-size: 13px !important;
+    }
+
+    .workspace-page-documents .government-count-badge {
+        padding: 8px 12px !important;
+        border: 1px solid #d6b55e !important;
+        background: #fff3cc !important;
+        color: #714b00 !important;
+        font-size: 13px !important;
+        white-space: nowrap;
+    }
+
+    .workspace-page-documents .government-count-badge.is-clear {
+        border-color: #a3c9b7 !important;
+        background: #e7f5ed !important;
+        color: #145435 !important;
+    }
+
+    .workspace-page-documents .document-list-summary {
+        margin: 0 !important;
+        padding: 14px 20px !important;
+        color: #334e6f !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents .government-table-wrap {
+        border-radius: 0 !important;
+        border-right: 0 !important;
+        border-left: 0 !important;
+    }
+
+    .workspace-page-documents .government-data-table {
+        min-width: 1120px !important;
+    }
+
+    .workspace-page-documents .government-data-table th {
+        padding: 14px 16px !important;
+        background: #244b83 !important;
+        color: #fff !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        border-bottom-color: #244b83 !important;
+        white-space: nowrap;
+    }
+
+    .workspace-page-documents .government-data-table td {
+        padding: 16px !important;
+        border-bottom-color: #d5dfec !important;
+        color: #172b4d !important;
+        font-size: 14px !important;
+        vertical-align: top !important;
+    }
+
+    .workspace-page-documents .government-data-table tbody tr {
+        background: #fff !important;
+    }
+
+    .workspace-page-documents .government-data-table tbody tr:nth-child(even) {
+        background: #f0f5fb !important;
+    }
+
+    .workspace-page-documents .government-data-table tbody tr:hover {
+        background: #e4eefb !important;
+    }
+
+    .workspace-page-documents .government-data-table td > strong {
+        color: #172b4d !important;
+        font-size: 14px !important;
+        line-height: 1.5;
+    }
+
+    .workspace-page-documents .government-data-table td:nth-child(2) {
+        min-width: 180px;
+    }
+
+    .workspace-page-documents .government-data-table small {
+        display: block;
+        margin-top: 6px;
+        color: #415570 !important;
+        font-size: 13px !important;
+        line-height: 1.55 !important;
+        overflow-wrap: anywhere;
+    }
+
+    .workspace-page-documents .document-payment-cell {
+        min-width: 220px;
+        max-width: 280px;
+    }
+
+    .workspace-page-documents .document-payment-cell a {
+        color: #1c4074 !important;
+        font-size: 13px !important;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+    .workspace-page-documents :is(.request-status, .payment-status) {
+        padding: 6px 10px !important;
+        border: 1px solid #aebfd3 !important;
+        border-radius: 8px !important;
+        background: #edf2f7 !important;
+        color: #334e6f !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        line-height: 1.4;
+        text-transform: none !important;
+        white-space: normal !important;
+    }
+
+    .workspace-page-documents :is(.request-status-pending, .payment-status-pending_verification) {
+        border-color: #d6b55e !important;
+        background: #fff3cc !important;
+        color: #714b00 !important;
+    }
+
+    .workspace-page-documents .request-status-processing {
+        border-color: #aac6ee !important;
+        background: #e6efff !important;
+        color: #1c4074 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-ready, .request-status-completed, .payment-status-paid) {
+        border-color: #a3c9b7 !important;
+        background: #e7f5ed !important;
+        color: #145435 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-rejected, .payment-status-rejected, .payment-status-unpaid) {
+        border-color: #e3b1b7 !important;
+        background: #fdecef !important;
+        color: #922435 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) {
+        display: grid;
+        min-width: 220px;
+        gap: 8px;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) label {
+        margin: 0 !important;
+        color: #334e6f !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) :is(input, select) {
+        min-height: 42px !important;
+        border-color: #94a9c4 !important;
+        background: #fff !important;
+        color: #172b4d !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents input::placeholder {
+        color: #53647b !important;
+        opacity: 1 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) button {
+        min-height: 42px !important;
+        background: #244b83 !important;
+        color: #fff !important;
+        font-size: 14px !important;
+    }
+
+    .workspace-page-documents .payment-verification-form .danger-button {
+        border-color: #e3b1b7 !important;
+        background: #fdecef !important;
+        color: #922435 !important;
+    }
+
+    .workspace-page-documents :is(.request-status-form, .payment-verification-form) button:hover {
+        border-color: #172b4d !important;
+        background: #172b4d !important;
+        color: #fff !important;
+    }
+
+    .workspace-page-documents .document-pagination {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px;
+        background: #f0f5fb;
+        color: #334e6f;
+        font-size: 14px;
+    }
+
+    .workspace-page-documents .document-page-links {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .workspace-page-documents .document-page-links :is(a, span) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid #aebfd3;
+        border-radius: 7px;
+        background: #fff;
+        color: #1c4074 !important;
+        font-size: 14px !important;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .workspace-page-documents .document-page-links a:hover,
+    .workspace-page-documents .document-page-links [aria-current="page"] {
+        border-color: #244b83;
+        background: #244b83;
+        color: #fff !important;
+    }
+
+    .workspace-page-documents .document-page-links [aria-disabled="true"] {
+        background: #e6edf5;
+        color: #53647b !important;
+    }
+
+    .workspace-page-documents .document-page-links .document-page-gap {
+        min-width: 24px;
+        padding: 4px;
+        border: 0;
+        background: transparent;
+    }
+
+    @media (max-width: 640px) {
+        .workspace-page-documents .government-card-header {
             flex-wrap: wrap;
-            gap: 8px 16px;
-            padding: 8px 0 !important;
-            border: 0 !important;
-            background: transparent !important;
+            gap: 12px;
         }
 
-        & .government-card-header h2 { color: var(--municipal-ink) !important; }
-
-        & .document-list-summary {
-            margin: 0 !important;
-            padding: 0 0 12px !important;
-            color: var(--municipal-muted) !important;
-            font-size: 14px !important;
+        .workspace-page-documents .document-pagination {
+            padding: 16px 16px 72px;
         }
 
-        & .government-table-wrap {
-            overflow: auto !important;
-            border: 0 !important;
-            border-block-start: 1px solid var(--municipal-line) !important;
-            border-radius: 0 !important;
-        }
-
-        & .government-table-wrap:focus-visible {
-            outline: 2px solid var(--municipal-action);
-            outline-offset: -2px;
-        }
-
-        & .government-data-table {
+        .workspace-page-documents .document-page-links {
             width: 100%;
-            min-width: 800px !important;
-            table-layout: fixed;
         }
+    }
+}
 
-        & .government-data-table th:nth-child(1) { width: 13%; }
-        & .government-data-table th:nth-child(2) { width: 17%; }
-        & .government-data-table th:nth-child(3) { width: 20%; }
-        & .government-data-table th:nth-child(4) { width: 20%; }
-        & .government-data-table th:nth-child(5) { width: 11%; }
-        & .government-data-table th:nth-child(6) { width: 19%; }
-
-        & .government-data-table :is(th, td) {
-            min-width: 0 !important;
-            padding: 12px !important;
-            overflow-wrap: anywhere;
-        }
-
-        & .government-data-table th {
-            background: var(--municipal-canvas) !important;
-            color: var(--municipal-muted) !important;
-            font-size: 13px !important;
-            font-weight: 650 !important;
-        }
-
-        & .government-data-table td {
-            color: var(--municipal-ink) !important;
-            vertical-align: top !important;
-        }
-
-        & .government-data-table td strong {
-            color: var(--municipal-ink) !important;
-            font-weight: 650 !important;
-        }
-
-        & .government-data-table small {
-            display: block;
-            margin-top: 4px;
-            color: var(--municipal-muted) !important;
-            line-height: 1.5;
-        }
-
-        & .government-data-table .document-payment-cell {
-            max-width: none;
-        }
-
-        & .document-payment-cell > .payment-status { display: block !important; }
-
-        & .document-payment-cell > a {
-            color: var(--municipal-action) !important;
-            font-weight: 650;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        & :is(.request-status-form, .payment-verification-form) {
-            display: grid;
-            min-width: 0 !important;
-            gap: 8px;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: 0 !important;
-            background: transparent !important;
-        }
-
-        & .payment-verification-form + .payment-verification-form {
-            margin-top: 12px !important;
-        }
-
-        & :is(.request-status-form, .payment-verification-form) :is(input:not([type="checkbox"]), select, button) {
-            max-width: 100%;
-            min-width: 0 !important;
-            font-size: 13px !important;
-        }
-
-        & :is(.request-status-form, .payment-verification-form) button:not(.danger-button) {
-            border-color: var(--municipal-primary) !important;
-            background: var(--municipal-primary) !important;
-            color: white !important;
-        }
-
-        & .document-pagination {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 12px 0;
-            border-top: 1px solid var(--municipal-line);
-            background: transparent !important;
-            color: var(--municipal-muted) !important;
-            font-size: 14px;
-        }
-
-        & .document-page-links {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 4px;
-        }
-
-        & .document-page-links :is(a, span) {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 36px;
-            min-height: 40px;
-            padding: 4px 8px;
-            border: 0 !important;
-            background: transparent !important;
-            color: var(--municipal-action) !important;
-        }
-
-        & .document-page-links :is(a:hover, [aria-current="page"]) {
-            font-weight: 700;
-            text-decoration: underline;
-            text-underline-offset: 4px;
-        }
-
-        & .document-page-links [aria-disabled="true"] { color: var(--municipal-muted) !important; }
+@layer professional-workspace {
+    @media screen {
+        .professional-content #main-content .workspace-page-documents .workspace-documents-panel { border: 1px solid var(--to-line) !important; border-radius: 8px !important; background: var(--to-surface) !important; }
+        .professional-content #main-content .workspace-page-documents .government-card-header { padding: 18px 20px !important; border-bottom: 1px solid var(--to-line) !important; background: var(--to-surface) !important; }
+        .professional-content #main-content .workspace-page-documents .government-count-badge { border-color: #dfcfaf !important; background: var(--to-gold-tint) !important; color: #755b32 !important; }
+        .professional-content #main-content .workspace-page-documents .government-count-badge.is-clear { border-color: #c8dbcf !important; background: #edf4ef !important; color: #3d6b50 !important; }
+        .professional-content #main-content .workspace-page-documents .document-list-summary { padding: 11px 20px !important; color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents .government-table-wrap { border-top: 1px solid var(--to-line) !important; border-bottom: 1px solid var(--to-line) !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table { width: 100% !important; min-width: 0 !important; table-layout: fixed; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(1) { width: 11%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(2) { width: 15%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(3) { width: 18%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(4) { width: 22%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(5) { width: 10%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th:nth-child(6) { width: 24%; }
+        .professional-content #main-content .workspace-page-documents .government-data-table th { padding: 11px 12px !important; border-color: var(--to-line) !important; background: var(--to-tint) !important; color: var(--to-ink) !important; font-size: 11px !important; letter-spacing: .035em; }
+        .professional-content #main-content .workspace-page-documents .government-data-table td { min-width: 0 !important; padding: 15px 12px !important; border-color: var(--to-line) !important; color: var(--to-text) !important; font-size: 13px !important; overflow-wrap: anywhere; }
+        .professional-content #main-content .workspace-page-documents .government-data-table td > strong { color: var(--to-ink) !important; font-weight: 650; }
+        .professional-content #main-content .workspace-page-documents .government-data-table tbody tr:nth-child(even) { background: #fbfaf7 !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table tbody tr:hover { background: var(--to-subtle) !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table small { color: var(--to-muted) !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents .government-data-table .document-payment-cell { max-width: none; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) { min-width: 0 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) :is(input,select,button) { width: 100% !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status, .payment-status) { border-color: #d4dce2 !important; border-radius: 5px !important; background: #eff2f4 !important; color: #52677a !important; font-size: 11px !important; font-weight: 650 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-pending, .payment-status-pending_verification) { border-color: #dfcfaf !important; background: var(--to-gold-tint) !important; color: #755b32 !important; }
+        .professional-content #main-content .workspace-page-documents .request-status-processing { border-color: #cbd9e4 !important; background: #edf2f7 !important; color: #41617e !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-ready, .request-status-completed, .payment-status-paid) { border-color: #c8dbcf !important; background: #edf4ef !important; color: #3d6b50 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-rejected, .payment-status-rejected, .payment-status-unpaid) { border-color: #e4ced1 !important; background: #f6edee !important; color: #864850 !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) :is(input,select) { min-height: 38px !important; border-color: var(--to-line) !important; background: var(--to-surface) !important; color: var(--to-ink) !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents :is(.request-status-form, .payment-verification-form) button:not(.danger-button) { min-height: 38px !important; border-color: var(--to-primary) !important; background: var(--to-primary) !important; color: #fff !important; font-size: 12px !important; }
+        .professional-content #main-content .workspace-page-documents .document-pagination { border-top: 1px solid var(--to-line); background: var(--to-subtle) !important; color: var(--to-text) !important; }
+        .professional-content #main-content .workspace-page-documents .document-page-links :is(a,span) { border-color: var(--to-line) !important; color: var(--to-primary) !important; }
+        .professional-content #main-content .workspace-page-documents .document-page-links [aria-current="page"] { border-color: var(--to-primary) !important; background: var(--to-primary) !important; color: #fff !important; }
+        @media (max-width: 1020px) { .professional-content #main-content .workspace-page-documents .government-data-table { min-width: 960px !important; } }
     }
 }
