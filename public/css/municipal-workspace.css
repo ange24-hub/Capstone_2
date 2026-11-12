@@ -1,0 +1,506 @@
+@layer municipal-workspace {
+    .municipal-ui {
+        --municipal-navy: #172d46;
+        --municipal-ink: #192e45;
+        --municipal-muted: #4e6277;
+        --municipal-action: #224f7d;
+        --municipal-accent: #c3a26b;
+        --municipal-canvas: #f5f7fa;
+        --municipal-line: #d4dde6;
+        --municipal-tint: #eaf1f8;
+        --municipal-radius: 6px;
+    }
+
+    /* Signed-in navigation and account controls */
+    .professional-shell .app-shell {
+        font-family: "Inter", "Segoe UI", sans-serif !important;
+        transition: none !important;
+    }
+
+    .professional-shell #app-sidebar {
+        padding: 18px 12px !important;
+        border: 0 !important;
+        border-top: 3px solid var(--municipal-accent) !important;
+        border-radius: 0 !important;
+        background: var(--municipal-navy) !important;
+        box-shadow: none !important;
+        scrollbar-color: #62768a transparent !important;
+    }
+
+    .professional-shell #app-sidebar::before { display: none !important; }
+
+    .professional-shell #app-sidebar .app-brand {
+        margin: 0 0 12px !important;
+        padding: 4px 8px 18px !important;
+        gap: 10px !important;
+        border: 0 !important;
+        border-bottom: 1px solid #ffffff26 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .professional-shell #app-sidebar .app-brand-seal {
+        width: 42px !important;
+        height: 42px !important;
+        flex: 0 0 42px !important;
+    }
+
+    .professional-shell #app-sidebar .app-brand strong {
+        color: white !important;
+        font-size: 18px !important;
+        letter-spacing: -.02em !important;
+    }
+
+    .professional-shell #app-sidebar .app-brand :is(small, em) {
+        margin: 0 !important;
+        color: #c2d2e2 !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        letter-spacing: 0 !important;
+        text-transform: none !important;
+    }
+
+    .professional-shell #app-sidebar .side-nav { gap: 2px !important; }
+
+    .professional-shell #app-sidebar .side-section {
+        margin: 12px 0 2px !important;
+        padding: 9px 10px 2px !important;
+        border: 0 !important;
+        border-top: 1px solid #ffffff24 !important;
+        letter-spacing: .06em !important;
+    }
+
+    .professional-shell #app-sidebar .side-nav > a {
+        min-height: 38px !important;
+        padding: 6px 10px !important;
+        gap: 9px !important;
+        border: 0 !important;
+        border-radius: 4px !important;
+        color: #dfebf6 !important;
+        box-shadow: none !important;
+    }
+
+    .professional-shell #app-sidebar .side-nav > a:hover {
+        color: white !important;
+        background: #ffffff14 !important;
+    }
+
+    .professional-shell #app-sidebar .side-nav > a.active {
+        color: white !important;
+        background: #2b4864 !important;
+        box-shadow: inset 3px 0 var(--municipal-accent) !important;
+    }
+
+    .professional-shell #app-sidebar .side-nav .nav-mark {
+        width: 22px !important;
+        height: 22px !important;
+        flex-basis: 22px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+    .professional-shell #app-sidebar .rbi-sidebar-subpages { border-color: #62768a !important; }
+
+    .professional-shell #app-sidebar .rbi-sidebar-subpages a[aria-current="page"] {
+        color: white !important;
+        background: #2b4864 !important;
+    }
+
+    @media (min-width: 961px) {
+        .professional-shell .app-shell { --sidebar: 248px !important; }
+        .professional-shell.sidebar-collapsed .app-shell { --sidebar: 72px !important; }
+        .professional-shell.sidebar-collapsed #app-sidebar .side-nav > a { justify-content: center !important; }
+        .professional-shell.sidebar-collapsed #app-sidebar .app-brand { padding-inline: 0 !important; }
+        .professional-shell.sidebar-collapsed #app-sidebar .side-section { padding: 0 !important; margin: 8px 5px !important; }
+    }
+
+    .professional-shell .app-header {
+        position: sticky !important;
+        top: 0 !important;
+        min-height: 62px !important;
+        padding: 8px clamp(14px, 2vw, 28px) !important;
+        gap: 12px !important;
+        background: white !important;
+        border-color: var(--municipal-line) !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .professional-shell .app-header :is(.app-header-primary, .app-header-meta) { gap: 8px !important; }
+    .professional-shell .portal-header-identity > strong { color: var(--municipal-ink) !important; font-size: 14px !important; }
+    .professional-shell .portal-header-identity > span { color: var(--municipal-muted) !important; font-size: 12px !important; }
+    .professional-shell .header-date { margin-right: 6px; padding: 0; border: 0; font-variant-numeric: tabular-nums; }
+
+    .professional-shell .app-header :is(.desktop-sidebar-button, .mobile-menu-button, .header-logout button, .profile-navigation-trigger, .assistant-launcher) {
+        min-height: 42px !important;
+        border: 1px solid var(--municipal-line) !important;
+        border-radius: var(--municipal-radius) !important;
+        background: white !important;
+        color: var(--municipal-ink) !important;
+        box-shadow: none !important;
+    }
+
+    .professional-shell .app-header :is(.desktop-sidebar-button, .mobile-menu-button, .header-logout button, .profile-navigation-trigger, .assistant-launcher):hover {
+        background: var(--municipal-tint) !important;
+    }
+
+    .professional-shell .app-header .profile-navigation-avatar {
+        border-radius: 4px !important;
+        background: var(--municipal-tint) !important;
+        color: var(--municipal-action) !important;
+    }
+
+    .professional-shell .app-header .rbim-assistant { position: static !important; }
+
+    .professional-shell .app-header .assistant-launcher {
+        width: auto !important;
+        padding: 7px 10px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        visibility: visible !important;
+    }
+
+    .professional-shell .app-header .assistant-launcher-icon {
+        width: 18px !important;
+        height: 18px !important;
+        background: transparent !important;
+        color: inherit !important;
+    }
+
+    .professional-shell .app-header .assistant-launcher-icon svg { width: 18px !important; height: 18px !important; }
+
+    .professional-shell .app-header .assistant-panel {
+        position: fixed !important;
+        inset: 70px 16px auto auto !important;
+        max-height: calc(100dvh - 86px) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 10px 32px #172d4626 !important;
+    }
+
+    .professional-shell .assistant-header { background: var(--municipal-navy) !important; }
+
+    /* Shared page hierarchy and surfaces */
+    .professional-shell :is(.app-main, .app-content, .app-footer) { background: var(--municipal-canvas) !important; }
+
+    .professional-shell .app-content {
+        max-width: 1620px !important;
+        padding: 22px clamp(18px, 2.4vw, 36px) 36px !important;
+        animation: none !important;
+    }
+
+    .professional-shell #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-hero, .municipal-directory-header, .population-page-heading, .population-submission-toolbar, .rbi-workspace-overview .rbi-report-header) {
+        min-height: 0 !important;
+        padding: 0 0 16px !important;
+        background: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--municipal-line) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        color: var(--municipal-ink) !important;
+    }
+
+    .professional-shell #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-hero, .municipal-directory-header, .population-page-heading, .rbi-workspace-overview .rbi-report-header) h1 {
+        margin: 0 !important;
+        color: var(--municipal-ink) !important;
+        font-size: clamp(23px, 2.4vw, 31px) !important;
+        line-height: 1.2 !important;
+    }
+
+    .professional-shell #main-content :is(.dashboard-page-header, .page-head, .government-page-heading, .profile-page-heading, .municipal-hero, .municipal-directory-header, .population-page-heading, .rbi-workspace-overview .rbi-report-header) p {
+        color: var(--municipal-muted) !important;
+        margin-block: 6px 0 !important;
+    }
+
+    .professional-shell #main-content :is(.workspace-heading-emblem, .municipal-hero-copy > h1 > svg, .barangay-hero-weave) { display: none !important; }
+
+    .professional-shell #main-content :is(.workspace-heading-copy > .dashboard-eyebrow, .municipal-hero-copy > .municipal-eyebrow, .admin-section-heading > div > span) {
+        display: none !important;
+    }
+
+    .professional-shell #main-content :is(.metric-card, .workflow-card, .dashboard-card, .government-content-card, .government-side-card, .government-stat-card, .profile-section, .table-wrap, .municipal-shortcuts > a, .workspace-launcher > a) {
+        border-color: var(--municipal-line) !important;
+        border-radius: var(--municipal-radius) !important;
+        box-shadow: none !important;
+    }
+
+    .professional-shell #main-content :is(.metric-card, .municipal-shortcuts > a, .workspace-launcher > a) {
+        background: white !important;
+        transform: none !important;
+        translate: none !important;
+    }
+
+    .professional-shell #main-content :is(.metric-icon, .workspace-launcher-icon, .municipal-shortcuts > a > span:first-child) {
+        background: var(--municipal-tint) !important;
+        color: var(--municipal-action) !important;
+        border-radius: var(--municipal-radius) !important;
+    }
+
+    .professional-shell #main-content :is(.municipal-shortcuts > a, .workspace-launcher > a):hover { border-color: var(--municipal-action) !important; }
+
+    .professional-shell #main-content .metric-warning .metric-icon { background: #fff4df !important; color: #865313 !important; }
+    .professional-shell #main-content .metric-danger .metric-icon { background: #fcebec !important; color: #9b2534 !important; }
+
+    :is(.professional-shell, .professional-public) #main-content
+    :is(.button, .primary-block, .municipal-hero-actions a:first-child, .rbi-history-create):not(:where(.secondary-button, .outline-button, .danger-button, .table-wrap *, .leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *, :disabled, [aria-disabled="true"])) {
+        background: var(--municipal-action) !important;
+        border-color: var(--municipal-action) !important;
+        border-radius: var(--municipal-radius) !important;
+        color: white !important;
+        box-shadow: none !important;
+    }
+
+    :is(.professional-shell, .professional-public) #main-content
+    :is(.button, .primary-block, .municipal-hero-actions a:first-child, .rbi-history-create):hover:not(:where(.secondary-button, .outline-button, .danger-button, .table-wrap *, .leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *, :disabled, [aria-disabled="true"])) {
+        background: var(--municipal-navy) !important;
+        border-color: var(--municipal-navy) !important;
+    }
+
+    /* Monthly RBI entry and report navigation */
+    .professional-shell .rbi-forms-workspace { gap: 14px !important; }
+    .professional-shell #main-content .rbi-workspace-overview .rbi-report-header { border-bottom: 0 !important; padding-bottom: 0 !important; animation: none !important; }
+
+    .professional-shell #main-content .rbi-subpages {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: stretch !important;
+        gap: 0 16px !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--municipal-line) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+    }
+
+    .professional-shell #main-content .rbi-subpages a {
+        display: inline-flex !important;
+        align-items: center !important;
+        flex: 0 1 auto !important;
+        min-height: 42px !important;
+        padding: 7px 3px !important;
+        border: 0 !important;
+        border-bottom: 2px solid transparent !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        color: var(--municipal-muted) !important;
+        box-shadow: none !important;
+        font-size: 14px !important;
+        font-weight: 550 !important;
+        text-align: left !important;
+    }
+
+    .professional-shell #main-content .rbi-subpages a[aria-current="page"] {
+        color: var(--municipal-action) !important;
+        border-bottom-color: var(--municipal-action) !important;
+        font-weight: 700 !important;
+    }
+
+    .professional-shell #main-content .rbi-subpages a[aria-current="page"]::after { display: none !important; }
+    .professional-shell #main-content .rbi-subpages a:hover { color: var(--municipal-action) !important; text-decoration: underline; }
+    .professional-shell .rbi-history-totals { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0; color: var(--municipal-muted); font-size: 14px; }
+    .professional-shell .rbi-history-totals strong { color: var(--municipal-ink); }
+
+    .professional-shell #main-content .report-editor {
+        padding: clamp(14px, 2vw, 22px) !important;
+        border: 1px solid var(--municipal-line) !important;
+        background: white !important;
+    }
+
+    .professional-shell #main-content .report-editor > .workflow-head {
+        padding-bottom: 0 !important;
+        margin-bottom: 12px !important;
+        border: 0 !important;
+        align-items: center !important;
+    }
+
+    .professional-shell #rbi-monthly-form { gap: 16px !important; }
+
+    .professional-shell #rbi-monthly-form [data-rbi-common-fields] {
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+    }
+
+    .professional-shell #rbi-monthly-form [data-rbi-common-fields] > div {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        align-content: start !important;
+        gap: 4px !important;
+    }
+
+    .professional-shell #rbi-monthly-form [data-rbi-common-fields] label { margin: 0 !important; }
+    .professional-shell #rbi-monthly-form [data-rbi-common-fields] input { width: 100% !important; margin: 0 !important; }
+
+    .professional-shell #main-content .rbi-section-nav {
+        gap: 4px !important;
+        padding: 4px !important;
+        border: 1px solid var(--municipal-line) !important;
+        border-radius: var(--municipal-radius) !important;
+        background: var(--municipal-canvas) !important;
+    }
+
+    .professional-shell #main-content .rbi-section-nav a {
+        border-radius: 4px !important;
+        border: 1px solid transparent !important;
+        color: var(--municipal-muted) !important;
+    }
+
+    .professional-shell #main-content .rbi-section-nav a[aria-current="step"] {
+        border-color: #b9ccdf !important;
+        background: white !important;
+        color: var(--municipal-ink) !important;
+        box-shadow: none !important;
+    }
+
+    .professional-shell #main-content :is(.rbi-section-nav a > span, .rbi-section-letter),
+    .professional-shell #main-content #certification-section::before {
+        background: var(--municipal-tint) !important;
+        color: var(--municipal-action) !important;
+        border-radius: 4px !important;
+    }
+
+    .professional-shell #main-content .rbi-section-nav a[aria-current="step"] > span {
+        background: var(--municipal-action) !important;
+        color: white !important;
+    }
+
+    .professional-shell #rbi-monthly-form .rbi-monthly-section { padding-top: 0 !important; border-top: 0 !important; }
+
+    .professional-shell #main-content #rbi-monthly-form :is(.family-entry-card, .member-entry-card) {
+        border: 1px solid var(--municipal-line) !important;
+        border-radius: var(--municipal-radius) !important;
+        background: white !important;
+        box-shadow: none !important;
+    }
+
+    .professional-shell #rbi-monthly-form :is(.form-grid input, .form-grid select, .form-grid textarea) {
+        border-color: #bbc9d7 !important;
+        border-radius: var(--municipal-radius) !important;
+    }
+
+    /* Public portal */
+    .professional-public :is(.ph-government-bar, .public-footer, .public-footer-bottom, .portal-login-intro, .registration-guide) {
+        background: var(--municipal-navy) !important;
+    }
+
+    .professional-public .public-site-header {
+        border-color: var(--municipal-line) !important;
+        background: white !important;
+        box-shadow: none !important;
+    }
+
+    .professional-public .public-brand-copy strong { color: var(--municipal-ink) !important; }
+    .professional-public .public-brand-copy small { color: var(--municipal-muted) !important; text-transform: none !important; letter-spacing: 0 !important; }
+    .professional-public .public-nav .public-register-link { background: var(--municipal-action) !important; color: white !important; }
+    .professional-public .public-nav a[aria-current="page"] { box-shadow: inset 0 -2px var(--municipal-action) !important; }
+    .professional-public :is(.auth-panel, .registration-card, .service-card) { border-radius: var(--municipal-radius) !important; box-shadow: none !important; }
+    .professional-public .portal-login-layout { animation: none !important; }
+
+    .portal-home { background: var(--municipal-canvas); color: var(--municipal-ink); }
+    .portal-home-inner { max-width: 1160px; margin-inline: auto; padding-inline: clamp(18px, 4vw, 36px); }
+
+    .portal-home-intro {
+        padding-block: clamp(36px, 6vw, 76px);
+        border-bottom: 3px solid var(--municipal-accent);
+        background: var(--municipal-navy);
+        color: white;
+    }
+
+    .portal-home-intro h1 {
+        max-width: 780px;
+        margin: 0;
+        color: inherit;
+        font-size: clamp(29px, 4vw, 49px);
+        font-weight: 700;
+        line-height: 1.12;
+        text-wrap: wrap !important;
+    }
+
+    .portal-home-intro p { max-width: 610px; margin: 14px 0 24px; color: #dce7f1; font-size: clamp(15px, 2vw, 18px); }
+    .portal-home-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .professional-public .portal-home .portal-home-actions .button {
+        background: white !important;
+        border: 1px solid white !important;
+        border-radius: var(--municipal-radius) !important;
+        color: var(--municipal-navy) !important;
+        box-shadow: none !important;
+    }
+
+    .professional-public .portal-home .portal-home-actions .secondary-button {
+        color: white !important;
+        border-color: #9cb3ca !important;
+        background: transparent !important;
+    }
+
+    .professional-public .portal-home .portal-home-actions .button:hover { background: var(--municipal-tint) !important; color: var(--municipal-navy) !important; }
+    .portal-home-section { padding-block: 28px; scroll-margin-top: 20px; }
+    .portal-home-section + .portal-home-section { padding-top: 4px; padding-bottom: 44px; }
+    .portal-home-section h2 { margin: 0 0 12px; font-size: 23px; font-weight: 700; }
+
+    .portal-home-services {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .portal-home-services article {
+        padding: 18px;
+        border: 1px solid var(--municipal-line);
+        border-radius: var(--municipal-radius);
+        background: white;
+    }
+
+    .portal-home-services .app-icon { width: 22px; height: 22px; color: var(--municipal-action); }
+    .portal-home-services h3 { margin: 8px 0 4px; font-size: 16px; font-weight: 650; }
+    .portal-home-section p { margin: 0; color: var(--municipal-muted); }
+    .portal-home-steps { list-style: decimal; margin: 12px 0 0; padding-left: 22px; color: var(--municipal-ink); }
+    .portal-home-steps li + li { margin-top: 4px; }
+
+    @media (max-width: 1160px) {
+        .professional-shell .app-header .header-date { display: none !important; }
+    }
+
+    @media (max-width: 960px) {
+        .professional-shell #app-sidebar .app-brand { padding-right: 40px !important; }
+        .professional-shell .portal-header-identity > span { display: block; }
+    }
+
+    @media (max-width: 640px) {
+        .professional-shell .app-content { padding: 16px 12px 28px !important; }
+        .professional-shell .app-header { padding-inline: 10px !important; gap: 6px !important; }
+        .professional-shell .app-header :is(.app-header-primary, .app-header-meta) { gap: 5px !important; }
+        .professional-shell .app-header .portal-header-identity > strong { font-size: 12px !important; }
+        .professional-shell .app-header .portal-header-identity > span { font-size: 11px !important; }
+
+        .professional-shell .app-header .assistant-launcher {
+            width: 42px !important;
+            justify-content: center !important;
+            padding: 6px !important;
+        }
+
+        .professional-shell .app-header .assistant-launcher > span:last-child { display: none !important; }
+
+        .professional-shell .app-header .assistant-panel {
+            inset: auto 12px calc(12px + var(--assistant-viewport-offset, 0px)) auto !important;
+            max-height: calc(var(--assistant-viewport-height, 100dvh) - 24px) !important;
+        }
+
+        .professional-shell #main-content .rbi-subpages { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0 !important; }
+        .professional-shell #main-content .rbi-subpages a { justify-content: center !important; min-height: 44px !important; padding-inline: 2px !important; font-size: 12px !important; text-align: center !important; }
+        .portal-home-services { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+        .professional-shell .app-header .profile-navigation-trigger {
+            width: 42px !important;
+            padding: 4px !important;
+            justify-content: center !important;
+        }
+
+        .professional-shell .app-header .profile-navigation-copy,
+        .professional-shell .app-header .header-user:not(.profile-navigation-trigger) { display: none !important; }
+    }
+}

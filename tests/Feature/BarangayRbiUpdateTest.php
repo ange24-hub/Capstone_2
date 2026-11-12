@@ -41,7 +41,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('barangay.rbi-updates.index'))
             ->assertOk()
-            ->assertSee('Monthly report')
+            ->assertSee('Monthly RBI form')
             ->assertSee('Add Another Family Form')
             ->assertSee('Add Member to This Family')
             ->assertSee('Monthly Form Certification')
@@ -123,7 +123,7 @@ class BarangayRbiUpdateTest extends TestCase
             ->assertSee('href="'.route('rbi-updates.show', $update).'"', false)
             ->assertSee('Carnaga')
             ->assertSee('August 2026')
-            ->assertSee('AI-assisted Decision Support');
+            ->assertSee('id="decision-support"', false);
 
         $this->actingAs($municipal)
             ->get(route('rbi-updates.show', $update))
@@ -235,7 +235,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('barangay.rbi-updates.index', ['edit' => $draft->id]))
             ->assertOk()
-            ->assertSee('Continue Monthly Draft')
+            ->assertSee('Continue draft')
             ->assertSee('Dela Cruz Family')
             ->assertSee('Santos Family');
 
@@ -323,7 +323,7 @@ class BarangayRbiUpdateTest extends TestCase
         $this->actingAs($secretary)
             ->get(route('barangay.rbi-updates.index', ['edit' => $report->id]))
             ->assertOk()
-            ->assertSee('Update Submitted Monthly Form')
+            ->assertSee('Update submitted report')
             ->assertSee('Ana Dela Cruz')
             ->assertSee('Save Updated Monthly Form');
 

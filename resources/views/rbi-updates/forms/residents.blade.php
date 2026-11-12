@@ -4,15 +4,18 @@
                     @if ($editingReport) @method('PUT') @endif
 
                     <div class="form-grid grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2" data-rbi-common-fields>
-                        <div><label>Barangay</label><input type="text" value="{{ $barangay->name }}" readonly></div>
+                        <div><label for="rbi-reporting-barangay">Barangay</label><input id="rbi-reporting-barangay" type="text" value="{{ $barangay->name }}" readonly></div>
                         <div>
-                            <label for="reporting_month">For the month of <x-required-mark /></label>
+                            <label for="reporting_month">Reporting month <x-required-mark /></label>
                             <input id="reporting_month" name="reporting_month" type="month" value="{{ old('reporting_month', $defaultReportingMonth) }}" required>
-                            @if (request()->boolean('new'))
-                                <small class="field-help">Select the month for the new report. To add entries to an already submitted month, use “Update form” in the history below.</small>
-                            @endif
                         </div>
                     </div>
+
+                    <nav class="rbi-section-nav" aria-label="RBI form sections">
+                        <a href="#family-section" data-rbi-step-link="residents"><span>A</span> New residents</a>
+                        <a href="#deceased-section" data-rbi-step-link="deceased"><span>B</span> Deceased</a>
+                        <a href="#certification-section" data-rbi-step-link="certification"><span>C</span> Certification</a>
+                    </nav>
 
                     <section class="rbi-monthly-section rbi-monthly-residents" data-rbi-step-panel="residents">
                     <div class="rbi-section-heading"><div><h3 class="section-title" id="family-section"><span class="rbi-section-letter">A</span> Newly registered inhabitants</h3></div>
@@ -25,10 +28,7 @@
                         @foreach ($formFamilies as $family)
                             <article class="workflow-card family-entry-card rounded-xl border border-slate-200 bg-white bg-none shadow-sm min-w-0 p-5 sm:p-6" data-family-card data-family-key="{{ $family['family_key'] }}">
                                 <div class="workflow-head flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
-                                    <div>
-                                        <span class="step-pill" data-family-number>Family {{ $loop->iteration }}</span>
-                                        <h4 class="section-title text-lg font-semibold text-slate-900">Household Information</h4>
-                                    </div>
+                                    <h4 class="section-title text-lg font-semibold text-slate-900" data-family-number>Family {{ $loop->iteration }}</h4>
                                     <button class="secondary-button" type="button" data-remove-family @disabled(count($formFamilies) === 1)>Remove Family</button>
                                 </div>
 
@@ -36,8 +36,7 @@
                                     <div>
                                         <label data-family-head-label>Household head <span class="rbi-optional-label">Optional</span></label>
                                         <input type="text" value="{{ $family['household_head'] }}" list="rbi-household-heads" data-family-head autocomplete="off">
-                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id></div><div><label>Household number</label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100" placeholder="Existing number, or leave blank">
-                                        <small class="field-help">Use an existing number, or leave blank.</small>
+                                        <input type="hidden" value="{{ $family['household_id'] }}" data-family-household-id></div><div><label>Household number <span class="rbi-optional-label">Optional</span></label><input value="{{ $family['household_number'] ?? '' }}" data-family-household-number maxlength="100">
                                         <p class="rbi-household-notice" data-household-match-notice role="status" aria-live="polite" hidden></p>
                                     </div>
                                 </div>
@@ -86,7 +85,7 @@
                     </div>
                     <div class="form-actions split-actions flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
                         <small class="field-help">Each family becomes a complete RBI form/page inside one monthly PDF.</small>
-                        <button type="button" id="add-family-form">Add Another Family Form</button>
+                        <button class="secondary-button" type="button" id="add-family-form">Add Another Family Form</button>
                     </div>
 
                     </fieldset></section>
