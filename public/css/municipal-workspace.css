@@ -1,8 +1,8 @@
 @layer municipal-workspace {
     .municipal-ui {
         --municipal-primary: #172d46;
-        --municipal-ink: #172638;
-        --municipal-muted: #4b5d73;
+        --municipal-ink: #20262e;
+        --municipal-muted: #535e6b;
         --municipal-action: #28496b;
         --municipal-accent: var(--municipal-primary);
         --municipal-canvas: #f6f8fb;

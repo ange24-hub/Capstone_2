@@ -127,7 +127,7 @@
                             <div class="government-empty-state"><div><strong>No requests on this page</strong><a href="{{ $barangayDocumentRequests->url(1) }}">Return to the first page</a></div></div>
                         @else
                             <p class="document-list-summary">Showing <strong>{{ $barangayDocumentRequests->firstItem() }}&ndash;{{ $barangayDocumentRequests->lastItem() }}</strong> of <strong>{{ $barangayDocumentRequests->total() }}</strong> requests</p>
-                            <div class="table-wrap government-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
+                            <div class="table-wrap government-table-wrap w-full overflow-x-auto" role="region" aria-label="Document requests" tabindex="0">
                                 <table class="government-data-table">
                                     <thead><tr><th scope="col">Reference</th><th scope="col">Resident</th><th scope="col">Document and Purpose</th><th scope="col">Payment</th><th scope="col" class="table-cell-end">Status</th><th scope="col">Process Request</th></tr></thead>
                                     <tbody>@foreach ($barangayDocumentRequests as $documentRequest)

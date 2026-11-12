@@ -41,7 +41,7 @@
         border-color: var(--municipal-line) !important;
     }
 
-    .professional-shell #app-sidebar .app-brand strong { color: var(--municipal-ink) !important; font-weight: 850 !important; }
+    .professional-shell #app-sidebar .app-brand strong { color: var(--municipal-ink) !important; font-weight: 750 !important; }
     .professional-shell #app-sidebar .app-brand :is(small, em) { color: var(--municipal-muted) !important; }
     .professional-shell #app-sidebar .side-nav { gap: 0 !important; }
 
@@ -59,7 +59,7 @@
         gap: 8px !important;
         border-radius: var(--municipal-radius) !important;
         color: var(--municipal-ink) !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
     }
 
     .professional-shell #app-sidebar .side-nav a:hover { background: white !important; }
@@ -87,12 +87,12 @@
         --workspace-control-ink: var(--municipal-ink);
 
         & :is(h1, h2, h3, h4):not(:where(.rbi-source-table *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *, .leaflet-container *)) {
-            font-weight: 800 !important;
+            font-weight: 700 !important;
         }
 
         & h1:not(:where(.portal-home-intro *, .portal-login-intro *, .registration-guide *, .rbi-source-table *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *, .leaflet-container *)) {
             color: var(--municipal-ink) !important;
-            font-weight: 850 !important;
+            font-weight: 750 !important;
         }
 
         & :is(.rbi-subpages a, .rbi-section-nav a, .rbi-history-sections a, .report-table-actions a, .profile-dashboard-link, .brgy-text-link) {
@@ -123,8 +123,63 @@
         }
 
         & :is(.government-card-header, .profile-section-heading) {
-            background-color: var(--municipal-canvas) !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-bottom: 1px solid var(--municipal-line) !important;
+            border-radius: 0 !important;
         }
+
+        & :is(.government-card-header, .profile-section-heading, .workflow-head) h2 {
+            color: var(--municipal-ink) !important;
+        }
+
+        & :is(.government-count-badge, .rbi-section-letter, .rbi-section-nav a > span) {
+            min-width: 0 !important;
+            min-height: 0 !important;
+            width: auto !important;
+            height: auto !important;
+            flex-basis: auto !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            color: var(--municipal-muted) !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            letter-spacing: normal !important;
+            text-transform: none !important;
+            box-shadow: none !important;
+        }
+
+        & :is(.government-content-card, .government-side-card):has(> .government-empty-state) {
+            border: 0 !important;
+            background: transparent !important;
+        }
+
+        & :is(.government-empty-state, .dashboard-empty-state, .empty-directory) {
+            justify-content: start !important;
+            min-height: 0 !important;
+            padding: 16px 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            color: var(--municipal-muted) !important;
+            text-align: left !important;
+            box-shadow: none !important;
+        }
+
+        & :is(.government-empty-state, .dashboard-empty-state, .empty-directory) strong {
+            color: var(--municipal-ink) !important;
+            font-size: 15px !important;
+            font-weight: 650 !important;
+        }
+
+        & :is(.government-empty-state, .dashboard-empty-state) span:not(.empty-state-mark) {
+            color: var(--municipal-muted) !important;
+            font-size: 14px !important;
+        }
+
+        & .government-empty-state .empty-state-mark { display: none !important; }
 
         & :is(.metric-card, .concern-status-card, .profile-section-heading) { padding: 16px !important; }
         & :is(.metric-icon, .profile-avatar, .profile-section-icon, .concern-status-symbol) {
@@ -233,14 +288,14 @@
         }
 
         & :is(.civic-status, .concern-status, .payment-history-status) {
-            padding: 0 8px !important;
-            border: 1px solid transparent !important;
-            border-radius: 4px !important;
-            background: var(--municipal-canvas) !important;
-            color: var(--municipal-ink) !important;
-            font-size: 12px !important;
-            font-weight: 700 !important;
-            line-height: 24px !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            color: var(--municipal-muted) !important;
+            font-size: 13px !important;
+            font-weight: 650 !important;
+            line-height: 1.5 !important;
             letter-spacing: normal !important;
             text-transform: none !important;
             box-shadow: none !important;
@@ -248,17 +303,14 @@
 
         & :is(.civic-status.approved, .civic-status.submitted, .civic-status.resolved, .civic-status.completed,
         .civic-status.released, .civic-status.paid, .payment-history-status[data-status="paid"]) {
-            background: #e8f2ec !important;
             color: #285641 !important;
         }
 
         & :is(.civic-status.pending, .civic-status.under_review, .civic-status.in_progress, .payment-history-status[data-status="pending"]) {
-            background: #f7f0df !important;
             color: #694c19 !important;
         }
 
         & :is(.civic-status.rejected, .civic-status.cancelled, .payment-history-status[data-status="rejected"]) {
-            background: #f9ecec !important;
             color: #843535 !important;
         }
 

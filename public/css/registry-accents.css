@@ -14,10 +14,11 @@
         & > .page-head {
             align-items: center;
             margin: 0 !important;
-            padding: 24px !important;
-            border: 1px solid var(--municipal-line) !important;
-            border-radius: var(--municipal-radius) !important;
-            background: #fff !important;
+            padding: 0 0 16px !important;
+            border: 0 !important;
+            border-bottom: 1px solid var(--municipal-line) !important;
+            border-radius: 0 !important;
+            background: transparent !important;
         }
 
         & > .page-head :is(.page-kicker, .dashboard-eyebrow) {
@@ -196,7 +197,7 @@
         & .registry-screen-table td a { color: var(--municipal-primary) !important; }
 
         @media (max-width: 640px) {
-            & > .page-head, & > .workflow-card { padding: 16px !important; }
+            & > .workflow-card { padding: 16px !important; }
             & .registry-list-tools, & .registry-records-heading { align-items: stretch !important; }
             & .registry-records-filter { width: 100%; }
             & .registry-records-filter .registry-search-field { flex-basis: 128px; }
