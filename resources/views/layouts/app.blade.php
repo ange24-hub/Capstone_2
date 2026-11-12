@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#174332">
+    <meta name="theme-color" content="#172d46">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preload" href="{{ asset('fonts/roboto/RobotoLatin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <title>{{ config('app.name', 'RBIM') }} | Municipality of Tomas Oppus</title>

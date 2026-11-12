@@ -181,7 +181,7 @@
 
         & .registry-screen-table tbody tr:last-child > td { border-bottom: 0 !important; }
         & .registry-screen-table tbody tr:hover > td { background: var(--municipal-canvas) !important; }
-        & .registry-screen-table tbody .residence-elsewhere > td { background: #f6f5ef !important; }
+        & .registry-screen-table tbody .residence-elsewhere > td { background: var(--municipal-canvas) !important; }
         & .registry-screen-table tbody .rbi-household-start > td { border-top: 2px solid var(--municipal-line) !important; }
         & .registry-screen-table :is(th, td).table-cell-end {
             text-align: right !important;

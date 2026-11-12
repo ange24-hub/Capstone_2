@@ -1,14 +1,14 @@
 @layer municipal-workspace {
     .municipal-ui {
-        --municipal-primary: #174332;
-        --municipal-ink: #172922;
-        --municipal-muted: #4b5e54;
-        --municipal-action: #205942;
-        --municipal-accent: #174332;
-        --municipal-canvas: #f6f5ef;
-        --municipal-line: #dce3da;
-        --municipal-tint: #e7efe6;
-        --municipal-field-line: #84978a;
+        --municipal-primary: #172d46;
+        --municipal-ink: #172638;
+        --municipal-muted: #4b5d73;
+        --municipal-action: #28496b;
+        --municipal-accent: var(--municipal-primary);
+        --municipal-canvas: #f6f8fb;
+        --municipal-line: #dce3ed;
+        --municipal-tint: #e8eef6;
+        --municipal-field-line: #8596ab;
         --municipal-font: Roboto, Inter, "Segoe UI", sans-serif;
         --municipal-radius: 6px;
     }
