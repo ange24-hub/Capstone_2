@@ -129,7 +129,7 @@
                             <p class="document-list-summary">Showing <strong>{{ $barangayDocumentRequests->firstItem() }}&ndash;{{ $barangayDocumentRequests->lastItem() }}</strong> of <strong>{{ $barangayDocumentRequests->total() }}</strong> requests</p>
                             <div class="table-wrap government-table-wrap w-full overflow-x-auto rounded-xl border border-slate-200">
                                 <table class="government-data-table">
-                                    <thead><tr><th scope="col">Reference</th><th scope="col">Resident</th><th scope="col">Document and Purpose</th><th scope="col">Payment</th><th scope="col">Status</th><th scope="col">Process Request</th></tr></thead>
+                                    <thead><tr><th scope="col">Reference</th><th scope="col">Resident</th><th scope="col">Document and Purpose</th><th scope="col">Payment</th><th scope="col" class="table-cell-end">Status</th><th scope="col">Process Request</th></tr></thead>
                                     <tbody>@foreach ($barangayDocumentRequests as $documentRequest)
                                         <tr>
                                             <td><strong>{{ $documentRequest->reference_number }}</strong><small>{{ $documentRequest->created_at->format('M d, Y') }}</small></td>
@@ -183,7 +183,7 @@
                                                     <x-status-badge status="not_required" class="payment-status payment-status-not_required">No payment required</x-status-badge>
                                                 @endif
                                             </td>
-                                            <td><x-status-badge :status="$documentRequest->status" class="request-status request-status-{{ $documentRequest->status }}">{{ $documentRequest->statusLabel() }}</x-status-badge></td>
+                                            <td class="table-cell-end"><x-status-badge :status="$documentRequest->status" class="request-status request-status-{{ $documentRequest->status }}">{{ $documentRequest->statusLabel() }}</x-status-badge></td>
                                             <td><form class="request-status-form" method="POST" action="{{ route('barangay.document-requests.update', $documentRequest) }}">@csrf @method('PUT')
                                                 <label for="request-status-{{ $documentRequest->id }}">Request status</label>
                                                 <select id="request-status-{{ $documentRequest->id }}" name="status" aria-label="Status for {{ $documentRequest->reference_number }}" required>@foreach ($documentRequestStatuses as $value => $label)<option value="{{ $value }}" @selected($documentRequest->status === $value)>{{ $label }}</option>@endforeach</select>

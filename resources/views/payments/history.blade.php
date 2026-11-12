@@ -16,7 +16,7 @@
     <div class="dashboard-card payment-history-card rounded-xl border border-slate-200 bg-white p-5">
         <div class="payment-history-table-wrap table-wrap overflow-x-auto">
             <table class="payment-history-table w-full text-sm">
-                <thead><tr><th>Date (PhST)</th>@if($secretary)<th>Resident</th>@endif<th>Request / document</th><th>Amount</th><th>Method / reference</th><th>Update</th><th>Recorded by / remarks</th><th>Receipt</th></tr></thead>
+                <thead><tr><th>Date (PhST)</th>@if($secretary)<th>Resident</th>@endif<th>Request / document</th><th class="table-cell-end">Amount</th><th>Method / reference</th><th class="table-cell-end">Update</th><th>Recorded by / remarks</th><th>Receipt</th></tr></thead>
                 <tbody>
                 @forelse($histories as $history)
                     @php($payment = $history->snapshot)
@@ -24,9 +24,9 @@
                         <td>{{ $history->occurred_at->timezone('Asia/Manila')->format('M d, Y g:i A') }}</td>
                         @if($secretary)<td>{{ $history->documentRequest->user?->name ?? 'Resident unavailable' }}</td>@endif
                         <td><strong>{{ $payment['reference_number'] }}</strong><br>{{ App\Models\DocumentRequest::typeLabels()[$payment['document_type']] ?? 'Document' }}</td>
-                        <td>₱{{ number_format((float) $payment['amount_due'], 2) }}</td>
+                        <td class="table-cell-end">₱{{ number_format((float) $payment['amount_due'], 2) }}</td>
                         <td>{{ ($payment['payment_method'] ?? '') === 'gcash' ? 'GCash' : 'In person' }}<br>{{ $payment['payment_reference'] ?? '—' }}</td>
-                        <td><strong>{{ $history->eventLabel() }}</strong><br><span class="payment-history-status" data-status="{{ $payment['payment_status'] ?? '' }}">{{ App\Models\DocumentRequest::paymentStatusLabels()[$payment['payment_status']] ?? $payment['payment_status'] }}</span></td>
+                        <td class="table-cell-end"><strong>{{ $history->eventLabel() }}</strong><br><span class="payment-history-status" data-status="{{ $payment['payment_status'] ?? '' }}">{{ App\Models\DocumentRequest::paymentStatusLabels()[$payment['payment_status']] ?? $payment['payment_status'] }}</span></td>
                         <td>{{ $history->actor?->name ?? 'Existing record' }}@if(!empty($payment['payment_remarks']))<br>{{ $payment['payment_remarks'] }}@endif</td>
                         <td>@if(!empty($payment['payment_proof_path']) && ($payment['payment_method'] ?? '') === 'gcash')<a href="{{ route('document-payments.history.proof', $history) }}">View receipt</a>@else — @endif</td>
                     </tr>

@@ -16,9 +16,9 @@
     </form>
     <p class="population-history-description">{{ $submissions->total() }} reports · Saved copies stay unchanged when resident records are updated.</p>
     <div class="population-history">
-    <div class="population-history-table"><table><thead><tr><th>Reference</th><th>Barangay</th><th>Reporting period</th><th>Inhabitants</th><th>Source / submitter</th><th>Submitted / archived on</th><th>Status</th><th>Report</th></tr></thead><tbody>
+    <div class="population-history-table"><table><thead><tr><th>Reference</th><th>Barangay</th><th>Reporting period</th><th class="table-cell-end">Inhabitants</th><th>Source / submitter</th><th>Submitted / archived on</th><th class="table-cell-end">Status</th><th>Report</th></tr></thead><tbody>
     @forelse($submissions as $submission)
-        <tr><td>{{ $submission->reference }}</td><td>{{ $submission->barangay_name }}</td><td>{{ $submission->semester===1?'1st':'2nd' }} Semester {{ $submission->report_year }}</td><td>{{ number_format($submission->total_records) }}</td><td>{{ $submission->submitted_by_name }}</td><td>{{ $submission->submitted_at->format('M d, Y h:i A') }}</td><td>{{ $submission->is_historical_archive ? 'Archived historical report' : 'Submitted to Municipal DILG/Admin' }}</td><td><a href="{{ route('reports.population.submissions.show',$submission) }}">View saved report</a></td></tr>
+        <tr><td>{{ $submission->reference }}</td><td>{{ $submission->barangay_name }}</td><td>{{ $submission->semester===1?'1st':'2nd' }} Semester {{ $submission->report_year }}</td><td class="table-cell-end">{{ number_format($submission->total_records) }}</td><td>{{ $submission->submitted_by_name }}</td><td>{{ $submission->submitted_at->format('M d, Y h:i A') }}</td><td class="table-cell-end"><x-status-badge :status="$submission->is_historical_archive ? 'archived' : 'submitted'">{{ $submission->is_historical_archive ? 'Archived historical report' : 'Submitted to Municipal DILG/Admin' }}</x-status-badge></td><td><a href="{{ route('reports.population.submissions.show',$submission) }}">View saved report</a></td></tr>
     @empty<tr><td colspan="8">No population summary submissions yet.</td></tr>@endforelse
     </tbody></table></div></div>{{ $submissions->links() }}
 </section>

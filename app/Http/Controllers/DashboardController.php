@@ -10,6 +10,7 @@ use App\Models\MigrationRecord;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -195,15 +196,28 @@ class DashboardController extends Controller
             ->latest()
             ->get();
         $reportHistoryPage = null;
+        $reportHistorySearch = '';
         if ($request->routeIs('barangay.rbi-updates.history')) {
+            $search = $request->query('report_search');
+            $reportHistorySearch = is_string($search) ? trim(mb_substr($search, 0, 64)) : '';
+            $reports = $rbiUpdates->sortBy([['reporting_month', 'desc'], ['id', 'desc']]);
+            if ($reportHistorySearch !== '') {
+                $term = mb_strtolower($reportHistorySearch);
+                $reports = $reports->filter(function (BarangayRbiUpdate $report) use ($term): bool {
+                    $month = $report->reporting_month;
+                    $searchable = implode(' ', [$month?->format('F Y'), $month?->format('M Y'), $month?->format('Y-m'), $report->statusLabel()]);
+
+                    return str_contains(mb_strtolower($searchable), $term);
+                });
+            }
+
             $perPage = 5;
-            $page = min(max(1, $request->integer('report_page', 1)), max(1, (int) ceil($rbiUpdates->count() / $perPage)));
-            $reportHistoryPage = BarangayRbiUpdate::where('barangay_user_id', auth()->id())
-                ->orderByDesc('reporting_month')
-                ->orderByDesc('id')
-                ->paginate($perPage, ['*'], 'report_page', $page)
-                ->withQueryString()
-                ->fragment('report-history');
+            $total = $reports->count();
+            $page = min(max(1, $request->integer('report_page', 1)), max(1, (int) ceil($total / $perPage)));
+            $reportHistoryPage = (new LengthAwarePaginator($reports->forPage($page, $perPage)->values(), $total, $perPage, $page, [
+                'path' => $request->url(),
+                'pageName' => 'report_page',
+            ]))->withQueryString()->fragment('report-history');
         }
         $draftRbiUpdate = $request->integer('edit')
             ? $rbiUpdates->first(fn (BarangayRbiUpdate $update): bool => $update->id === $request->integer('edit'))
@@ -272,6 +286,7 @@ class DashboardController extends Controller
             'registryActivities' => $barangay ? \App\Models\RegistryActivity::with('user')->where('barangay_id', $barangay->id)->latest('id')->paginate(15, ['*'], 'activity_page') : collect(),
             'rbiUpdates' => $rbiUpdates,
             'reportHistoryPage' => $reportHistoryPage,
+            'reportHistorySearch' => $reportHistorySearch,
             'barangay' => $barangay,
             'residentApprovalRequests' => $residentApprovalRequests,
             'residentRbiChecks' => $residentRbiChecks,

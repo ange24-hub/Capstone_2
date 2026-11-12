@@ -1,19 +1,21 @@
 @layer municipal-workspace {
     .municipal-ui {
-        --municipal-navy: #172d46;
-        --municipal-ink: #192e45;
-        --municipal-muted: #4e6277;
-        --municipal-action: #224f7d;
-        --municipal-accent: #c3a26b;
-        --municipal-canvas: #f5f7fa;
-        --municipal-line: #d4dde6;
-        --municipal-tint: #eaf1f8;
+        --municipal-primary: #174332;
+        --municipal-ink: #172922;
+        --municipal-muted: #4b5e54;
+        --municipal-action: #205942;
+        --municipal-accent: #174332;
+        --municipal-canvas: #f6f5ef;
+        --municipal-line: #dce3da;
+        --municipal-tint: #e7efe6;
+        --municipal-field-line: #84978a;
+        --municipal-font: Roboto, Inter, "Segoe UI", sans-serif;
         --municipal-radius: 6px;
     }
 
     /* Signed-in navigation and account controls */
     .professional-shell .app-shell {
-        font-family: "Inter", "Segoe UI", sans-serif !important;
+        font-family: var(--municipal-font) !important;
         transition: none !important;
     }
 
@@ -22,7 +24,7 @@
         border: 0 !important;
         border-top: 3px solid var(--municipal-accent) !important;
         border-radius: 0 !important;
-        background: var(--municipal-navy) !important;
+        background: var(--municipal-primary) !important;
         box-shadow: none !important;
         scrollbar-color: #62768a transparent !important;
     }
@@ -178,7 +180,7 @@
         box-shadow: 0 10px 32px #172d4626 !important;
     }
 
-    .professional-shell .assistant-header { background: var(--municipal-navy) !important; }
+    .professional-shell .assistant-header { background: var(--municipal-primary) !important; }
 
     /* Shared page hierarchy and surfaces */
     .professional-shell :is(.app-main, .app-content, .app-footer) { background: var(--municipal-canvas) !important; }
@@ -252,8 +254,8 @@
 
     :is(.professional-shell, .professional-public) #main-content
     :is(.button, .primary-block, .municipal-hero-actions a:first-child, .rbi-history-create):hover:not(:where(.secondary-button, .outline-button, .danger-button, .table-wrap *, .leaflet-container *, .rbi-document-preview *, .rbi-word-page *, .population-monitoring-paper *, :disabled, [aria-disabled="true"])) {
-        background: var(--municipal-navy) !important;
-        border-color: var(--municipal-navy) !important;
+        background: var(--municipal-primary) !important;
+        border-color: var(--municipal-primary) !important;
     }
 
     /* Monthly RBI entry and report navigation */
@@ -382,7 +384,7 @@
 
     /* Public portal */
     .professional-public :is(.ph-government-bar, .public-footer, .public-footer-bottom, .portal-login-intro, .registration-guide) {
-        background: var(--municipal-navy) !important;
+        background: var(--municipal-primary) !important;
     }
 
     .professional-public .public-site-header {
@@ -404,7 +406,7 @@
     .portal-home-intro {
         padding-block: clamp(36px, 6vw, 76px);
         border-bottom: 3px solid var(--municipal-accent);
-        background: var(--municipal-navy);
+        background: var(--municipal-primary);
         color: white;
     }
 
@@ -418,14 +420,14 @@
         text-wrap: wrap !important;
     }
 
-    .portal-home-intro p { max-width: 610px; margin: 14px 0 24px; color: #dce7f1; font-size: clamp(15px, 2vw, 18px); }
+    .portal-home-intro p { max-width: 610px; margin: 14px 0 24px; color: var(--municipal-tint); font-size: clamp(15px, 2vw, 18px); }
     .portal-home-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
     .professional-public .portal-home .portal-home-actions .button {
         background: white !important;
         border: 1px solid white !important;
         border-radius: var(--municipal-radius) !important;
-        color: var(--municipal-navy) !important;
+        color: var(--municipal-primary) !important;
         box-shadow: none !important;
     }
 
@@ -435,7 +437,7 @@
         background: transparent !important;
     }
 
-    .professional-public .portal-home .portal-home-actions .button:hover { background: var(--municipal-tint) !important; color: var(--municipal-navy) !important; }
+    .professional-public .portal-home .portal-home-actions .button:hover { background: var(--municipal-tint) !important; color: var(--municipal-primary) !important; }
     .portal-home-section { padding-block: 28px; scroll-margin-top: 20px; }
     .portal-home-section + .portal-home-section { padding-top: 4px; padding-bottom: 44px; }
     .portal-home-section h2 { margin: 0 0 12px; font-size: 23px; font-weight: 700; }
