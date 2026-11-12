@@ -1,8 +1,13 @@
 @extends('layouts.app')
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/registry-accents.css') }}?v={{ filemtime(public_path('css/registry-accents.css')) }}" media="screen">
+@endpush
 @section('content')
-<section class="panel grid gap-6">
-    <header class="page-head"><x-workspace-heading icon="users" label="Resident Registry"><h1>Edit person / household movement</h1><p>{{ $resident->fullName() }} · Household {{ $resident->household?->household_number }}</p></x-workspace-heading></header>
-    <a href="{{ route('barangay.registry.active') }}" class="button secondary-button">Back to Consolidated / All Registered</a>
+<section class="panel registry-color-workspace">
+    <header class="page-head">
+        <x-workspace-heading icon="users" label="Resident Registry"><h1>Edit person / household movement</h1><p>{{ $resident->fullName() }} · Household {{ $resident->household?->household_number }}</p></x-workspace-heading>
+        <a href="{{ route('barangay.registry.active') }}" class="button secondary-button">Back to Consolidated / All Registered</a>
+    </header>
     @if($errors->any())<div class="errors" role="alert">{{ $errors->first() }}</div>@endif
     <form method="POST" action="{{ route('registry.movement.update',$resident) }}" class="workflow-card grid gap-5" id="registry-movement-form">
         @csrf @method('PUT')

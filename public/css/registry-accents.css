@@ -1,71 +1,205 @@
-/* Restrained color for the resident registry, residence lists, and edit forms. */
+/* Shared screen layout for resident registry lists and edit pages. */
 #registry-records { scroll-margin-block-start: 16px; }
-#registry-records:target { min-block-size: calc(100dvh - 32px); }
 
-@layer professional-workspace {
-    @media screen {
-        .professional-content #main-content .registry-color-workspace {
+@layer municipal-components {
+    .professional-shell #main-content .registry-color-workspace {
+        display: grid;
+        gap: 16px !important;
+        min-width: 0;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+
+        & > .page-head {
+            align-items: center;
+            margin: 0 !important;
+            padding: 24px !important;
+            border: 1px solid var(--municipal-line) !important;
+            border-radius: var(--municipal-radius) !important;
+            background: #fff !important;
+        }
+
+        & > .page-head :is(.page-kicker, .dashboard-eyebrow) {
+            display: block !important;
+            margin: 0 0 8px !important;
+            color: var(--municipal-muted) !important;
+            font-size: 12px !important;
+        }
+
+        & > .workflow-card {
+            min-width: 0;
+            padding: 24px !important;
+        }
+
+        & .registry-list-tools {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: start;
+            justify-content: space-between;
+            gap: 8px 16px;
+        }
+
+        & .registry-scope-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: 0 !important;
+        }
+
+        & :is(.registry-scope-actions, .registry-print-options, .registry-records-filter) :is(a.button, button) {
+            min-height: 40px !important;
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            white-space: normal !important;
+        }
+
+        & .registry-print-options {
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid var(--municipal-line) !important;
+            border-radius: var(--municipal-radius) !important;
+            background: #fff !important;
+        }
+
+        & .registry-print-options summary {
+            width: auto;
+            min-height: 40px;
+            padding: 8px 16px !important;
+            color: var(--municipal-primary) !important;
+            font-size: 14px !important;
+            font-weight: 750;
+            line-height: 24px;
+            cursor: pointer;
+        }
+
+        & .registry-print-options[open] > .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0 !important;
+            padding: 8px !important;
+            border-top: 1px solid var(--municipal-line) !important;
+        }
+
+        & .registry-records-heading {
+            align-items: end !important;
+            gap: 16px !important;
+            margin: 0 0 16px !important;
+            padding: 0 0 16px !important;
+        }
+
+        & .registry-records-filter > button {
+            align-self: end !important;
+            min-height: 44px !important;
+            margin: 0 !important;
+        }
+
+        & .registry-records-heading h2 { margin: 0 !important; }
+        & .registry-records-heading p {
+            margin: 8px 0 0 !important;
+            color: var(--municipal-muted) !important;
+            font-size: 14px !important;
+        }
+
+        & .registry-records-filter {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 8px;
+            margin: 0 !important;
             padding: 0 !important;
             border: 0 !important;
             background: transparent !important;
-            box-shadow: none !important;
         }
 
-        .professional-content #main-content .registry-color-workspace > .page-head {
-            padding: 22px 26px !important;
-            border: 1px solid #cddfe8 !important;
-            border-left: 4px solid #2a7890 !important;
-            border-radius: 10px !important;
-            background: #f4f9fb !important;
-            box-shadow: none !important;
+        & .registry-records-filter .registry-search-field {
+            flex: 1 1 216px;
+            min-width: 0;
         }
 
-        .professional-content #main-content .registry-color-workspace .workspace-heading-emblem {
-            display: grid !important;
-            place-items: center !important;
-            flex: 0 0 44px !important;
-            width: 44px !important;
-            height: 44px !important;
-            border-radius: 9px !important;
-            background: #e2f0f3 !important;
-            color: #246b83 !important;
+        & .registry-records-filter .registry-search-field input {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            min-height: 40px !important;
         }
 
-        .professional-content #main-content .registry-color-workspace > .page-head h1 {
-            color: #1e4d68 !important;
+        & .registry-scroll-hint {
+            margin: 0 0 8px !important;
+            color: var(--municipal-muted) !important;
+            font-size: 13px !important;
         }
 
-        .professional-content #main-content .registry-color-workspace > .page-head :is(.page-kicker, .dashboard-eyebrow) {
-            display: block !important;
-            color: #2a7188 !important;
+        & .registry-scroll-region {
+            max-width: 100%;
+            overflow: auto;
         }
 
-        .professional-content #main-content .registry-color-workspace > .workflow-card {
-            border: 1px solid #d7e4e9 !important;
-            border-top: 3px solid #8bbbc7 !important;
-            background: #fffefc !important;
-            box-shadow: none !important;
+        & .registry-scroll-region:focus-visible {
+            outline: 2px solid var(--municipal-primary);
+            outline-offset: 2px;
         }
 
-        .professional-content #main-content .registry-color-workspace > .workflow-card :is(h2, .section-title) {
-            color: #255870 !important;
+        & .registry-screen-table {
+            border: 1px solid var(--municipal-line) !important;
+            border-radius: var(--municipal-radius) !important;
+            background: #fff !important;
         }
 
-        .professional-content #main-content .registry-color-workspace .table-wrap table th {
-            border-color: #c9dfe6 !important;
-            background: #eaf3f6 !important;
-            color: #28576d !important;
+        & .registry-screen-table table {
+            min-width: 1728px !important;
         }
 
-        .professional-content #main-content .registry-color-workspace .registry-print-options {
-            border-color: #d4e4e9 !important;
-            background: #f6fafb !important;
+        & .registry-screen-table.registry-document-list table {
+            min-width: 640px !important;
         }
+
+        & .moved-out-list-card .registry-screen-table table { min-width: 864px !important; }
+
+        & .registry-screen-table :is(th, td) {
+            padding: 8px !important;
+            border: 0 !important;
+            border-bottom: 1px solid var(--municipal-line) !important;
+            background: #fff !important;
+            color: var(--municipal-ink) !important;
+            font-family: var(--municipal-font) !important;
+            font-size: 13px !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+
+        & .registry-screen-table thead th {
+            background: var(--municipal-tint) !important;
+            font-weight: 800 !important;
+        }
+
+        & .registry-screen-table tbody tr:last-child > td { border-bottom: 0 !important; }
+        & .registry-screen-table tbody tr:hover > td { background: var(--municipal-canvas) !important; }
+        & .registry-screen-table tbody .residence-elsewhere > td { background: #f6f5ef !important; }
+        & .registry-screen-table tbody .rbi-household-start > td { border-top: 2px solid var(--municipal-line) !important; }
+        & .registry-screen-table :is(th, td).table-cell-end {
+            text-align: right !important;
+            font-variant-numeric: tabular-nums;
+        }
+
+        & .registry-screen-table :is(input, textarea, select):focus-visible {
+            outline: 2px solid var(--municipal-primary) !important;
+            outline-offset: 0;
+        }
+
+        & .registry-screen-table td a { color: var(--municipal-primary) !important; }
 
         @media (max-width: 640px) {
-            .professional-content #main-content .registry-color-workspace > .page-head {
-                padding: 18px !important;
-            }
+            & > .page-head, & > .workflow-card { padding: 16px !important; }
+            & .registry-list-tools, & .registry-records-heading { align-items: stretch !important; }
+            & .registry-records-filter { width: 100%; }
+            & .registry-records-filter .registry-search-field { flex-basis: 128px; }
         }
     }
 }
