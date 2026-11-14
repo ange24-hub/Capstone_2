@@ -88,6 +88,8 @@ class RbiDocumentPreviewTest extends TestCase
             'rows' => [['household_head' => 'Household Head', 'inhabitant_name' => 'Example, Child', 'sex' => 'Female']]]);
         $this->actingAs($staff)->get(route('rbi-updates.show', $report))->assertOk()
             ->assertSee('Print Report')
+            ->assertSee(route('rbi-updates.export-pdf', ['rbiUpdate' => $report, 'inline' => 1]))
+            ->assertDontSee('window.print()', false)
             ->assertSee('rbi-word-page')->assertSee('Example, Child')->assertSee('Prepared Official')
             ->assertSee('Certified Official')->assertSee('BHW / Encoder')->assertSee('Barangay Captain / Punong Barangay')->assertDontSee('Brgy. Secretary')
             ->assertDontSee('contenteditable')->assertDontSee('Update Form')
@@ -95,6 +97,11 @@ class RbiDocumentPreviewTest extends TestCase
         $response = $this->get(route('rbi-updates.export-word', $report))->assertOk();
         $pdf = $this->get(route('rbi-updates.export-pdf', $report))->assertOk()->assertHeader('content-type', 'application/pdf');
         $this->assertSame(1, preg_match_all('/\/Type\s*\/Page\b/', $pdf->getContent()), 'A household form and its signatures must fit on one PDF page.');
+        $this->assertStringStartsWith('attachment;', $pdf->headers->get('Content-Disposition'));
+        $print = $this->get(route('rbi-updates.export-pdf', ['rbiUpdate' => $report, 'inline' => 1]))
+            ->assertOk()->assertHeader('Content-Type', 'application/pdf');
+        $this->assertStringStartsWith('inline;', $print->headers->get('Content-Disposition'));
+        $this->assertSame(1, preg_match_all('/\/Type\s*\/Page\b/', $print->getContent()));
         $path = tempnam(sys_get_temp_dir(), 'rbi-layout-test-');
         try {
             file_put_contents($path, $response->streamedContent());

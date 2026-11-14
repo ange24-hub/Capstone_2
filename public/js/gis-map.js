@@ -344,8 +344,8 @@
                 weight: key === 'municipal-boundary' ? 2.5 : 1.5,
                 fill: false, dashArray: key === 'barangay-boundaries' ? '5 5' : null
             } : building ? {
-                color: feature.properties.within_barangay_boundary ? '#0f766e' : '#9a3412', weight: 1,
-                fillColor: feature.properties.within_barangay_boundary ? '#14b8a6' : '#f97316', fillOpacity: 0.85
+                color: '#0f766e', weight: 1,
+                fillColor: '#14b8a6', fillOpacity: 0.85
             } : { color: classification(feature, key).color, weight: 0.5, fillOpacity: 0.45 },
             pointToLayer: (feature, latlng) => L.polygon(buildingCorners(latlng), {
                 pane: 'buildings', renderer: buildingRenderer, bubblingMouseEvents: false

@@ -26,7 +26,7 @@ class RbiArrivalPeriodController extends Controller
         return Barangay::findOrFail($request->validate(['barangay_id' => ['required', 'integer', 'exists:barangays,id']])['barangay_id']);
     }
 
-    public function index(Request $request, RbiArrivalReview $review)
+    public function index(Request $request)
     {
         $area = $this->area($request);
 
@@ -47,7 +47,7 @@ class RbiArrivalPeriodController extends Controller
             }
         }
 
-        return view('rbi-updates.arrival-periods', ['barangay' => $area, 'periods' => $review->periods($area), 'storageReady' => Schema::hasTable('rbi_arrival_periods'),
+        return view('rbi-updates.arrival-periods', ['barangay' => $area,
             'historyMonths' => $history->whereNotNull('reporting_month')->groupBy(fn ($row) => $row->reporting_month->format('Y-m'))->map(fn ($rows) => $rows->count()),
             'historyEntries' => $history->whereNotNull('reporting_month')->groupBy(fn ($row) => $row->reporting_month->format('Y-m')),
             'historyClassifications' => $classifications,

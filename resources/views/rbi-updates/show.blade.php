@@ -2,6 +2,7 @@
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/rbi-report-view.css') }}?v={{ filemtime(public_path('css/rbi-report-view.css')) }}">
+    <style>@media print { @page { size: A4 landscape; margin: 0; } }</style>
 @endpush
 
 @section('content')
@@ -18,7 +19,7 @@
                 </div>
             </div>
             <div class="rbi-report-downloads" aria-label="Report actions">
-                <button class="rbi-report-button" type="button" onclick="window.print()"><x-app-icon name="document" />Print Report</button>
+                <a class="rbi-report-button" href="{{ route('rbi-updates.export-pdf', ['rbiUpdate' => $rbiUpdate, 'inline' => 1]) }}" target="_blank" rel="noopener"><x-app-icon name="document" />Print Report</a>
                 <a class="rbi-report-button rbi-report-pdf" href="{{ route('rbi-updates.export-pdf', $rbiUpdate) }}"><x-app-icon name="document" />Download Consolidated PDF</a>
                 <a class="rbi-report-button rbi-report-word" href="{{ route('rbi-updates.export-excel', $rbiUpdate) }}"><x-app-icon name="form" />Download Excel</a>
                 @if ($rbiUpdate->source_file_path)<a class="rbi-report-button" href="{{ route('rbi-updates.download', $rbiUpdate) }}">Original Upload</a>@endif

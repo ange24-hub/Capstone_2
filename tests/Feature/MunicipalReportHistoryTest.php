@@ -27,7 +27,7 @@ class MunicipalReportHistoryTest extends TestCase
         $admin = User::factory()->create(['role' => 'municipal_lgu']);
         $this->actingAs($admin)->get(route('municipal.rbi-report-history'))->assertOk()
             ->assertSee('RBI report history')->assertSee(route('municipal.prediction-forecast'))
-            ->assertSee(route('municipal.prediction-history', $area))->assertSee(route('rbi.arrivals.index', ['barangay_id' => $area->id]))
+            ->assertSee(route('municipal.prediction-history', $area))->assertDontSee(route('rbi.arrivals.index', ['barangay_id' => $area->id]))
             ->assertDontSee('Show backtest')->assertDontSee('Training dataset')->assertDontSee('AGE-BASED ESTIMATES')
             ->assertViewHas('history', fn ($h) => $h['area_count'] === 29 && ! $h['age_estimates'] && $h['datasets'][$area->id]['entries']['2021-05'][0]['type'] === null);
         $this->get(route('municipal.prediction-history', [$area, 'month' => '2021-05']))->assertOk()

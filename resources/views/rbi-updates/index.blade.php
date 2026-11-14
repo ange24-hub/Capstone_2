@@ -58,9 +58,8 @@
                 <div class="rbi-report-downloads" aria-label="Workspace actions">
                     @if($rbiSection === 'history')
                     <a class="rbi-report-button rbi-history-create" href="{{ route('barangay.rbi-updates.residents',['new'=>1]) }}"><x-app-icon name="form" />New monthly form</a>
-                    <details class="rbi-history-page-tools"><summary>Tools<x-app-icon name="chevron-down" /></summary><div><a href="{{ route('rbi.arrivals.index') }}">3-month arrival counts</a><a href="{{ route('dashboard.barangay') }}">Back to Dashboard</a></div></details>
+                    <a class="rbi-report-button rbi-report-pdf" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @else
-                    <a class="rbi-report-button" href="{{ route('rbi.arrivals.index') }}">3-month arrival counts</a>
                     <a class="rbi-report-button rbi-report-pdf" href="{{ route('dashboard.barangay') }}">Back to Dashboard</a>
                     @if ($editingReport)
                         <a class="rbi-report-button rbi-report-word" href="{{ route($rbiFormRoute, ['new' => 1]) }}">Start Another Month</a>

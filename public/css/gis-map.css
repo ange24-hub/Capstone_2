@@ -145,7 +145,6 @@
 .legend-household { background:#2563eb; }
 .legend-building-polygon { width:16px; height:12px; border:1px solid #0f766e; }
 .legend-building { background:#14b8a6; }
-.legend-building-review { background:#f97316; border-color:#9a3412; }
 .legend-line { width:24px; height:0; border-top:3px solid #172b43; }
 .legend-barangay { border-top:2px dashed #64748b; }
 .legend-area { width:16px; height:16px; border:1px solid #64748b; border-radius:3px; }

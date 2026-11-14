@@ -128,7 +128,7 @@
                     <ul>
                         <li><i class="legend-symbol legend-dot legend-household" aria-hidden="true"></i><span><strong>Registered household</strong><small>Saved in the RBIM registry</small></span></li>
                         <li><i class="legend-symbol legend-building-polygon legend-building" aria-hidden="true"></i><span><strong>Building polygon</strong><small>Symbol at the source location; not counted as a registered household</small></span></li>
-                        <li><i class="legend-symbol legend-building-polygon legend-building-review" aria-hidden="true"></i><span><strong>Building polygon for review</strong><small>Outside its assigned barangay boundary on this map</small></span></li>
+                        <li><i class="legend-symbol legend-building-polygon legend-building" aria-hidden="true"></i><span><strong>Building polygon for review</strong><small>Outside its assigned barangay boundary on this map</small></span></li>
                     </ul>
                 </section>
                 <section class="gis-legend-group" aria-labelledby="legend-boundaries">

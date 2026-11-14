@@ -37,6 +37,19 @@ class RbiArrivalPeriodTest extends TestCase
         return ['start_month' => $p['start'], 'fingerprint' => $p['fingerprint'], 'counts' => ['2026-02' => 1, '2026-03' => 1, '2026-04' => 0], 'confirmed' => 1];
     }
 
+    public function test_monthly_rbi_form_and_history_omit_the_arrival_count_link(): void
+    {
+        $area = Barangay::where('name', 'Cawayan')->firstOrFail();
+        $staff = User::factory()->create(['role' => User::ROLE_BARANGAY, 'barangay_id' => $area->id]);
+
+        $this->actingAs($staff);
+        foreach (['barangay.rbi-updates.index', 'barangay.rbi-updates.residents', 'barangay.rbi-updates.history'] as $route) {
+            $this->get(route($route))->assertOk()
+                ->assertDontSeeText('3-month arrival counts')
+                ->assertDontSee('href="'.route('rbi.arrivals.index').'"', false);
+        }
+    }
+
     public function test_period_starts_with_first_submitted_month_and_supplies_only_reviewed_arrivals(): void
     {
         [$area,$staff,$reports] = $this->source();
@@ -53,7 +66,9 @@ class RbiArrivalPeriodTest extends TestCase
         $this->assertCount(3, $after['consecutive']);
         $this->assertSame('classified_rbi_first_save_dates', app(MigrationForecastHistory::class)->build($area->id, Carbon::parse('2026-04-01'), 3, 'in')['source']);
         $this->assertDatabaseCount('migration_records', 0);
-        $this->get(route('rbi.arrivals.index'))->assertOk()->assertSee('2 confirmed arrivals');
+        $this->get(route('rbi.arrivals.index'))->assertOk()->assertSee('RBI entry classification')
+            ->assertDontSee('Three-month arrival counts')->assertDontSee('Confirmed arrivals')
+            ->assertDontSee('action="'.route('rbi.arrivals.store').'"', false);
         $reports[0]->update(['rows' => [['first_name' => 'Changed', 'last_name' => 'Source']]]);
         $changed = $service->history($area->id, Carbon::parse('2026-04-01'), 3);
         $this->assertCount(0, $changed['consecutive']);
@@ -93,13 +108,12 @@ class RbiArrivalPeriodTest extends TestCase
         $period = $service->periods($area)[0];
         $this->assertTrue($period['complete']);
         $this->assertSame([false, true, false], array_column($period['months'], 'inferred_zero'));
-        $page = $this->get(route('rbi.arrivals.index'))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/name="counts\[2026-03\]"[^>]*value="0"[^>]*readonly/', $page);
+        $this->assertSame(0, $period['months'][1]['eligible']);
         $payload = ['start_month' => $period['start'], 'fingerprint' => $period['fingerprint'], 'counts' => ['2026-02' => 1, '2026-03' => 0, '2026-04' => 1], 'confirmed' => 1];
         $this->actingAs($staff)->post(route('rbi.arrivals.store'), $payload)->assertSessionHasNoErrors();
         $history = $service->history($area->id, Carbon::parse('2026-04-01'), 3);
         $this->assertSame([1, 0, 1], array_column($history['consecutive'], 'count'));
-        $this->get(route('rbi.arrivals.index'))->assertOk()->assertSee('No report — zero new entries');
+        $this->assertSame('No report — zero new entries', $period['months'][1]['source_status']);
         $reports[1]->replicate()->fill(['status' => 'draft', 'submitted_at' => null])->save();
         $changed = $service->periods($area)[0];
         $this->assertFalse($changed['complete']);

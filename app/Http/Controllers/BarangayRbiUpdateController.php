@@ -345,7 +345,7 @@ class BarangayRbiUpdateController extends Controller
         $filenameBarangay = trim((string) preg_replace('/[^A-Za-z0-9]+/', '_', Str::ascii($barangayName)), '_') ?: 'Barangay';
         $filename = 'RBI_'.$filenameBarangay.'_'.$month.'.pdf';
 
-        return Pdf::loadView('rbi-updates.pdf', [
+        $pdf = Pdf::loadView('rbi-updates.pdf', [
             'rbiUpdate' => $rbiUpdate,
             'pages' => $pages,
             'barangayName' => $barangayName,
@@ -355,7 +355,9 @@ class BarangayRbiUpdateController extends Controller
             'certifiedSignatureDataUri' => $this->storageImageDataUri($rbiUpdate->certified_signature_path),
             'preparedSignatureDataUri' => $this->storageImageDataUri($rbiUpdate->prepared_signature_path),
             'attestedSignatureDataUri' => $this->storageImageDataUri($rbiUpdate->attested_signature_path),
-        ])->setPaper('a4', 'landscape')->download($filename);
+        ])->setPaper('a4', 'landscape');
+
+        return $request->boolean('inline') ? $pdf->stream($filename) : $pdf->download($filename);
     }
 
     private function formRoute(Request $request): string
