@@ -33,7 +33,7 @@
             'chartRows' => $populationChart, 'chartNote' => 'S1 / S2 = semester',
         ])
     @endif
-    <p class="forecast-qualification"><x-app-icon name="shield" /><span>Planning estimate only. Predictive accuracy is not yet validated. This is not an official population count.</span></p>
+    <p class="forecast-qualification"><x-app-icon name="shield" /><span>Preliminary estimate based on submitted population reports. For planning reference only.</span></p>
     <details class="statistical-details forecast-sources"><summary><span><x-app-icon name="document" />Calculation &amp; source reports</span><x-app-icon name="chevron-down" /></summary>
         @if(!empty($populationProjection['excluded_reports']))
             <p>{{ count($populationProjection['excluded_reports']) }} submitted report(s) excluded from forecast inputs:</p>
