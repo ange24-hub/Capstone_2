@@ -79,7 +79,7 @@ class RbiSpreadsheet
                 $add($signatureCells, 36);
                 $add([$cell(1, 5, $report->prepared_by ?? '', 'name'), $cell(6, 5, $report->certified_by ?? '', 'name'),
                     $cell(11, 5, $report->attested_by ?? '', 'name')]);
-                $add([$cell(1, 5, 'BHW / Encoder', 'center'), $cell(6, 5, 'Barangay Secretary', 'center'),
+                $add([$cell(1, 5, $report->preparedRoleLabel(), 'center'), $cell(6, 5, 'Barangay Secretary', 'center'),
                     $cell(11, 5, 'Barangay Captain / Punong Barangay', 'center')], 24);
             }
             $add([], 12);

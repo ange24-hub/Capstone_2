@@ -1,0 +1,99 @@
+.rbi-certification {
+    container-type: inline-size;
+    min-width: 0;
+    gap: 16px;
+}
+
+.rbi-certification-header,
+.rbi-certification-form {
+    min-width: 0;
+    padding: clamp(16px, 2.5vw, 26px);
+    border: 1px solid #d9e4ed;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.rbi-certification-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-left: 4px solid #166d75;
+}
+
+.rbi-certification-header h1 {
+    margin: 8px 0 4px;
+    color: var(--rbi-navy);
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 700;
+    line-height: 1.2;
+}
+.rbi-certification-header p,
+.rbi-certification-actions p { margin: 0; color: #4b6273; font-size: 14px; }
+.rbi-certification-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.rbi-certification-form { display: grid; gap: 12px; }
+.rbi-certification-form > :is(h3, p) { margin: 0; }
+.rbi-certification-form .rbi-signers {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+}
+.rbi-certification-form .signature-pad-field {
+    background: #f6f9fb !important;
+    border-color: #d9e4ed !important;
+    padding: 16px !important;
+}
+.rbi-certification-form .signature-pad-field h4 {
+    margin: 3px 0 0;
+    overflow-wrap: anywhere;
+}
+.rbi-certification-form .signature-pad-field > div:first-child p { margin: 0; }
+.rbi-certification-form .rbi-signature-methods { display: grid; min-width: 0; gap: 6px; margin-top: auto; }
+.rbi-certification-form .rbi-signature-methods :is(label, .field-help) { margin: 0; }
+.rbi-certification-form .rbi-signature-methods input[type="file"] { max-width: 100%; }
+.rbi-certification [data-upload-preview][hidden] { display: none; }
+.rbi-certification-form .rbi-no-activity {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #d9e4ed;
+    border-radius: 8px;
+    background: #f6f9fb;
+}
+.rbi-certification-form .rbi-no-activity input[type="checkbox"] {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    min-height: 0;
+    margin: 2px 0 0;
+    accent-color: #166d75;
+}
+.rbi-certification-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid #d9e4ed;
+}
+.rbi-certification .rbi-certification-actions button {
+    padding: 10px 16px;
+    border-color: #166d75;
+    background: #166d75;
+    color: #fff;
+}
+.rbi-certification .rbi-certification-actions button:hover:not(:disabled) {
+    border-color: #12575e;
+    background: #12575e;
+    color: #fff;
+}
+@container (min-width: 56rem) {
+    .rbi-certification-form .rbi-signers { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+@container (max-width: 30rem) {
+    .rbi-certification-actions button { width: 100%; }
+}

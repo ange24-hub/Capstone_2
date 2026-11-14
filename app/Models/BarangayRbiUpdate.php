@@ -22,6 +22,7 @@ class BarangayRbiUpdate extends Model
         'reporting_month',
         'as_of_date',
         'prepared_by',
+        'prepared_role',
         'prepared_signature_path',
         'certified_by',
         'certified_signature_path',
@@ -44,6 +45,11 @@ class BarangayRbiUpdate extends Model
         'deceased_rows' => 'array',
         'submitted_at' => 'datetime',
     ];
+
+    public function preparedRoleLabel(): string
+    {
+        return $this->prepared_role ?? 'BHW / Encoder';
+    }
 
     public static function rowFields(): array
     {

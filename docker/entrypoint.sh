@@ -20,14 +20,13 @@ gosu www-data php artisan config:cache
 gosu www-data php artisan route:cache
 gosu www-data php artisan view:cache
 
-# General migrations remain opt-in; only this release's additive forecast
-# storage is prepared automatically. Never seed demo accounts on startup.
+# General migrations remain opt-in. Prepare feature storage as needed.
+# Never seed demo accounts on startup.
 if [ "${RUN_MIGRATIONS:-false}" = 'true' ]; then
     gosu www-data php artisan migrate --force --no-interaction
 else
-    # These reviewed releases only add completeness confirmations. No existing
-    # records are rewritten and other pending migrations remain opt-in.
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
+    gosu www-data php artisan rbi:prepare-certification-storage --no-interaction
 fi
 
 # Optional feature storage must not prevent the existing web server from starting.

@@ -26,7 +26,7 @@
                         <p>Prepared by:</p>
                         <div class="rbi-word-signature-image">@if($rbiUpdate->prepared_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'secretary']) }}" alt="BHW / Encoder signature">@endif</div>
                         <strong>{{ $rbiUpdate->prepared_by }}</strong>
-                        <span>BHW / Encoder</span>
+                        <span>{{ $rbiUpdate->preparedRoleLabel() }}</span>
                     </div>
                     <div><p>Certified Correct:</p><div class="rbi-word-signature-image">@if($rbiUpdate->certified_signature_path)<img src="{{ route('rbi-updates.signature', [$rbiUpdate, 'certified']) }}" alt="Barangay Secretary signature">@endif</div><strong>{{ $rbiUpdate->certified_by }}</strong><span>Barangay Secretary</span></div>
                     <div>

@@ -447,6 +447,7 @@ class BarangayRbiUpdateController extends Controller
             $rules[$type.'_signature_data'] = ['nullable', 'string', 'max:3000000'];
             $rules[$type.'_signature_upload'] = ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'];
         }
+        $rules['prepared_role'] = ['nullable', 'string', 'max:100'];
         $request->validate($rules);
 
         $errors = [];
@@ -473,6 +474,10 @@ class BarangayRbiUpdateController extends Controller
         foreach (['prepared', 'certified', 'attested'] as $type) {
             $attributes[$type.'_by'] = trim((string) $request->input($type.'_by', $report->{$type.'_by'}));
             $attributes[$type.'_signature_path'] = $this->storeSignature($request, $type, $report->{$type.'_signature_path'});
+        }
+        if ($request->has('prepared_role')) {
+            $role = trim((string) $request->input('prepared_role'));
+            $attributes['prepared_role'] = $role === '' ? null : $role;
         }
         if (! $attributes['attested_by']) {
             $attributes['attested_by'] = $request->user()->barangay?->punong_barangay_name;
@@ -967,7 +972,8 @@ class BarangayRbiUpdateController extends Controller
                         $rbiUpdate->attested_by ?: '',
                         $signatureMedia,
                         $documentIdOffset,
-                        $rbiUpdate->certified_by ?? ''
+                        $rbiUpdate->certified_by ?? '',
+                        $rbiUpdate->preparedRoleLabel()
                     ) : '')
                     .$pageBreak;
             })
@@ -985,10 +991,10 @@ class BarangayRbiUpdateController extends Controller
 </w:document>';
     }
 
-    private function wordSignatureTable(string $preparedBy, string $notedBy, array $signatureMedia, int $documentIdOffset = 0, string $certifiedBy = ''): string
+    private function wordSignatureTable(string $preparedBy, string $notedBy, array $signatureMedia, int $documentIdOffset, string $certifiedBy, string $preparedRole): string
     {
         $signatureRows = ['', '', '', ''];
-        foreach ([['Prepared by:', $preparedBy, 'BHW / Encoder', 'secretary', 1], ['Certified Correct:', $certifiedBy, 'Barangay Secretary', 'certified', 4], ['Verified by:', $notedBy, 'Barangay Captain / Punong Barangay', 'captain', 2]] as [$label, $name, $title, $media, $offset]) {
+        foreach ([['Prepared by:', $preparedBy, $preparedRole, 'secretary', 1], ['Certified Correct:', $certifiedBy, 'Barangay Secretary', 'certified', 4], ['Verified by:', $notedBy, 'Barangay Captain / Punong Barangay', 'captain', 2]] as [$label, $name, $title, $media, $offset]) {
             $image = isset($signatureMedia[$media]) ? $this->wordImageDrawing($signatureMedia[$media]['relationship'], $label, $documentIdOffset + $offset) : $this->wordParagraph('', false, true, 22);
             foreach ([$this->wordParagraph($label, false, true, 22), $image, $this->wordParagraph($name, true, true, 22), $this->wordParagraph($title, false, true, 22)] as $row => $content) {
                 $border = $row === 2 ? '<w:tcBorders><w:bottom w:val="single" w:sz="4" w:color="000000"/></w:tcBorders>' : '';

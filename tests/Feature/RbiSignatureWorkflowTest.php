@@ -77,6 +77,7 @@ class RbiSignatureWorkflowTest extends TestCase
             $this->get(route('barangay.rbi-updates.history'))->assertOk()->assertSee($url);
             $this->get($url)->assertOk()->assertSee('enctype="multipart/form-data"', false)
                 ->assertSee('name="prepared_signature_upload"', false)->assertSee('<canvas', false)
+                ->assertSee('name="prepared_role" type="text" value="BHW / Encoder"', false)
                 ->assertSee('Example Captain')->assertSee('rbi-signatures.js');
         }
         $this->assertSame('draft', $report->fresh()->status);
@@ -87,6 +88,8 @@ class RbiSignatureWorkflowTest extends TestCase
     {
         $report = $this->draft();
         $this->post(route('barangay.rbi-updates.submit', $report), [
+            'prepared_by' => 'Edited Encoder Name',
+            'prepared_role' => 'Barangay Health Worker',
             'prepared_signature_upload' => UploadedFile::fake()->image('encoder.jpg'),
             'certified_signature_upload' => UploadedFile::fake()->image('secretary.png'),
             'attested_signature_upload' => UploadedFile::fake()->image('captain.png'),
@@ -94,6 +97,12 @@ class RbiSignatureWorkflowTest extends TestCase
         $report->refresh();
         $this->assertSame('submitted', $report->status);
         $this->assertNotNull($report->submitted_at);
+        $this->assertSame('Edited Encoder Name', $report->prepared_by);
+        $this->assertSame('Barangay Health Worker', $report->prepared_role);
+        $this->assertSame('Example Secretary', $report->certified_by);
+        $this->assertSame('Example Captain', $report->attested_by);
+        $this->get(route('rbi-updates.show', $report))->assertOk()
+            ->assertSee('Edited Encoder Name')->assertSee('Barangay Health Worker');
         foreach (['prepared', 'certified', 'attested'] as $type) {
             Storage::assertExists($report->{$type.'_signature_path'});
         }
@@ -108,6 +117,7 @@ class RbiSignatureWorkflowTest extends TestCase
     {
         $report = $this->draft();
         $this->post(route('barangay.rbi-updates.add-to-registry', $report), [
+            'prepared_role' => 'Health Worker',
             'prepared_signature_data' => self::SIGNATURE, 'attested_signature_data' => self::SIGNATURE,
         ])->assertSessionHasNoErrors()->assertRedirect(route('barangay.rbi-updates.history'));
         $report->refresh();
@@ -119,6 +129,7 @@ class RbiSignatureWorkflowTest extends TestCase
         $report->refresh();
         $this->assertSame('submitted', $report->status);
         $this->assertSame($paths, [$report->prepared_signature_path, $report->attested_signature_path]);
+        $this->assertSame('Health Worker', $report->prepared_role);
         $this->assertCount(2, Storage::allFiles('rbi-signatures'));
     }
 

@@ -72,7 +72,7 @@
                     <div class="signature-block">
                         <div class="signature-space">@if ($preparedSignatureDataUri)<img class="signature-image" src="{{ $preparedSignatureDataUri }}" alt="BHW / Encoder signature">@endif</div>
                         <span class="official-name">{{ $rbiUpdate->prepared_by }}</span>
-                        <span class="official-title">BHW / Encoder</span>
+                        <span class="official-title">{{ $rbiUpdate->preparedRoleLabel() }}</span>
                     </div>
                 </td>
                 <td><p class="signature-label">Certified Correct:</p><div class="signature-block"><div class="signature-space">@if($certifiedSignatureDataUri)<img class="signature-image" src="{{ $certifiedSignatureDataUri }}" alt="Barangay Secretary signature">@endif</div><span class="official-name">{{ $rbiUpdate->certified_by }}</span><span class="official-title">Barangay Secretary</span></div></td>
