@@ -39,9 +39,13 @@
         <form class="rbi-certification-form" method="POST" enctype="multipart/form-data" action="{{ route($certificationAction === 'submit' ? 'barangay.rbi-updates.submit' : 'barangay.rbi-updates.add-to-registry', $editingReport) }}">
             @csrf
             @if($certificationAction === 'submit' && empty($editingReport->rows) && empty($editingReport->deceased_rows))<label class="rbi-no-activity"><input type="checkbox" name="confirm_no_activity" value="1" required @checked(old('confirm_no_activity'))> I confirm that no new residents or deceased inhabitants were recorded for this reporting month.</label>@endif
-            @include('rbi-updates.forms._certification', ['collectSignatures' => true])
+            @if($signaturesRequired)
+                @include('rbi-updates.forms._certification', ['collectSignatures' => true])
+            @else
+                <p class="rbi-existing-signatures-note">All listed residents already exist in the Consolidated RBI registry. Signatures are not needed to link them to this report.</p>
+            @endif
             <div class="rbi-certification-actions">
-                <p>Prepared by and Punong Barangay signatures are required. The Barangay Secretary signature is optional.</p>
+                @if($signaturesRequired)<p>Prepared by and Punong Barangay signatures are required. The Barangay Secretary signature is optional.</p>@endif
                 <button type="submit">{{ $certificationAction === 'submit' ? 'Submit to Municipal' : 'Add to Consolidated RBI' }}</button>
             </div>
         </form>

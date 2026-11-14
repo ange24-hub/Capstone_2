@@ -48,6 +48,14 @@
 .rbi-existing-residents ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .rbi-existing-residents li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 8px 10px; border-radius: 7px; background: #fff; }
 .rbi-existing-residents li span { font-weight: 600; }
+.rbi-existing-signatures-note {
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #c7e4d3;
+    border-radius: 8px;
+    background: #f1faf4;
+    color: #285b3d;
+}
 .rbi-certification-form .rbi-signers {
     display: grid;
     grid-template-columns: minmax(0, 1fr) !important;

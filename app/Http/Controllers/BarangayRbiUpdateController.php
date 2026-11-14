@@ -52,13 +52,20 @@ class BarangayRbiUpdateController extends Controller
             throw ValidationException::withMessages(['reporting_month' => 'Reports through 2025 are added to Consolidated RBI and are not submitted to DILG.']);
         }
 
+        $existingResidents = $validated['action'] === 'consolidate'
+            ? $this->existingResidentsForConsolidation($rbiUpdate, $request->user()->barangay_id)
+            : [];
+        $reportRows = collect($rbiUpdate->rows ?? [])->filter(fn (array $row): bool => filled($row['inhabitant_name'] ?? null));
+        $signaturesRequired = $validated['action'] !== 'consolidate'
+            || $reportRows->isEmpty()
+            || count($existingResidents) !== $reportRows->count();
+
         return view('rbi-updates.certification', [
             'editingReport' => $rbiUpdate,
             'barangay' => $request->user()->barangay,
             'certificationAction' => $validated['action'],
-            'existingResidents' => $validated['action'] === 'consolidate'
-                ? $this->existingResidentsForConsolidation($rbiUpdate, $request->user()->barangay_id)
-                : collect(),
+            'existingResidents' => $existingResidents,
+            'signaturesRequired' => $signaturesRequired,
         ]);
     }
 
@@ -94,7 +101,7 @@ class BarangayRbiUpdateController extends Controller
                 'households' => $matches->map(fn ($resident): string => (string) ($resident->household?->household_number ?: 'Household number unavailable'))
                     ->unique()->values()->all(),
             ];
-        })->filter()->unique('name')->values()->all();
+        })->filter()->values()->all();
     }
 
     public function addToRegistry(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
@@ -105,8 +112,10 @@ class BarangayRbiUpdateController extends Controller
         $result = DB::transaction(function () use ($request, $rbiUpdate): array {
             $barangay = \App\Models\Barangay::whereKey($request->user()->barangay_id)->lockForUpdate()->firstOrFail();
             $report = BarangayRbiUpdate::whereKey($rbiUpdate->id)->lockForUpdate()->firstOrFail();
-            $this->validateReportSignatures($request, $report);
             $result = \App\Support\RbiReportRegistry::add($barangay, $report);
+            if ($result['created'] > 0) {
+                $this->validateReportSignatures($request, $report);
+            }
             $report->update($this->reportSignatureAttributes($request, $report));
             $this->syncRelationalRecords($report, $this->cleanRows($result['rows']), $this->cleanDeceasedRows($report->deceased_rows ?? []));
             $report->forceFill([
