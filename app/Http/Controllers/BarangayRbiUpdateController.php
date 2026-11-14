@@ -48,6 +48,9 @@ class BarangayRbiUpdateController extends Controller
         $this->authorizeBarangayReportOwner($request, $rbiUpdate);
         abort_unless($rbiUpdate->barangay_name === $this->assignedBarangayName($request), 403);
         $validated = $request->validate(['action' => ['required', Rule::in(['submit', 'consolidate'])]]);
+        if ($validated['action'] === 'submit' && $this->isHistoricalRbiReport($rbiUpdate)) {
+            throw ValidationException::withMessages(['reporting_month' => 'Reports through 2025 are added to Consolidated RBI and are not submitted to DILG.']);
+        }
 
         return view('rbi-updates.certification', [
             'editingReport' => $rbiUpdate,
@@ -107,8 +110,10 @@ class BarangayRbiUpdateController extends Controller
             $report->update($this->reportSignatureAttributes($request, $report));
             $this->syncRelationalRecords($report, $this->cleanRows($result['rows']), $this->cleanDeceasedRows($report->deceased_rows ?? []));
             $report->forceFill([
-                'status' => BarangayRbiUpdate::STATUS_SUBMITTED,
-                'submitted_at' => $report->submitted_at ?? now(),
+                'status' => $this->isHistoricalRbiReport($report)
+                    ? BarangayRbiUpdate::STATUS_ADDED
+                    : BarangayRbiUpdate::STATUS_SUBMITTED,
+                'submitted_at' => $this->isHistoricalRbiReport($report) ? null : ($report->submitted_at ?? now()),
                 'consolidated_at' => $report->consolidated_at ?? now(),
             ])->save();
 
@@ -124,6 +129,9 @@ class BarangayRbiUpdateController extends Controller
         $barangayName = $this->assignedBarangayName($request);
 
         $validated = $request->validate($this->formRules());
+        if ($request->boolean('submit_to_municipal') && (int) substr($validated['reporting_month'], 0, 4) <= 2025) {
+            throw ValidationException::withMessages(['reporting_month' => 'Reports through 2025 are added to Consolidated RBI and are not submitted to DILG.']);
+        }
         [$rows, $deceasedRows] = $this->sectionRows($request, $validated);
         $preparedBy = trim((string) ($validated['prepared_by'] ?? ''));
         $attestedBy = trim((string) ($validated['attested_by'] ?? '')) ?: (string) ($request->user()->barangay?->punong_barangay_name ?? '');
@@ -201,6 +209,9 @@ class BarangayRbiUpdateController extends Controller
         $barangayName = $this->assignedBarangayName($request);
 
         $validated = $request->validate($this->formRules());
+        if ($request->boolean('submit_to_municipal') && (int) substr($validated['reporting_month'], 0, 4) <= 2025) {
+            throw ValidationException::withMessages(['reporting_month' => 'Reports through 2025 are added to Consolidated RBI and are not submitted to DILG.']);
+        }
 
         $conflictingReport = BarangayRbiUpdate::where('barangay_user_id', $request->user()->id)
             ->whereKeyNot($rbiUpdate->id)
@@ -280,6 +291,9 @@ class BarangayRbiUpdateController extends Controller
     public function submit(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
     {
         $this->authorizeBarangayReportOwner($request, $rbiUpdate);
+        if ($this->isHistoricalRbiReport($rbiUpdate)) {
+            throw ValidationException::withMessages(['reporting_month' => 'Reports through 2025 are added to Consolidated RBI and are not submitted to DILG.']);
+        }
         \App\Support\RbiEntryClassification::validateRows($rbiUpdate->rows ?? [], $rbiUpdate->reporting_month->format('Y-m'));
         app(\App\Services\RbiDuplicateEntries::class)->validate(
             $rbiUpdate->rows ?? [], $rbiUpdate->deceased_rows ?? [], $this->assignedBarangayName($request),
@@ -299,6 +313,11 @@ class BarangayRbiUpdateController extends Controller
             ->route($this->formRoute($request), ['new' => 1])
             ->with('status', 'Monthly RBI form submitted successfully. The form below is now ready for a new report.')
             ->with('submitted_rbi_update_id', $rbiUpdate->id);
+    }
+
+    private function isHistoricalRbiReport(BarangayRbiUpdate $report): bool
+    {
+        return (int) $report->reporting_month->format('Y') <= 2025;
     }
 
     public function download(Request $request, BarangayRbiUpdate $rbiUpdate): StreamedResponse

@@ -15,6 +15,8 @@ class BarangayRbiUpdate extends Model
 
     public const STATUS_SUBMITTED = 'submitted';
 
+    public const STATUS_ADDED = 'added';
+
     protected $casts = [
         'reporting_month' => 'date',
         'as_of_date' => 'date',
@@ -94,6 +96,10 @@ class BarangayRbiUpdate extends Model
 
     public function statusLabel(): string
     {
+        if ($this->status === self::STATUS_ADDED) {
+            return 'Submitted and Added';
+        }
+
         return ucfirst($this->status);
     }
 }

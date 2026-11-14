@@ -11,7 +11,7 @@
                     <div class="rbi-history-card-info">
                         <span class="rbi-history-month-icon" aria-hidden="true"><small>{{ optional($report->reporting_month)->format('M') ?: 'RBI' }}</small><strong>{{ optional($report->reporting_month)->format('Y') ?: '—' }}</strong></span>
                         <div class="rbi-history-card-copy">
-                            <div class="rbi-history-card-title"><h3>{{ $period }}</h3><x-status-badge :status="'submitted'">Submitted and Added</x-status-badge></div>
+                            <div class="rbi-history-card-title"><h3>{{ $period }}</h3><x-status-badge :status="$report->status">Submitted and Added</x-status-badge></div>
                             <div class="rbi-history-card-meta"><span><strong>{{ count($report->rows ?? []) }}</strong> {{ Str::plural('inhabitant', count($report->rows ?? [])) }}</span></div>
                             <div class="rbi-history-card-dates"><span>Added {{ $report->consolidated_at->copy()->timezone('Asia/Manila')->format('M d, Y') }}</span></div>
                         </div>
