@@ -25,6 +25,17 @@
         @if($errors->any())
             <div role="alert" class="errors"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul><p>Please select uploaded files again before retrying.</p></div>
         @endif
+        @if($certificationAction === 'consolidate' && $existingResidents !== [])
+            <aside class="rbi-existing-residents" role="status" aria-live="polite">
+                <h2>Existing residents in Consolidated RBI</h2>
+                <p>These people already have registry records. Check their household numbers before adding this report.</p>
+                <ul>
+                    @foreach($existingResidents as $resident)
+                        <li><strong>{{ $resident['name'] }}</strong><span>{{ collect($resident['households'])->map(fn ($number) => 'Household '.$number)->join(', ') }}</span></li>
+                    @endforeach
+                </ul>
+            </aside>
+        @endif
         <form class="rbi-certification-form" method="POST" enctype="multipart/form-data" action="{{ route($certificationAction === 'submit' ? 'barangay.rbi-updates.submit' : 'barangay.rbi-updates.add-to-registry', $editingReport) }}">
             @csrf
             @if($certificationAction === 'submit' && empty($editingReport->rows) && empty($editingReport->deceased_rows))<label class="rbi-no-activity"><input type="checkbox" name="confirm_no_activity" value="1" required @checked(old('confirm_no_activity'))> I confirm that no new residents or deceased inhabitants were recorded for this reporting month.</label>@endif

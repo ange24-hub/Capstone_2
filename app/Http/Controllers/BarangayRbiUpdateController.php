@@ -53,7 +53,45 @@ class BarangayRbiUpdateController extends Controller
             'editingReport' => $rbiUpdate,
             'barangay' => $request->user()->barangay,
             'certificationAction' => $validated['action'],
+            'existingResidents' => $validated['action'] === 'consolidate'
+                ? $this->existingResidentsForConsolidation($rbiUpdate, $request->user()->barangay_id)
+                : collect(),
         ]);
+    }
+
+    private function existingResidentsForConsolidation(BarangayRbiUpdate $report, int $barangayId): array
+    {
+        $residents = \App\Models\Inhabitant::with('household:id,household_number')
+            ->where('barangay_id', $barangayId)
+            ->get(['id', 'household_id', 'last_name', 'first_name', 'middle_name', 'suffix', 'birth_date']);
+
+        return collect($report->rows ?? [])->map(function (array $row) use ($residents): ?array {
+            $parts = array_map('trim', explode(',', (string) ($row['inhabitant_name'] ?? '')));
+            if (count($parts) < 2 || count($parts) > 3) {
+                return null;
+            }
+
+            [$last, $first] = $parts;
+            $middle = $parts[2] ?? '';
+            $normalize = static fn (?string $value): string => mb_strtolower(preg_replace('/\\s+/u', ' ', trim((string) $value)));
+            $matches = $residents->filter(function ($resident) use ($last, $first, $middle, $row, $normalize): bool {
+                $sameName = $normalize($resident->last_name) === $normalize($last)
+                    && $normalize($resident->first_name) === $normalize($first)
+                    && $normalize($resident->middle_name) === $normalize($middle)
+                    && $normalize($resident->suffix) === $normalize($row['suffix'] ?? '');
+                $birthDate = $row['birth_date'] ?? '';
+                $sameBirthDate = blank($birthDate) || blank($resident->birth_date)
+                    || $resident->birth_date->format('Y-m-d') === $birthDate;
+
+                return $sameName && $sameBirthDate;
+            });
+
+            return $matches->isEmpty() ? null : [
+                'name' => $row['inhabitant_name'],
+                'households' => $matches->map(fn ($resident): string => (string) ($resident->household?->household_number ?: 'Household number unavailable'))
+                    ->unique()->values()->all(),
+            ];
+        })->filter()->unique('name')->values()->all();
     }
 
     public function addToRegistry(Request $request, BarangayRbiUpdate $rbiUpdate): RedirectResponse
