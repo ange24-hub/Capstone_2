@@ -15,6 +15,16 @@ class BarangayRbiUpdate extends Model
 
     public const STATUS_SUBMITTED = 'submitted';
 
+    protected $casts = [
+        'reporting_month' => 'date',
+        'as_of_date' => 'date',
+        'families' => 'array',
+        'rows' => 'array',
+        'deceased_rows' => 'array',
+        'submitted_at' => 'datetime',
+        'consolidated_at' => 'datetime',
+    ];
+
     protected $fillable = [
         'barangay_user_id',
         'barangay_name',
@@ -35,16 +45,9 @@ class BarangayRbiUpdate extends Model
         'source_file_path',
         'source_file_name',
         'submitted_at',
+        'consolidated_at',
     ];
 
-    protected $casts = [
-        'reporting_month' => 'date',
-        'as_of_date' => 'date',
-        'families' => 'array',
-        'rows' => 'array',
-        'deceased_rows' => 'array',
-        'submitted_at' => 'datetime',
-    ];
 
     public function preparedRoleLabel(): string
     {

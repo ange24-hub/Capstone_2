@@ -27,6 +27,7 @@ if [ "${RUN_MIGRATIONS:-false}" = 'true' ]; then
 else
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
     gosu www-data php artisan rbi:prepare-certification-storage --no-interaction
+    gosu www-data php artisan rbi:prepare-consolidation-status --no-interaction
 fi
 
 # Optional feature storage must not prevent the existing web server from starting.

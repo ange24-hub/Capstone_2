@@ -106,6 +106,11 @@ class BarangayRbiUpdateController extends Controller
             $result = \App\Support\RbiReportRegistry::add($barangay, $report);
             $report->update($this->reportSignatureAttributes($request, $report));
             $this->syncRelationalRecords($report, $this->cleanRows($result['rows']), $this->cleanDeceasedRows($report->deceased_rows ?? []));
+            $report->forceFill([
+                'status' => BarangayRbiUpdate::STATUS_SUBMITTED,
+                'submitted_at' => $report->submitted_at ?? now(),
+                'consolidated_at' => $report->consolidated_at ?? now(),
+            ])->save();
 
             return $result;
         });

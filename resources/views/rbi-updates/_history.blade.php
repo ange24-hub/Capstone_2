@@ -1,5 +1,8 @@
         <nav class="rbi-history-sections" data-rbi-history-navigation aria-label="Report history sections">
             <a href="#report-history" aria-current="page">Monthly forms <span>{{ $reportHistoryPage->total() }}</span></a>
+            @if($submittedAndAddedReports->isNotEmpty())
+                <a href="#submitted-and-added">Submitted and Added <span>{{ $submittedAndAddedReports->count() }}</span></a>
+            @endif
             @if($savedHouseholdPage->total() > 0)
                 <a href="#saved-inhabitant-records">Pending consolidation <span>{{ $savedHouseholdPage->total() }}</span></a>
             @endif
@@ -10,6 +13,7 @@
         </nav>
 
         @include('rbi-updates._monthly-history')
+        @include('rbi-updates._submitted-and-added')
 
         <details class="rbi-history-tools">
             <summary>Month with no new or deceased residents?</summary>

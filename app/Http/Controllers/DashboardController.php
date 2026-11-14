@@ -200,7 +200,9 @@ class DashboardController extends Controller
         if ($request->routeIs('barangay.rbi-updates.history')) {
             $search = $request->query('report_search');
             $reportHistorySearch = is_string($search) ? trim(mb_substr($search, 0, 64)) : '';
-            $reports = $rbiUpdates->sortBy([['reporting_month', 'desc'], ['id', 'desc']]);
+            $submittedAndAddedReports = $rbiUpdates->filter(fn (BarangayRbiUpdate $report): bool => $report->consolidated_at !== null)
+                ->sortBy([['reporting_month', 'desc'], ['id', 'desc']])->values();
+            $reports = $rbiUpdates->whereNull('consolidated_at')->sortBy([['reporting_month', 'desc'], ['id', 'desc']]);
             if ($reportHistorySearch !== '') {
                 $term = mb_strtolower($reportHistorySearch);
                 $reports = $reports->filter(function (BarangayRbiUpdate $report) use ($term): bool {
@@ -286,6 +288,7 @@ class DashboardController extends Controller
             'registryActivities' => $barangay ? \App\Models\RegistryActivity::with('user')->where('barangay_id', $barangay->id)->latest('id')->paginate(15, ['*'], 'activity_page') : collect(),
             'rbiUpdates' => $rbiUpdates,
             'reportHistoryPage' => $reportHistoryPage,
+            'submittedAndAddedReports' => $submittedAndAddedReports ?? collect(),
             'reportHistorySearch' => $reportHistorySearch,
             'barangay' => $barangay,
             'residentApprovalRequests' => $residentApprovalRequests,
