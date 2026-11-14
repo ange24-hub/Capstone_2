@@ -18,7 +18,7 @@ class PopulationReportController extends Controller
 {
     public function __invoke(Request $request, PopulationSummary $summary, PopulationSpreadsheet $spreadsheet)
     {
-        $calendar = now(config('migration_forecast.timezone', 'Asia/Manila'));
+        $currentPeriod = PopulationReportPeriod::current();
         $request->validate([
             'barangay_id' => ['nullable', 'integer', 'exists:barangays,id'],
             'section' => ['nullable', Rule::in(array_keys(PopulationSummary::SECTIONS))],
@@ -27,10 +27,12 @@ class PopulationReportController extends Controller
             'report_year' => ['nullable', 'integer', 'min:1900', 'max:'.PopulationReportPeriod::maximumYear()],
             'semester' => ['nullable', Rule::in([1,2])],
         ]);
+        $period = [
+            'report_year' => $request->integer('report_year', $currentPeriod['report_year']),
+            'semester' => $request->integer('semester', $currentPeriod['semester']),
+        ];
         $isSecretary = $request->user()->hasRole(User::ROLE_BARANGAY);
         if ($request->user()->hasRole(User::ROLE_MUNICIPAL_LGU)) {
-            $period = ['report_year'=>($request->filled('report_year') ? $request->integer('report_year') : $calendar->year),
-                'semester'=>($request->filled('semester') ? $request->integer('semester') : ($calendar->month <= 6 ? 1 : 2))];
             if ($request->routeIs('reports.population')) {
                 return redirect()->route('reports.population.submissions.index', $period + $request->only('barangay_id'));
             }
@@ -49,29 +51,28 @@ class PopulationReportController extends Controller
         $barangayId = $isSecretary ? $request->user()->barangay_id : ($request->filled('barangay_id') ? $request->integer('barangay_id') : null);
         $selectedSection = $request->input('section') ?: 'summary';
         $printMode = $request->boolean('print');
-        $reportFilters=array_filter(['barangay_id'=>$barangayId,'report_year'=>$request->integer('report_year',$calendar->year),
-            'semester'=>$request->integer('semester',$calendar->month<=6?1:2)]);
-        if ($selectedSection === 'summary' && app(PopulationReportPeriod::class)->usesHistory($reportFilters['report_year'], $reportFilters['semester'])) {
-            $saved = $barangayId && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')
-                ? app(PopulationReportPeriod::class)->nearestSaved($barangayId, $reportFilters['report_year'], $reportFilters['semester']) : null;
-            if ($saved) {
-                $action = $request->routeIs('reports.population.pdf') ? 'pdf' : ($request->routeIs('reports.population.excel') ? 'excel' : 'show');
-                $parameters = ['submission'=>$saved->id] + ($printMode && $action === 'show' ? ['print'=>1] : []);
-                $redirect = redirect()->route('reports.population.submissions.'.$action, $parameters);
-                if ($saved->report_year !== $reportFilters['report_year'] || $saved->semester !== $reportFilters['semester']) {
-                    $redirect->with('population_period_notice', 'No exact saved report for '.($reportFilters['semester']===1?'1st':'2nd')
-                        .' Semester '.$reportFilters['report_year'].'. Opened the nearest earlier report: '
-                        .($saved->semester===1?'1st':'2nd').' Semester '.$saved->report_year.'. Its original period and counts are preserved.');
-                }
-                return $redirect;
-            }
-            return response()->view('reports.population-period-empty', [
-                'reportFilters'=>$reportFilters, 'isSecretary'=>$isSecretary, 'areaId'=>$barangayId,
-                'barangays'=>$isSecretary ? collect() : Barangay::orderBy('name')->get(['id','name']),
-            ], $request->routeIs('reports.population') ? 200 : 404)->header('Cache-Control','private, no-store');
+        $reportFilters = array_filter(['barangay_id' => $barangayId]) + $period;
+        $periods = app(PopulationReportPeriod::class);
+        $year = $reportFilters['report_year'];
+        $semester = $reportFilters['semester'];
+        $futurePeriod = [$year, $semester] > [$currentPeriod['report_year'], $currentPeriod['semester']];
+        $saved = ! $futurePeriod && $selectedSection === 'summary' && $barangayId
+            && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')
+            ? $periods->submitted($barangayId, $year, $semester) : null;
+        if ($saved) {
+            $action = $request->routeIs('reports.population.pdf') ? 'pdf' : ($request->routeIs('reports.population.excel') ? 'excel' : 'show');
+
+            return redirect()->route('reports.population.submissions.'.$action,
+                ['submission' => $saved->id] + ($printMode && $action === 'show' ? ['print' => 1] : []));
         }
-        // New periods use the latest Consolidated data. Saved historical copies
-        // are opened above without changing their actual reporting period.
+        if (! $periods->canGenerate($year, $semester)) {
+            return response()->view('reports.population-period-empty', [
+                'reportFilters' => $reportFilters, 'isSecretary' => $isSecretary, 'areaId' => $barangayId,
+                'futurePeriod' => $futurePeriod,
+                'barangays' => $isSecretary ? collect() : Barangay::orderBy('name')->get(['id', 'name']),
+            ], $request->routeIs('reports.population') ? 200 : 404)->header('Cache-Control', 'private, no-store');
+        }
+
         $report = $summary->build($barangayId, $selectedSection);
         if($selectedSection==='summary') {
             $report['monitoring']['year']=$reportFilters['report_year'];
@@ -123,10 +124,7 @@ class PopulationReportController extends Controller
                 ])->values();
         }
         $submissionPreviewToken = null;
-        $periodSubmission = $selectedSection === 'summary' && $barangayId
-            && \Illuminate\Support\Facades\Schema::hasTable('population_report_submissions')
-            ? app(PopulationReportPeriod::class)->submitted($barangayId, $reportFilters['report_year'], $reportFilters['semester']) : null;
-        if ($isSecretary && $request->user()->isApproved() && $selectedSection === 'summary' && ! $printMode && !$periodSubmission) {
+        if ($isSecretary && $request->user()->isApproved() && $selectedSection === 'summary' && ! $printMode) {
             $previews = array_filter($request->session()->get('population_submission_previews', []), fn ($item) => $item['expires_at'] >= time());
             $previews = array_slice($previews, -4, null, true);
             $submissionPreviewToken = (string) Str::uuid();
@@ -136,7 +134,6 @@ class PopulationReportController extends Controller
         }
         return response()->view('reports.population', [
             'submissionPreviewToken' => $submissionPreviewToken,
-            'periodSubmission' => $periodSubmission,
             'usingSavedSignatures' => $usingSavedSignatures,
             'selectedSection' => $selectedSection, 'sectionLabels' => $sectionLabels, 'reportTitle' => $reportTitle,
             'detailGroups' => $detailGroups, 'detailPagination' => $detailPagination,

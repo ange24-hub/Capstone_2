@@ -81,6 +81,8 @@ class PopulationReportSubmissionTest extends TestCase
 
     private function preview(User $staff, int $year = 2026, int $semester = 2): string
     {
+        $this->travelTo(now('Asia/Manila')->setDate($year, $semester === 1 ? 3 : 9, 15)->startOfDay());
+
         return $this->actingAs($staff)->get(route('reports.population', ['report_year' => $year, 'semester' => $semester]))
             ->assertOk()->assertSee('Submit to Municipal DILG/Admin')->viewData('submissionPreviewToken');
     }
@@ -104,9 +106,7 @@ class PopulationReportSubmissionTest extends TestCase
             $this->post(route('reports.population.submissions.store'), ['preview_token' => $token] + $this->signaturePayload())->assertRedirect()->assertSessionHasNoErrors();
         }
         $saved = PopulationReportSubmission::firstOrFail();
-        $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertOk()
-            ->assertSee('Already submitted for this semester')->assertSee('View submitted report')
-            ->assertDontSee('Submit to Municipal DILG/Admin')->assertViewHas('submissionPreviewToken', null);
+        $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertRedirect(route('reports.population.submissions.show', $saved));
         $this->assertDatabaseCount('population_report_submissions', 1);
         $this->assertSame(1, $saved->total_records);
         $this->assertSame($staff->id, $saved->submitted_by);
@@ -134,11 +134,18 @@ class PopulationReportSubmissionTest extends TestCase
         $this->assertSame(1, $report['sex']['Male']);
         $this->assertSame(0, $report['sex']['Female']);
         $this->assertSame($original['monitoring'], $report['monitoring']);
-        $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertOk()
-            ->assertViewHas('submissionPreviewToken', null)->assertDontSee('Submit to Municipal DILG/Admin');
+        $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertRedirect(route('reports.population.submissions.show', $saved));
         $new = $this->submit($staff, 2027, 1);
         $this->assertNotSame($saved->id, $new->id);
         $this->assertSame(2, $new->total_records);
+        $oldPeriod = ['report_year' => 2026, 'semester' => 2];
+        foreach (['reports.population' => 'show', 'reports.population.pdf' => 'pdf', 'reports.population.excel' => 'excel'] as $route => $action) {
+            $this->get(route($route, $oldPeriod))->assertRedirect(route('reports.population.submissions.'.$action, $saved));
+        }
+        $this->get(route('reports.population', $oldPeriod + ['print' => 1]))
+            ->assertRedirect(route('reports.population.submissions.show', ['submission' => $saved, 'print' => 1]));
+        $this->followingRedirects()->get(route('reports.population', $oldPeriod))->assertOk()
+            ->assertSee('2nd Semester of CY 2026')->assertViewHas('report', fn (array $report) => $report['totalRecords'] === 1);
         $this->assertSame($original, $saved->fresh()->snapshot);
         $this->get(route('reports.population.submissions.index'))->assertOk()->assertSee($saved->reference)->assertSee($new->reference);
     }
@@ -225,8 +232,7 @@ class PopulationReportSubmissionTest extends TestCase
                 ->assertRedirect(route('reports.population.submissions.show', $saved));
             $this->post(route('reports.population.submissions.store'), ['preview_token'=>$token])
                 ->assertRedirect(route('reports.population.submissions.show', $saved));
-            $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertOk()
-                ->assertViewHas('submissionPreviewToken', null)->assertDontSee('Submit to Municipal DILG/Admin');
+            $this->get(route('reports.population', ['report_year'=>2026,'semester'=>2]))->assertRedirect(route('reports.population.submissions.show', $saved));
         }
         $this->assertDatabaseCount('population_report_submissions', 1);
         $this->assertDatabaseCount('registry_activities', 1);
@@ -315,7 +321,7 @@ class PopulationReportSubmissionTest extends TestCase
         $this->assertDatabaseCount('population_report_submissions', 1);
     }
 
-    public function test_reuse_is_bound_to_the_report_previewed_even_when_a_newer_signature_exists(): void
+    public function test_an_open_signing_tab_cannot_submit_after_its_semester_ends(): void
     {
         $staff = $this->secretary();
         $first = $this->submit($staff);
@@ -330,12 +336,10 @@ class PopulationReportSubmissionTest extends TestCase
         $this->post(route('reports.population.submissions.store'), ['preview_token' => $newerToken] + $replacement)
             ->assertSessionHasNoErrors()->assertRedirect();
         $this->assertDatabaseCount('population_report_submissions', 2);
-        $this->post(route('reports.population.submissions.store'), ['preview_token' => $token,
+        $this->postJson(route('reports.population.submissions.store'), ['preview_token' => $token,
             'signature_source_id' => $first->id, 'prepared_name' => 'Test Secretary', 'submitted_name' => 'Test Captain',
             'prepared_signature_reuse' => '1', 'submitted_signature_reuse' => '1'])
-            ->assertSessionHasNoErrors()->assertRedirect();
-        $last = PopulationReportSubmission::latest('id')->firstOrFail();
-        $this->assertSame($first->snapshot['signatures'], $last->snapshot['signatures']);
-        $this->assertDatabaseCount('population_report_submissions', 3);
+            ->assertUnprocessable()->assertJsonValidationErrors('submission');
+        $this->assertDatabaseCount('population_report_submissions', 2);
     }
 }

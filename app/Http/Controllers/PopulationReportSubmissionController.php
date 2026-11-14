@@ -69,13 +69,14 @@ class PopulationReportSubmissionController extends Controller
         if (! $preview || (int) $preview['user_id'] !== (int) $user->id || (int) $preview['barangay_id'] !== (int) $user->barangay_id || $preview['expires_at'] < time()) {
             throw ValidationException::withMessages(['submission' => 'This preview expired. Reload the summary and review it before submitting.']);
         }
-        if (app(\App\Services\PopulationReportPeriod::class)->usesHistory(
-            $preview['snapshot']['monitoring']['year'], $preview['snapshot']['monitoring']['semester'])) {
-            throw ValidationException::withMessages(['submission'=>'This historical period uses saved reports. Choose a newer period to submit a new report from Consolidated.']);
-        }
         $periods = app(\App\Services\PopulationReportPeriod::class);
-        $alreadySubmitted = $periods->submitted($user->barangay_id, $preview['snapshot']['monitoring']['year'], $preview['snapshot']['monitoring']['semester']);
+        $year = $preview['snapshot']['monitoring']['year'];
+        $semester = $preview['snapshot']['monitoring']['semester'];
+        $alreadySubmitted = $periods->submitted($user->barangay_id, $year, $semester);
         if ($alreadySubmitted) return redirect()->route('reports.population.submissions.show', $alreadySubmitted);
+        if (! $periods->canGenerate($year, $semester)) {
+            throw ValidationException::withMessages(['submission' => 'Only the current reporting semester can be submitted. Open the current Population Summary to generate a new report.']);
+        }
         $signatures = app(\App\Services\PopulationReportSignatures::class)->capture($request);
         $submission = DB::transaction(function () use ($preview, $summary, $snapshots, $user, $token, $signatures) {
             Barangay::whereKey($user->barangay_id)->lockForUpdate()->firstOrFail();
@@ -130,6 +131,10 @@ class PopulationReportSubmissionController extends Controller
         $alreadySubmitted = app(\App\Services\PopulationReportPeriod::class)->submitted($request->user()->barangay_id,
             $preview['snapshot']['monitoring']['year'], $preview['snapshot']['monitoring']['semester']);
         if ($alreadySubmitted) return redirect()->route('reports.population.submissions.show', $alreadySubmitted);
+        if (! app(\App\Services\PopulationReportPeriod::class)->canGenerate(
+            $preview['snapshot']['monitoring']['year'], $preview['snapshot']['monitoring']['semester'])) {
+            return redirect()->route('reports.population')->withErrors(['submission' => 'Only the current reporting semester can be submitted. Generate a new report for the current semester.']);
+        }
         return response()->view('reports.population-sign', ['previewToken'=>$token, 'report'=>$preview['snapshot'],
             'savedSignatures'=>app(\App\Services\PopulationReportSignatures::class)->savedFor($request->user())])
             ->header('Cache-Control', 'private, no-store');

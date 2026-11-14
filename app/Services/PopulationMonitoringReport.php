@@ -60,6 +60,18 @@ class PopulationMonitoringReport
             'preparedBy'=>$area?->secretary_name,'submittedBy'=>$area?->punong_barangay_name,'isBarangay'=>$area!==null];
     }
 
+    public static function sectorRemarks(array $row): string
+    {
+        $remarks = $row['remarks'] ?? '';
+        $remarks = $remarks === 'Not recorded' ? '' : $remarks;
+        $unspecified = $row['unspecified'] ?? 0;
+        if ($unspecified) {
+            $remarks = $remarks === '' ? 'Sex unspecified: '.$unspecified : $remarks.'; sex unspecified: '.$unspecified;
+        }
+
+        return $remarks;
+    }
+
     private function row(string $label): array {return ['label'=>$label,'male'=>0,'female'=>0,'unspecified'=>0,'total'=>0];}
     private function increment(array &$row,string $sex): void {$row[$sex]++;$row['total']++;}
     private function marked(string $text,string $pattern): bool

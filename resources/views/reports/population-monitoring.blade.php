@@ -27,7 +27,7 @@
             <tr class="monitoring-total"><td>{{ $historical ? 'Sum of age brackets as recorded' : 'Total registered residents' }}</td><td>{{ $number($report['sex']['Male']) }}</td><td>{{ $number($report['sex']['Female']) }}</td><td>{{ number_format($historical ? $report['ageTotalSum'] : $report['totalRecords']) }}</td><td class="monitoring-remarks">{{ $historical && $report['ageTotalSum']!==$report['totalRecords'] ? 'Differs from reported population' : ($report['sex']['Not specified / other'] ? 'Sex unspecified: '.$report['sex']['Not specified / other'] : '') }}</td></tr>
             <tr class="monitoring-section"><th colspan="5">Population by Sector:</th></tr>
             @foreach($form['sectors'] as $row)
-                <tr><td>{{ $row['label'] }}</td><td>{{ $row['available'] ? $number($row['male']) : '—' }}</td><td>{{ $row['available'] ? $number($row['female']) : '—' }}</td><td>{{ $row['available'] ? $number($row['total']) : '—' }}</td><td class="monitoring-remarks">{{ $row['remarks'] }}{{ $row['unspecified'] ? '; sex unspecified: '.$row['unspecified'] : '' }}</td></tr>
+                <tr><td>{{ $row['label'] }}</td><td>{{ $row['available'] ? $number($row['male']) : '—' }}</td><td>{{ $row['available'] ? $number($row['female']) : '—' }}</td><td>{{ $row['available'] ? $number($row['total']) : '—' }}</td><td class="monitoring-remarks">{{ \App\Services\PopulationMonitoringReport::sectorRemarks($row) }}</td></tr>
             @endforeach
         </tbody>
     </table>

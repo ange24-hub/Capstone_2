@@ -34,7 +34,7 @@ class HistoricalPopulationReportTest extends TestCase
                 ->assertRedirect(route('reports.population.submissions.'.$action,$saved));
         }
         $this->get(route('reports.population',['report_year'=>2024,'semester'=>2]))
-            ->assertRedirect(route('reports.population.submissions.show',$saved))->assertSessionHas('population_period_notice');
+            ->assertOk()->assertSee('No saved report for this period');
         $this->get(route('reports.population.submissions.show', $saved))->assertOk()->assertSee('Needs reconciliation')->assertSee('459')->assertSee('429');
         $this->get(route('reports.population.submissions.source', $saved))->assertOk()->assertHeader('Content-Type', 'image/jpeg');
         $this->get(route('reports.population.submissions.source', ['submission'=>$saved->id, 'download'=>1]))

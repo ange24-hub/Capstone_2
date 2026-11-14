@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+@php($currentPeriod = \App\Services\PopulationReportPeriod::current())
 <section class="dashboard-page population-report population-spreadsheet {{ $selectedSection === 'summary' ? 'population-report-monitoring' : '' }} population-workspace population-report-builder" aria-labelledby="population-report-title">
     @unless($selectedSection === 'summary')
     @include('reports._document-header', ['documentTitle' => strtoupper($reportTitle).' REPORT', 'documentBarangay' => str_starts_with($report['scopeLabel'], 'Barangay ') ? substr($report['scopeLabel'], 9) : 'All barangays', 'documentDate' => $report['generatedAt']->format('m/d/Y'), 'documentPrintOnly' => true])
@@ -9,17 +10,17 @@
         <span class="population-live-badge"><span aria-hidden="true"></span>Latest Consolidated records</span>
     </header>
     @include('reports._population-pages')
-    <form class="population-controls population-builder-controls" method="GET" action="{{ route('reports.population') }}" aria-label="Choose population report" data-population-report-controls>
+    <form class="population-controls population-builder-controls" method="GET" action="{{ route('reports.population') }}" aria-label="Choose population report" data-population-report-controls data-current-year="{{ $currentPeriod['report_year'] }}" data-current-semester="{{ $currentPeriod['semester'] }}">
         @unless($isSecretary)<div class="population-control population-control-wide"><label for="report-barangay">Barangay</label><select id="report-barangay" name="barangay_id"><option value="">All barangays</option>@foreach($barangays as $barangay)<option value="{{ $barangay->id }}" @selected($selectedBarangayId === $barangay->id)>{{ $barangay->name }}</option>@endforeach</select></div>@endunless
         <div class="population-control population-control-wide"><label for="report-section">Report type</label><select id="report-section" name="section">
             @foreach(['Summary & resident lists'=>['summary','residents','families','households','seniors','pwd'], 'Population breakdown'=>['sex','ages','coverage','area-ages']] as $group=>$keys)
                 <optgroup label="{{ $group }}">@foreach($keys as $key)<option value="{{ $key }}" @selected($selectedSection === $key)>{{ $key==='summary' ? 'Population Summary' : $sectionLabels[$key] }}</option>@endforeach</optgroup>
             @endforeach
         </select></div>
-        <div class="population-control population-control-year"><label for="report-year">Year</label><select id="report-year" name="report_year" required>@foreach(range(\App\Services\PopulationReportPeriod::maximumYear(),1900) as $year)<option value="{{ $year }}" @selected($reportFilters['report_year']===$year)>{{ $year }}</option>@endforeach</select></div>
+        <div class="population-control population-control-year"><label for="report-year">Year</label><select id="report-year" name="report_year" required>@foreach(range($currentPeriod['report_year'], 1900) as $year)<option value="{{ $year }}" @selected($reportFilters['report_year']===$year)>{{ $year }}</option>@endforeach</select></div>
         <div class="population-control"><label for="report-semester">Semester</label><select id="report-semester" name="semester"><option value="1" @selected($reportFilters['semester'] === 1)>1st Semester · Jan–Jun</option><option value="2" @selected($reportFilters['semester'] === 2)>2nd Semester · Jul–Dec</option></select></div>
         <button class="button" type="submit"><x-app-icon name="document" /><span data-report-generate-label>Generate report</span></button>
-        <p class="population-builder-control-hint" data-report-control-status role="status">Through 1st Semester 2026: saved reports. Newer periods: latest Consolidated data.</p>
+        <p class="population-builder-control-hint" data-report-control-status role="status">Submitted reports open from their saved copy. Generate a new report for the current semester.</p>
     </form>
     @if($selectedSection==='summary')
     <div class="population-builder-stats" aria-label="Consolidated report totals">
@@ -37,21 +38,13 @@
             <a class="button secondary-button" href="{{ route('reports.population.excel', array_merge($reportFilters, ['section'=>$selectedSection])) }}"><x-app-icon name="download" />Download Excel</a>
         </div>
     </div>
-    <div class="population-builder-source" role="note"><x-app-icon name="activity" /><p><strong>Source: latest Consolidated registry</strong><span>As of {{ $report['generatedAt']->format('M d, Y · h:i A') }}. The selected year and semester label this newly generated report.</span></p>@if($usingSavedSignatures ?? false)<span class="population-builder-saved"><x-app-icon name="check" />Saved signatures included</span>@endif</div>
+    <div class="population-builder-source" role="note"><x-app-icon name="activity" /><p><strong>Source: latest Consolidated registry</strong><span>As of {{ $report['generatedAt']->format('M d, Y · h:i A') }}. This report uses the registry data available in the current semester.</span></p>@if($usingSavedSignatures ?? false)<span class="population-builder-saved"><x-app-icon name="check" />Saved signatures included</span>@endif</div>
     @if($selectedSection==='summary')<p class="population-builder-mobile-hint">Swipe left or right to view the full document, or download the A4 PDF.</p>@endif
     @if($report['totalRecords'] === 0)<div class="dashboard-empty-state"><strong>No resident records encoded in this scope</strong><p>The report does not indicate zero population.</p></div>@endif
     @include('reports.population-content')
     <p class="population-coverage-note" role="note">{{ $report['coveredBarangays'] }} / {{ $report['totalBarangays'] }} barangays with resident records. Completeness has not been verified. Original historical reports remain unchanged in Submission History.</p>
     </div>
-    @if(($periodSubmission ?? null) && !$printMode)
-        <section class="population-submission-panel population-submission-complete" aria-label="Population summary already submitted">
-            <span class="population-submitted-icon" aria-hidden="true"><x-app-icon name="check" /></span>
-            <div class="population-submit-copy"><h2>Already submitted for this semester</h2>
-                <p>{{ $periodSubmission->reference }} · Submitted {{ $periodSubmission->submitted_at->format('M d, Y') }}. The saved report stays unchanged; this preview shows the latest registry.</p>
-            </div>
-            <a class="button secondary-button" href="{{ route('reports.population.submissions.show', $periodSubmission) }}">View submitted report<x-app-icon name="arrow-right" /></a>
-        </section>
-    @elseif($submissionPreviewToken ?? null)
+    @if($submissionPreviewToken ?? null)
         <section class="population-submission-panel" aria-label="Submit population summary">
             <div class="population-submit-copy"><h2><span class="population-sticker population-sticker-green" aria-hidden="true"><x-app-icon name="document" /></span>Submit Population Report Summary</h2>
             <p>After reviewing, sign and submit this {{ $report['monitoring']['semester'] === 1 ? '1st' : '2nd' }} Semester {{ $report['monitoring']['year'] }} report to Municipal DILG/Admin. The signed copy is saved in Submission History.</p>

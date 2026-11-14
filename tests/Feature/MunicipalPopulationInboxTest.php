@@ -20,6 +20,7 @@ class MunicipalPopulationInboxTest extends TestCase
 
     private function submit(User $staff, int $year, int $semester): PopulationReportSubmission
     {
+        $this->travelTo(now('Asia/Manila')->setDate($year, $semester === 1 ? 3 : 9, 15)->startOfDay());
         $token = $this->actingAs($staff)->get(route('reports.population',['report_year'=>$year,'semester'=>$semester]))->assertOk()->viewData('submissionPreviewToken');
         $image=imagecreatetruecolor(240,80); imagefill($image,0,0,imagecolorallocate($image,255,255,255));imagesetthickness($image,3);
         imageline($image,10,60,220,20,imagecolorallocate($image,20,40,60));ob_start();imagepng($image);$png='data:image/png;base64,'.base64_encode(ob_get_clean());

@@ -9,7 +9,6 @@
 <section class="population-workspace population-report-builder population-report-monitoring population-archive-document">
     <header class="population-page-heading population-builder-heading"><div><span class="population-builder-eyebrow">Saved historical report · {{ $submission->reference }}</span><h1><span class="population-sticker population-sticker-blue"><x-app-icon name="document" /></span>{{ $submission->barangay_name }} Population Summary</h1><p>{{ $submission->semester===1?'1st':'2nd' }} Semester {{ $submission->report_year }} · Original reporting period preserved</p></div><span class="population-history-badge"><x-app-icon name="clock" />Historical document</span></header>
     @include('reports._population-pages')
-    @if(session('population_period_notice'))<p class="population-period-notice" role="status">{{ session('population_period_notice') }}</p>@endif
     @include('reports._population-period-controls')
     <div class="population-builder-stats" aria-label="Original reported totals">
         @foreach([['users','Reported inhabitants',$archive['population']],['home','Households',$archive['households']],['directory','Families',$archive['families']]] as [$icon,$label,$value])<div><span class="population-builder-stat-icon"><x-app-icon :name="$icon" /></span><p><strong>{{ number_format($value) }}</strong><span>{{ $label }}</span></p></div>@endforeach

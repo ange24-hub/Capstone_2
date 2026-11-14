@@ -216,7 +216,7 @@ class PopulationSpreadsheet
         $add(['Population by Sector:'],12,17,true);
         foreach($form['sectors'] as $row) $add([$row['label'],$row['available']?$row['male']:'-',
             $row['available']?$row['female']:'-',$row['available']?$row['total']:'-',
-            $row['remarks'].($row['unspecified']?'; sex unspecified: '.$row['unspecified']:'')],4,19);
+            PopulationMonitoringReport::sectorRemarks($row)],4,19);
         $add([],0,9);
         $signatureRow=count($rows)+1;$add(['Prepared by:','','Submitted by:'],0,16);
         $merges[]='A'.$signatureRow.':B'.$signatureRow;$merges[]='C'.$signatureRow.':E'.$signatureRow;
