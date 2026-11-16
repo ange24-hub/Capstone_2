@@ -45,7 +45,7 @@
                                     <span class="account-type-icon" aria-hidden="true">{{ $value === App\Models\User::ROLE_RESIDENT ? 'R' : 'BS' }}</span>
                                     <span>
                                         <strong>{{ $label }}</strong>
-                                        <small>{{ $value === App\Models\User::ROLE_RESIDENT ? 'For people living in a Tomas Oppus barangay' : 'For authorized barangay secretaries' }}</small>
+                                        <small>{{ $value === App\Models\User::ROLE_RESIDENT ? 'For people living in a Tomas Oppus barangay' : 'For Barangay RBI secretaries' }}</small>
                                     </span>
                                 </label>
                             @endforeach
@@ -89,26 +89,18 @@
 
                     <div class="registration-section secretary-fields" data-secretary-fields>
                         <div class="registration-section-head">
-                            <span>Secretary verification</span>
-                            <small>These details confirm your authorized barangay role.</small>
+                            <span>Secretary-RBI details</span>
+                            <small>Municipal LGU approval is required before system access is enabled.</small>
                         </div>
 
                         <div class="registration-fields grid grid-cols-1 gap-5 md:grid-cols-2">
                             <div class="field-group">
-                                <label for="user_id">Secretary user ID</label>
+                                <label for="user_id">Secretary-RBI user ID</label>
                                 <input id="user_id" name="user_id" type="text" value="{{ old('user_id') }}" autocomplete="username" placeholder="e.g. TO-BANDAY-001" @error('user_id') aria-invalid="true" @enderror>
                                 <small class="field-help">Letters, numbers, dashes, and underscores only.</small>
                                 @error('user_id') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
                             </div>
 
-                            <div class="field-group">
-                                <label for="access_code">LGU access code</label>
-                                <x-password-control field-id="access_code" label="access code">
-                                    <input id="access_code" name="access_code" type="password" autocomplete="off" placeholder="Code issued by Municipal LGU" @error('access_code') aria-invalid="true" @enderror>
-                                </x-password-control>
-                                <small class="field-help">Contact the Municipal LGU if you have not received a code.</small>
-                                @error('access_code') <small class="field-error text-sm text-red-700">{{ $message }}</small> @enderror
-                            </div>
                         </div>
                     </div>
 
@@ -173,14 +165,14 @@
                     input.required = isSecretary;
                 });
 
-                title.textContent = isSecretary ? 'Barangay secretary registration' : 'Resident registration';
+                title.textContent = isSecretary ? 'Secretary-RBI registration' : 'Resident registration';
                 description.textContent = isSecretary
-                    ? 'Create an official secretary account for Municipal LGU verification.'
+                    ? 'Register as a Secretary-RBI. Municipal LGU approval is required before access.'
                     : 'Submit your details for review by your barangay secretary.';
                 approvalNote.textContent = isSecretary
                     ? 'The Municipal LGU will review this secretary account before workspace access is enabled.'
                     : 'Your barangay secretary will review this resident account before portal access is enabled.';
-                submit.textContent = isSecretary ? 'Create Secretary Account' : 'Create Resident Account';
+                submit.textContent = isSecretary ? 'Create Secretary-RBI Account' : 'Create Resident Account';
             }
 
             roleInputs.forEach((input) => input.addEventListener('change', updateRegistrationForm));

@@ -38,8 +38,6 @@ class DeploymentCheck extends Command
             && ! in_array($host, ['localhost', '127.0.0.1', 'example.com'], true)
             && empty($url['path']) && empty($url['user']) && empty($url['pass']), 'APP_URL is the real HTTPS domain, hosted at its root');
         $check(config('session.secure') === true && config('session.http_only') === true, 'Secure HTTP-only session cookies');
-        $code = (string) config('auth.registration_codes.barangay');
-        $check(strlen($code) >= 24 && ! in_array($code, ['barangay-secret', 'CHANGE_ME'], true), 'Private barangay registration code with at least 24 characters');
         $check(config('database.default') === 'mysql', 'Production database uses MySQL');
         $connection = config('database.connections.mysql');
         $check(filled($connection['password'] ?? null) && ! in_array($connection['username'] ?? '', ['', 'root'], true), 'Dedicated database account with a password');

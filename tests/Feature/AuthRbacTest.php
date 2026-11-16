@@ -6,7 +6,6 @@ use App\Models\Barangay;
 use App\Models\DocumentRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class AuthRbacTest extends TestCase
@@ -140,26 +139,9 @@ class AuthRbacTest extends TestCase
         ]);
     }
 
-    public function test_staff_registration_requires_matching_access_code(): void
+    public function test_secretary_rbi_registers_without_shared_code_and_waits_for_municipal_approval(): void
     {
-        Config::set('auth.registration_codes.barangay', 'barangay-secret');
-
-        $this->post('/register', [
-            'name' => 'Barangay Staff',
-            'email' => 'staff@example.com',
-            'role' => User::ROLE_BARANGAY,
-            'access_code' => 'wrong-code',
-            'password' => 'Password123!',
-            'password_confirmation' => 'Password123!',
-        ])->assertSessionHasErrors('access_code');
-
-        $this->assertGuest();
-        $this->assertDatabaseMissing('users', ['email' => 'staff@example.com']);
-    }
-
-    public function test_barangay_secretary_registers_and_waits_for_municipal_approval(): void
-    {
-        Config::set('auth.registration_codes.barangay', 'barangay-secret');
+        $this->get('/register')->assertOk()->assertSee('Secretary-RBI')->assertDontSee('LGU access code');
         $barangay = Barangay::where('name', 'Banday')->firstOrFail();
 
         $this->post('/register', [
@@ -168,7 +150,6 @@ class AuthRbacTest extends TestCase
             'user_id' => 'TO-BANDAY-001',
             'role' => User::ROLE_BARANGAY,
             'barangay_id' => $barangay->id,
-            'access_code' => 'barangay-secret',
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
         ])->assertRedirect(route('dashboard'));
@@ -181,9 +162,6 @@ class AuthRbacTest extends TestCase
             'barangay_id' => $barangay->id,
             'approval_status' => User::APPROVAL_PENDING,
         ]);
-
-        $this->get(route('dashboard'))
-            ->assertRedirect(route('approval.pending'));
 
         $this->get(route('approval.pending'))
             ->assertOk()

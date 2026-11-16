@@ -28,8 +28,6 @@ services:
       SESSION_LIFETIME: ${SESSION_LIFETIME:-30}
       SESSION_SECURE_COOKIE: "true"
       SESSION_COOKIE: ${SESSION_COOKIE:-sbispgm_session}
-      BARANGAY_REGISTRATION_CODE: ${BARANGAY_REGISTRATION_CODE:?Set a private barangay registration code}
-      MUNICIPAL_LGU_REGISTRATION_CODE: ${MUNICIPAL_LGU_REGISTRATION_CODE:?Set a private municipal registration code}
       MAIL_MAILER: smtp
       MAIL_HOST: ${MAIL_HOST:?Set the SMTP host}
       MAIL_PORT: ${MAIL_PORT:-587}

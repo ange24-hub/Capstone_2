@@ -112,20 +112,4 @@ return [
 
     'password_timeout' => 10800,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Staff Registration Access Codes
-    |--------------------------------------------------------------------------
-    |
-    | Resident registration is public. Barangay and municipal LGU registrations
-    | require an access code so public users cannot grant themselves staff-level
-    | permissions. Set these in .env before creating staff accounts.
-    |
-    */
-
-    'registration_codes' => [
-        'barangay' => env('BARANGAY_REGISTRATION_CODE'),
-        'municipal_lgu' => env('MUNICIPAL_LGU_REGISTRATION_CODE'),
-    ],
-
 ];

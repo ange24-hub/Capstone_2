@@ -33,7 +33,7 @@ Dokploy's [Compose documentation](https://docs.dokploy.com/docs/core/docker-comp
 | `APP_KEY` | A permanent Laravel encryption key. Generate once using the command below; retain the existing key when moving an existing installation. |
 | `DB_DATABASE`, `DB_USERNAME` | Dedicated database and non-root application user; defaults are `sbispgm`. |
 | `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD` | Different strong passwords. |
-| `BARANGAY_REGISTRATION_CODE`, `MUNICIPAL_LGU_REGISTRATION_CODE` | Different private random values, each at least 24 characters. |
+| Secretary-RBI registration | Accounts remain pending and require Municipal LGU approval before any staff access. No shared registration secret is needed. |
 | `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | Your SMTP account and real sender address for password resets. |
 
 Generate a new installation's key on your local machine without editing the local `.env`:

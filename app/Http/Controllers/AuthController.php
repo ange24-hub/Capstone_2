@@ -52,7 +52,7 @@ class AuthController extends Controller
         return view('auth.register', [
             'roles' => [
                 User::ROLE_RESIDENT => User::roleLabels()[User::ROLE_RESIDENT],
-                User::ROLE_BARANGAY => User::roleLabels()[User::ROLE_BARANGAY],
+                User::ROLE_BARANGAY => 'Secretary-RBI',
             ],
             'barangays' => Barangay::where('municipality', Barangay::MUNICIPALITY)
                 ->orderBy('name')
@@ -132,23 +132,8 @@ class AuthController extends Controller
             'user_id' => ['nullable', 'required_if:role,'.User::ROLE_BARANGAY, 'string', 'max:100', 'alpha_dash', 'unique:users,staff_id'],
             'role' => ['required', 'in:resident,barangay'],
             'barangay_id' => ['required', Rule::exists('barangays', 'id')->where('municipality', Barangay::MUNICIPALITY)],
-            'access_code' => ['nullable', 'string', 'max:100'],
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
-
-        $validator->after(function ($validator) use ($request): void {
-            $role = (string) $request->input('role');
-
-            if ($role !== User::ROLE_BARANGAY) {
-                return;
-            }
-
-            $configuredCode = config("auth.registration_codes.{$role}");
-
-            if (! $configuredCode || ! hash_equals($configuredCode, (string) $request->input('access_code'))) {
-                $validator->errors()->add('access_code', 'A valid LGU access code is required for this role.');
-            }
-        });
 
         $validated = $validator->validate();
 
