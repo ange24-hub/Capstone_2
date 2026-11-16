@@ -103,7 +103,7 @@ return [
     'Please ask about one reporting year at a time.' => 'Palihog usa lang ka tuig sa report kada pangutana.',
     'Please select one valid reporting month per question, for example migration September 2026.' => 'Palihog pagpili og usa ka hustong bulan kada pangutana, pananglitan migration September 2026.',
     'Population reports are current database snapshots. Historical population totals are not available from these records.' => 'Ang population reports nagpakita sa kasamtangang datos sa database. Walay historical nga population totals gikan niini nga records.',
-    'Forecasting is not enabled. Recorded migration events alone do not establish reliable future or seasonal trends.' => 'Dili enabled ang forecasting dinhi sa chat. Ang natala nga migration events lamang dili igo aron masaligan ang banabana sa umaabot o seasonal trends.',
+    'Population Forecast uses completed semester reports and shows historical MAE and RMSE when enough consecutive reports are available. Migration Trends shows recorded arrivals and departures only; migration forecasts are not provided.' => 'Ang Population Forecast naggamit sa nahuman nga semester reports ug nagpakita sa historical MAE ug RMSE kon igo ang sunod-sunod nga reports. Ang Migration Trends nagpakita lang sa recorded arrivals ug departures; wala kini migration forecast.',
     "\nIn-migration: " => "\nMga pagsulod (in-migration): ",
     "\nOut-migration: " => "\nMga paggawas (out-migration): ",
     "\nNet change: " => "\nKalainan sa pagsulod ug paggawas: ",

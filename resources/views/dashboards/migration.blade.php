@@ -2,7 +2,6 @@
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/migration-workspace.css') }}?v={{ filemtime(public_path('css/migration-workspace.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/migration-forecast.css') }}?v={{ filemtime(public_path('css/migration-forecast.css')) }}">
 @endpush
 
 @section('content')
@@ -10,18 +9,16 @@
         $netMovement = $totalIn - $totalOut;
         $netKnown = $inKnown && $outKnown;
         $selectedBarangay = $barangays->firstWhere('id', (int) $selectedBarangayId);
-        $migrationSection = in_array(request('section'), ['forecast', 'events'], true) ? request('section') : 'trends';
-        $isAdminForecast = request()->routeIs('municipal.prediction-forecast');
-        $forecastRoute = $isAdminForecast ? 'municipal.prediction-forecast' : 'migration.dashboard';
+        $migrationSection = request('section') === 'events' ? 'events' : 'trends';
+        $migrationRoute = 'migration.dashboard';
     @endphp
 
     <section class="dashboard-page migration-dashboard" aria-labelledby="migration-dashboard-title">
         <header class="dashboard-page-header dashboard-page-header-with-actions flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-transparent bg-none pb-6 shadow-none">
             <x-workspace-heading icon="trend">
                 <span class="dashboard-eyebrow text-xs font-semibold uppercase tracking-widest text-blue-700">Population Movement</span>
-                <h1 id="migration-dashboard-title">{{ $isAdminForecast ? 'Prediction analytics' : 'Migration Trends' }}</h1>
+                <h1 id="migration-dashboard-title">Migration Trends</h1>
                 <p>{{ match ($migrationSection) {
-                    'forecast' => 'Verified migration forecasts and experimental SVR arrival estimates for supported barangays.',
                     'events' => 'Review the latest recorded arrivals and departures.',
                     default => 'Compare monthly arrivals and departures for '.$selectedYear.'.',
                 } }}</p>
@@ -32,13 +29,13 @@
             @foreach (['trends' => 'Trends', 'events' => 'Recent events'] as $section => $label)
                 <a href="{{ route('migration.dashboard', array_filter(['year'=>$selectedYear,'barangay_id'=>$selectedBarangayId,'section'=>$section])) }}" @if($migrationSection===$section) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
-            <a href="{{ route('prediction.dashboard', array_filter(['barangay_id'=>$selectedBarangayId])) }}">Population estimate</a>
+            <a href="{{ route('prediction.dashboard', array_filter(['barangay_id'=>$selectedBarangayId])) }}">Population forecast</a>
             @if(auth()->user()->hasRole(App\Models\User::ROLE_MUNICIPAL_LGU))
             <a href="{{ route('municipal.rbi-report-history') }}">RBI report history</a>
             @endif
         </nav>
 
-        <form class="migration-filters" method="GET" action="{{ route($forecastRoute) }}" aria-label="Migration filters">
+        <form class="migration-filters" method="GET" action="{{ route($migrationRoute) }}" aria-label="Migration filters">
             <input type="hidden" name="section" value="{{ $migrationSection }}">
             <div class="migration-filter-field">
                 <label for="migration-year">Reporting year</label>
@@ -53,11 +50,11 @@
             @else
                 <div class="migration-filter-scope"><span>Barangay scope</span><strong>{{ auth()->user()->barangay?->name }}</strong></div>
             @endif
-            <button type="submit"><x-app-icon name="filter" />{{ $migrationSection === 'forecast' ? 'Show forecast' : 'Apply filters' }}</button>
+            <button type="submit"><x-app-icon name="filter" />Apply filters</button>
         </form>
 
         @if ($selectedBarangay && ! auth()->user()->hasRole(App\Models\User::ROLE_BARANGAY))
-            <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} &middot; {{ $selectedYear }}</span><a href="{{ route($forecastRoute, ['year' => $selectedYear, 'section' => $migrationSection]) }}">Clear barangay filter</a></div>
+            <div class="active-filter"><span>Showing Barangay {{ $selectedBarangay->name }} &middot; {{ $selectedYear }}</span><a href="{{ route($migrationRoute, ['year' => $selectedYear, 'section' => $migrationSection]) }}">Clear barangay filter</a></div>
         @endif
 
         @if ($migrationSection === 'trends')
@@ -72,10 +69,6 @@
         <p class="migration-source-note">Counts use actual movement dates. A dash means no confirmed count; recorded events may still have incomplete coverage. @if($duplicateEvents){{ $duplicateEvents }} duplicate {{ \Illuminate\Support\Str::plural('entry',$duplicateEvents) }} excluded from counts; originals retained.@endif
             @if(auth()->user()->isApproved())<a href="{{ route('prediction.migration', array_filter(['barangay_id'=>$selectedBarangayId])) }}#forecast-records">Review dated movements and coverage</a>@endif
         </p>
-
-        @if ($migrationSection === 'forecast')
-            @include('dashboards._migration-forecast')
-        @endif
 
         @if ($migrationSection === 'trends')
         <div class="analytics-grid migration-analysis">

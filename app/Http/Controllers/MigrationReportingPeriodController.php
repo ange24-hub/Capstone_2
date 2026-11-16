@@ -59,7 +59,7 @@ class MigrationReportingPeriodController extends Controller
                     'after' => $period->only($fields)]]);
         });
 
-        return redirect()->route('migration.dashboard', ['section' => 'forecast', 'year' => $data['year'], 'barangay_id' => $data['barangay_id']])
-            ->with('status', $data['action'] === 'verify' ? 'The '.'departure'.' reporting month is verified complete. Forecast readiness has been recalculated.' : 'The month has been reopened. It will not be used for forecasting until verified again.');
+        return redirect()->route('migration.dashboard', ['section' => 'events', 'year' => $data['year'], 'barangay_id' => $data['barangay_id']])
+            ->with('status', $data['action'] === 'verify' ? 'The departure reporting month is verified complete. Migration trend coverage has been recalculated.' : 'The month has been reopened. Its migration trend count is unavailable until verified again.');
     }
 }

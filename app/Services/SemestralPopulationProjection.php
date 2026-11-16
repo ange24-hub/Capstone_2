@@ -20,7 +20,8 @@ class SemestralPopulationProjection
         $target = $current + 1;
         $result = ['target' => $this->label($target), 'estimate' => null, 'history' => [],
             'inputs' => [], 'steps' => [], 'reason' => 'Need at least 3 consecutive completed semester reports.',
-            'quality_issues' => 0, 'missing_periods' => [], 'excluded_reports' => [], 'mape' => null, 'historical_check' => null];
+            'quality_issues' => 0, 'missing_periods' => [], 'excluded_reports' => [], 'mape' => null, 'historical_check' => null,
+            'backtest' => [], 'test_periods' => 0, 'mae' => null, 'rmse' => null];
         if (! Schema::hasTable('population_report_submissions')) return $result;
         $snapshots = app(PopulationReportSubmissionSnapshot::class);
         $periods = [];
@@ -73,8 +74,35 @@ class SemestralPopulationProjection
             $inputs[] = $periods[$p];
         }
         $result['inputs'] = $inputs;
-        // Usa ka retrospective one-step check lang kung adunay upat ka sunod-sunod
-        // nga actual reports. Dili kini pre-issued forecast o live MAPE.
+        // Rolling one-step backtest: only use three immediately preceding actual
+        // semesters. Gaps never become zero and projected bridge values are excluded.
+        $backtest = [];
+        $history = $result['history'];
+        for ($targetIndex = 3; $targetIndex < count($history); $targetIndex++) {
+            $training = array_slice($history, $targetIndex - 3, 3);
+            if ($training[1]['period'] !== $training[0]['period'] + 1
+                || $training[2]['period'] !== $training[1]['period'] + 1
+                || $history[$targetIndex]['period'] !== $training[2]['period'] + 1) {
+                continue;
+            }
+            $values = array_column($training, 'population');
+            $predicted = ($values[0] + 2 * $values[1] + 3 * $values[2]) / 6;
+            $actual = $history[$targetIndex]['population'];
+            $backtest[] = [
+                'label' => $history[$targetIndex]['label'],
+                'actual' => $actual,
+                'predicted' => $predicted,
+                'absolute_error' => abs($actual - $predicted),
+                'training_through' => $training[2]['label'],
+            ];
+        }
+        $errors = array_map(fn ($row) => $row['actual'] - $row['predicted'], $backtest);
+        $result['backtest'] = $backtest;
+        $result['test_periods'] = count($backtest);
+        $result['mae'] = $errors ? array_sum(array_map('abs', $errors)) / count($errors) : null;
+        $result['rmse'] = $errors ? sqrt(array_sum(array_map(fn ($error) => $error ** 2, $errors)) / count($errors)) : null;
+
+        // Keep the latest one-step comparison for compatibility with existing callers.
         if (isset($periods[$latest - 3])) {
             $previous = array_map(fn ($p) => $periods[$p]['population'], range($latest - 3, $latest - 1));
             $actual = $periods[$latest]['population'];

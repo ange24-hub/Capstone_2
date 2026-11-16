@@ -54,6 +54,7 @@ class ForecastManuscriptEvidenceTest extends TestCase
         $this->assertSame('2027 · 1st semester',$projection['target']);
         $this->assertNull($projection['mape']);
         $this->assertSame($before,PopulationReportSubmission::orderBy('id')->get()->map->getAttributes()->all());
-        $this->actingAs($staff)->get(route('prediction.migration'))->assertOk()->assertSee('2-month lead');
+        $this->actingAs($staff)->get(route('prediction.migration'))->assertOk()
+            ->assertSee('Migration records')->assertDontSee('Migration forecast')->assertDontSee('2-month lead');
     }
 }

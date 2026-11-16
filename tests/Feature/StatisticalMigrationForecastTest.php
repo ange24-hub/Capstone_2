@@ -80,6 +80,72 @@ class StatisticalMigrationForecastTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_migration_records_page_does_not_show_migration_forecasts(): void
+    {
+        $this->person();
+        $this->actingAs($this->staff)->get(route('prediction.migration'))->assertOk()
+            ->assertViewIs('barangay.dashboard.migration-records')->assertSee('Migration records')
+            ->assertSee('Save movement event')->assertDontSee('Monthly migration')->assertDontSee('Save in/out forecasts');
+        foreach (['2026-08' => 2, '2026-09' => 4, '2026-10' => 8] as $month => $count) {
+            $this->events($month, $count); $this->verify($month);
+        }
+        $issued = $this->service->issueForecast($this->area->id, 'in');
+        $before = ForecastLog::orderBy('id')->get()->map->getAttributes()->all();
+        $this->get(route('prediction.migration'))->assertOk()->assertSee('Migration records')
+            ->assertDontSee('WMA · Verified monthly history')->assertDontSee('5.67');
+        $this->assertSame($before, ForecastLog::orderBy('id')->get()->map->getAttributes()->all());
+        $this->assertSame('weighted_moving_average', $issued->fresh()->method);
+        $this->assertSame(5.6667, $this->service->forecastNextMonth($this->area->id, 'in')['predicted_value']);
+        Http::assertNothingSent();
+    }
+
+    public function test_tinago_in_uses_seasonal_mean_with_verified_history_and_correct_calendar_horizon(): void
+    {
+        $this->area = Barangay::where('name', 'Tinago')->firstOrFail();
+        $this->staff->update(['barangay_id' => $this->area->id]);
+        $counts = [1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2];
+        foreach ($counts as $index => $count) {
+            $month = \Illuminate\Support\Carbon::parse('2025-08-01')->addMonths($index)->format('Y-m');
+            $this->events($month, $count); $this->verify($month);
+        }
+        $this->events('2026-11', 5); $this->events('2026-12', 7);
+        $result = $this->service->forecastNextMonth($this->area->id, 'in');
+        $this->assertSame('seasonal_mean', $result['method']);
+        $this->assertSame(2, $result['horizon_months']);
+        $this->assertSame('2026-12', $result['log_month']);
+        $this->assertSame('2026-10', $result['data_through']);
+        $this->assertCount(15, $result['history']);
+        $this->assertSame(.5, $result['predicted_value']); // Dec 2025=0; fifteen-month mean=1.
+        $this->assertSame(['seasonal' => .5, 'historical_mean' => .5], $result['component_weights']);
+        $this->assertSame('population_baseline', $this->service->forecastNextMonth($this->area->id, 'out')['method']);
+        $issued = $this->service->issueForecast($this->area->id, 'in');
+        $before = $issued->fresh()->getAttributes();
+        $this->actingAs($this->staff)->get(route('prediction.migration'))->assertOk()
+            ->assertSee('Migration records')->assertDontSee('Seasonal + Mean · Verified monthly history')
+            ->assertDontSee('50% same month last year');
+        $this->assertSame($before, $this->service->issueForecast($this->area->id, 'in')->getAttributes());
+        Http::assertNothingSent();
+    }
+
+    public function test_tinago_missing_month_blocks_seasonal_mean_and_fallback_keeps_its_six_month_window(): void
+    {
+        $this->area = Barangay::where('name', 'Tinago')->firstOrFail();
+        $this->staff->update(['barangay_id' => $this->area->id]);
+        for ($index = 0; $index < 15; $index++) {
+            $month = \Illuminate\Support\Carbon::parse('2025-08-01')->addMonths($index)->format('Y-m');
+            if ($month === '2025-11') continue; // Exactly eleven consecutive verified months after this gap.
+            $this->verify($month);
+        }
+        $result = $this->service->forecastNextMonth($this->area->id, 'in');
+        $this->assertSame('seasonal_mean', $result['preferred_method']);
+        $this->assertSame(11, $result['available_verified_months']);
+        $this->assertSame('weighted_moving_average', $result['method']);
+        $this->assertCount(6, $result['history']);
+        $this->assertSame([1, 2, 3, 4, 5, 6], $result['weights']);
+        $this->assertSame(0.0, $result['predicted_value']);
+        Http::assertNothingSent();
+    }
+
     public function test_missing_month_is_unknown_but_confirmed_zero_is_valid_history(): void
     {
         $this->verify('2026-08'); $this->verify('2026-10');
@@ -154,15 +220,15 @@ class StatisticalMigrationForecastTest extends TestCase
         $other = Barangay::where('name', 'Looc')->firstOrFail();
         $this->person();
         $this->actingAs($this->staff)->get(route('prediction.migration'))->assertOk()
-            ->assertViewIs('barangay.dashboard.prediction')->assertSee('Population-based assumption')->assertDontSee('SVR');
+            ->assertViewIs('barangay.dashboard.migration-records')->assertSee('Migration records')->assertDontSee('SVR');
         $this->get(route('prediction.migration', ['barangay_id' => $other->id]))->assertForbidden();
         foreach (['prediction.store', 'prediction.verify', 'prediction.sync', 'prediction.movements.store'] as $route) {
             $this->post(route($route), ['barangay_id' => $other->id])->assertForbidden();
         }
         $this->post(route('prediction.store'), ['target_month' => '2026-12'])->assertRedirect();
-        $this->assertDatabaseCount('forecast_logs', 2);
+        $this->assertDatabaseCount('forecast_logs', 0);
         $this->post(route('prediction.store'), ['target_month' => '2026-12'])->assertRedirect();
-        $this->assertDatabaseCount('forecast_logs', 2);
+        $this->assertDatabaseCount('forecast_logs', 0);
         $this->post(route('prediction.verify'), ['log_month' => '2026-10', 'migration_type' => 'out', 'source_hash' => str_repeat('a', 64)])->assertSessionHasErrors('confirm_complete');
         $resident = User::factory()->create(['role' => User::ROLE_RESIDENT]);
         $this->actingAs($resident)->get(route('prediction.migration'))->assertForbidden();
@@ -201,21 +267,16 @@ class StatisticalMigrationForecastTest extends TestCase
         $this->assertSame(-200.0, $this->service->calculateForecastAccuracy($this->area->id, 'in')['accuracy_rate']);
     }
 
-    public function test_workspace_distinguishes_preview_and_saved_forecasts_without_replacing_the_first_issue(): void
+    public function test_migration_records_workspace_does_not_offer_forecast_issuing(): void
     {
         $this->person();
         $this->actingAs($this->staff)->get(route('prediction.migration'))->assertOk()
-            ->assertSee('Migration forecast')->assertSee('December 2026')
-            ->assertSee('Save in/out forecasts')->assertSee('History cutoff')
-            ->assertDontSee('Last usable month:');
+            ->assertSee('Migration records')->assertSee('Save movement event')
+            ->assertDontSee('Migration forecast')->assertDontSee('Save in/out forecasts');
         $this->post(route('prediction.store'), ['target_month' => '2026-12'])->assertRedirect();
-        $first = ForecastLog::orderBy('id')->get()->map->getAttributes()->all();
-        $this->person();
         $this->get(route('prediction.migration'))->assertOk()
-            ->assertSee('Forecasts saved')->assertSee('Saved for December 2026')
-            ->assertDontSee('Save in/out forecasts')
-            ->assertViewHas('forecasts', fn ($forecasts) => $forecasts['in']['population'] === 1);
-        $this->assertSame($first, ForecastLog::orderBy('id')->get()->map->getAttributes()->all());
+            ->assertDontSee('Forecasts saved')->assertDontSee('Saved forecasts');
+        $this->assertDatabaseCount('forecast_logs', 0);
         Http::assertNothingSent();
     }
 
@@ -227,8 +288,8 @@ class StatisticalMigrationForecastTest extends TestCase
                 'predicted_value' => 1, 'method' => 'population_baseline', 'issued_at' => '2020-01-01']);
         }
         $response = $this->actingAs($this->staff)->get(route('prediction.migration', ['page' => 2]))->assertOk()
-            ->assertSee('barangay_id='.$this->area->id.'&amp;page=1#saved-forecasts', false);
-        $this->assertMatchesRegularExpression('/id="saved-forecasts"\s+open\b/', $response->getContent());
+            ->assertSee('Migration records')->assertDontSee('Saved forecasts');
+        $this->assertStringNotContainsString('saved-forecasts', $response->getContent());
     }
 
     public function test_invalid_movement_returns_to_an_open_form_with_the_original_values(): void
@@ -241,35 +302,24 @@ class StatisticalMigrationForecastTest extends TestCase
         $response = $this->get(route('prediction.migration'))->assertOk()
             ->assertSee('value="2026-10-14"', false)
             ->assertSee('value="out" selected', false);
-        $this->assertMatchesRegularExpression('/open\s*><summary>Record a verified movement/', $response->getContent());
+        $this->assertStringContainsString('Record a verified movement', $response->getContent());
     }
 
-    public function test_chart_keeps_unknown_months_blank_and_only_compares_preissued_forecasts_in_scope(): void
+    public function test_migration_records_keeps_unknown_months_distinct_from_confirmed_zeroes(): void
     {
         $this->events('2026-08', 3); // Recorded, but coverage is not confirmed.
         $this->verify('2026-09'); // A verified zero must still be plotted.
         $this->events('2026-10', 2);
         $this->verify('2026-10');
-        ForecastLog::create(['barangay_id' => $this->area->id, 'migration_type' => 'in',
-            'log_month' => '2026-08', 'predicted_value' => 4, 'issued_at' => '2026-07-01']);
-        ForecastLog::where('barangay_id', $this->area->id)->where('log_month', '2026-09')
-            ->update(['predicted_value' => 99, 'issued_at' => '2026-09-05']);
-        $other = Barangay::where('name', 'Looc')->firstOrFail();
-        ForecastLog::create(['barangay_id' => $other->id, 'migration_type' => 'in',
-            'log_month' => '2026-10', 'predicted_value' => 777, 'issued_at' => '2026-09-01']);
-
         $response = $this->actingAs($this->staff)->get(route('prediction.migration', ['page' => 2]))->assertOk();
-        $rows = collect($response->viewData('migrationCharts')['in'])->keyBy('period');
-        $this->assertNull($rows['2026-08']['actual']);
-        $this->assertSame(4.0, $rows['2026-08']['predicted']);
-        $this->assertSame(0, $rows['2026-09']['actual']);
-        $this->assertNull($rows['2026-09']['predicted']);
-        $this->assertSame(2, $rows['2026-10']['actual']);
-        $this->assertNull($rows['2026-10']['predicted']);
-        $this->assertNull($rows['2026-11']['actual']);
-        $this->assertNull($rows['2026-12']['actual']);
-        $this->assertSame($response->viewData('forecasts')['in']['predicted_value'], $rows['2026-12']['predicted']);
-        $this->assertTrue($rows['2026-12']['assumption']);
+        $rows = collect($response->viewData('history')['in'])->keyBy('month');
+        $this->assertFalse($rows['2026-08']['verified']);
+        $this->assertSame(3, $rows['2026-08']['count']);
+        $this->assertTrue($rows['2026-09']['verified']);
+        $this->assertSame(0, $rows['2026-09']['count']);
+        $this->assertTrue($rows['2026-10']['verified']);
+        $this->assertSame(2, $rows['2026-10']['count']);
+        $this->assertArrayNotHasKey('forecasts', $response->viewData());
         Http::assertNothingSent();
     }
 }

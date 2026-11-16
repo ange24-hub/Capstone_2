@@ -50,11 +50,11 @@ class PredictionAnalyticsAccessTest extends TestCase
     {
         $admin = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($admin)->get(route('dashboard.municipal'))->assertOk()
-            ->assertSee('Provisional estimates')->assertSee(route('prediction.dashboard'));
-        $this->get(route('municipal.prediction-forecast'))->assertOk()->assertSee('Provisional Population Estimate')
+            ->assertSee('Population forecast')->assertSee(route('prediction.dashboard'));
+        $this->get(route('municipal.prediction-forecast'))->assertOk()->assertSee('Population forecast')
             ->assertViewMissing('forecasts')->assertDontSee('Monthly migration');
-        $this->get(route('prediction.migration'))->assertOk()->assertSee('Population-based assumption')
-            ->assertViewHas('forecasts')->assertSee('Saved forecasts');
+        $this->get(route('prediction.migration'))->assertOk()->assertSee('Migration records')
+            ->assertDontSee('Population-based assumption')->assertDontSee('Saved forecasts');
     }
 
     public function test_pending_municipal_account_has_no_prediction_access(): void

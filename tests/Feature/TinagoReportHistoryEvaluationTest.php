@@ -85,12 +85,11 @@ class TinagoReportHistoryEvaluationTest extends TestCase
             'status' => 'draft', 'rows' => [['first_name' => 'OutsideScope', 'last_name' => 'Fixture', 'birth_date' => '1990-01-01']]]);
         $before = BarangayRbiUpdate::orderBy('id')->get()->map->getAttributes()->all();
         $response = $this->actingAs($staff)->get(route('prediction.migration'))->assertOk()
-            ->assertSee('Tinago in-migrant history test')->assertSee('historical label error')
-            ->assertSee('2.50')->assertSee('43.49%')->assertDontSee('OutsideScope');
-        $evaluation = $response->viewData('reportHistoryEvaluation');
+            ->assertSee('Migration records')->assertDontSee('Tinago in-migrant history test')
+            ->assertDontSee('historical label error')->assertDontSee('OutsideScope');
+        $evaluation = app(TinagoReportHistoryEvaluation::class)->forBarangay($area);
         $this->assertSame([7, 0, 2], array_column($evaluation['test_results'], 'actual'));
         $this->assertSame(30, $evaluation['estimated_labels']);
-        $this->assertNull($response->viewData('accuracies')['in']['mape']);
         $this->assertSame($before, BarangayRbiUpdate::orderBy('id')->get()->map->getAttributes()->all());
         $this->assertSame(0, ForecastLog::count());
         $this->assertSame(0, MigrationLog::count());

@@ -95,6 +95,6 @@ class RbiArrivalPeriodController extends Controller
                 'changes' => ['record_type' => 'rbi_arrival_period', 'start_month' => $period->start_month, 'reviewed_at' => null]]);
         });
 
-        return back()->with('status', 'Arrival period reopened. These counts are excluded from forecasting until reviewed again.');
+        return back()->with('status', 'Arrival period reopened. These counts remain unavailable until reviewed again.');
     }
 }

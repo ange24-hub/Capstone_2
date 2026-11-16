@@ -26,7 +26,7 @@ class AssistantReportSummary
             return $this->answer(AssistantLanguage::text('An approved barangay account with an assigned barangay is required to read reports.'));
         }
 
-        return $this->respond($user, $question);
+        return $this->retiredMigrationForecastAnswer($user->barangay_id);
     }
 
     public function respond(User $user, string $question): ?array
@@ -100,16 +100,7 @@ class AssistantReportSummary
             if (! $user->hasAnyRole([User::ROLE_MUNICIPAL_LGU, User::ROLE_BARANGAY]) || ! $user->isApproved()) {
                 return $this->answer(app()->getLocale() === 'ceb' ? 'Ang prediction analytics para ra sa approved Municipal LGU administrator.' : 'Prediction analytics is available to approved Municipal LGU administrators only.');
             }
-            $ceb = app()->getLocale() === 'ceb';
-            $url = route('prediction.dashboard', array_filter(['barangay_id' => $areaId]));
-            if (preg_match('/\b(?:19|20)\d{2}\b|\b(?:seasonal|next year|monthly|by month|most|highest|peak|pinakadaghan|january|february|march|april|may|june|july|august|september|october|november|december)\b/iu', $question)) {
-                return ['reply' => $ceb ? 'Ang forecast sa chat para sa sunod nga calendar month. Ablihi ang Forecast tab aron susihon ang historical reporting year; dili suportado dinhi ang ubang forecast horizons o seasonal claims.'
-                    : 'Chat forecasts cover arrivals, departures and net migration for the next calendar month. Open the Forecast tab to review a historical reporting year; other horizons and seasonal claims are not supported here.',
-                    'mode' => 'system_guidance', 'needs_clarification' => true, 'scope' => AssistantLanguage::text('RBIM system only'),
-                    'actions' => [['label' => AssistantLanguage::text('Open relevant page'), 'url' => $url]], 'suggestions' => []];
-            }
-
-            return $this->forecastAnswer($areaId, $question, $url, $ceb);
+            return $this->retiredMigrationForecastAnswer($areaId);
         }
         if ($migration) {
             $r = $this->migration->build($areaId, $year);
@@ -175,25 +166,14 @@ class AssistantReportSummary
         return $result;
     }
 
-    private function forecastAnswer(?int $areaId, string $question, string $url, bool $ceb): array
+    private function retiredMigrationForecastAnswer(?int $areaId): array
     {
-        if (! $areaId) return $this->answer($ceb ? 'Pilia ang usa ka barangay sa Provisional estimates page.' : 'Select one barangay in the Provisional estimates page.');
-        if (! \Illuminate\Support\Facades\Schema::hasTable('forecast_logs')) return $this->answer('Statistical forecast storage is not ready.');
-        $service = app(MigrationPredictionService::class);
-        $forecasts = []; $scores = [];
-        foreach (['in', 'out'] as $type) {
-            $preview = $service->forecastNextMonth($areaId, $type);
-            $saved = \App\Models\ForecastLog::where(['barangay_id'=>$areaId,'migration_type'=>$type,'log_month'=>$preview['log_month']])->whereNotNull('predicted_value')->first();
-            $forecasts[$type] = $saved?->history_snapshot ?? $preview;
-            $scores[$type] = $service->calculateForecastAccuracy($areaId, $type);
-        }
-        $reply = Barangay::findOrFail($areaId)->name.' — '.$forecasts['in']['log_month']."\n".
-            $service->generateHumanReadableSummary($forecasts['in']['predicted_value'], $forecasts['out']['predicted_value'],
-                $scores['in']['accuracy_rate'], $scores['out']['accuracy_rate']);
-        return ['reply'=>$reply, 'mode'=>'database_forecast', 'scope'=>AssistantLanguage::text('RBIM system only'),
-            'facts'=>['forecast_month'=>$forecasts['in']['log_month'],'forecasts'=>$forecasts,'accuracy'=>$scores,
-                'basis'=>'Pure PHP WMA or explicitly assumed population baseline; only verified closed months; no ML.'],
-            'actions'=>[['label'=>AssistantLanguage::text('Open relevant page'),'url'=>$url]],'suggestions'=>[]];
+        $url = route('prediction.dashboard', array_filter(['barangay_id' => $areaId]));
+        $reply = app()->getLocale() === 'ceb'
+            ? 'Dili na mohatag ang system og migration forecast. Makita gihapon ang aktuwal nga migration trends ug records. Ang forecast page naggamit karon sa population reports ug nagpakita sa MAE ug RMSE sa historical test periods.'
+            : 'The system no longer provides migration forecasts. Recorded migration trends and events remain available. The forecast page now uses population reports and shows MAE and RMSE for historical test periods.';
+        return ['reply'=>$reply, 'mode'=>'system_guidance', 'scope'=>AssistantLanguage::text('RBIM system only'),
+            'actions'=>[['label'=>AssistantLanguage::text('Open population forecast'),'url'=>$url]], 'suggestions'=>[]];
     }
 
     private function answer(string $reply): array

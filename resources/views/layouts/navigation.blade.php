@@ -9,7 +9,7 @@
                 ['municipal.barangays.index', 'municipal.barangays.*', 'directory', 'New Inhabitant Report'],
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
-                ...($user->isApproved() ? [['prediction.dashboard', ['prediction.*','municipal.prediction-*'], 'trend', 'Provisional estimates']] : []),
+                ...($user->isApproved() ? [['prediction.dashboard', ['prediction.*','municipal.prediction-*'], 'users', 'Population forecast']] : []),
                 ['concerns.summary', 'concerns.*', 'users', 'Concern summary'],
             ],
             'Maps' => [['spatial.index', 'spatial.index', 'map', 'Household map']],
@@ -31,7 +31,7 @@
             'Reports' => [
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
-                ...($user->isApproved() ? [['prediction.dashboard', 'prediction.*', 'trend', 'Provisional estimates']] : []),
+                ...($user->isApproved() ? [['prediction.dashboard', 'prediction.*', 'users', 'Population forecast']] : []),
             ],
             'Maps & surveys' => [
                 ['spatial.index', 'spatial.index', 'map', 'Household map'],

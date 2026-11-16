@@ -44,9 +44,11 @@ class AssistantGuide
                 'actions' => $permitted ? [['label' => $municipal ? AssistantLanguage::text('Concern Insights') : AssistantLanguage::text('Open Concerns'), 'url' => route($municipal ? 'concerns.summary' : 'concerns.index')]] : []];
         }
         if (preg_match('/\b(forecast readiness|ready for forecasting|migration trends)\b/u', $q)) {
-            return ['reply' => AssistantLanguage::text('Open Migration Trends to review recorded movements and the provisional next-month out-migration estimate when recent records are available. Missing records are not verified zero movement.'),
+            $migrationTrends = preg_match('/\bmigration trends\b/u', $q);
+            $route = $migrationTrends ? 'migration.dashboard' : 'prediction.dashboard';
+            return ['reply' => AssistantLanguage::text('Population Forecast uses completed semester reports and shows historical MAE and RMSE when enough consecutive reports are available. Migration Trends shows recorded arrivals and departures only; migration forecasts are not provided.'),
                 'scope' => AssistantLanguage::text('RBIM system only'), 'suggestions' => ['What can I ask?'],
-                'actions' => $user->hasAnyRole([User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU]) && $user->isApproved() ? [['label' => AssistantLanguage::text('Open Migration Trends'), 'url' => route('migration.dashboard')]] : []];
+                'actions' => $user->hasAnyRole([User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU]) && $user->isApproved() ? [['label' => AssistantLanguage::text($migrationTrends ? 'Open Migration Trends' : 'Open Population forecast'), 'url' => route($route)]] : []];
         }
         if (preg_match('/\b(what can i ask|what can you do|help|unsa.*mapangutana|sample questions)\b/u', $q)) {
             $reply = AssistantLanguage::text("You can ask in Cebuano or English. Try a complete question and include the barangay or reporting month when needed.\n\n")

@@ -62,14 +62,18 @@
                 @foreach($populationProjection['history'] as $row)<tr><td>{{ $row['label'] }}</td><td>{{ $row['population'] }}</td><td>{{ $row['age_sum'] }}</td><td>{{ in_array($row['id'], array_column($populationProjection['inputs'], 'id')) ? 'Yes' : 'No' }}</td><td><a href="{{ route('reports.population.submissions.show', $row['id']) }}">{{ $row['source'] === 'archive' ? 'Archived report' : 'Submitted report' }}</a></td></tr>@endforeach
             </tbody></table></div>
         @endif
-        @if($populationProjection['historical_check'])
-            @php($check=$populationProjection['historical_check'])
-            <div class="statistical-backtest"><strong>Historical one-step check · {{ $check['label'] }}</strong>
-                <p>Gamit ang tulo ka naunang actual reports: WMA estimate <b>{{ number_format($check['estimate'], 2) }}</b>; reported actual <b>{{ number_format($check['actual']) }}</b>. Kalainan: <b>{{ number_format($check['absolute_error'], 2) }}</b> inhabitants{{ $check['percentage_error'] === null ? '' : ' ('.number_format($check['percentage_error'], 2).'%)' }}.</p>
-                <p>Kung gisunod lang ang pinakabag-ong report, ang kalainan kay {{ number_format($check['last_report_error'], 2) }}. Usa ra kini ka historical example, ug adunay source reconciliation issues; dili pa ebidensya nga mas maayo o accurate ang future WMA.</p>
-            </div>
-        @endif
-        <p><b>Accuracy / MAPE:</b> wala pa ma-validate. Kinahanglan una ma-save ang forecast sa dili pa ang target semester, dayon i-compare sa verified actual report. Kini nga preview dili accuracy result.</p>
+        <div class="statistical-backtest" aria-label="Population forecast backtest metrics">
+            <strong>Historical one-step WMA backtest</strong>
+            @if(($populationProjection['test_periods'] ?? 0) > 0)
+                <p>MAE: <b>{{ number_format($populationProjection['mae'], 2) }}</b> inhabitants · RMSE: <b>{{ number_format($populationProjection['rmse'], 2) }}</b> inhabitants · Test semesters: <b>{{ $populationProjection['test_periods'] }}</b>.</p>
+                <p>Each test estimate used the previous three consecutive actual reports. These are retrospective results; a small test count is limited evidence.</p>
+                <div class="statistical-table"><table><thead><tr><th>Test semester</th><th>Training through</th><th>Predicted</th><th>Actual</th><th>Absolute error</th></tr></thead><tbody>
+                    @foreach($populationProjection['backtest'] as $test)<tr><td>{{ $test['label'] }}</td><td>{{ $test['training_through'] }}</td><td>{{ number_format($test['predicted'], 2) }}</td><td>{{ number_format($test['actual']) }}</td><td>{{ number_format($test['absolute_error'], 2) }}</td></tr>@endforeach
+                </tbody></table></div>
+            @else
+                <p>MAE ug RMSE wala pay sukod. Kinahanglan og labing menos upat ka sunod-sunod nga completed population reports para sa usa ka held-out test semester.</p>
+            @endif
+        </div>
         <p>Ang method mosunod sa past totals; dili niya mahibal-an ang kalit nga births, deaths, o migration.</p>
     </details>
 </section>

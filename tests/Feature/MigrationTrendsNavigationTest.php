@@ -55,7 +55,7 @@ class MigrationTrendsNavigationTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_old_link_keeps_role_access_and_assistant_points_to_migration_trends(): void
+    public function test_old_link_keeps_role_access_and_assistant_points_to_population_forecast(): void
     {
         $this->get(route('analysis.forecast-readiness'))->assertRedirect(route('login'));
         $resident = User::factory()->create(['role' => User::ROLE_RESIDENT]);
@@ -63,7 +63,7 @@ class MigrationTrendsNavigationTest extends TestCase
 
         $staff = User::factory()->create(['role' => User::ROLE_MUNICIPAL_LGU]);
         $this->actingAs($staff)->postJson(route('assistant.chat'), ['message' => 'Open forecast readiness'])
-            ->assertOk()->assertJsonPath('actions.0.url', route('migration.dashboard'));
+            ->assertOk()->assertJsonPath('actions.0.url', route('prediction.dashboard'));
         $this->postJson(route('assistant.chat'), ['message' => 'Open migration trends'])
             ->assertOk()->assertJsonPath('actions.0.url', route('migration.dashboard'));
     }

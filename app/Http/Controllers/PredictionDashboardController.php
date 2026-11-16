@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Barangay, ForecastLog, Inhabitant, MigrationLog, MigrationRecord, User};
+use App\Models\{Barangay, Inhabitant, MigrationLog, MigrationRecord, User};
 use App\Services\{MigrationPredictionService, StatisticalMigrationLogSync};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +14,7 @@ class PredictionDashboardController extends Controller
     // Dependency Injection: Laravel maoy mohimo sa local PHP service.
     public function __construct(private MigrationPredictionService $prediction) {}
 
-    private function area(Request $request): Barangay
+    private function area(Request $request, ?string $defaultBarangay = null): Barangay
     {
         $user = $request->user();
         abort_unless($user && $user->isApproved() && $user->hasAnyRole([User::ROLE_BARANGAY, User::ROLE_MUNICIPAL_LGU]), 403);
@@ -25,8 +25,10 @@ class PredictionDashboardController extends Controller
             abort_if($request->filled('barangay_id') && $request->integer('barangay_id') !== (int) $user->barangay_id, 403);
             return Barangay::findOrFail($user->barangay_id);
         }
-        return $request->filled('barangay_id') ? Barangay::findOrFail($request->integer('barangay_id'))
-            : ($user->barangay_id ? Barangay::findOrFail($user->barangay_id) : Barangay::orderBy('name')->firstOrFail());
+        if ($request->filled('barangay_id')) return Barangay::findOrFail($request->integer('barangay_id'));
+        if ($user->barangay_id) return Barangay::findOrFail($user->barangay_id);
+        if ($defaultBarangay) return Barangay::where('name', $defaultBarangay)->firstOrFail();
+        return Barangay::orderBy('name')->firstOrFail();
     }
 
     private function ready(): void
@@ -37,8 +39,8 @@ class PredictionDashboardController extends Controller
 
     public function index(Request $request)
     {
-        $barangay = $this->area($request);
-        $forecastPage = $request->routeIs('prediction.migration') ? 'migration' : 'population';
+        $forecastPage = $request->routeIs('prediction.migration') ? 'records' : 'population';
+        $barangay = $this->area($request, $forecastPage === 'population' ? 'Carnaga' : null);
         $barangays = $request->user()->hasRole(User::ROLE_MUNICIPAL_LGU) ? Barangay::orderBy('name')->get(['id', 'name']) : collect([$barangay]);
         $chartData = app(\App\Services\PredictionChartData::class);
         if ($forecastPage === 'population') {
@@ -49,40 +51,14 @@ class PredictionDashboardController extends Controller
         }
 
         $this->ready();
-        $forecasts = []; $accuracies = []; $history = [];
-        foreach (['in', 'out'] as $type) {
-            $preview = $this->prediction->forecastNextMonth($barangay->id, $type);
-            $saved = ForecastLog::where(['barangay_id' => $barangay->id, 'migration_type' => $type, 'log_month' => $preview['log_month']])
-                ->whereNotNull('predicted_value')->first();
-            $forecasts[$type] = ($saved?->history_snapshot ?? $preview) + ['saved_at' => $saved?->issued_at?->toIso8601String()];
-            $accuracies[$type] = $this->prediction->calculateForecastAccuracy($barangay->id, $type);
-            $history[$type] = $this->prediction->history($barangay->id, $type);
-        }
-        $summary = $this->prediction->generateHumanReadableSummary($forecasts['in']['predicted_value'], $forecasts['out']['predicted_value'],
-            $accuracies['in']['accuracy_rate'], $accuracies['out']['accuracy_rate']);
-        $logs = ForecastLog::where('barangay_id', $barangay->id)->whereNotNull('predicted_value')
-            ->orderByDesc('log_month')->orderBy('migration_type')->paginate(24)->fragment('saved-forecasts');
-        $logChecks = [];
-        foreach ($logs as $log) $logChecks[$log->id] = $this->prediction->monthSnapshot($barangay->id, $log->migration_type, $log->log_month);
+        $history = [];
+        foreach (['in', 'out'] as $type) $history[$type] = $this->prediction->history($barangay->id, $type);
         $movements = MigrationLog::actualRecords()->with('resident')->where('barangay_id', $barangay->id)->orderByDesc('transaction_date')->orderByDesc('id')->limit(20)->get();
         $residents = Inhabitant::withoutMigrationDemo()->where('barangay_id', $barangay->id)->orderBy('last_name')->orderBy('first_name')
             ->get(['id', 'first_name', 'middle_name', 'last_name', 'suffix']);
-        $migrationCharts = $chartData->migration($barangay->id, $history, $forecasts);
-        $reportHistoryEvaluation = app(\App\Services\TinagoReportHistoryEvaluation::class)->forBarangay($barangay);
-        return view('barangay.dashboard.prediction', compact('barangay', 'barangays', 'forecastPage', 'forecasts', 'accuracies', 'history', 'summary', 'logs', 'logChecks', 'movements', 'residents', 'migrationCharts', 'reportHistoryEvaluation'));
-    }
-
-    public function store(Request $request)
-    {
-        $barangay = $this->area($request); $this->ready();
-        $request->validate(['target_month' => ['required', 'date_format:Y-m']]);
-        if ($request->input('target_month') !== $this->prediction->calendar()->startOfMonth()->addMonth()->format('Y-m')) {
-            throw ValidationException::withMessages(['target_month' => 'Na-usab na ang target month. I-refresh ang page.']);
-        }
-        DB::transaction(function () use ($barangay) {
-            foreach (['in', 'out'] as $type) $this->prediction->issueForecast($barangay->id, $type);
-        });
-        return redirect()->route('prediction.migration', ['barangay_id' => $barangay->id])->with('status', 'Na-save ang first-issued forecasts. Dili kini ma-overwrite sa sunod nga refresh.');
+        $reviewError = session()->hasOldInput('log_month') || session()->hasOldInput('confirm_complete');
+        $movementError = session()->hasOldInput('resident_id') || session()->hasOldInput('transaction_date');
+        return view('barangay.dashboard.migration-records', compact('barangay', 'barangays', 'history', 'movements', 'residents', 'reviewError', 'movementError'));
     }
 
     public function verify(Request $request)
@@ -92,6 +68,13 @@ class PredictionDashboardController extends Controller
             'source_hash' => ['required', 'regex:/^[a-f0-9]{64}$/'], 'confirm_complete' => ['required', 'accepted']]);
         $this->prediction->confirmActualMonth($barangay->id, $data['migration_type'], $data['log_month'], $request->user()->id, $data['source_hash']);
         return redirect()->route('prediction.migration', ['barangay_id' => $barangay->id])->with('status', 'Na-confirm ang complete month. Ang actual count gikan mismo sa dated movement logs.');
+    }
+
+    public function retiredStore(Request $request)
+    {
+        $barangay = $this->area($request, 'Carnaga');
+        return redirect()->route('prediction.dashboard', ['barangay_id' => $barangay->id])
+            ->with('status', 'Migration forecasting is retired. Population forecast remains available.');
     }
 
     public function sync(Request $request, StatisticalMigrationLogSync $sync)
