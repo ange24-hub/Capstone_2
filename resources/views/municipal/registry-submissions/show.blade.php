@@ -17,12 +17,22 @@
         </div>
     </header>
 
-    <p>Submitted by {{ $submission->submitter?->name ?? 'Account unavailable' }} on {{ $submission->submitted_at->timezone('Asia/Manila')->format('M d, Y h:i A') }}. This read-only copy keeps the submitted registry layout.</p>
-    <details class="statistical-details"><summary>Snapshot integrity hash</summary><code>{{ $submission->snapshot_hash }}</code></details>
+    <p>Submitted by {{ $submission->submitter?->name ?? 'Account unavailable' }} on {{ $submission->submitted_at->timezone('Asia/Manila')->format('M d, Y h:i A') }}.</p>
 
-    <div class="workflow-card rounded-xl border border-slate-200 bg-white p-4">
-        <h2 class="section-title text-lg font-semibold text-slate-900">Consolidated household record of barangay inhabitants (RBI)</h2>
-        <p>Barangay: {{ $submission->barangay_name }} · Residents: {{ number_format($submission->record_count) }}</p>
+    <div class="registry-table-summary">
+        <p class="text-center font-semibold">Republic of the Philippines</p>
+        <p class="text-center">Province of Southern Leyte</p>
+        <p class="text-center">Municipality of Tomas Oppus</p>
+        <h3>{{ strtoupper($submission->scopeLabel()) }}</h3>
+        <dl>
+            <div><dt>Region</dt><dd>VIII</dd></div>
+            <div><dt>Province</dt><dd>Southern Leyte</dd></div>
+            <div><dt>Municipality</dt><dd>Tomas Oppus</dd></div>
+            <div><dt>Barangay</dt><dd>{{ $submission->barangay_name }}</dd></div>
+            <div><dt>Households</dt><dd>{{ number_format($householdCount) }}</dd></div>
+            <div><dt>Residents</dt><dd>{{ number_format($submission->record_count) }}</dd></div>
+        </dl>
+        <p class="text-center text-sm">Submitted {{ $submission->submitted_at->timezone('Asia/Manila')->format('M d, Y h:i A') }} · Read-only registry snapshot</p>
     </div>
 
     <div tabindex="0" role="region" aria-label="Submitted resident records; scroll horizontally for all columns" class="table-wrap registry-document-table w-full overflow-x-auto rounded-xl border border-slate-200">

@@ -77,7 +77,10 @@ class RegistryReportSubmissionController extends Controller
 
     public function show(RegistryReportSubmission $submission)
     {
-        return view('municipal.registry-submissions.show', compact('submission'));
+        $householdCount = collect($submission->snapshot ?? [])
+            ->pluck('household_number')->filter()->unique()->count();
+
+        return view('municipal.registry-submissions.show', compact('submission', 'householdCount'));
     }
 
     public function download(RegistryReportSubmission $submission): StreamedResponse
