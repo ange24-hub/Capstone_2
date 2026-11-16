@@ -25,6 +25,10 @@ gosu www-data php artisan view:cache
 if [ "${RUN_MIGRATIONS:-false}" = 'true' ]; then
     gosu www-data php artisan migrate --force --no-interaction
 else
+    # The registry-submission feature uses one additive, tracked table migration.
+    # Keep unrelated application migrations opt-in while preparing this feature storage.
+    gosu www-data php artisan migrate --path=database/migrations/2026_11_15_000001_create_registry_report_submissions_table.php --force --no-interaction \
+        || echo 'Registry submission storage preparation failed; review app logs before using this feature.' >&2
     gosu www-data php artisan migration:prepare-forecast-storage --no-interaction
     gosu www-data php artisan rbi:prepare-certification-storage --no-interaction
     gosu www-data php artisan rbi:prepare-consolidation-status --no-interaction
