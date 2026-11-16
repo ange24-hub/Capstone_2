@@ -82,17 +82,31 @@ class RegistryReportSubmissionController extends Controller
 
     public function download(RegistryReportSubmission $submission): StreamedResponse
     {
-        $headers = ['Household No.', 'Family No.', 'Last Name', 'First Name', 'Middle Name', 'Suffix',
-            'Relationship', 'Purok', 'Birth Place', 'Birth Date', 'Recorded Age', 'Sex', 'Civil Status',
-            'Education', 'Religion', 'Occupation', 'Remarks', 'Ethnicity', 'Residence Status'];
+        $columns = [
+            'household_number' => 'HH No.', 'family_number' => 'Family No.', 'last_name' => 'Last Name',
+            'first_name' => 'First Name', 'middle_name' => 'Middle Name', 'suffix' => 'Qualifier',
+            'relationship_to_head' => 'Relationship to Household Head', 'purok' => 'Purok / Sitio',
+            'birth_place' => 'Place of Birth', 'birth_date' => 'Birth (mm-dd-yy)', 'recorded_age' => 'Age',
+            'sex' => 'Sex (M/F)', 'civil_status' => 'Civil Status', 'education_level' => 'Grade/Year/Level Completed',
+            'religion' => 'Religion', 'occupation' => 'Occupation', 'remarks' => 'Other Info', 'ethnicity' => 'Ethnicity',
+        ];
+        $headers = array_values($columns);
         $filename = $submission->reference().'-'.str_replace(' ', '-', $submission->barangay_name).'.csv';
 
-        return response()->streamDownload(function () use ($submission, $headers): void {
+        return response()->streamDownload(function () use ($submission, $headers, $columns): void {
             $file = fopen('php://output', 'w');
             fwrite($file, "\xEF\xBB\xBF");
             fputcsv($file, $headers, ',', '"', '');
             foreach ($submission->snapshot ?? [] as $row) {
-                $values = array_values($row);
+                $values = array_map(fn ($key) => $row[$key] ?? '', array_keys($columns));
+                if (!empty($row['birth_date'])) {
+                    $dateIndex = array_search('birth_date', array_keys($columns), true);
+                    $values[$dateIndex] = \Carbon\Carbon::parse($row['birth_date'])->format('m-d-y');
+                }
+                if (isset($row['sex'])) {
+                    $sexIndex = array_search('sex', array_keys($columns), true);
+                    $values[$sexIndex] = ['Male' => 'M', 'Female' => 'F'][$row['sex']] ?? $row['sex'];
+                }
                 $values = array_map(fn ($value) => preg_match('/^[=+@\-\t\r]/', (string) $value) ? "'".$value : $value, $values);
                 fputcsv($file, $values, ',', '"', '');
             }
