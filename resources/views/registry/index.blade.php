@@ -28,6 +28,10 @@
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'living_elsewhere']) }}">Registered, Living Elsewhere</a>
                 <a class="button secondary-button" href="{{ route('barangay.residence.index', ['scope'=>'unconfirmed']) }}">Residence Needs Confirmation</a>
                 <a class="button secondary-button" href="{{ route('barangay.registry.download', ['scope' => 'consolidated']) }}">Download Consolidated Excel</a>
+                <form method="POST" action="{{ route('barangay.registry-submissions.store') }}" onsubmit="return confirm('Submit a read-only snapshot of all active registered inhabitants to Municipal DILG/Admin?')">
+                    @csrf<input type="hidden" name="scope" value="registered">
+                    <button class="button" type="submit">Submit registry to Municipal DILG/Admin</button>
+                </form>
             </div>
         @endif
 

@@ -15,6 +15,10 @@
             @php($reportScope = $scope === App\Models\Inhabitant::RESIDENCE_HERE ? 'registered' : $scope)
             <a class="button secondary-button" href="{{ route('barangay.registry.print', ['scope' => $reportScope]) }}" target="_blank" rel="noopener">Print this list</a>
             <a class="button" href="{{ route('barangay.registry.download', ['scope' => $reportScope]) }}">Download Excel</a>
+            <form method="POST" action="{{ route('barangay.registry-submissions.store') }}" onsubmit="return confirm('Submit this {{ App\Models\Inhabitant::residenceLabels()[$scope] }} snapshot to Municipal DILG/Admin?')">
+                @csrf<input type="hidden" name="scope" value="{{ $scope }}">
+                <button class="button" type="submit">Submit this list to Municipal DILG/Admin</button>
+            </form>
         </div>
     </div>
     @if(session('status'))<div class="success rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{{ session('status') }}</div>@endif

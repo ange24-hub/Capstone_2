@@ -7,6 +7,7 @@
             ],
             'Reports' => [
                 ['municipal.barangays.index', 'municipal.barangays.*', 'directory', 'New Inhabitant Report'],
+                ['municipal.registry-submissions.index', 'municipal.registry-submissions.*', 'users', 'Registry submissions'],
                 ['reports.population', 'reports.population*', 'document', 'Population reports'],
                 ['reports.migration', 'reports.migration*', 'document', 'Migration reports'],
                 ...($user->isApproved() ? [['prediction.dashboard', ['prediction.*','municipal.prediction-*'], 'users', 'Population forecast']] : []),

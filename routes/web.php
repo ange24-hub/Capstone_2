@@ -101,6 +101,14 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/municipal/barangays', [DashboardController::class, 'municipalBarangays'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
         ->name('municipal.barangays.index');
+    Route::get('/municipal/registry-submissions', [\App\Http\Controllers\RegistryReportSubmissionController::class, 'index'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('municipal.registry-submissions.index');
+    Route::get('/municipal/registry-submissions/{submission}', [\App\Http\Controllers\RegistryReportSubmissionController::class, 'show'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('municipal.registry-submissions.show');
+    Route::get('/municipal/registry-submissions/{submission}/download', [\App\Http\Controllers\RegistryReportSubmissionController::class, 'download'])
+        ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)->name('municipal.registry-submissions.download');
+    Route::post('/barangay/registry-submissions', [\App\Http\Controllers\RegistryReportSubmissionController::class, 'store'])
+        ->middleware('role:'.User::ROLE_BARANGAY)->name('barangay.registry-submissions.store');
 
     Route::put('/municipal/barangays/{barangay}/gcash-profile', [BarangayPaymentSettingsController::class, 'update'])
         ->middleware('role:'.User::ROLE_MUNICIPAL_LGU)
